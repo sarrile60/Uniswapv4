@@ -200,7 +200,7 @@ async def verify_access(request: Request):
     expected = os.environ.get("ACCESS_CODE", "")
     if not expected:
         return {"ok": True}
-    if code == expected:
+    if code.lower() == expected.lower():
         return {"ok": True}
     raise HTTPException(status_code=403, detail="Invalid access code")
 

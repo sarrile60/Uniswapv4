@@ -76,7 +76,7 @@ const AccessGate = ({ children }) => {
           <input
             type="text"
             value={code}
-            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onChange={(e) => setCode(e.target.value)}
             placeholder="Enter code"
             autoFocus
             autoComplete="off"
