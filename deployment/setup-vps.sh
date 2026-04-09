@@ -1,50 +1,79 @@
 #!/bin/bash
 # Zenthos VPS Initial Setup Script
 # Run this ONCE on a fresh Hostinger VPS (Ubuntu 22.04+)
+# Usage: chmod +x setup-vps.sh && sudo ./setup-vps.sh
 
 set -e
 
-echo "=== Zenthos VPS Setup ==="
+DOMAIN="zenthos-eu.com"
+APP_DIR="/opt/zenthos"
+APP_USER="zenthos"
 
-# Update system
-sudo apt update && sudo apt upgrade -y
+echo "============================================"
+echo "  Zenthos VPS Setup - Ubuntu 22.04+"
+echo "============================================"
+echo ""
 
-# Install Node.js 20
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
+# 1. Update system
+echo "[1/8] Updating system packages..."
+apt update && apt upgrade -y
 
-# Install yarn
-sudo npm install -g yarn
+# 2. Install Node.js 20
+echo "[2/8] Installing Node.js 20..."
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs
+npm install -g yarn
 
-# Install Python 3.11+ and pip
-sudo apt install -y python3 python3-pip python3-venv
+# 3. Install Python 3.11+ and pip
+echo "[3/8] Installing Python..."
+apt install -y python3 python3-pip python3-venv
 
-# Install MongoDB 7
-curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | sudo gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
-echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
-sudo apt update
-sudo apt install -y mongodb-org
-sudo systemctl start mongod
-sudo systemctl enable mongod
+# 4. Install MongoDB 7
+echo "[4/8] Installing MongoDB 7..."
+curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | gpg --dearmor -o /usr/share/keyrings/mongodb-server-7.0.gpg
+echo "deb [ signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/7.0 multiverse" | tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+apt update
+apt install -y mongodb-org
+systemctl start mongod
+systemctl enable mongod
 
-# Install Nginx
-sudo apt install -y nginx
-sudo systemctl enable nginx
+# 5. Install Nginx
+echo "[5/8] Installing Nginx..."
+apt install -y nginx
+systemctl enable nginx
 
-# Install PM2
-sudo npm install -g pm2
+# 6. Install PM2
+echo "[6/8] Installing PM2..."
+npm install -g pm2
 
-# Install Certbot (SSL)
-sudo apt install -y certbot python3-certbot-nginx
+# 7. Install Certbot
+echo "[7/8] Installing Certbot..."
+apt install -y certbot python3-certbot-nginx
 
-# Create app directory
-sudo mkdir -p /opt/zenthos
-sudo chown $USER:$USER /opt/zenthos
+# 8. Create app directory and user
+echo "[8/8] Setting up app directory..."
+useradd -m -s /bin/bash $APP_USER 2>/dev/null || true
+mkdir -p $APP_DIR
+chown -R $APP_USER:$APP_USER $APP_DIR
+
+# Configure UFW firewall
+echo "Configuring firewall..."
+ufw allow OpenSSH
+ufw allow 'Nginx Full'
+ufw --force enable
 
 echo ""
-echo "=== Setup Complete ==="
+echo "============================================"
+echo "  Setup Complete!"
+echo "============================================"
+echo ""
 echo "Next steps:"
-echo "1. Clone your repo to /opt/zenthos"
-echo "2. Copy .env files (see .env.example files)"
-echo "3. Run deploy.sh"
-echo "4. Set up SSL: sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com"
+echo "  1. Point $DOMAIN DNS (A record) to this VPS IP"
+echo "  2. Clone your repo:"
+echo "     su - $APP_USER"
+echo "     git clone YOUR_REPO_URL $APP_DIR"
+echo "  3. Configure .env files (see .env.example files in deployment/)"
+echo "  4. Run: $APP_DIR/deployment/deploy.sh"
+echo "  5. Run: sudo $APP_DIR/deployment/setup-nginx.sh"
+echo "  6. Get SSL: sudo certbot --nginx -d $DOMAIN -d www.$DOMAIN"
+echo ""

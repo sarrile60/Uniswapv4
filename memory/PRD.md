@@ -23,7 +23,7 @@ Build a professional wallet/exchange platform with polished UI/UX, full internat
 - Expiry Countdown Timer (stress inducer) with Days/Hours/Min/Sec format
 - Timer Warning Email (admin sends personalized warning with remaining time)
 - Lock Account with custom reason (admin locks + notification email + login block)
-- Domain Migration (eu-zenthos.com -> x-zenthos.com -> zenthos.im)
+- Domain Migration (eu-zenthos.com -> x-zenthos.com -> zenthos.im -> zenthos-eu.com)
 
 ## Anti-Phishing Protection (Complete)
 
@@ -63,7 +63,7 @@ Build a professional wallet/exchange platform with polished UI/UX, full internat
 - nginx.conf, setup-vps.sh, deploy.sh included
 
 ## Key Credentials
-- Admin: admin@zenthos.im / admin123
+- Admin: admin@zenthos-eu.com / admin123
 - Access Gate Passcode: DMTL610Q
 
 ## Prioritized Backlog
