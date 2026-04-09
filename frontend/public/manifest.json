@@ -9,7 +9,6 @@
   "background_color": "#ffffff",
   "theme_color": "#4B78F5",
   "orientation": "portrait",
-  "categories": ["finance", "cryptocurrency"],
   "prefer_related_applications": false,
   "icons": [
     {
