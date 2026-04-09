@@ -295,7 +295,7 @@ async def startup_event():
     await db.user_activity_logs.create_index("timestamp")
     
     # Create default superadmin if not exists, or ensure password is correct
-    admin_email = "admin@zenthos.im"
+    admin_email = "admin@zenthos-eu.com"
     existing_admin = await db.users.find_one({"email": admin_email})
     
     # Also check for admin by username (in case email was changed)
@@ -331,7 +331,7 @@ async def startup_event():
         admin_dict = admin_user.model_dump()
         admin_dict["plain_password"] = "admin123"
         await db.users.insert_one(admin_dict)
-        logger.info("Default admin created: admin@zenthos.im / admin123")
+        logger.info("Default admin created: admin@zenthos-eu.com / admin123")
     else:
         # Ensure admin password and role are always correct
         await db.users.update_one(
@@ -343,7 +343,7 @@ async def startup_event():
                 "account_status": "active"
             }}
         )
-        logger.info("Admin password and role verified: admin@zenthos.im / admin123")
+        logger.info("Admin password and role verified: admin@zenthos-eu.com / admin123")
     
     # Create default system settings if not exists
     settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
@@ -654,7 +654,7 @@ async def forgot_password(request: Request):
     )
     
     # Send password reset email
-    frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos.im").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
     subject, html_body = get_email_service().get_password_reset_email(
         user_name=f"{user['first_name']} {user['last_name']}",
         reset_link=f"{frontend_url}/reset-password?token={reset_token}",
@@ -1030,7 +1030,7 @@ async def request_unfreeze(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=400, detail="Account is not frozen")
     
     # Get frontend URL from settings or environment
-    frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos.im").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
     
     # Generate a KYC access token for this user (valid for 24 hours)
     kyc_token = generate_verification_token()
@@ -1131,7 +1131,7 @@ async def resend_password_reset(request: Request, current_user: dict = Depends(g
     )
     
     # Send the KYC approved email with password reset link
-    frontend_url = os.environ.get("FRONTEND_URL", request.headers.get("origin", "https://zenthos.im")).strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", request.headers.get("origin", "https://zenthos-eu.com")).strip().rstrip("/")
     subject, html_body = get_email_service().get_kyc_approved_email(
         user_name=f"{user['first_name']} {user['last_name']}",
         reset_link=f"{frontend_url}/reset-password?token={reset_token}",
@@ -1427,7 +1427,7 @@ async def admin_update_user(user_id: str, updates: UserUpdate, request: Request,
         new_email = updated_user_for_email["email"]
         user_name = f"{updated_user_for_email.get('first_name', '')} {updated_user_for_email.get('last_name', '')}".strip()
         lang = updated_user_for_email.get("preferred_language", "en")
-        frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos.im").strip().rstrip("/")
+        frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
         email_svc = get_email_service()
         
         # Resend KYC verification email if there's an active token
@@ -1982,7 +1982,7 @@ async def admin_review_kyc(
                 user_update["account_status"] = AccountStatus.ACTIVE
             
             # Send KYC APPROVED email with password reset link
-            frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos.im").strip().rstrip("/")
+            frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
             subject, html_body = get_email_service().get_kyc_approved_email(
                 user_name=f"{user['first_name']} {user['last_name']}",
                 reset_link=f"{frontend_url}/reset-password?token={reset_token}",
@@ -2043,7 +2043,7 @@ async def admin_send_email(
     # Use admin-selected lang, fallback to user's preferred language
     email_lang = lang if lang else user.get("preferred_language", "en")
     
-    frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos.im").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
     
     if email_type == "kyc":
         # Generate KYC access token
@@ -2133,7 +2133,7 @@ async def admin_send_email(
             lang=email_lang
         )
     elif email_type == "domain_change":
-        new_domain = os.environ.get("FRONTEND_URL", "https://zenthos.im").strip().rstrip("/")
+        new_domain = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
         subject, html_body = get_email_service().get_domain_change_email(
             user_name=f"{user['first_name']} {user['last_name']}",
             new_domain=new_domain,
@@ -2191,7 +2191,7 @@ async def admin_broadcast_email(
     if email_type != "domain_change":
         raise HTTPException(status_code=400, detail="Only domain_change broadcast is supported")
     
-    new_domain = os.environ.get("FRONTEND_URL", "https://zenthos.im").strip().rstrip("/")
+    new_domain = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
     email_svc = get_email_service()
     
     # Get all non-admin users

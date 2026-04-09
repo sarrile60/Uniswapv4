@@ -14,7 +14,7 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
 ACCESS_CODE = "DMTL610Q"
-ADMIN_EMAIL = "admin@zenthos.im"
+ADMIN_EMAIL = "admin@zenthos-eu.com"
 ADMIN_PASSWORD = "admin123"
 
 

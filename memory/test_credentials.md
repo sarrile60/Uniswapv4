@@ -1,7 +1,7 @@
 # Test Credentials
 
 ## Admin Account
-- Email: admin@zenthos.im
+- Email: admin@zenthos-eu.com
 - Password: admin123
 
 ## Access Gate
