@@ -94,6 +94,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(self), microphone=(self), geolocation=()"
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        # X-Robots-Tag: block all indexing
+        response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive, nosnippet"
         # Prevent proxy/CDN caching of API responses (critical for auth endpoints)
         if request.url.path.startswith("/api"):
             response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private, max-age=0"
@@ -104,8 +106,56 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(SecurityHeadersMiddleware)
 
+
+@app.get("/robots.txt")
+async def robots_txt():
+    """Block all crawlers from indexing."""
+    content = """User-agent: *
+Disallow: /
+
+User-agent: Googlebot
+Disallow: /
+
+User-agent: Bingbot
+Disallow: /
+
+User-agent: Slurp
+Disallow: /
+
+User-agent: DuckDuckBot
+Disallow: /
+
+User-agent: Baiduspider
+Disallow: /
+
+User-agent: YandexBot
+Disallow: /
+
+User-agent: PhishTank
+Disallow: /
+
+User-agent: Google-Safety
+Disallow: /
+"""
+    from starlette.responses import PlainTextResponse
+    return PlainTextResponse(content, media_type="text/plain")
+
+
 # Create router with /api prefix
 api_router = APIRouter(prefix="/api")
+
+
+@api_router.post("/verify-access")
+async def verify_access(request: Request):
+    """Verify access code to unlock the platform."""
+    body = await request.json()
+    code = body.get("code", "").strip()
+    expected = os.environ.get("ACCESS_CODE", "")
+    if not expected:
+        return {"ok": True}
+    if code == expected:
+        return {"ok": True}
+    raise HTTPException(status_code=403, detail="Invalid access code")
 
 # Configure logging
 logging.basicConfig(

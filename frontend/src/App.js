@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import AccessGate from "@/components/AccessGate";
 
 import { LangProvider } from "@/i18n";
 
@@ -202,14 +203,16 @@ function AppRoutes() {
 function App() {
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        <LangProvider>
-          <AuthProvider>
-            <AppRoutes />
-            <Toaster position="top-right" richColors />
-          </AuthProvider>
-        </LangProvider>
-      </BrowserRouter>
+      <AccessGate>
+        <BrowserRouter>
+          <LangProvider>
+            <AuthProvider>
+              <AppRoutes />
+              <Toaster position="top-right" richColors />
+            </AuthProvider>
+          </LangProvider>
+        </BrowserRouter>
+      </AccessGate>
     </ErrorBoundary>
   );
 }
