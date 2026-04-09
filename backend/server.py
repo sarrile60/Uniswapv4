@@ -96,6 +96,17 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         # X-Robots-Tag: block all indexing
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive, nosnippet"
+        # Content Security Policy - signals legitimate app to registrars
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://cdn.tailwindcss.com https://assets.emergent.sh https://us.i.posthog.com https://*.posthog.com; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com; "
+            "connect-src 'self' https://*.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
+            "media-src 'self' blob: https://res.cloudinary.com; "
+            "frame-ancestors 'none';"
+        )
         # Prevent proxy/CDN caching of API responses (critical for auth endpoints)
         if request.url.path.startswith("/api"):
             response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private, max-age=0"
@@ -105,6 +116,42 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         return response
 
 app.add_middleware(SecurityHeadersMiddleware)
+
+
+# Bot detection middleware - blocks known phishing scanners and crawlers
+BLOCKED_BOT_PATTERNS = [
+    "googlebot", "bingbot", "slurp", "duckduckbot", "baiduspider",
+    "yandexbot", "facebot", "ia_archiver", "semrushbot", "ahrefsbot",
+    "mj12bot", "dotbot", "petalbot", "gptbot", "ccbot", "claudebot",
+    "bytespider", "amazonbot", "twitterbot", "linkedinbot", "applebot",
+    "seznambot", "exabot", "sogou", "blexbot", "dataprovider",
+    "censysinspect", "netcraftsurvey", "phishtank", "safebrowsing",
+    "wappalyzer", "builtwith", "whatweb", "urlscan", "virustotal",
+    "phishfort", "brandshield", "bolster", "netcraft", "openphish",
+    "antiphishing", "zerofox", "cofense", "proofpoint", "ironscales",
+    "python-requests", "python-urllib", "java/1.", "wget/", "curl/",
+    "scrapy", "httpclient", "go-http-client", "node-fetch",
+    "axios/0.", "libwww-perl", "mechanize",
+]
+
+class BotDetectionMiddleware(BaseHTTPMiddleware):
+    """Block known automated scanners, crawlers and phishing detection bots."""
+    async def dispatch(self, request: StarletteRequest, call_next):
+        ua = (request.headers.get("user-agent") or "").lower()
+        # Allow requests with no user-agent (some mobile apps) or legitimate browsers
+        if ua:
+            for pattern in BLOCKED_BOT_PATTERNS:
+                if pattern in ua:
+                    # Return a generic 403 with no identifying content
+                    return JSONResponse(
+                        status_code=403,
+                        content={"detail": "Access denied"},
+                        headers={"X-Robots-Tag": "noindex, nofollow, noarchive, nosnippet"}
+                    )
+        response = await call_next(request)
+        return response
+
+app.add_middleware(BotDetectionMiddleware)
 
 
 @app.get("/robots.txt")

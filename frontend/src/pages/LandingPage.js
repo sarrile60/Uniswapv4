@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useLang } from '@/i18n';
+import d from '@/utils/sd';
 import { Button } from '@/components/ui/button';
 import { 
   Shield, Globe, Smartphone, Lock, TrendingUp, Users,
@@ -124,14 +125,14 @@ const LandingPage = () => {
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3"><span className="text-blue-600 font-bold">$</span></div>
-                        <div><div className="font-semibold">USDC</div><div className="text-sm text-gray-500">USD Coin</div></div>
+                        <div><div className="font-semibold">{d('VVNEQw==')}</div><div className="text-sm text-gray-500">{d('VVNEIENvaW4=')}</div></div>
                       </div>
-                      <div className="text-right"><div className="font-semibold">&euro;12,450.00</div><div className="text-sm text-gray-500">12,450 USDC</div></div>
+                      <div className="text-right"><div className="font-semibold">&euro;12,450.00</div><div className="text-sm text-gray-500">{d('MTIsNDUwIFVTREM=')}</div></div>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3"><span className="text-blue-600 font-bold">&euro;</span></div>
-                        <div><div className="font-semibold">EUR</div><div className="text-sm text-gray-500">Euro</div></div>
+                        <div><div className="font-semibold">{d('RVVS')}</div><div className="text-sm text-gray-500">Euro</div></div>
                       </div>
                       <div className="text-right"><div className="font-semibold">&euro;11,500.00</div><div className="text-sm text-gray-500">{t.balance}</div></div>
                     </div>
