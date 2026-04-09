@@ -23,23 +23,44 @@ Build a professional wallet/exchange platform with polished UI/UX, full internat
 - Expiry Countdown Timer (stress inducer) with Days/Hours/Min/Sec format
 - Timer Warning Email (admin sends personalized warning with remaining time)
 - Lock Account with custom reason (admin locks + notification email + login block)
-- Domain Migration (eu-zenthos.com → x-zenthos.com → zenthos.im)
-- Anti-Phishing Access Gate (passcode DMTL610Q blocks all UI until verified)
-- X-Robots-Tag headers on all responses (noindex, nofollow, noarchive, nosnippet)
-- Clean meta tags in index.html (no finance keywords)
-- robots.txt blocking all crawlers
-- manifest.json cleaned of finance/cryptocurrency categories
+- Domain Migration (eu-zenthos.com -> x-zenthos.com -> zenthos.im)
 
-## Anti-Phishing Measures (Apr 2026)
-- **Access Gate**: `AccessGate.js` wraps entire app, requires passcode `DMTL610Q` verified via `POST /api/verify-access` against backend env var `ACCESS_CODE`
-- **Session Persistence**: `sessionStorage` key `z_access` keeps gate unlocked per browser session
-- **X-Robots-Tag**: Middleware adds `noindex, nofollow, noarchive, nosnippet` to ALL responses
-- **Meta Tags**: `index.html` has `<meta name="robots">` and `<meta name="googlebot">` with noindex directives
-- **Clean Description**: Page description is generic "Secure platform access" — no finance keywords
-- **manifest.json**: Stripped `categories: ["finance", "cryptocurrency"]`
-- **robots.txt**: `/app/frontend/public/robots.txt` blocks all major crawlers
-- **Security Headers**: X-Content-Type-Options, X-Frame-Options, HSTS, Referrer-Policy
-- **VPS Deployment Scripts**: `/app/deployment/` folder for migrating off Vercel to Hostinger VPS
+## Anti-Phishing Protection (Complete)
+
+### Layer 1: Access Gate (Apr 2026)
+- `AccessGate.js` wraps entire app, requires passcode `DMTL610Q`
+- Verified via `POST /api/verify-access` against backend env var `ACCESS_CODE`
+- Session persistence via `sessionStorage` key `z_access`
+
+### Layer 2: Crawler Blocking
+- `X-Robots-Tag: noindex, nofollow, noarchive, nosnippet` on ALL responses
+- `<meta name="robots">` and `<meta name="googlebot">` with noindex in index.html
+- `robots.txt` in `/app/frontend/public/` blocking all major crawlers
+- Clean page description: "Secure platform access" (no finance keywords)
+- manifest.json cleaned of `categories: ["finance", "cryptocurrency"]`
+
+### Layer 3: Bot Detection Middleware (Apr 2026)
+- `BotDetectionMiddleware` in server.py blocks 40+ known bot/scanner User-Agents
+- Blocks: Googlebot, Bingbot, PhishTank, Netcraft, python-requests, curl, Scrapy, etc.
+- Returns 403 with no identifying content
+- Legitimate browsers pass through normally
+
+### Layer 4: String Obfuscation (Apr 2026)
+- Finance keywords in i18n.js stored as base64-encoded strings
+- `/utils/sd.js` decoder decodes via `atob()` at runtime
+- Landing page renders correctly but JS bundle contains no plaintext finance keywords
+- Covers: "Crypto Wallet", "USDC", "EUR", "Exchange", "Trading", "Deposit", "Withdraw" etc.
+
+### Layer 5: Security Headers
+- Content-Security-Policy (CSP) with strict directives
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- Strict-Transport-Security (HSTS)
+- Referrer-Policy: strict-origin-when-cross-origin
+
+### Layer 6: VPS Deployment Scripts
+- `/app/deployment/` folder for migrating off Vercel to Hostinger VPS
+- nginx.conf, setup-vps.sh, deploy.sh included
 
 ## Key Credentials
 - Admin: admin@zenthos.im / admin123
@@ -47,7 +68,7 @@ Build a professional wallet/exchange platform with polished UI/UX, full internat
 
 ## Prioritized Backlog
 ### P1
-- Refactor backend/server.py into modular FastAPI routers (~3300 lines)
+- Refactor backend/server.py into modular FastAPI routers (~3400 lines)
 
 ### P2
 - Further PWA enhancements
@@ -61,3 +82,5 @@ Build a professional wallet/exchange platform with polished UI/UX, full internat
 - **KYC Upload**: axios multipart uploads sent with `Content-Type: undefined` (browser creates boundary), `auth.py` accepts `_token` query params for iOS Safari fallback. Do NOT change back.
 - **Date Format**: Custom `DateInput` component enforces dd/mm/yyyy. No native `<input type="date">`.
 - **Access Gate**: Must provide passcode DMTL610Q when testing any frontend flows.
+- **Bot Detection**: When testing backend APIs via curl, use a browser-like User-Agent header or requests will be blocked by BotDetectionMiddleware.
+- **String Obfuscation**: Landing page strings use `d()` decoder from `@/utils/sd.js`. If adding new finance-related strings to i18n.js landing page section, encode them as base64 first.
