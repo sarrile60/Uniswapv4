@@ -10,8 +10,13 @@ import bcrypt
 import secrets
 from fastapi import HTTPException, Depends, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pathlib import Path
 
 import os
+from dotenv import load_dotenv
+
+# Load .env BEFORE reading any env vars
+load_dotenv(Path(__file__).parent / '.env')
 
 # Configuration
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', secrets.token_hex(32))
