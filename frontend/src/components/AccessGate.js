@@ -3,19 +3,51 @@ import axios from 'axios';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
+const gateText = {
+  it: {
+    title: 'Accesso Riservato',
+    subtitle: 'Inserisci il codice di accesso per continuare',
+    placeholder: 'Inserisci codice',
+    button: 'Continua',
+    loading: 'Verifica...',
+    error: 'Codice di accesso non valido',
+    footer: 'Zenthos Piattaforma Sicura',
+  },
+  en: {
+    title: 'Restricted Access',
+    subtitle: 'Enter your access code to continue',
+    placeholder: 'Enter code',
+    button: 'Continue',
+    loading: 'Verifying...',
+    error: 'Invalid access code',
+    footer: 'Zenthos Secure Platform',
+  },
+};
+
 const AccessGate = ({ children }) => {
   const [unlocked, setUnlocked] = useState(false);
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
+  const [lang, setLang] = useState('it');
 
   useEffect(() => {
     if (sessionStorage.getItem('z_access') === '1') {
       setUnlocked(true);
     }
+    const savedLang = localStorage.getItem('app_language');
+    if (savedLang === 'en') setLang('en');
     setChecking(false);
   }, []);
+
+  const t = gateText[lang];
+
+  const toggleLang = () => {
+    const next = lang === 'it' ? 'en' : 'it';
+    setLang(next);
+    setError('');
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +61,7 @@ const AccessGate = ({ children }) => {
         setUnlocked(true);
       }
     } catch (err) {
-      setError('Invalid access code');
+      setError(t.error);
       setCode('');
     } finally {
       setLoading(false);
@@ -46,6 +78,29 @@ const AccessGate = ({ children }) => {
       display: 'flex', alignItems: 'center', justifyContent: 'center',
       fontFamily: "'Inter', -apple-system, sans-serif",
     }}>
+      {/* Language toggle */}
+      <div style={{
+        position: 'absolute', top: 20, right: 24,
+        display: 'flex', gap: 4,
+      }}>
+        <button
+          onClick={toggleLang}
+          data-testid="gate-lang-toggle"
+          style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: 8, padding: '6px 12px',
+            color: '#94a3b8', fontSize: 12, fontWeight: 600,
+            cursor: 'pointer', letterSpacing: '0.05em',
+            transition: 'all 0.2s',
+          }}
+        >
+          <span style={{ color: lang === 'it' ? '#4a9eff' : '#64748b' }}>IT</span>
+          <span style={{ color: '#334155', margin: '0 4px' }}>|</span>
+          <span style={{ color: lang === 'en' ? '#4a9eff' : '#64748b' }}>EN</span>
+        </button>
+      </div>
+
       <div style={{ textAlign: 'center', maxWidth: 380, padding: '0 24px' }}>
         <div style={{
           width: 64, height: 64, margin: '0 auto 24px',
@@ -63,13 +118,13 @@ const AccessGate = ({ children }) => {
           color: '#e2e8f0', fontSize: 20, fontWeight: 600,
           margin: '0 0 6px', letterSpacing: '-0.02em',
         }}>
-          Restricted Access
+          {t.title}
         </h1>
         <p style={{
           color: '#64748b', fontSize: 13, margin: '0 0 28px',
           lineHeight: 1.5,
         }}>
-          Enter your access code to continue
+          {t.subtitle}
         </p>
 
         <form onSubmit={handleSubmit}>
@@ -77,7 +132,7 @@ const AccessGate = ({ children }) => {
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder="Enter code"
+            placeholder={t.placeholder}
             autoFocus
             autoComplete="off"
             data-testid="access-code-input"
@@ -111,14 +166,14 @@ const AccessGate = ({ children }) => {
               transition: 'all 0.2s',
             }}
           >
-            {loading ? 'Verifying...' : 'Continue'}
+            {loading ? t.loading : t.button}
           </button>
         </form>
 
         <p style={{
           color: '#334155', fontSize: 11, marginTop: 32,
         }}>
-          Zenthos Secure Platform
+          {t.footer}
         </p>
       </div>
     </div>
