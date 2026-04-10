@@ -38,8 +38,6 @@ const AccessGate = ({ children }) => {
     if (sessionStorage.getItem('z_access') === '1') {
       setUnlocked(true);
     }
-    const savedLang = localStorage.getItem('app_language');
-    if (savedLang === 'en') setLang('en');
     setChecking(false);
   }, []);
 
