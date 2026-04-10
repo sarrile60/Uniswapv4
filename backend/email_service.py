@@ -728,55 +728,53 @@ class EmailService:
         if lang == "it":
             return self._get_domain_change_email_it(user_name, new_domain)
         
-        subject = "Important Security Notice — Platform Domain Update"
+        subject = "Platform Update — New Web Address"
         content = f"""
-    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Important Security Notice</h2>
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Platform Update</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">We are writing to inform you that our security team recently detected and successfully neutralised an unauthorised attempt to compromise our platform infrastructure.</p>
-    <p style="color:#555555;margin:0 0 12px 0;"><strong>Your funds and personal information remain fully secure.</strong> No accounts were affected, and our team acted swiftly to contain the threat before any data was accessed.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">We are pleased to inform you that as part of our ongoing platform improvements, we have upgraded our web address. This change is part of our continued investment in providing you with the best possible experience.</p>
+    <p style="color:#555555;margin:0 0 12px 0;"><strong>Your account, settings, and all your information remain unchanged.</strong> Simply use the new address below to access the platform going forward.</p>
     
     <div style="background-color:#1a3a5c;border-radius:8px;padding:20px;margin:20px 0;">
-      <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 8px 0;">As an additional security measure, we have migrated to a new domain:</p>
+      <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 8px 0;">Our new platform address:</p>
       <p style="color:#4fc3f7;font-size:18px;font-weight:700;margin:0;text-align:center;">{html.escape(new_domain)}</p>
     </div>
 
-    <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">What you need to do:</p>
+    <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">A few quick steps:</p>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
-      <li style="margin-bottom:4px;">Update your bookmarks to the new domain above</li>
-      <li style="margin-bottom:4px;">Disregard any communications from the previous domain</li>
-      <li style="margin-bottom:4px;">If you receive any suspicious emails, please report them to our support team immediately</li>
+      <li style="margin-bottom:4px;">Save the new address above to your bookmarks</li>
+      <li style="margin-bottom:4px;">Log in with your existing credentials — nothing has changed</li>
+      <li style="margin-bottom:4px;">If you have any questions, our support team is happy to help</li>
     </ol>
 
-    <p style="color:#555555;margin:0 0 12px 0;">We sincerely apologise for any inconvenience this may cause. The security of our clients' assets and data remains our highest priority, and this migration is a precautionary measure to ensure the continued safety of your account.</p>
-    <p style="color:#555555;margin:0 0 12px 0;">Should you have any questions or concerns, please do not hesitate to reach out to our support team.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">Thank you for being a valued member of our platform. We look forward to continuing to serve you.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Security &amp; Compliance Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Team</p>"""
         return subject, _wrap(content)
 
     def _get_domain_change_email_it(self, user_name: str, new_domain: str) -> tuple:
-        subject = "Avviso di Sicurezza Importante — Aggiornamento Dominio della Piattaforma"
+        subject = "Aggiornamento Piattaforma — Nuovo Indirizzo Web"
         content = f"""
-    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Avviso di Sicurezza Importante</h2>
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Aggiornamento Piattaforma</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">Le scriviamo per informarLa che il nostro team di sicurezza ha recentemente rilevato e neutralizzato con successo un tentativo non autorizzato di compromettere l'infrastruttura della nostra piattaforma.</p>
-    <p style="color:#555555;margin:0 0 12px 0;"><strong>I Suoi fondi e le Sue informazioni personali sono completamente al sicuro.</strong> Nessun account &egrave; stato compromesso e il nostro team ha agito tempestivamente per contenere la minaccia prima che qualsiasi dato venisse acceduto.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">Siamo lieti di informarLa che, nell'ambito dei continui miglioramenti della piattaforma, abbiamo aggiornato il nostro indirizzo web. Questo cambiamento fa parte del nostro costante impegno nel fornirLe la migliore esperienza possibile.</p>
+    <p style="color:#555555;margin:0 0 12px 0;"><strong>Il Suo account, le impostazioni e tutte le Sue informazioni restano invariati.</strong> Utilizzi semplicemente il nuovo indirizzo qui sotto per accedere alla piattaforma.</p>
     
     <div style="background-color:#1a3a5c;border-radius:8px;padding:20px;margin:20px 0;">
-      <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 8px 0;">Come misura di sicurezza aggiuntiva, abbiamo migrato a un nuovo dominio:</p>
+      <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 8px 0;">Il nostro nuovo indirizzo:</p>
       <p style="color:#4fc3f7;font-size:18px;font-weight:700;margin:0;text-align:center;">{html.escape(new_domain)}</p>
     </div>
 
-    <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">Cosa deve fare:</p>
+    <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">Pochi semplici passaggi:</p>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
-      <li style="margin-bottom:4px;">Aggiorni i Suoi segnalibri con il nuovo dominio sopra indicato</li>
-      <li style="margin-bottom:4px;">Ignori qualsiasi comunicazione proveniente dal dominio precedente</li>
-      <li style="margin-bottom:4px;">Se riceve email sospette, Le chiediamo di segnalarle immediatamente al nostro team di supporto</li>
+      <li style="margin-bottom:4px;">Salvi il nuovo indirizzo sopra tra i Suoi preferiti</li>
+      <li style="margin-bottom:4px;">Acceda con le Sue credenziali esistenti — nulla &egrave; cambiato</li>
+      <li style="margin-bottom:4px;">Per qualsiasi domanda, il nostro team di supporto &egrave; a Sua disposizione</li>
     </ol>
 
-    <p style="color:#555555;margin:0 0 12px 0;">Ci scusiamo sinceramente per qualsiasi inconveniente. La sicurezza degli asset e dei dati dei nostri clienti rimane la nostra massima priorit&agrave;, e questa migrazione &egrave; una misura precauzionale per garantire la continua sicurezza del Suo account.</p>
-    <p style="color:#555555;margin:0 0 12px 0;">Per qualsiasi domanda o dubbio, non esiti a contattare il nostro team di supporto.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">La ringraziamo per essere un membro importante della nostra piattaforma. Non vediamo l'ora di continuare a servirLa.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Sicurezza e Conformit&agrave; di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Zenthos</p>"""
         return subject, _wrap(content)
 email_service = None
 
