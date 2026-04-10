@@ -1172,6 +1172,7 @@ async def admin_list_users(
     status: Optional[str] = None,
     role: Optional[str] = None,
     kyc_status: Optional[str] = None,
+    timer_filter: Optional[str] = None,
     admin: dict = Depends(require_admin)
 ):
     """List all users (admin only)"""
@@ -1208,14 +1209,60 @@ async def admin_list_users(
     if kyc_status:
         query["kyc_status"] = kyc_status
     
-    total = await db.users.count_documents(query)
-    skip = (page - 1) * page_size
+    # Timer filter: apply at DB level so pagination is correct
+    if timer_filter == "has_timer":
+        query["timer_duration_hours"] = {"$ne": None, "$gt": 0}
+    elif timer_filter == "expired":
+        now = datetime.now(timezone.utc)
+        query["timer_duration_hours"] = {"$ne": None, "$gt": 0}
+        query["timer_started_at"] = {"$ne": None}
+        # We'll do post-filtering for expired since it requires calculation
+    elif timer_filter == "expiring_soon":
+        query["timer_duration_hours"] = {"$ne": None, "$gt": 0}
+        query["timer_started_at"] = {"$ne": None}
     
-    users = await db.users.find(query, {"password_hash": 0, "_id": 0})\
-        .sort("created_at", -1)\
-        .skip(skip)\
-        .limit(page_size)\
-        .to_list(page_size)
+    # For expired/expiring_soon, we need to fetch all matching users and filter by calculation
+    if timer_filter in ("expired", "expiring_soon"):
+        all_timer_users = await db.users.find(query, {"password_hash": 0, "_id": 0})\
+            .sort("created_at", -1)\
+            .to_list(None)
+        
+        now = datetime.now(timezone.utc)
+        filtered = []
+        for u in all_timer_users:
+            started = u.get("timer_started_at")
+            hours = u.get("timer_duration_hours")
+            if started and hours:
+                if isinstance(started, str):
+                    started = datetime.fromisoformat(started.replace("Z", "+00:00"))
+                expires = started + timedelta(hours=hours)
+                remaining = (expires - now).total_seconds()
+                if timer_filter == "expired" and remaining <= 0:
+                    filtered.append(u)
+                elif timer_filter == "expiring_soon" and remaining > 0:
+                    filtered.append(u)
+        
+        # Sort expiring_soon by remaining time (ascending)
+        if timer_filter == "expiring_soon":
+            def sort_key(u):
+                started = u.get("timer_started_at")
+                hours = u.get("timer_duration_hours", 0)
+                if isinstance(started, str):
+                    started = datetime.fromisoformat(started.replace("Z", "+00:00"))
+                return (started + timedelta(hours=hours) - now).total_seconds()
+            filtered.sort(key=sort_key)
+        
+        total = len(filtered)
+        skip = (page - 1) * page_size
+        users = filtered[skip:skip + page_size]
+    else:
+        total = await db.users.count_documents(query)
+        skip = (page - 1) * page_size
+        users = await db.users.find(query, {"password_hash": 0, "_id": 0})\
+            .sort("created_at", -1)\
+            .skip(skip)\
+            .limit(page_size)\
+            .to_list(page_size)
     
     return {
         "ok": True,
@@ -1224,7 +1271,7 @@ async def admin_list_users(
             "total": total,
             "page": page,
             "page_size": page_size,
-            "pages": (total + page_size - 1) // page_size
+            "pages": max(1, (total + page_size - 1) // page_size)
         }
     }
 

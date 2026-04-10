@@ -77,6 +77,7 @@ const AdminUsers = () => {
       const params = { page, page_size: 20 };
       if (search) params.search = search;
       if (statusFilter !== 'all') params.status = statusFilter;
+      if (timerFilter !== 'all') params.timer_filter = timerFilter;
       
       const response = await api.get('/admin/users', { params });
       if (response.data.ok) {
@@ -95,7 +96,7 @@ const AdminUsers = () => {
 
   useEffect(() => {
     loadUsers();
-  }, [page, statusFilter]);
+  }, [page, statusFilter, timerFilter]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -216,24 +217,8 @@ const AdminUsers = () => {
     return expires - new Date();
   };
 
-  const filteredUsers = React.useMemo(() => {
-    let result = [...users];
-    if (timerFilter === 'expired') {
-      result = result.filter(u => {
-        const rem = getTimerRemaining(u);
-        return rem !== null && rem <= 0;
-      });
-    } else if (timerFilter === 'expiring_soon') {
-      result = result.filter(u => {
-        const rem = getTimerRemaining(u);
-        return rem !== null && rem > 0;
-      });
-      result.sort((a, b) => getTimerRemaining(a) - getTimerRemaining(b));
-    } else if (timerFilter === 'has_timer') {
-      result = result.filter(u => u.timer_duration_hours);
-    }
-    return result;
-  }, [users, timerFilter]);
+  // Timer filter is now handled by backend, use users directly
+  const filteredUsers = users;
 
   return (
     <AdminLayout title="Users">
@@ -267,7 +252,7 @@ const AdminUsers = () => {
             </SelectContent>
           </Select>
 
-          <Select value={timerFilter} onValueChange={(v) => setTimerFilter(v)}>
+          <Select value={timerFilter} onValueChange={(v) => { setTimerFilter(v); setPage(1); }}>
             <SelectTrigger className="w-[160px]" data-testid="timer-filter">
               <SelectValue placeholder="Timer" />
             </SelectTrigger>
