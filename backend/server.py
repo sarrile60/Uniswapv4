@@ -218,7 +218,7 @@ logger = logging.getLogger(__name__)
 async def heartbeat(request: Request, current_user: dict = Depends(get_current_user)):
     """Update user's last_active_at timestamp for online tracking."""
     await db.users.update_one(
-        {"id": current_user["id"]},
+        {"id": current_user["user_id"]},
         {"$set": {"last_active_at": datetime.now(timezone.utc).isoformat()}}
     )
     return {"ok": True}
