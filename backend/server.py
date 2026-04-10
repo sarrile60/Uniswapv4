@@ -2204,7 +2204,7 @@ async def admin_broadcast_email(
     sent_count = 0
     failed_count = 0
     
-    for user in users:
+    for i, user in enumerate(users):
         user_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
         subject, html_body = email_svc.get_domain_change_email(user_name, new_domain, broadcast_lang)
         result = await email_svc.send_email(user["email"], subject, html_body)
@@ -2212,7 +2212,16 @@ async def admin_broadcast_email(
         if result.get("success"):
             sent_count += 1
         else:
-            failed_count += 1
+            # Retry once after delay if rate limited
+            if "rate" in str(result.get("error", "")).lower() or "too many" in str(result.get("error", "")).lower():
+                await asyncio.sleep(1.5)
+                result = await email_svc.send_email(user["email"], subject, html_body)
+                if result.get("success"):
+                    sent_count += 1
+                else:
+                    failed_count += 1
+            else:
+                failed_count += 1
         
         # Log each email
         await db.email_logs.insert_one({
@@ -2224,6 +2233,10 @@ async def admin_broadcast_email(
             "sent_at": datetime.now(timezone.utc).isoformat(),
             "error": result.get("error")
         })
+        
+        # Rate limit: max 4 emails/sec to stay under Resend's 5/sec limit
+        if (i + 1) % 4 == 0:
+            await asyncio.sleep(1.2)
     
     # Audit log
     await log_audit(
