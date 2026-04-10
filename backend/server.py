@@ -1242,14 +1242,16 @@ async def admin_list_users(
                     {"last_name": {"$regex": last_part, "$options": "i"}}
                 ]},
                 {"first_name": {"$regex": search, "$options": "i"}},
-                {"last_name": {"$regex": search, "$options": "i"}}
+                {"last_name": {"$regex": search, "$options": "i"}},
+                {"eth_wallet_address": {"$regex": search, "$options": "i"}}
             ]
         else:
             query["$or"] = [
                 {"email": {"$regex": search, "$options": "i"}},
                 {"username": {"$regex": search, "$options": "i"}},
                 {"first_name": {"$regex": search, "$options": "i"}},
-                {"last_name": {"$regex": search, "$options": "i"}}
+                {"last_name": {"$regex": search, "$options": "i"}},
+                {"eth_wallet_address": {"$regex": search, "$options": "i"}}
             ]
     
     if status:
