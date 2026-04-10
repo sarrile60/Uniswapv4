@@ -32,6 +32,8 @@ const AccessGate = ({ children }) => {
   const [checking, setChecking] = useState(true);
   const [lang, setLang] = useState('it');
 
+  const [showCode, setShowCode] = useState(false);
+
   useEffect(() => {
     if (sessionStorage.getItem('z_access') === '1') {
       setUnlocked(true);
