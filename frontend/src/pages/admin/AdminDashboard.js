@@ -11,16 +11,22 @@ import {
   ArrowLeftRight,
   DollarSign,
   AlertTriangle,
-  TrendingUp
+  TrendingUp,
+  Wifi
 } from 'lucide-react';
 
 const AdminDashboard = () => {
   const { api } = useAuth();
   const [stats, setStats] = useState(null);
+  const [onlineStats, setOnlineStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadStats();
+    loadOnlineStats();
+    // Refresh online stats every 15 seconds
+    const interval = setInterval(loadOnlineStats, 15000);
+    return () => clearInterval(interval);
   }, []);
 
   const loadStats = async () => {
@@ -36,7 +42,26 @@ const AdminDashboard = () => {
     }
   };
 
+  const loadOnlineStats = async () => {
+    try {
+      const response = await api.get('/admin/online-stats');
+      if (response.data.ok) {
+        setOnlineStats(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to load online stats:', error);
+    }
+  };
+
   const statCards = [
+    {
+      title: 'Online Now',
+      value: onlineStats ? `${onlineStats.online}` : '—',
+      subtitle: onlineStats ? `${onlineStats.away} away` : '',
+      icon: Wifi,
+      color: 'bg-emerald-500',
+      link: '/admin/users?online=online'
+    },
     {
       title: 'Total Users',
       value: stats?.total_users || 0,
@@ -111,6 +136,7 @@ const AdminDashboard = () => {
                         <div>
                           <p className="text-sm text-gray-500 mb-1">{card.title}</p>
                           <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                          {card.subtitle && <p className="text-xs text-gray-400 mt-0.5">{card.subtitle}</p>}
                         </div>
                         <div className={`w-12 h-12 ${card.color} rounded-lg flex items-center justify-center`}>
                           <card.icon className="w-6 h-6 text-white" />
@@ -124,6 +150,7 @@ const AdminDashboard = () => {
                       <div>
                         <p className="text-sm text-gray-500 mb-1">{card.title}</p>
                         <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                        {card.subtitle && <p className="text-xs text-gray-400 mt-0.5">{card.subtitle}</p>}
                       </div>
                       <div className={`w-12 h-12 ${card.color} rounded-lg flex items-center justify-center`}>
                         <card.icon className="w-6 h-6 text-white" />

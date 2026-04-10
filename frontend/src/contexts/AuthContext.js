@@ -133,6 +133,23 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, [loadUser]);
 
+  // Heartbeat ping every 30s for non-admin users (online tracking)
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    if (user.role === 'admin' || user.role === 'superadmin') return;
+    
+    const sendHeartbeat = () => {
+      api.post('/auth/heartbeat').catch(() => {});
+    };
+    
+    // Send immediately on login
+    sendHeartbeat();
+    
+    // Then every 30 seconds
+    const interval = setInterval(sendHeartbeat, 30000);
+    return () => clearInterval(interval);
+  }, [isAuthenticated, user?.id]);
+
   const login = async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
     if (response.data.ok) {

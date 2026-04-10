@@ -69,6 +69,19 @@ const AdminUsers = () => {
   const [emailLang, setEmailLang] = useState('en');
   const [broadcastLang, setBroadcastLang] = useState('en');
   const [timerFilter, setTimerFilter] = useState('all');
+  const [onlineFilter, setOnlineFilter] = useState('all');
+
+  // Helper to get online status from last_active_at
+  const getOnlineStatus = (user) => {
+    if (!user.last_active_at) return 'offline';
+    const lastActive = new Date(user.last_active_at);
+    const now = new Date();
+    const diffMs = now - lastActive;
+    const diffMin = diffMs / 60000;
+    if (diffMin <= 2) return 'online';
+    if (diffMin <= 10) return 'away';
+    return 'offline';
+  };
 
   const loadUsers = async () => {
     setLoading(true);
@@ -78,6 +91,7 @@ const AdminUsers = () => {
       if (search) params.search = search;
       if (statusFilter !== 'all') params.status = statusFilter;
       if (timerFilter !== 'all') params.timer_filter = timerFilter;
+      if (onlineFilter !== 'all') params.online_filter = onlineFilter;
       
       const response = await api.get('/admin/users', { params });
       if (response.data.ok) {
@@ -96,7 +110,7 @@ const AdminUsers = () => {
 
   useEffect(() => {
     loadUsers();
-  }, [page, statusFilter, timerFilter]);
+  }, [page, statusFilter, timerFilter, onlineFilter]);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -264,6 +278,18 @@ const AdminUsers = () => {
             </SelectContent>
           </Select>
           
+          <Select value={onlineFilter} onValueChange={(v) => { setOnlineFilter(v); setPage(1); }}>
+            <SelectTrigger className="w-36" data-testid="online-filter">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="online">Online</SelectItem>
+              <SelectItem value="away">Away</SelectItem>
+              <SelectItem value="offline">Offline</SelectItem>
+            </SelectContent>
+          </Select>
+          
           <Link to="/admin/users/create">
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Plus className="w-4 h-4 mr-2" />
@@ -327,11 +353,21 @@ const AdminUsers = () => {
                 filteredUsers.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {user.first_name} {user.last_name}
+                      <div className="flex items-center gap-2">
+                        <span
+                          data-testid={`online-status-${user.id}`}
+                          className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
+                            getOnlineStatus(user) === 'online' ? 'bg-green-500' :
+                            getOnlineStatus(user) === 'away' ? 'bg-yellow-500' : 'bg-red-500'
+                          }`}
+                          title={getOnlineStatus(user) === 'online' ? 'Online' : getOnlineStatus(user) === 'away' ? 'Away' : 'Offline'}
+                        />
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {user.first_name} {user.last_name}
+                          </div>
+                          <div className="text-sm text-gray-500">@{user.username}</div>
                         </div>
-                        <div className="text-sm text-gray-500">@{user.username}</div>
                       </div>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>

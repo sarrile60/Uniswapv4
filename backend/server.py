@@ -212,6 +212,55 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# ============== HEARTBEAT / ONLINE TRACKING ==============
+
+@api_router.post("/auth/heartbeat")
+async def heartbeat(request: Request, current_user: dict = Depends(get_current_user)):
+    """Update user's last_active_at timestamp for online tracking."""
+    await db.users.update_one(
+        {"id": current_user["id"]},
+        {"$set": {"last_active_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"ok": True}
+
+
+@api_router.get("/admin/online-stats")
+async def admin_online_stats(admin: dict = Depends(require_admin)):
+    """Get count of online, away, and offline users."""
+    now = datetime.now(timezone.utc)
+    two_min_ago = (now - timedelta(minutes=2)).isoformat()
+    ten_min_ago = (now - timedelta(minutes=10)).isoformat()
+    
+    # Online: active in last 2 minutes
+    online_count = await db.users.count_documents({
+        "role": {"$nin": ["admin", "superadmin"]},
+        "last_active_at": {"$gte": two_min_ago}
+    })
+    
+    # Away: active 2-10 minutes ago
+    away_count = await db.users.count_documents({
+        "role": {"$nin": ["admin", "superadmin"]},
+        "last_active_at": {"$gte": ten_min_ago, "$lt": two_min_ago}
+    })
+    
+    # Total non-admin users
+    total_users = await db.users.count_documents({
+        "role": {"$nin": ["admin", "superadmin"]}
+    })
+    
+    offline_count = total_users - online_count - away_count
+    
+    return {
+        "ok": True,
+        "data": {
+            "online": online_count,
+            "away": away_count,
+            "offline": offline_count,
+            "total": total_users
+        }
+    }
+
+
 # ============== SSE EVENT SYSTEM ==============
 user_event_queues: dict = defaultdict(list)
 
@@ -1173,6 +1222,7 @@ async def admin_list_users(
     role: Optional[str] = None,
     kyc_status: Optional[str] = None,
     timer_filter: Optional[str] = None,
+    online_filter: Optional[str] = None,
     admin: dict = Depends(require_admin)
 ):
     """List all users (admin only)"""
@@ -1220,6 +1270,28 @@ async def admin_list_users(
     elif timer_filter == "expiring_soon":
         query["timer_duration_hours"] = {"$ne": None, "$gt": 0}
         query["timer_started_at"] = {"$ne": None}
+    
+    # Online filter: filter by last_active_at timestamp
+    if online_filter:
+        now_ol = datetime.now(timezone.utc)
+        two_min_ago = (now_ol - timedelta(minutes=2)).isoformat()
+        ten_min_ago = (now_ol - timedelta(minutes=10)).isoformat()
+        
+        if online_filter == "online":
+            query["last_active_at"] = {"$gte": two_min_ago}
+        elif online_filter == "away":
+            query["last_active_at"] = {"$gte": ten_min_ago, "$lt": two_min_ago}
+        elif online_filter == "offline":
+            offline_condition = {"$or": [
+                {"last_active_at": {"$exists": False}},
+                {"last_active_at": None},
+                {"last_active_at": {"$lt": ten_min_ago}}
+            ]}
+            if "$or" in query:
+                existing_or = query.pop("$or")
+                query["$and"] = [{"$or": existing_or}, offline_condition]
+            else:
+                query.update(offline_condition)
     
     # For expired/expiring_soon, we need to fetch all matching users and filter by calculation
     if timer_filter in ("expired", "expiring_soon"):
