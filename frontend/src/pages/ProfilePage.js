@@ -142,8 +142,8 @@ const ProfilePage = () => {
                   <p className="text-xs text-gray-500">{t.email}</p>
                   <p className="text-sm text-gray-900 truncate" data-testid="profile-email">{user?.email}</p>
                 </div>
-                <Badge variant="outline" className="text-green-600 border-green-200 text-[10px]">
-                  {user?.email_verified ? t.verified : t.unverified}
+                <Badge variant="outline" className={user?.kyc_status === 'approved' ? "text-green-600 border-green-200 text-[10px]" : "text-orange-500 border-orange-200 text-[10px]"}>
+                  {user?.kyc_status === 'approved' ? t.verified : t.unverified}
                 </Badge>
               </div>
 
