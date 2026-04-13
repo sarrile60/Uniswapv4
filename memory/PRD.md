@@ -64,11 +64,14 @@ Build a professional wallet/exchange platform with polished UI/UX, full internat
 
 ## Key Credentials
 - Admin: admin@zenthos-eu.com / admin123
-- Access Gate Passcode: DMTL610Q
+- Access Gate Passcode: ZENTHOS2026
+
+## Recent Changes
+- **Welcome Email Fix (Apr 2026)**: Added `send_email()` call in `admin_create_user` endpoint (server.py). Previously, user creation completed but never dispatched the welcome/account creation email via Resend. Now sends Italian welcome email (`get_welcome_email`) upon successful user creation.
 
 ## Prioritized Backlog
 ### P1
-- Refactor backend/server.py into modular FastAPI routers (~3400 lines)
+- Refactor backend/server.py into modular FastAPI routers (~3500 lines)
 
 ### P2
 - Further PWA enhancements

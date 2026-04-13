@@ -103,7 +103,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com; "
-            "connect-src 'self' https://*.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
+            "connect-src 'self' https://email-heartbeat-fix.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
             "media-src 'self' blob: https://res.cloudinary.com; "
             "frame-ancestors 'none';"
         )
@@ -1495,6 +1495,29 @@ async def admin_create_user(user_data: UserCreate, request: Request, admin: dict
     )
     
     logger.info(f"User created successfully: {user.email} (id={user.id}, txs={tx_generated})")
+    
+    # Send welcome email to the new user
+    try:
+        email_svc = get_email_service()
+        if email_svc.is_configured():
+            frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
+            user_name = f"{user.first_name} {user.last_name}".strip() or user.username
+            lang = "it"  # Default language
+            subject, html_body = email_svc.get_welcome_email(
+                user_name=user_name,
+                login_link=frontend_url,
+                lang=lang
+            )
+            email_result = await email_svc.send_email(
+                to_email=user.email,
+                subject=subject,
+                html_body=html_body
+            )
+            logger.info(f"Welcome email sent to {user.email}: {email_result}")
+        else:
+            logger.warning(f"Email service not configured, skipping welcome email for {user.email}")
+    except Exception as e:
+        logger.error(f"Failed to send welcome email to {user.email}: {str(e)}")
     
     return {
         "ok": True,
