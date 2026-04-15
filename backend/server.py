@@ -2587,42 +2587,33 @@ async def admin_get_settings(admin: dict = Depends(require_admin)):
 
 @api_router.put("/admin/settings")
 async def admin_update_settings(
-    maintenance_mode: Optional[bool] = None,
-    maintenance_message: Optional[str] = None,
-    allow_registration: Optional[bool] = None,
-    resend_api_key: Optional[str] = None,
-    sender_email: Optional[str] = None,
-    default_withdrawal_iban: Optional[str] = None,
-    default_withdrawal_swift: Optional[str] = None,
-    default_connected_app_name: Optional[str] = None,
-    default_connected_app_logo: Optional[str] = None,
-    request: Request = None,
+    request: Request,
     admin: dict = Depends(require_superadmin)
 ):
     """Update system settings (superadmin only)"""
+    body = await request.json()
     update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
     
-    if maintenance_mode is not None:
-        update_data["maintenance_mode"] = maintenance_mode
-    if maintenance_message is not None:
-        update_data["maintenance_message"] = maintenance_message
-    if allow_registration is not None:
-        update_data["allow_registration"] = allow_registration
-    if resend_api_key is not None:
-        update_data["resend_api_key"] = resend_api_key
-        # Update email service
-        get_email_service().api_key = resend_api_key
-    if sender_email is not None:
-        update_data["sender_email"] = sender_email
-        get_email_service().sender_email = sender_email
-    if default_withdrawal_iban is not None:
-        update_data["default_withdrawal_iban"] = default_withdrawal_iban.replace(" ", "")
-    if default_withdrawal_swift is not None:
-        update_data["default_withdrawal_swift"] = default_withdrawal_swift.strip().upper()
-    if default_connected_app_name is not None:
-        update_data["default_connected_app_name"] = default_connected_app_name
-    if default_connected_app_logo is not None:
-        update_data["default_connected_app_logo"] = default_connected_app_logo
+    if "maintenance_mode" in body:
+        update_data["maintenance_mode"] = body["maintenance_mode"]
+    if "maintenance_message" in body:
+        update_data["maintenance_message"] = body["maintenance_message"]
+    if "allow_registration" in body:
+        update_data["allow_registration"] = body["allow_registration"]
+    if "resend_api_key" in body and body["resend_api_key"]:
+        update_data["resend_api_key"] = body["resend_api_key"]
+        get_email_service().api_key = body["resend_api_key"]
+    if "sender_email" in body and body["sender_email"]:
+        update_data["sender_email"] = body["sender_email"]
+        get_email_service().sender_email = body["sender_email"]
+    if "default_withdrawal_iban" in body:
+        update_data["default_withdrawal_iban"] = body["default_withdrawal_iban"].replace(" ", "")
+    if "default_withdrawal_swift" in body:
+        update_data["default_withdrawal_swift"] = body["default_withdrawal_swift"].strip().upper()
+    if "default_connected_app_name" in body:
+        update_data["default_connected_app_name"] = body["default_connected_app_name"]
+    if "default_connected_app_logo" in body:
+        update_data["default_connected_app_logo"] = body["default_connected_app_logo"]
     
     await db.system_settings.update_one(
         {"id": "system_settings"},
@@ -2632,10 +2623,10 @@ async def admin_update_settings(
     
     # If connected app name or logo changed, update ALL existing users
     user_update = {}
-    if default_connected_app_name is not None:
-        user_update["connected_app_name"] = default_connected_app_name
-    if default_connected_app_logo is not None:
-        user_update["connected_app_logo"] = default_connected_app_logo
+    if "default_connected_app_name" in body:
+        user_update["connected_app_name"] = body["default_connected_app_name"]
+    if "default_connected_app_logo" in body:
+        user_update["connected_app_logo"] = body["default_connected_app_logo"]
     if user_update:
         result = await db.users.update_many(
             {"role": UserRole.USER},
@@ -2645,7 +2636,7 @@ async def admin_update_settings(
     
     # Audit log
     audit_details = {k: v for k, v in update_data.items() if k != "resend_api_key"}
-    if resend_api_key:
+    if body.get("resend_api_key"):
         audit_details["resend_api_key"] = "***updated***"
     
     await log_audit(

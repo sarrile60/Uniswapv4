@@ -52,20 +52,20 @@ const AdminSettings = () => {
 
     setSaving(true);
     try {
-      const params = {};
-      if (settings.maintenance_mode !== undefined) params.maintenance_mode = settings.maintenance_mode;
-      if (settings.maintenance_message) params.maintenance_message = settings.maintenance_message;
-      if (settings.allow_registration !== undefined) params.allow_registration = settings.allow_registration;
+      const payload = {};
+      if (settings.maintenance_mode !== undefined) payload.maintenance_mode = settings.maintenance_mode;
+      if (settings.maintenance_message) payload.maintenance_message = settings.maintenance_message;
+      if (settings.allow_registration !== undefined) payload.allow_registration = settings.allow_registration;
       if (settings.resend_api_key && settings.resend_api_key !== '***configured***') {
-        params.resend_api_key = settings.resend_api_key;
+        payload.resend_api_key = settings.resend_api_key;
       }
-      if (settings.sender_email) params.sender_email = settings.sender_email;
-      if (settings.default_withdrawal_iban) params.default_withdrawal_iban = settings.default_withdrawal_iban;
-      if (settings.default_withdrawal_swift) params.default_withdrawal_swift = settings.default_withdrawal_swift;
-      if (settings.default_connected_app_name !== undefined) params.default_connected_app_name = settings.default_connected_app_name;
-      if (settings.default_connected_app_logo !== undefined) params.default_connected_app_logo = settings.default_connected_app_logo;
+      if (settings.sender_email) payload.sender_email = settings.sender_email;
+      if (settings.default_withdrawal_iban) payload.default_withdrawal_iban = settings.default_withdrawal_iban;
+      if (settings.default_withdrawal_swift) payload.default_withdrawal_swift = settings.default_withdrawal_swift;
+      if (settings.default_connected_app_name !== undefined) payload.default_connected_app_name = settings.default_connected_app_name;
+      if (settings.default_connected_app_logo !== undefined) payload.default_connected_app_logo = settings.default_connected_app_logo;
 
-      const response = await api.put('/admin/settings', null, { params });
+      const response = await api.put('/admin/settings', payload);
       if (response.data.ok) {
         toast.success('Settings saved successfully');
         loadSettings();
