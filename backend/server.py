@@ -2694,7 +2694,7 @@ async def admin_get_badges(admin: dict = Depends(require_admin)):
     
     # Get last-seen timestamps for each section
     seen_docs = await db.admin_section_seen.find({"admin_id": admin_id}, {"_id": 0}).to_list(10)
-    seen_map = {d["section"]: _strip_tz(d["last_seen_at"]) for d in seen_docs}
+    seen_map = {d["section"]: d["last_seen_at"] for d in seen_docs}
     
     # Users: count users (non-admin) created after last seen
     users_since = seen_map.get("users", "1970-01-01T00:00:00")
@@ -2737,7 +2737,7 @@ async def admin_mark_section_read(section: str, admin: dict = Depends(require_ad
         raise HTTPException(status_code=400, detail="Invalid section")
     
     admin_id = admin["user_id"]
-    now = _strip_tz(datetime.now(timezone.utc).isoformat())
+    now = datetime.now(timezone.utc).isoformat()
     
     # Find the latest item date for this section so we never miss future-dated items
     latest_date = now

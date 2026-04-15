@@ -39,9 +39,15 @@ const AdminLayout = ({ children, title }) => {
   const loadBadges = useCallback(async () => {
     try {
       const res = await api.get('/admin/badges');
-      if (res.data.ok) setBadges(res.data.data);
+      if (res.data.ok) {
+        const data = res.data.data;
+        // Force current section badge to 0 (admin is already viewing it)
+        const section = BADGE_SECTIONS[location.pathname];
+        if (section) data[section] = 0;
+        setBadges(data);
+      }
     } catch (e) { /* ignore */ }
-  }, [api]);
+  }, [api, location.pathname]);
 
   // Load badges on mount + poll every 15s
   useEffect(() => {
