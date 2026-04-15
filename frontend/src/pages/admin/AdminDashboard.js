@@ -12,7 +12,9 @@ import {
   DollarSign,
   AlertTriangle,
   TrendingUp,
-  Wifi
+  Wifi,
+  CheckCircle,
+  CalendarCheck
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -114,6 +116,18 @@ const AdminDashboard = () => {
       value: `€${stats?.total_unpaid_fees || '0.00'}`,
       icon: AlertTriangle,
       color: 'bg-orange-500',
+    },
+    {
+      title: 'Total Paid Fees',
+      value: `€${stats?.total_paid_fees || '0.00'}`,
+      icon: CheckCircle,
+      color: 'bg-teal-500',
+    },
+    {
+      title: 'Fees Paid Today',
+      value: `€${stats?.fees_paid_today || '0.00'}`,
+      icon: CalendarCheck,
+      color: 'bg-lime-600',
     },
   ];
 
