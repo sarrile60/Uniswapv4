@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminLayout from './AdminLayout';
@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { ArrowLeft, Info, Wallet, Calendar, User, Shield, AlertTriangle, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Info, Wallet, Calendar, User, Shield, AlertTriangle, ExternalLink, RefreshCw } from 'lucide-react';
 import { DateInput } from '@/components/DateInput';
 
 const AdminCreateUser = () => {
@@ -24,6 +24,27 @@ const AdminCreateUser = () => {
   const { api } = useAuth();
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
+  const [eurInput, setEurInput] = useState('');
+  const [exchangeRate, setExchangeRate] = useState(null);
+  const [rateLoading, setRateLoading] = useState(false);
+
+  const fetchRate = useCallback(async () => {
+    setRateLoading(true);
+    try {
+      const res = await api.get('/exchange-rate');
+      if (res.data.ok) {
+        setExchangeRate(res.data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch exchange rate:', e);
+    } finally {
+      setRateLoading(false);
+    }
+  }, [api]);
+
+  useEffect(() => {
+    fetchRate();
+  }, [fetchRate]);
   
   const [formData, setFormData] = useState({
     // Step 1: Basic Info
@@ -324,7 +345,7 @@ const AdminCreateUser = () => {
                   <div className="space-y-2">
                     <Label htmlFor="initial_eur_balance">Initial EUR Balance</Label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">€</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">&euro;</span>
                       <Input
                         id="initial_eur_balance"
                         type="number"
@@ -336,6 +357,57 @@ const AdminCreateUser = () => {
                       />
                     </div>
                   </div>
+                </div>
+
+                {/* EUR → USDC Converter */}
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-semibold text-blue-900">EUR to USDC Converter</Label>
+                    <div className="flex items-center gap-2">
+                      {exchangeRate && (
+                        <span className="text-xs text-blue-600">
+                          1 EUR = {exchangeRate.eur_usdc?.toFixed(4)} USDC
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={fetchRate}
+                        className="text-blue-500 hover:text-blue-700"
+                        title="Refresh rate"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${rateLoading ? 'animate-spin' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">&euro;</span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Enter EUR amount"
+                        value={eurInput}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setEurInput(val);
+                          if (val && exchangeRate?.eur_usdc) {
+                            const usdc = (parseFloat(val) * exchangeRate.eur_usdc).toFixed(2);
+                            handleChange('initial_usdc_balance', usdc);
+                          }
+                        }}
+                        className="pl-7"
+                        data-testid="eur-to-usdc-input"
+                      />
+                    </div>
+                    <span className="text-blue-400 font-bold">=</span>
+                    <div className="flex-1 bg-white border rounded-md px-3 py-2 text-sm text-gray-700">
+                      {eurInput && exchangeRate?.eur_usdc
+                        ? `$ ${(parseFloat(eurInput) * exchangeRate.eur_usdc).toFixed(2)} USDC`
+                        : '$ 0.00 USDC'}
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-600">Live rate from ECB/Frankfurter. Typing here auto-fills the USDC balance above.</p>
                 </div>
 
                 <div className="flex justify-between pt-4">
