@@ -2692,34 +2692,21 @@ async def admin_get_badges(admin: dict = Depends(require_admin)):
     """Get unread badge counts for admin sidebar sections"""
     admin_id = admin["user_id"]
     
-    # Get last-seen timestamps for each section
+    # Get last-seen counts for each section
     seen_docs = await db.admin_section_seen.find({"admin_id": admin_id}, {"_id": 0}).to_list(10)
-    seen_map = {d["section"]: d["last_seen_at"] for d in seen_docs}
+    seen_map = {d["section"]: d.get("last_count", 0) for d in seen_docs}
     
-    # Users: count users (non-admin) created after last seen
-    users_since = seen_map.get("users", "1970-01-01T00:00:00")
-    new_users = await db.users.count_documents({
-        "role": UserRole.USER,
-        "created_at": {"$gt": users_since}
-    })
+    # Users: total non-admin users minus last seen count
+    total_users = await db.users.count_documents({"role": UserRole.USER})
+    new_users = max(0, total_users - seen_map.get("users", 0))
     
-    # KYC: count KYC docs submitted after last seen
-    kyc_since = seen_map.get("kyc", "1970-01-01T00:00:00")
-    new_kyc = await db.kyc_documents.count_documents({
-        "submitted_at": {"$gt": kyc_since}
-    })
-    # Fallback: also check created_at for older docs
-    if new_kyc == 0:
-        new_kyc = await db.kyc_documents.count_documents({
-            "created_at": {"$gt": kyc_since},
-            "status": {"$in": [KYCStatus.PENDING, KYCStatus.UNDER_REVIEW]}
-        })
+    # KYC: total KYC docs minus last seen count
+    total_kyc = await db.kyc_documents.count_documents({})
+    new_kyc = max(0, total_kyc - seen_map.get("kyc", 0))
     
-    # Transactions: count all new transactions after last seen
-    tx_since = seen_map.get("transactions", "1970-01-01T00:00:00")
-    new_tx = await db.transactions.count_documents({
-        "created_at": {"$gt": tx_since}
-    })
+    # Transactions: total transactions minus last seen count
+    total_tx = await db.transactions.count_documents({})
+    new_tx = max(0, total_tx - seen_map.get("transactions", 0))
     
     return {
         "ok": True,
@@ -2737,40 +2724,20 @@ async def admin_mark_section_read(section: str, admin: dict = Depends(require_ad
         raise HTTPException(status_code=400, detail="Invalid section")
     
     admin_id = admin["user_id"]
-    now = datetime.now(timezone.utc).isoformat()
     
-    # Find the latest item date for this section so we never miss future-dated items
-    latest_date = now
+    # Store current total count for this section
     if section == "transactions":
-        latest_tx = await db.transactions.find_one(
-            {"type": {"$in": ["send", "swap", "withdrawal"]}},
-            {"_id": 0, "created_at": 1},
-            sort=[("created_at", -1)]
-        )
-        if latest_tx and latest_tx.get("created_at", "") > now:
-            latest_date = latest_tx["created_at"]
+        count = await db.transactions.count_documents({})
     elif section == "users":
-        latest_user = await db.users.find_one(
-            {"role": UserRole.USER},
-            {"_id": 0, "created_at": 1},
-            sort=[("created_at", -1)]
-        )
-        if latest_user and latest_user.get("created_at", "") > now:
-            latest_date = latest_user["created_at"]
+        count = await db.users.count_documents({"role": UserRole.USER})
     elif section == "kyc":
-        latest_kyc = await db.kyc_documents.find_one(
-            {},
-            {"_id": 0, "submitted_at": 1, "created_at": 1},
-            sort=[("created_at", -1)]
-        )
-        if latest_kyc:
-            kyc_date = latest_kyc.get("submitted_at") or latest_kyc.get("created_at", "")
-            if kyc_date > now:
-                latest_date = kyc_date
+        count = await db.kyc_documents.count_documents({})
+    else:
+        count = 0
     
     await db.admin_section_seen.update_one(
         {"admin_id": admin_id, "section": section},
-        {"$set": {"admin_id": admin_id, "section": section, "last_seen_at": latest_date}},
+        {"$set": {"admin_id": admin_id, "section": section, "last_count": count}},
         upsert=True
     )
     
