@@ -16,8 +16,11 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { ArrowLeft, Info, Wallet, Calendar, User, Shield, AlertTriangle, ExternalLink, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Info, Wallet, Calendar, User, Shield, AlertTriangle, ExternalLink, RefreshCw, CalendarIcon } from 'lucide-react';
 import { DateInput } from '@/components/DateInput';
+import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format, parse } from 'date-fns';
 
 const AdminCreateUser = () => {
   const navigate = useNavigate();
@@ -488,20 +491,60 @@ const AdminCreateUser = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label htmlFor="transaction_start_date">Start Date *</Label>
-                        <DateInput
-                          id="transaction_start_date"
-                          value={formData.transaction_start_date}
-                          onChange={(val) => handleChange('transaction_start_date', val)}
-                        />
+                        <Label>Start Date *</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className={`w-full justify-start text-left font-normal ${!formData.transaction_start_date ? 'text-muted-foreground' : ''}`}
+                              data-testid="start-date-picker"
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {formData.transaction_start_date
+                                ? format(parse(formData.transaction_start_date, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy')
+                                : 'Pick a date'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarPicker
+                              mode="single"
+                              selected={formData.transaction_start_date ? parse(formData.transaction_start_date, 'yyyy-MM-dd', new Date()) : undefined}
+                              onSelect={(date) => {
+                                if (date) handleChange('transaction_start_date', format(date, 'yyyy-MM-dd'));
+                              }}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="transaction_end_date">End Date *</Label>
-                        <DateInput
-                          id="transaction_end_date"
-                          value={formData.transaction_end_date}
-                          onChange={(val) => handleChange('transaction_end_date', val)}
-                        />
+                        <Label>End Date *</Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              className={`w-full justify-start text-left font-normal ${!formData.transaction_end_date ? 'text-muted-foreground' : ''}`}
+                              data-testid="end-date-picker"
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {formData.transaction_end_date
+                                ? format(parse(formData.transaction_end_date, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy')
+                                : 'Pick a date'}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <CalendarPicker
+                              mode="single"
+                              selected={formData.transaction_end_date ? parse(formData.transaction_end_date, 'yyyy-MM-dd', new Date()) : undefined}
+                              onSelect={(date) => {
+                                if (date) handleChange('transaction_end_date', format(date, 'yyyy-MM-dd'));
+                              }}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
                       </div>
                     </div>
 
