@@ -14,7 +14,8 @@ import {
   TrendingUp,
   Wifi,
   CheckCircle,
-  CalendarCheck
+  CalendarCheck,
+  UserPlus
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -70,6 +71,12 @@ const AdminDashboard = () => {
       icon: Users,
       color: 'bg-blue-500',
       link: '/admin/users'
+    },
+    {
+      title: 'Registered Today',
+      value: stats?.users_today || 0,
+      icon: UserPlus,
+      color: 'bg-sky-500',
     },
     {
       title: 'Active Users',

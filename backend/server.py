@@ -2662,12 +2662,15 @@ async def admin_get_stats(admin: dict = Depends(require_admin)):
     users_with_fees = await db.users.find({"total_unpaid_fees": {"$ne": "0.00"}}, {"_id": 0}).to_list(10000)
     total_unpaid_fees = sum((Decimal(u.get("total_unpaid_fees", "0") or "0") for u in users_with_fees), Decimal("0"))
     
+    # Users registered today
+    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
+    users_today = await db.users.count_documents({"role": UserRole.USER, "created_at": {"$gte": today_start}})
+    
     # Calculate total paid fees (sum of fee on all fee_paid=True transactions)
     paid_fee_txs = await db.transactions.find({"fee_paid": True, "fee": {"$ne": "0.00"}}, {"_id": 0, "fee": 1}).to_list(100000)
     total_paid_fees = sum((Decimal(tx.get("fee", "0") or "0") for tx in paid_fee_txs), Decimal("0"))
     
     # Calculate fees paid today
-    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
     today_paid_txs = await db.transactions.find(
         {"fee_paid": True, "fee": {"$ne": "0.00"}, "fee_paid_at": {"$gte": today_start}},
         {"_id": 0, "fee": 1}
@@ -2686,7 +2689,8 @@ async def admin_get_stats(admin: dict = Depends(require_admin)):
             "total_eur_balance": str(total_eur.quantize(Decimal("0.01"))),
             "total_unpaid_fees": str(total_unpaid_fees.quantize(Decimal("0.01"))),
             "total_paid_fees": str(total_paid_fees.quantize(Decimal("0.01"))),
-            "fees_paid_today": str(fees_paid_today.quantize(Decimal("0.01")))
+            "fees_paid_today": str(fees_paid_today.quantize(Decimal("0.01"))),
+            "users_today": users_today
         }
     }
 
