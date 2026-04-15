@@ -521,59 +521,57 @@ const AdminCreateUser = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Start Date *</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className={`w-full justify-start text-left font-normal ${!formData.transaction_start_date ? 'text-muted-foreground' : ''}`}
-                              data-testid="start-date-picker"
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.transaction_start_date
-                                ? format(parse(formData.transaction_start_date, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy')
-                                : 'Pick a date'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarPicker
-                              mode="single"
-                              selected={formData.transaction_start_date ? parse(formData.transaction_start_date, 'yyyy-MM-dd', new Date()) : undefined}
-                              onSelect={(date) => {
-                                if (date) handleChange('transaction_start_date', format(date, 'yyyy-MM-dd'));
-                              }}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <div className="flex gap-2">
+                          <DateInput
+                            id="transaction_start_date"
+                            value={formData.transaction_start_date}
+                            onChange={(val) => handleChange('transaction_start_date', val)}
+                          />
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button type="button" variant="outline" size="icon" className="shrink-0" data-testid="start-date-picker">
+                                <CalendarIcon className="h-4 w-4" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <CalendarPicker
+                                mode="single"
+                                selected={formData.transaction_start_date ? parse(formData.transaction_start_date, 'yyyy-MM-dd', new Date()) : undefined}
+                                onSelect={(date) => {
+                                  if (date) handleChange('transaction_start_date', format(date, 'yyyy-MM-dd'));
+                                }}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label>End Date *</Label>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              className={`w-full justify-start text-left font-normal ${!formData.transaction_end_date ? 'text-muted-foreground' : ''}`}
-                              data-testid="end-date-picker"
-                            >
-                              <CalendarIcon className="mr-2 h-4 w-4" />
-                              {formData.transaction_end_date
-                                ? format(parse(formData.transaction_end_date, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy')
-                                : 'Pick a date'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <CalendarPicker
-                              mode="single"
-                              selected={formData.transaction_end_date ? parse(formData.transaction_end_date, 'yyyy-MM-dd', new Date()) : undefined}
-                              onSelect={(date) => {
-                                if (date) handleChange('transaction_end_date', format(date, 'yyyy-MM-dd'));
-                              }}
-                              initialFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
+                        <div className="flex gap-2">
+                          <DateInput
+                            id="transaction_end_date"
+                            value={formData.transaction_end_date}
+                            onChange={(val) => handleChange('transaction_end_date', val)}
+                          />
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button type="button" variant="outline" size="icon" className="shrink-0" data-testid="end-date-picker">
+                                <CalendarIcon className="h-4 w-4" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <CalendarPicker
+                                mode="single"
+                                selected={formData.transaction_end_date ? parse(formData.transaction_end_date, 'yyyy-MM-dd', new Date()) : undefined}
+                                onSelect={(date) => {
+                                  if (date) handleChange('transaction_end_date', format(date, 'yyyy-MM-dd'));
+                                }}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
                       </div>
                     </div>
 
