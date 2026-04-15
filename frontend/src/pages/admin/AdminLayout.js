@@ -26,6 +26,7 @@ const AdminLayout = ({ children, title }) => {
   const { user, logout, api } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [badges, setBadges] = useState({ users: 0, kyc: 0, transactions: 0 });
+  const clearedSections = useRef(new Set());
 
   const menuItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -41,13 +42,18 @@ const AdminLayout = ({ children, title }) => {
       const res = await api.get('/admin/badges');
       if (res.data.ok) {
         const data = res.data.data;
-        // Force current section badge to 0 (admin is already viewing it)
-        const section = BADGE_SECTIONS[location.pathname];
-        if (section) data[section] = 0;
+        // Respect locally cleared sections until backend catches up
+        for (const section of clearedSections.current) {
+          if (data[section] === 0) {
+            clearedSections.current.delete(section);
+          } else {
+            data[section] = 0;
+          }
+        }
         setBadges(data);
       }
     } catch (e) { /* ignore */ }
-  }, [api, location.pathname]);
+  }, [api]);
 
   // Load badges on mount + poll every 15s
   useEffect(() => {
@@ -56,19 +62,19 @@ const AdminLayout = ({ children, title }) => {
     return () => clearInterval(interval);
   }, [loadBadges]);
 
-  // Mark section as read only when navigating to it (not on poll updates)
+  // Mark section as read when navigating to it
   const prevPathRef = useRef(location.pathname);
   useEffect(() => {
     if (location.pathname !== prevPathRef.current) {
       prevPathRef.current = location.pathname;
       const section = BADGE_SECTIONS[location.pathname];
-      if (section && badges[section] > 0) {
-        api.put(`/admin/badges/${section}/mark-read`).then(() => {
-          setBadges(prev => ({ ...prev, [section]: 0 }));
-        }).catch(() => {});
+      if (section) {
+        clearedSections.current.add(section);
+        setBadges(prev => ({ ...prev, [section]: 0 }));
+        api.put(`/admin/badges/${section}/mark-read`).catch(() => {});
       }
     }
-  }, [location.pathname, api, badges]);
+  }, [location.pathname, api]);
 
   const handleLogout = () => {
     logout();
@@ -78,11 +84,10 @@ const AdminLayout = ({ children, title }) => {
   const handleNavClick = async (path) => {
     setSidebarOpen(false);
     const section = BADGE_SECTIONS[path];
-    if (section && badges[section] > 0) {
-      try {
-        await api.put(`/admin/badges/${section}/mark-read`);
-        setBadges(prev => ({ ...prev, [section]: 0 }));
-      } catch (e) { /* ignore */ }
+    if (section) {
+      clearedSections.current.add(section);
+      setBadges(prev => ({ ...prev, [section]: 0 }));
+      api.put(`/admin/badges/${section}/mark-read`).catch(() => {});
     }
   };
 
