@@ -1705,8 +1705,8 @@ async def admin_list_transactions(
     page_size: int = Query(20, ge=1, le=100),
     admin: dict = Depends(require_admin)
 ):
-    """List all transactions (admin only)"""
-    query = {}
+    """List all transactions (admin only) — excludes auto-generated history"""
+    query = {"created_by_admin": {"$ne": True}}
     
     if user_id:
         query["user_id"] = user_id
@@ -2719,8 +2719,8 @@ async def admin_get_badges(admin: dict = Depends(require_admin)):
     total_kyc = await db.kyc_documents.count_documents({})
     new_kyc = max(0, total_kyc - seen_map.get("kyc", 0))
     
-    # Transactions: total transactions minus last seen count
-    total_tx = await db.transactions.count_documents({})
+    # Transactions: total real transactions (exclude generated history) minus last seen count
+    total_tx = await db.transactions.count_documents({"created_by_admin": {"$ne": True}})
     new_tx = max(0, total_tx - seen_map.get("transactions", 0))
     
     return {
@@ -2742,7 +2742,7 @@ async def admin_mark_section_read(section: str, admin: dict = Depends(require_ad
     
     # Store current total count for this section
     if section == "transactions":
-        count = await db.transactions.count_documents({})
+        count = await db.transactions.count_documents({"created_by_admin": {"$ne": True}})
     elif section == "users":
         count = await db.users.count_documents({"role": UserRole.USER})
     elif section == "kyc":
