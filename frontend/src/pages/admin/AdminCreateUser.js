@@ -48,6 +48,24 @@ const AdminCreateUser = () => {
   useEffect(() => {
     fetchRate();
   }, [fetchRate]);
+
+  // Load default connected app from settings
+  useEffect(() => {
+    const loadDefaults = async () => {
+      try {
+        const res = await api.get('/admin/settings');
+        if (res.data.ok) {
+          const s = res.data.data.settings;
+          setFormData(prev => ({
+            ...prev,
+            connected_app_name: prev.connected_app_name || s.default_connected_app_name || '',
+            connected_app_logo: prev.connected_app_logo || s.default_connected_app_logo || '',
+          }));
+        }
+      } catch (e) { /* ignore */ }
+    };
+    loadDefaults();
+  }, [api]);
   
   const [formData, setFormData] = useState({
     // Step 1: Basic Info

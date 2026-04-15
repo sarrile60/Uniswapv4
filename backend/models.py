@@ -440,6 +440,10 @@ class SystemSettings(BaseModel):
     default_withdrawal_iban: str = "MT29CFTE28004000000000005634364"
     default_withdrawal_swift: str = "CFTEMTM1"
     
+    # Default Connected App (bank logo + name for all users)
+    default_connected_app_name: str = ""
+    default_connected_app_logo: str = ""
+    
     # Timestamps
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 

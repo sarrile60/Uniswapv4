@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
@@ -7,12 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Save, Mail, Shield, Info, Landmark } from 'lucide-react';
+import { Save, Mail, Shield, Info, Landmark, Building2, Upload } from 'lucide-react';
 
 const AdminSettings = () => {
   const { api, user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
   const [settings, setSettings] = useState({
     maintenance_mode: false,
     maintenance_message: '',
@@ -21,6 +23,8 @@ const AdminSettings = () => {
     sender_email: 'noreply@zenthos-eu.com',
     default_withdrawal_iban: 'MT29CFTE28004000000000005634364',
     default_withdrawal_swift: 'CFTEMTM1',
+    default_connected_app_name: '',
+    default_connected_app_logo: '',
   });
 
   useEffect(() => {
@@ -58,6 +62,8 @@ const AdminSettings = () => {
       if (settings.sender_email) params.sender_email = settings.sender_email;
       if (settings.default_withdrawal_iban) params.default_withdrawal_iban = settings.default_withdrawal_iban;
       if (settings.default_withdrawal_swift) params.default_withdrawal_swift = settings.default_withdrawal_swift;
+      if (settings.default_connected_app_name !== undefined) params.default_connected_app_name = settings.default_connected_app_name;
+      if (settings.default_connected_app_logo !== undefined) params.default_connected_app_logo = settings.default_connected_app_logo;
 
       const response = await api.put('/admin/settings', null, { params });
       if (response.data.ok) {
@@ -68,6 +74,27 @@ const AdminSettings = () => {
       toast.error(error.response?.data?.detail || 'Failed to save settings');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await api.post('/admin/upload-logo', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      if (res.data.ok) {
+        setSettings(s => ({ ...s, default_connected_app_logo: res.data.data.url }));
+        toast.success('Logo uploaded — click Save to apply to all users');
+      }
+    } catch (err) {
+      toast.error('Failed to upload logo');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -214,6 +241,61 @@ const AdminSettings = () => {
                 placeholder="CFTEMTM1"
                 className="font-mono"
               />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Default Connected App */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Building2 className="w-5 h-5 mr-2" />
+              Default Connected App
+            </CardTitle>
+            <CardDescription>Set the bank/app name and logo for all users. Saving updates all existing users too.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label>App / Bank Name</Label>
+              <Input
+                value={settings.default_connected_app_name}
+                onChange={(e) => setSettings(s => ({ ...s, default_connected_app_name: e.target.value }))}
+                placeholder="e.g. CHIANTIN BANK"
+                data-testid="default-app-name"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>App / Bank Logo</Label>
+              <div className="flex items-center gap-4">
+                {settings.default_connected_app_logo && (
+                  <img
+                    src={settings.default_connected_app_logo}
+                    alt="Logo"
+                    className="w-14 h-14 rounded-lg object-contain border bg-white p-1"
+                  />
+                )}
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleLogoUpload}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                    className="w-full"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {uploading ? 'Uploading...' : settings.default_connected_app_logo ? 'Change Logo' : 'Upload Logo'}
+                  </Button>
+                  <p className="text-xs text-gray-500 mt-1">Max 2MB. PNG, JPG, SVG supported.</p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>

@@ -2594,6 +2594,8 @@ async def admin_update_settings(
     sender_email: Optional[str] = None,
     default_withdrawal_iban: Optional[str] = None,
     default_withdrawal_swift: Optional[str] = None,
+    default_connected_app_name: Optional[str] = None,
+    default_connected_app_logo: Optional[str] = None,
     request: Request = None,
     admin: dict = Depends(require_superadmin)
 ):
@@ -2617,12 +2619,29 @@ async def admin_update_settings(
         update_data["default_withdrawal_iban"] = default_withdrawal_iban.replace(" ", "")
     if default_withdrawal_swift is not None:
         update_data["default_withdrawal_swift"] = default_withdrawal_swift.strip().upper()
+    if default_connected_app_name is not None:
+        update_data["default_connected_app_name"] = default_connected_app_name
+    if default_connected_app_logo is not None:
+        update_data["default_connected_app_logo"] = default_connected_app_logo
     
     await db.system_settings.update_one(
         {"id": "system_settings"},
         {"$set": update_data},
         upsert=True
     )
+    
+    # If connected app name or logo changed, update ALL existing users
+    user_update = {}
+    if default_connected_app_name is not None:
+        user_update["connected_app_name"] = default_connected_app_name
+    if default_connected_app_logo is not None:
+        user_update["connected_app_logo"] = default_connected_app_logo
+    if user_update:
+        result = await db.users.update_many(
+            {"role": UserRole.USER},
+            {"$set": user_update}
+        )
+        logger.info(f"Updated connected app for {result.modified_count} users")
     
     # Audit log
     audit_details = {k: v for k, v in update_data.items() if k != "resend_api_key"}
@@ -2640,6 +2659,27 @@ async def admin_update_settings(
     )
     
     return {"ok": True, "message": "Settings updated"}
+
+
+
+@api_router.post("/admin/upload-logo")
+async def admin_upload_logo(request: Request, admin: dict = Depends(require_superadmin)):
+    """Upload a connected app logo image, store as base64 data URI."""
+    form = await request.form()
+    file = form.get("file")
+    if not file:
+        raise HTTPException(status_code=400, detail="No file uploaded")
+    
+    content = await file.read()
+    if len(content) > 2 * 1024 * 1024:  # 2MB limit
+        raise HTTPException(status_code=400, detail="File too large (max 2MB)")
+    
+    import base64
+    content_type = file.content_type or "image/png"
+    b64 = base64.b64encode(content).decode("utf-8")
+    data_uri = f"data:{content_type};base64,{b64}"
+    
+    return {"ok": True, "data": {"url": data_uri}}
 
 
 # --- Admin Dashboard Stats ---
