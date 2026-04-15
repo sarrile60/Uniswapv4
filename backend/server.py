@@ -1406,6 +1406,7 @@ async def admin_create_user(user_data: UserCreate, request: Request, admin: dict
         username=user_data.username.lower(),
         password_hash=hash_password(user_data.password),
         first_name=user_data.first_name,
+        middle_name=user_data.middle_name,
         last_name=user_data.last_name,
         date_of_birth=user_data.date_of_birth,
         phone=user_data.phone,

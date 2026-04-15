@@ -76,6 +76,7 @@ class User(BaseModel):
     username: str
     password_hash: str
     first_name: str
+    middle_name: Optional[str] = None
     last_name: str
     date_of_birth: str  # Format: YYYY-MM-DD
     phone: Optional[str] = None
@@ -146,6 +147,7 @@ class UserCreate(BaseModel):
     username: str
     password: str
     first_name: str
+    middle_name: Optional[str] = None
     last_name: str
     date_of_birth: str
     phone: Optional[str] = None
@@ -178,6 +180,7 @@ class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     username: Optional[str] = None
     first_name: Optional[str] = None
+    middle_name: Optional[str] = None
     last_name: Optional[str] = None
     date_of_birth: Optional[str] = None
     phone: Optional[str] = None
@@ -214,6 +217,7 @@ class UserPublic(BaseModel):
     email: str
     username: str
     first_name: str
+    middle_name: Optional[str] = None
     last_name: str
     phone: Optional[str] = None
     date_of_birth: Optional[str] = None

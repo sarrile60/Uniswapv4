@@ -52,6 +52,7 @@ const AdminCreateUser = () => {
   const [formData, setFormData] = useState({
     // Step 1: Basic Info
     first_name: '',
+    middle_name: '',
     last_name: '',
     email: '',
     username: '',
@@ -107,6 +108,7 @@ const AdminCreateUser = () => {
     try {
       const payload = {
         first_name: formData.first_name,
+        middle_name: formData.middle_name || null,
         last_name: formData.last_name,
         email: formData.email,
         username: formData.username,
@@ -202,7 +204,7 @@ const AdminCreateUser = () => {
                 <CardDescription>Enter the user's personal details</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="first_name">First Name *</Label>
                     <Input
@@ -211,6 +213,15 @@ const AdminCreateUser = () => {
                       onChange={(e) => handleChange('first_name', e.target.value)}
                       placeholder="John"
                       required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="middle_name">Middle Name</Label>
+                    <Input
+                      id="middle_name"
+                      value={formData.middle_name}
+                      onChange={(e) => handleChange('middle_name', e.target.value)}
+                      placeholder="Optional"
                     />
                   </div>
                   <div className="space-y-2">
