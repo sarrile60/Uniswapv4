@@ -1706,11 +1706,15 @@ async def admin_list_transactions(
     page_size: int = Query(20, ge=1, le=100),
     admin: dict = Depends(require_admin)
 ):
-    """List all transactions (admin only) — excludes auto-generated history"""
-    query = {"created_by_admin": {"$ne": True}}
+    """List all transactions (admin only) — excludes auto-generated history unless viewing a specific user"""
+    query = {}
     
     if user_id:
+        # When viewing a specific user, show ALL their transactions (including generated history)
         query["user_id"] = user_id
+    else:
+        # Global transactions list: exclude auto-generated history
+        query["created_by_admin"] = {"$ne": True}
     if asset:
         query["asset"] = asset.upper()
     if type:
