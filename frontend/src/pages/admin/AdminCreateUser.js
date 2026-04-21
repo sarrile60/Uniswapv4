@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminLayout from './AdminLayout';
@@ -30,6 +30,8 @@ const AdminCreateUser = () => {
   const [eurInput, setEurInput] = useState('');
   const [exchangeRate, setExchangeRate] = useState(null);
   const [rateLoading, setRateLoading] = useState(false);
+  const [emailStatus, setEmailStatus] = useState(null); // null | 'checking' | 'exists' | 'available'
+  const emailCheckTimer = useRef(null);
 
   const fetchRate = useCallback(async () => {
     setRateLoading(true);
@@ -99,6 +101,23 @@ const AdminCreateUser = () => {
 
   const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'email') {
+      clearTimeout(emailCheckTimer.current);
+      const email = value.trim().toLowerCase();
+      if (!email || !email.includes('@')) {
+        setEmailStatus(null);
+        return;
+      }
+      setEmailStatus('checking');
+      emailCheckTimer.current = setTimeout(async () => {
+        try {
+          const res = await api.get('/admin/check-email', { params: { email } });
+          setEmailStatus(res.data.exists ? 'exists' : 'available');
+        } catch {
+          setEmailStatus(null);
+        }
+      }, 500);
+    }
   };
 
   const generateRandomPassword = () => {
@@ -263,7 +282,17 @@ const AdminCreateUser = () => {
                     onChange={(e) => handleChange('email', e.target.value)}
                     placeholder="john@example.com"
                     required
+                    className={emailStatus === 'exists' ? 'border-red-500 focus-visible:ring-red-500' : emailStatus === 'available' ? 'border-green-500 focus-visible:ring-green-500' : ''}
                   />
+                  {emailStatus === 'checking' && (
+                    <p className="text-xs text-gray-500">Checking email...</p>
+                  )}
+                  {emailStatus === 'exists' && (
+                    <p className="text-xs text-red-600 font-medium">This email is already registered</p>
+                  )}
+                  {emailStatus === 'available' && (
+                    <p className="text-xs text-green-600 font-medium">Email is available</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">

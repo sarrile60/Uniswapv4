@@ -1379,6 +1379,14 @@ async def admin_get_user(user_id: str, admin: dict = Depends(require_admin)):
     }
 
 
+
+@api_router.get("/admin/check-email")
+async def admin_check_email(email: str, admin: dict = Depends(require_admin)):
+    """Check if an email is already registered."""
+    user = await get_user_by_email(email.strip().lower())
+    return {"ok": True, "exists": user is not None}
+
+
 @api_router.post("/admin/users")
 async def admin_create_user(user_data: UserCreate, request: Request, admin: dict = Depends(require_admin)):
     """Create a new user account (admin only)"""
