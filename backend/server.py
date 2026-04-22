@@ -1932,6 +1932,10 @@ async def admin_update_transaction(
     allowed_fields = ["amount", "fee", "fee_paid", "status", "description", "type", "asset", "transaction_date", "external_wallet"]
     update_data = {k: v for k, v in updates.items() if k in allowed_fields and v is not None}
     
+    # Auto-set fee_paid_at when fee_paid changes to True
+    if update_data.get("fee_paid") is True:
+        update_data["fee_paid_at"] = datetime.now(timezone.utc).isoformat()
+    
     if update_data:
         await db.transactions.update_one({"id": transaction_id}, {"$set": update_data})
     
