@@ -79,7 +79,7 @@ const AdminEditUser = () => {
     timer_duration_hours: '',
     timer_started_at: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword, setShowPassword] = useState(true);
 
   useEffect(() => {
     loadUser();
@@ -431,17 +431,30 @@ const AdminEditUser = () => {
                       type={showPassword ? 'text' : 'password'}
                       value={user?.plain_password || ''}
                       readOnly
-                      className="bg-gray-50 text-gray-600"
+                      className="bg-gray-50 text-gray-600 pr-20"
                       data-testid="admin-user-current-password"
                     />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                      onClick={() => setShowPassword(!showPassword)}
-                      data-testid="admin-toggle-password-visibility"
-                    >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                      <button
+                        type="button"
+                        className="text-gray-400 hover:text-blue-600 p-1"
+                        onClick={() => {
+                          navigator.clipboard.writeText(user?.plain_password || '');
+                          toast.success('Password copied');
+                        }}
+                        title="Copy password"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        className="text-gray-400 hover:text-gray-600 p-1"
+                        onClick={() => setShowPassword(!showPassword)}
+                        data-testid="admin-toggle-password-visibility"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                   <p className="text-xs text-gray-500">Read-only. This is the user's current password.</p>
                 </div>
