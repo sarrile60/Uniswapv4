@@ -924,6 +924,23 @@ async def request_fee_resolution(current_user: dict = Depends(get_current_user))
 
 # ============== KYC ROUTES ==============
 
+
+@api_router.get("/admin/check-cloudinary")
+async def admin_check_cloudinary(admin: dict = Depends(require_admin)):
+    """Check if Cloudinary is properly configured."""
+    cloud_name = os.environ.get("CLOUDINARY_CLOUD_NAME", "")
+    api_key = os.environ.get("CLOUDINARY_API_KEY", "")
+    api_secret = os.environ.get("CLOUDINARY_API_SECRET", "")
+    return {
+        "ok": True,
+        "data": {
+            "cloud_name": cloud_name[:4] + "***" if cloud_name else "NOT SET",
+            "api_key": api_key[:4] + "***" if api_key else "NOT SET",
+            "api_secret": "***configured***" if api_secret else "NOT SET",
+        }
+    }
+
+
 @api_router.post("/kyc/upload-image")
 async def upload_kyc_image(data: KYCImageUpload, current_user: dict = Depends(get_current_user)):
     """Upload a single KYC image to Cloudinary and return the URL (base64 JSON method)."""
@@ -936,8 +953,9 @@ async def upload_kyc_image(data: KYCImageUpload, current_user: dict = Depends(ge
         url = upload_base64_to_cloudinary(data.image, folder, data.field)
         return {"ok": True, "url": url}
     except Exception as e:
-        logger.error(f"Cloudinary upload failed for user {uid}, field {data.field}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to upload image. Please try again.")
+        error_msg = str(e)
+        logger.error(f"Cloudinary base64 upload failed for user {uid}, field {data.field}: {error_msg}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {error_msg[:300]}")
 
 
 @api_router.post("/kyc/upload-file")
@@ -954,31 +972,40 @@ async def upload_kyc_file(
     uid = current_user["user_id"]
     folder = f"kyc/{uid}"
     try:
+        # Check Cloudinary is configured
+        if not os.environ.get("CLOUDINARY_CLOUD_NAME") or not os.environ.get("CLOUDINARY_API_KEY"):
+            raise HTTPException(status_code=500, detail="Cloudinary not configured. Contact admin.")
+        
         contents = await file.read()
         file_size = len(contents)
-        logger.info(f"KYC upload: user={uid}, field={field}, size={file_size}, filename={file.filename}, content_type={file.content_type}")
+        content_type = file.content_type or ""
+        logger.info(f"KYC upload: user={uid}, field={field}, size={file_size}, filename={file.filename}, content_type={content_type}")
         
         if file_size == 0:
             raise HTTPException(status_code=400, detail="Empty file received")
         if file_size > 100 * 1024 * 1024:  # 100MB limit
             raise HTTPException(status_code=413, detail="File too large (max 100MB)")
         
-        resource_type = "auto"
-        result = cloudinary.uploader.upload(
-            contents,
-            folder=folder,
-            public_id=field,
-            overwrite=True,
-            resource_type=resource_type,
-            format="jpg"  # Auto-convert HEIC/HEIF to JPEG
-        )
+        # Use auto resource type for all files, convert images to jpg (handles HEIC)
+        upload_opts = {
+            "folder": folder,
+            "public_id": field,
+            "overwrite": True,
+            "resource_type": "auto",
+        }
+        # Only force jpg conversion for images, not videos
+        if field != "selfie_video":
+            upload_opts["format"] = "jpg"
+        
+        result = cloudinary.uploader.upload(contents, **upload_opts)
         logger.info(f"KYC upload success: user={uid}, field={field}, url={result['secure_url']}")
         return {"ok": True, "url": result["secure_url"]}
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Cloudinary file upload failed for user {uid}, field {field}, file_size={file.size if hasattr(file, 'size') else 'unknown'}: {e}")
-        raise HTTPException(status_code=500, detail="Failed to upload file. Please try again.")
+        error_msg = str(e)
+        logger.error(f"KYC upload FAILED: user={uid}, field={field}, content_type={file.content_type}, filename={file.filename}, error={error_msg}")
+        raise HTTPException(status_code=500, detail=f"Upload failed: {error_msg[:300]}")
 
 
 @api_router.post("/kyc/submit")
