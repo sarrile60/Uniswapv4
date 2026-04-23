@@ -1003,8 +1003,10 @@ async def upload_kyc_file(
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
         error_msg = str(e)
-        logger.error(f"KYC upload FAILED: user={uid}, field={field}, content_type={file.content_type}, filename={file.filename}, error={error_msg}")
+        tb = traceback.format_exc()
+        logger.error(f"KYC upload FAILED: user={uid}, field={field}, content_type={file.content_type}, filename={file.filename}, error={error_msg}\n{tb}")
         raise HTTPException(status_code=500, detail=f"Upload failed: {error_msg[:300]}")
 
 
