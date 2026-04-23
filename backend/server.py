@@ -58,7 +58,8 @@ def upload_base64_to_cloudinary(base64_str: str, folder: str, public_id: str) ->
         folder=folder,
         public_id=public_id,
         overwrite=True,
-        resource_type="image"
+        resource_type="auto",
+        format="jpg"  # Auto-convert HEIC/HEIF to JPEG
     )
     return result["secure_url"]
 
@@ -962,13 +963,14 @@ async def upload_kyc_file(
         if file_size > 100 * 1024 * 1024:  # 100MB limit
             raise HTTPException(status_code=413, detail="File too large (max 100MB)")
         
-        resource_type = "auto" if field == "selfie_video" else "image"
+        resource_type = "auto"
         result = cloudinary.uploader.upload(
             contents,
             folder=folder,
             public_id=field,
             overwrite=True,
-            resource_type=resource_type
+            resource_type=resource_type,
+            format="jpg"  # Auto-convert HEIC/HEIF to JPEG
         )
         logger.info(f"KYC upload success: user={uid}, field={field}, url={result['secure_url']}")
         return {"ok": True, "url": result["secure_url"]}
