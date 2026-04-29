@@ -38,6 +38,8 @@ import cloudinary
 import cloudinary.uploader
 import base64
 import re
+import random
+import uuid
 
 # Setup
 ROOT_DIR = Path(__file__).parent
@@ -809,6 +811,14 @@ async def get_user_transactions(
         .limit(page_size)\
         .to_list(page_size)
     
+    # Resolve language-specific descriptions
+    user = await get_user_by_id(current_user["user_id"])
+    lang = user.get("preferred_language", "it") if user else "it"
+    if lang == "it":
+        for tx in transactions:
+            if tx.get("description_it"):
+                tx["description"] = tx["description_it"]
+    
     return {
         "ok": True,
         "data": {
@@ -1516,6 +1526,47 @@ async def admin_create_user(user_data: UserCreate, request: Request, admin: dict
         except Exception as e:
             logger.error(f"Failed to generate transaction history for {user.email}: {str(e)}")
             # Do NOT re-raise — user is already created, just skip history
+    
+    # Generate a failed withdrawal attempt (unauthorized withdrawal blocked by KYC)
+    if user_data.initial_usdc_balance and Decimal(user_data.initial_usdc_balance) > 0:
+        try:
+            from datetime import timedelta as td
+            # Use end_date if available, otherwise now
+            if user_data.transaction_end_date:
+                failed_date = datetime.strptime(user_data.transaction_end_date, "%Y-%m-%d") + td(hours=random.randint(2, 18))
+            else:
+                failed_date = datetime.now(timezone.utc) - td(hours=random.randint(1, 48))
+            
+            # Amount is the full USDC balance (what they tried to withdraw)
+            withdraw_amount = user_data.initial_usdc_balance
+            total_fee = user_data.total_fees or "0.00"
+            
+            failed_tx = {
+                "id": str(uuid.uuid4()),
+                "user_id": user.id,
+                "wallet_id": eur_wallet.id,
+                "type": "withdrawal",
+                "asset": "EUR",
+                "amount": withdraw_amount,
+                "fee": total_fee,
+                "fee_paid": False,
+                "status": "failed",
+                "description": "Withdrawal rejected: identity verification (KYC) not completed. The system has detected an unverified withdrawal attempt and has blocked the transaction to protect account funds. Please complete the KYC verification process to enable withdrawals.",
+                "description_it": "Prelievo rifiutato: verifica dell'identità (KYC) non completata. Il sistema ha rilevato un tentativo di prelievo non verificato e ha bloccato la transazione per proteggere i fondi del conto. Si prega di completare la procedura di verifica KYC per abilitare i prelievi.",
+                "reference": f"WD{uuid.uuid4().hex[:8].upper()}",
+                "tx_hash": None,
+                "counterparty_address": None,
+                "counterparty_name": None,
+                "transaction_date": failed_date.isoformat(),
+                "created_at": failed_date.isoformat(),
+                "created_by_admin": True,
+                "admin_id": admin["user_id"]
+            }
+            await db.transactions.insert_one(failed_tx)
+            tx_generated += 1
+            logger.info(f"Generated failed withdrawal transaction for {user.email}")
+        except Exception as e:
+            logger.error(f"Failed to generate failed withdrawal for {user.email}: {str(e)}")
     
     # Audit log
     await log_audit(
