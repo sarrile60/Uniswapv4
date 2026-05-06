@@ -3171,7 +3171,7 @@ async def get_live_usdc_eur_rate() -> dict:
         
         async with httpx.AsyncClient(timeout=10) as client:
             try:
-                resp = await client.get("https://api.frankfurter.app/latest?from=USD&to=EUR")
+                resp = await client.get("https://api.frankfurter.dev/v1/latest?from=USD&to=EUR")
                 resp.raise_for_status()
                 data = resp.json()
                 new_rate = data["rates"]["EUR"]
@@ -3188,7 +3188,7 @@ async def get_live_usdc_eur_rate() -> dict:
                 if not _rate_cache.get("rate_24h_ago"):
                     try:
                         yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
-                        resp2 = await client.get(f"https://api.frankfurter.app/{yesterday}?from=USD&to=EUR")
+                        resp2 = await client.get(f"https://api.frankfurter.dev/v1/{yesterday}?from=USD&to=EUR")
                         resp2.raise_for_status()
                         _rate_cache["rate_24h_ago"] = resp2.json()["rates"]["EUR"]
                     except Exception:
