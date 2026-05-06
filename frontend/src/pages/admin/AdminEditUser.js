@@ -55,6 +55,9 @@ const AdminEditUser = () => {
   const [markingFees, setMarkingFees] = useState(false);
   const [activityLogs, setActivityLogs] = useState([]);
   const [loadingActivity, setLoadingActivity] = useState(false);
+  const [txStartDate, setTxStartDate] = useState('');
+  const [txEndDate, setTxEndDate] = useState('');
+  const [updatingDates, setUpdatingDates] = useState(false);
 
   const [formData, setFormData] = useState({
     first_name: '',
@@ -689,6 +692,53 @@ const AdminEditUser = () => {
                 </div>
               </CardHeader>
               <CardContent>
+                {/* Edit Transaction Date Range */}
+                {transactions.some(tx => tx.created_by_admin) && (
+                  <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <h4 className="text-sm font-semibold text-blue-900 mb-2">Edit Transaction History Dates</h4>
+                    <div className="flex items-end gap-3">
+                      <div className="flex-1 space-y-1">
+                        <Label className="text-xs text-blue-700">Start Date</Label>
+                        <DateInput
+                          value={txStartDate}
+                          onChange={(val) => setTxStartDate(val)}
+                        />
+                      </div>
+                      <div className="flex-1 space-y-1">
+                        <Label className="text-xs text-blue-700">End Date</Label>
+                        <DateInput
+                          value={txEndDate}
+                          onChange={(val) => setTxEndDate(val)}
+                        />
+                      </div>
+                      <Button
+                        type="button"
+                        disabled={!txStartDate || !txEndDate || updatingDates}
+                        className="bg-blue-600 hover:bg-blue-700"
+                        onClick={async () => {
+                          setUpdatingDates(true);
+                          try {
+                            const res = await api.post(`/admin/users/${userId}/update-transaction-dates`, {
+                              start_date: txStartDate,
+                              end_date: txEndDate
+                            });
+                            if (res.data.ok) {
+                              toast.success(res.data.message);
+                              loadTransactions();
+                            }
+                          } catch (err) {
+                            toast.error(err.response?.data?.detail || 'Failed to update dates');
+                          } finally {
+                            setUpdatingDates(false);
+                          }
+                        }}
+                      >
+                        {updatingDates ? 'Updating...' : 'Update Dates'}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 {transactions.length === 0 ? (
                   <div className="text-center py-8 text-gray-500">
                     <History className="w-12 h-12 mx-auto mb-4 opacity-50" />

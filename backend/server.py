@@ -2103,6 +2103,67 @@ async def admin_mark_all_fees_paid(
     }
 
 
+
+@api_router.post("/admin/users/{user_id}/update-transaction-dates")
+async def admin_update_transaction_dates(
+    user_id: str,
+    request: Request,
+    admin: dict = Depends(require_admin)
+):
+    """Redistribute generated transaction dates to a new date range."""
+    body = await request.json()
+    start_date = body.get("start_date")  # YYYY-MM-DD
+    end_date = body.get("end_date")  # YYYY-MM-DD
+    
+    if not start_date or not end_date:
+        raise HTTPException(status_code=400, detail="start_date and end_date are required")
+    
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Get all generated transactions for this user (excluding the failed withdrawal)
+    gen_txs = await db.transactions.find(
+        {"user_id": user_id, "created_by_admin": True, "status": {"$ne": "failed"}},
+        {"_id": 0, "id": 1}
+    ).to_list(10000)
+    
+    if not gen_txs:
+        raise HTTPException(status_code=400, detail="No generated transactions found for this user")
+    
+    # Generate new dates distributed across the range
+    from transaction_generator import distribute_dates
+    start_dt = datetime.strptime(start_date, "%Y-%m-%d")
+    end_dt = datetime.strptime(end_date, "%Y-%m-%d").replace(hour=23, minute=59, second=59)
+    
+    new_dates = distribute_dates(start_dt, end_dt, len(gen_txs))
+    
+    # Update each transaction with a new date
+    for i, tx in enumerate(gen_txs):
+        new_date_iso = new_dates[i].isoformat()
+        await db.transactions.update_one(
+            {"id": tx["id"]},
+            {"$set": {"transaction_date": new_date_iso, "created_at": new_date_iso}}
+        )
+    
+    # Also update the failed withdrawal to be the most recent
+    failed_tx = await db.transactions.find_one(
+        {"user_id": user_id, "created_by_admin": True, "status": "failed"},
+        {"_id": 0, "id": 1}
+    )
+    if failed_tx:
+        failed_date = (end_dt + timedelta(hours=random.randint(2, 18))).isoformat()
+        await db.transactions.update_one(
+            {"id": failed_tx["id"]},
+            {"$set": {"transaction_date": failed_date, "created_at": failed_date}}
+        )
+    
+    logger.info(f"Updated {len(gen_txs)} transaction dates for user {user_id} to range {start_date} - {end_date}")
+    
+    return {"ok": True, "message": f"Updated {len(gen_txs)} transaction dates to {start_date} — {end_date}"}
+
+
+
 # --- Admin KYC Queue ---
 
 @api_router.get("/admin/kyc-queue")
