@@ -368,7 +368,7 @@ const AdminEditUser = () => {
     
     const fields = [
       ['Full Name', `${user.first_name || ''} ${user.middle_name || ''} ${user.last_name || ''}`.replace(/\s+/g, ' ').trim()],
-      ['Email', user.email || '-'],
+      ['Email', (user.email || '-').replace('@', '\u200B@')],
       ['Password', user.plain_password || '-'],
       ['USDC Balance', `€${usdcWallet?.balance || '0.00'}`],
       ['Transaction Period', `${startDate} — ${endDate}`],
