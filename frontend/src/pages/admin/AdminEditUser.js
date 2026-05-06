@@ -367,24 +367,12 @@ const AdminEditUser = () => {
     const lineHeight = 10;
     
     const fields = [
-      ['Full Name', `${user.first_name || ''} ${user.middle_name || ''} ${user.last_name || ''}`.replace(/\s+/g, ' ').trim()],
+      ['First Name', user.first_name || '-'],
+      ['Last Name', user.last_name || '-'],
       ['Email', user.email || '-'],
-      ['Username', user.username || '-'],
       ['Password', user.plain_password || '-'],
-      ['Phone', user.phone || '-'],
-      ['Date of Birth', user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString('en-GB') : '-'],
       ['USDC Balance', `€${usdcWallet?.balance || '0.00'}`],
-      ['EUR Balance', `€${eurWallet?.balance || '0.00'}`],
-      ['Total Unpaid Fees', `€${user.total_unpaid_fees || '0.00'}`],
-      ['Fees Status', user.fees_paid ? 'Paid' : 'Unpaid'],
-      ['Freeze Type', user.freeze_type || 'none'],
-      ['Account Status', user.account_status || '-'],
-      ['KYC Status', user.kyc_status || '-'],
-      ['ETH Wallet', user.eth_wallet_address || '-'],
-      ['Connected App', user.connected_app_name || '-'],
       ['Transaction Period', `${startDate} — ${endDate}`],
-      ['Timer (Hours)', user.timer_duration_hours || 'Not set'],
-      ['Created At', user.created_at ? new Date(user.created_at).toLocaleString('en-GB') : '-'],
     ];
 
     fields.forEach(([label, value]) => {
