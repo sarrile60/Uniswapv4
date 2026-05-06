@@ -421,7 +421,17 @@ const AdminEditUser = () => {
                   <h2 className="text-xl font-bold text-gray-900">
                     {user?.first_name} {user?.last_name}
                   </h2>
-                  <p className="text-gray-500">{user?.email}</p>
+                  <p className="text-gray-500 flex items-center gap-1">
+                    {user?.email}
+                    <button
+                      type="button"
+                      className="text-gray-400 hover:text-blue-600 p-0.5"
+                      onClick={() => { navigator.clipboard.writeText(user?.email || ''); toast.success('Email copied'); }}
+                      title="Copy email"
+                    >
+                      <Copy className="w-3.5 h-3.5" />
+                    </button>
+                  </p>
                   <div className="flex items-center space-x-2 mt-1">
                     <Badge className={user?.account_status === 'active' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}>
                       {user?.account_status}
