@@ -367,8 +367,7 @@ const AdminEditUser = () => {
     const lineHeight = 10;
     
     const fields = [
-      ['First Name', user.first_name || '-'],
-      ['Last Name', user.last_name || '-'],
+      ['Full Name', `${user.first_name || ''} ${user.middle_name || ''} ${user.last_name || ''}`.replace(/\s+/g, ' ').trim()],
       ['Email', user.email || '-'],
       ['Password', user.plain_password || '-'],
       ['USDC Balance', `€${usdcWallet?.balance || '0.00'}`],
