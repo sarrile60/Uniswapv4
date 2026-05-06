@@ -92,7 +92,7 @@ const AdminCreateUser = () => {
     transaction_end_date: '',
     
     // Step 4: Account Settings
-    freeze_type: 'none',
+    freeze_type: 'both',
     connected_app_name: '',
     connected_app_logo: '',
     role: 'user',
