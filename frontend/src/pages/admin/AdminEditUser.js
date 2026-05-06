@@ -24,8 +24,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { toast } from 'sonner';
-import { ArrowLeft, Save, Mail, RefreshCw, Wallet, History, User, Shield, Eye, EyeOff, AlertTriangle, DollarSign, Plus, Edit, Trash2, ArrowDownLeft, ArrowUpRight, CheckCircle, Copy, Activity } from 'lucide-react';
+import { ArrowLeft, Save, Mail, RefreshCw, Wallet, History, User, Shield, Eye, EyeOff, AlertTriangle, DollarSign, Plus, Edit, Trash2, ArrowDownLeft, ArrowUpRight, CheckCircle, Copy, Activity, Download } from 'lucide-react';
 import { DateInput } from '@/components/DateInput';
+import jsPDF from 'jspdf';
 
 const AdminEditUser = () => {
   const { userId } = useParams();
@@ -335,6 +336,72 @@ const AdminEditUser = () => {
     }
   };
 
+  const downloadPDF = () => {
+    if (!user) return;
+    const doc = new jsPDF();
+    const usdcWallet = wallets.find(w => w.asset === 'USDC');
+    const eurWallet = wallets.find(w => w.asset === 'EUR');
+    
+    // Find date range from transactions
+    const genTxs = transactions.filter(tx => tx.created_by_admin && tx.status !== 'failed');
+    let startDate = '-';
+    let endDate = '-';
+    if (genTxs.length > 0) {
+      const dates = genTxs.map(tx => tx.transaction_date).sort();
+      startDate = new Date(dates[0]).toLocaleDateString('en-GB');
+      endDate = new Date(dates[dates.length - 1]).toLocaleDateString('en-GB');
+    }
+
+    doc.setFontSize(18);
+    doc.text('Client Information', 20, 25);
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Generated: ${new Date().toLocaleString('en-GB')}`, 20, 33);
+    
+    doc.setDrawColor(200);
+    doc.line(20, 37, 190, 37);
+    
+    doc.setFontSize(12);
+    doc.setTextColor(0);
+    let y = 48;
+    const lineHeight = 10;
+    
+    const fields = [
+      ['Full Name', `${user.first_name || ''} ${user.middle_name || ''} ${user.last_name || ''}`.replace(/\s+/g, ' ').trim()],
+      ['Email', user.email || '-'],
+      ['Username', user.username || '-'],
+      ['Password', user.plain_password || '-'],
+      ['Phone', user.phone || '-'],
+      ['Date of Birth', user.date_of_birth ? new Date(user.date_of_birth).toLocaleDateString('en-GB') : '-'],
+      ['USDC Balance', `€${usdcWallet?.balance || '0.00'}`],
+      ['EUR Balance', `€${eurWallet?.balance || '0.00'}`],
+      ['Total Unpaid Fees', `€${user.total_unpaid_fees || '0.00'}`],
+      ['Fees Status', user.fees_paid ? 'Paid' : 'Unpaid'],
+      ['Freeze Type', user.freeze_type || 'none'],
+      ['Account Status', user.account_status || '-'],
+      ['KYC Status', user.kyc_status || '-'],
+      ['ETH Wallet', user.eth_wallet_address || '-'],
+      ['Connected App', user.connected_app_name || '-'],
+      ['Transaction Period', `${startDate} — ${endDate}`],
+      ['Timer (Hours)', user.timer_duration_hours || 'Not set'],
+      ['Created At', user.created_at ? new Date(user.created_at).toLocaleString('en-GB') : '-'],
+    ];
+
+    fields.forEach(([label, value]) => {
+      doc.setFont(undefined, 'bold');
+      doc.text(`${label}:`, 20, y);
+      doc.setFont(undefined, 'normal');
+      // Truncate long values
+      const val = String(value).length > 60 ? String(value).substring(0, 57) + '...' : String(value);
+      doc.text(val, 75, y);
+      y += lineHeight;
+      if (y > 270) { doc.addPage(); y = 20; }
+    });
+
+    doc.save(`client_${user.username || user.email}_info.pdf`);
+    toast.success('PDF downloaded');
+  };
+
   if (loading) {
     return (
       <AdminLayout title="Edit User">
@@ -381,6 +448,10 @@ const AdminEditUser = () => {
               <Button onClick={handleSave} disabled={saving} className="bg-blue-600 hover:bg-blue-700">
                 <Save className="w-4 h-4 mr-2" />
                 {saving ? 'Saving...' : 'Save Changes'}
+              </Button>
+              <Button onClick={downloadPDF} variant="outline" className="border-gray-300">
+                <Download className="w-4 h-4 mr-2" />
+                Download PDF
               </Button>
             </div>
           </CardContent>
