@@ -424,6 +424,38 @@ async def health_check():
 
 # ============== AUTH ROUTES ==============
 
+@api_router.get("/public/check-user")
+async def public_check_user(q: str):
+    """Public endpoint to check if a user is registered by name or email."""
+    q = q.strip()
+    if not q or len(q) < 2:
+        return {"ok": True, "found": False}
+    
+    q_lower = q.lower()
+    # Search by email (exact match)
+    user = await db.users.find_one(
+        {"email": q_lower, "role": UserRole.USER},
+        {"_id": 0, "id": 1}
+    )
+    if user:
+        return {"ok": True, "found": True}
+    
+    # Search by name (case-insensitive partial match on first_name, last_name, or combined)
+    name_query = {
+        "role": UserRole.USER,
+        "$or": [
+            {"first_name": {"$regex": q, "$options": "i"}},
+            {"last_name": {"$regex": q, "$options": "i"}},
+        ]
+    }
+    user = await db.users.find_one(name_query, {"_id": 0, "id": 1})
+    if user:
+        return {"ok": True, "found": True}
+    
+    return {"ok": True, "found": False}
+
+
+
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin, request: Request):
     """User login"""
