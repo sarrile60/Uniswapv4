@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -54,9 +54,12 @@ const t = {
     allCopied: 'Tutti i dettagli copiati!',
     optional: 'Opzionale',
     timer: 'Timer (Ore)',
-    timerPlaceholder: 'es. 72',
+    timerPlaceholder: 'es. 72 (opzionale)',
     agentName: 'Nome Agente *',
     agentPlaceholder: 'Il tuo nome',
+    emailExists: 'Questa email è già registrata',
+    emailAvailable: 'Email disponibile',
+    emailChecking: 'Verifica email...',
   },
   en: {
     pinTitle: 'Access Required',
@@ -101,9 +104,12 @@ const t = {
     allCopied: 'All details copied!',
     optional: 'Optional',
     timer: 'Timer (Hours)',
-    timerPlaceholder: 'e.g. 72',
+    timerPlaceholder: 'e.g. 72 (optional)',
     agentName: 'Agent Name *',
     agentPlaceholder: 'Your name',
+    emailExists: 'This email is already registered',
+    emailAvailable: 'Email available',
+    emailChecking: 'Checking email...',
   },
 };
 
@@ -115,6 +121,8 @@ const CreateAccountPage = () => {
   const [createdUser, setCreatedUser] = useState(null);
   const [lang, setLang] = useState('it');
   const [dark, setDark] = useState(true);
+  const [emailStatus, setEmailStatus] = useState(null);
+  const emailTimer = useRef(null);
   const [form, setForm] = useState({
     first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '',
     date_of_birth: '', start_date: '', end_date: '',
@@ -144,12 +152,35 @@ const CreateAccountPage = () => {
     }
   };
 
-  const handleChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
+  const handleChange = (field, value) => {
+    setForm(prev => ({ ...prev, [field]: value }));
+    if (field === 'email') {
+      clearTimeout(emailTimer.current);
+      const email = value.trim().toLowerCase();
+      if (!email || !email.includes('@')) {
+        setEmailStatus(null);
+        return;
+      }
+      setEmailStatus('checking');
+      emailTimer.current = setTimeout(async () => {
+        try {
+          const res = await axios.get(`${API_URL}/api/public/check-user`, { params: { q: email } });
+          setEmailStatus(res.data.found ? 'exists' : 'available');
+        } catch {
+          setEmailStatus(null);
+        }
+      }, 500);
+    }
+  };
 
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!form.first_name || !form.last_name || !form.username || !form.email || !form.password || !form.date_of_birth || !form.agent_name) {
       toast.error(l.fillAll);
+      return;
+    }
+    if (emailStatus === 'exists') {
+      toast.error(l.emailExists);
       return;
     }
     setLoading(true);
@@ -272,7 +303,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               <Button onClick={copyAll} className="flex-1" variant="outline">
                 <Copy className="w-4 h-4 mr-2" /> {l.copyAll}
               </Button>
-              <Button onClick={() => { setCreatedUser(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '', agent_name: form.agent_name }); }} className="flex-1">
+              <Button onClick={() => { setCreatedUser(null); setEmailStatus(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '', agent_name: form.agent_name }); }} className="flex-1">
                 <UserPlus className="w-4 h-4 mr-2" /> {l.createAnother}
               </Button>
             </div>
@@ -338,7 +369,10 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className={textSecondary}>{l.email}</Label>
-                <Input type="email" value={form.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="cliente@email.com" required className={inputCls} />
+                <Input type="email" value={form.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="cliente@email.com" required className={`${inputCls} ${emailStatus === 'exists' ? 'border-red-500' : emailStatus === 'available' ? 'border-green-500' : ''}`} />
+                {emailStatus === 'checking' && <p className={`text-xs ${textMuted}`}>{l.emailChecking}</p>}
+                {emailStatus === 'exists' && <p className="text-xs text-red-500 font-medium">{l.emailExists}</p>}
+                {emailStatus === 'available' && <p className="text-xs text-green-500 font-medium">{l.emailAvailable}</p>}
               </div>
               <div className="space-y-1.5">
                 <Label className={textSecondary}>{l.password}</Label>
