@@ -136,7 +136,7 @@ const translations = {
     landAbout_services: 'I Nostri Servizi',
     landAbout_svc1_title: d('Q3J5cHRvIFdhbGxldA=='), landAbout_svc1_desc: d('UG9ydGFmb2dsaSBkaWdpdGFsaSBwZXIgQml0Y29pbiwgRXRoZXJldW0sIFVTREMgZSBtb2x0byBhbHRybw=='),
     landAbout_svc2_title: d('UGlhdHRhZm9ybWEgRXhjaGFuZ2U='), landAbout_svc2_desc: d('QWNxdWlzdGEsIHZlbmRpIGUgc2NhbWJpYSBjcmlwdG92YWx1dGU='),
-    landAbout_svc3_title: 'Portfolio Tracker', landAbout_svc3_desc: 'Analisi e approfondimenti del portafoglio in tempo reale',
+    landAbout_svc3_title: 'Monitoraggio Portafoglio', landAbout_svc3_desc: 'Analisi e approfondimenti del portafoglio in tempo reale',
     landAbout_svc4_title: 'Servizi Istituzionali', landAbout_svc4_desc: d('VHJhZGluZyBPVEMgZSBpbmZyYXN0cnV0dHVyYSBpc3RpdHV6aW9uYWxl'),
     landAbout_regulation: 'Conformità:', landAbout_regDesc: 'Zenthos opera in conformità con le normative applicabili sugli asset digitali e mantiene robuste procedure AML/KYC.',
     landCTA_title: d('UHJvbnRvIGEgaW5pemlhcmUgaWwgdHVvIHZpYWdnaW8gbmVsIG1vbmRvIGNyeXB0bz8='), landCTA_desc: d('VW5pc2NpdGkgYWdsaSB1dGVudGkgY2hlIGFmZmlkYW5vIGkgcHJvcHJpIGFzc2V0IGRpZ2l0YWxpIGEgWmVudGhvcy4='), landCTA_btn: d('Q3JlYSBQb3J0YWZvZ2xpbyBHcmF0dWl0bw=='),
