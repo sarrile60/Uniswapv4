@@ -36,6 +36,7 @@ const AdminLayout = ({ children, title }) => {
     { path: '/admin/transactions', icon: ArrowLeftRight, label: 'Transactions', badgeKey: 'transactions' },
     { path: '/admin/audit-logs', icon: ScrollText, label: 'Audit Logs' },
     { path: '/admin/wallet-pool', icon: Wallet, label: 'Wallet Pool' },
+    { path: '/admin/agents', icon: Users, label: 'Agents' },
     { path: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
 

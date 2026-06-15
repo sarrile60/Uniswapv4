@@ -34,6 +34,7 @@ import AdminTransactions from "@/pages/admin/AdminTransactions";
 import AdminAuditLogs from "@/pages/admin/AdminAuditLogs";
 import AdminSettings from "@/pages/admin/AdminSettings";
 import AdminWalletPool from "@/pages/admin/AdminWalletPool";
+import AdminAgents from "@/pages/admin/AdminAgents";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -203,6 +204,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute adminOnly>
             <AdminWalletPool />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/agents"
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminAgents />
           </ProtectedRoute>
         }
       />

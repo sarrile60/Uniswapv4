@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe, ArrowLeft } from 'lucide-react';
+import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe, ArrowLeft, LogIn, User } from 'lucide-react';
 import { DateInput } from '@/components/DateInput';
 import axios from 'axios';
 
@@ -17,6 +17,14 @@ const t = {
     pinPlaceholder: 'Inserisci PIN',
     enter: 'Accedi',
     invalidPin: 'PIN non valido',
+    loginTitle: 'Accesso Agente',
+    loginSubtitle: 'Inserisci le tue credenziali',
+    usernamePlaceholder: 'Nome utente',
+    passwordPlaceholder: 'Password',
+    login: 'Accedi',
+    loggingIn: 'Accesso...',
+    loggedAs: 'Connesso come',
+    logout: 'Esci',
     title: 'Crea Account Cliente',
     walletsAvailable: 'portafogli disponibili',
     firstName: 'Nome *',
@@ -55,11 +63,10 @@ const t = {
     optional: 'Opzionale',
     timer: 'Timer (Ore)',
     timerPlaceholder: 'es. 72 (opzionale)',
-    agentName: 'Nome Agente *',
-    agentPlaceholder: 'Il tuo nome',
     emailExists: 'Questa email è già registrata',
     emailAvailable: 'Email disponibile',
     emailChecking: 'Verifica email...',
+    createdBy: 'Creato da',
   },
   en: {
     pinTitle: 'Access Required',
@@ -67,6 +74,14 @@ const t = {
     pinPlaceholder: 'Enter PIN',
     enter: 'Enter',
     invalidPin: 'Invalid PIN',
+    loginTitle: 'Agent Login',
+    loginSubtitle: 'Enter your credentials',
+    usernamePlaceholder: 'Username',
+    passwordPlaceholder: 'Password',
+    login: 'Login',
+    loggingIn: 'Logging in...',
+    loggedAs: 'Logged in as',
+    logout: 'Logout',
     title: 'Create Client Account',
     walletsAvailable: 'wallets available',
     firstName: 'First Name *',
@@ -105,17 +120,22 @@ const t = {
     optional: 'Optional',
     timer: 'Timer (Hours)',
     timerPlaceholder: 'e.g. 72 (optional)',
-    agentName: 'Agent Name *',
-    agentPlaceholder: 'Your name',
     emailExists: 'This email is already registered',
     emailAvailable: 'Email available',
     emailChecking: 'Checking email...',
+    createdBy: 'Created by',
   },
 };
 
 const CreateAccountPage = () => {
   const [pinUnlocked, setPinUnlocked] = useState(false);
   const [pin, setPin] = useState('');
+  const [agentToken, setAgentToken] = useState(() => localStorage.getItem('agent_token') || '');
+  const [agentInfo, setAgentInfo] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('agent_info') || 'null'); } catch { return null; }
+  });
+  const [agentCreds, setAgentCreds] = useState({ username: '', password: '' });
+  const [loggingIn, setLoggingIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [availableWallets, setAvailableWallets] = useState(null);
   const [createdUser, setCreatedUser] = useState(null);
@@ -126,7 +146,7 @@ const CreateAccountPage = () => {
   const [form, setForm] = useState({
     first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '',
     date_of_birth: '', start_date: '', end_date: '',
-    eur_amount: '', total_fees: '', timer_duration_hours: '', agent_name: '',
+    eur_amount: '', total_fees: '', timer_duration_hours: '',
   });
 
   const l = t[lang];
@@ -139,17 +159,40 @@ const CreateAccountPage = () => {
   }, []);
 
   useEffect(() => {
-    if (pinUnlocked) loadWalletCount();
-  }, [pinUnlocked, loadWalletCount]);
+    if (agentToken && agentInfo) { setPinUnlocked(true); loadWalletCount(); }
+  }, [agentToken, agentInfo, loadWalletCount]);
 
   const handlePinSubmit = (e) => {
     e.preventDefault();
-    if (pin === '8971') {
-      setPinUnlocked(true);
-    } else {
-      toast.error(l.invalidPin);
-      setPin('');
-    }
+    if (pin === '8971') { setPinUnlocked(true); }
+    else { toast.error(l.invalidPin); setPin(''); }
+  };
+
+  const handleAgentLogin = async (e) => {
+    e.preventDefault();
+    setLoggingIn(true);
+    try {
+      const res = await axios.post(`${API_URL}/api/public/agent-login`, {
+        pin: '8971', username: agentCreds.username, password: agentCreds.password,
+      });
+      if (res.data.ok) {
+        const { token, ...info } = res.data.data;
+        setAgentToken(token);
+        setAgentInfo(info);
+        localStorage.setItem('agent_token', token);
+        localStorage.setItem('agent_info', JSON.stringify(info));
+        loadWalletCount();
+        toast.success(`${l.loggedAs} ${info.display_name}`);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Login failed');
+    } finally { setLoggingIn(false); }
+  };
+
+  const handleAgentLogout = () => {
+    setAgentToken(''); setAgentInfo(null);
+    localStorage.removeItem('agent_token'); localStorage.removeItem('agent_info');
+    setPinUnlocked(false); setPin('');
   };
 
   const handleChange = (field, value) => {
@@ -157,45 +200,38 @@ const CreateAccountPage = () => {
     if (field === 'email') {
       clearTimeout(emailTimer.current);
       const email = value.trim().toLowerCase();
-      if (!email || !email.includes('@')) {
-        setEmailStatus(null);
-        return;
-      }
+      if (!email || !email.includes('@')) { setEmailStatus(null); return; }
       setEmailStatus('checking');
       emailTimer.current = setTimeout(async () => {
         try {
           const res = await axios.get(`${API_URL}/api/public/check-user`, { params: { q: email } });
           setEmailStatus(res.data.found ? 'exists' : 'available');
-        } catch {
-          setEmailStatus(null);
-        }
+        } catch { setEmailStatus(null); }
       }, 500);
     }
   };
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    if (!form.first_name || !form.last_name || !form.username || !form.email || !form.password || !form.date_of_birth || !form.agent_name) {
-      toast.error(l.fillAll);
-      return;
+    if (!form.first_name || !form.last_name || !form.username || !form.email || !form.password || !form.date_of_birth) {
+      toast.error(l.fillAll); return;
     }
-    if (emailStatus === 'exists') {
-      toast.error(l.emailExists);
-      return;
-    }
+    if (emailStatus === 'exists') { toast.error(l.emailExists); return; }
     setLoading(true);
     try {
-      const res = await axios.post(`${API_URL}/api/public/agent-create-user`, { ...form, pin: '8971' });
+      const res = await axios.post(`${API_URL}/api/public/agent-create-user`, form, {
+        headers: { Authorization: `Bearer ${agentToken}` },
+      });
       if (res.data.ok) {
         setCreatedUser(res.data.data);
         loadWalletCount();
         toast.success(l.accountCreated);
       }
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to create account');
-    } finally {
-      setLoading(false);
-    }
+      const detail = err.response?.data?.detail || 'Failed';
+      if (detail.includes('expired') || detail.includes('token')) { handleAgentLogout(); }
+      toast.error(detail);
+    } finally { setLoading(false); }
   };
 
   const copyAll = () => {
@@ -211,7 +247,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
     toast.success(l.allCopied);
   };
 
-  // Theme classes
+  // Theme
   const bg = dark ? 'bg-gray-950' : 'bg-gray-50';
   const cardBg = dark ? 'bg-gray-900 border-gray-800' : 'bg-white';
   const textPrimary = dark ? 'text-gray-100' : 'text-gray-900';
@@ -235,8 +271,8 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
     </div>
   );
 
-  // PIN Gate
-  if (!pinUnlocked) {
+  // Step 1: PIN Gate
+  if (!pinUnlocked && !agentToken) {
     return (
       <div className={`min-h-screen ${bg} flex items-center justify-center p-4 transition-colors`}>
         {topBar}
@@ -248,18 +284,31 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               <p className={`text-sm ${textSecondary} mt-1`}>{l.pinSubtitle}</p>
             </div>
             <form onSubmit={handlePinSubmit} className="space-y-4">
-              <Input
-                type="password"
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                placeholder={l.pinPlaceholder}
-                className={`text-center text-lg tracking-widest ${inputCls}`}
-                maxLength={4}
-                data-testid="agent-pin-input"
-              />
-              <Button type="submit" className="w-full" data-testid="agent-pin-submit">
-                {l.enter}
-              </Button>
+              <Input type="password" value={pin} onChange={(e) => setPin(e.target.value)} placeholder={l.pinPlaceholder} className={`text-center text-lg tracking-widest ${inputCls}`} maxLength={4} data-testid="agent-pin-input" />
+              <Button type="submit" className="w-full" data-testid="agent-pin-submit">{l.enter}</Button>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Step 2: Agent Login
+  if (!agentToken) {
+    return (
+      <div className={`min-h-screen ${bg} flex items-center justify-center p-4 transition-colors`}>
+        {topBar}
+        <Card className={`w-full max-w-sm shadow-lg ${cardBg}`}>
+          <CardContent className="pt-8 pb-8 px-6">
+            <div className="text-center mb-6">
+              <LogIn className={`w-10 h-10 ${textMuted} mx-auto mb-3`} />
+              <h1 className={`text-lg font-bold ${textPrimary}`}>{l.loginTitle}</h1>
+              <p className={`text-sm ${textSecondary} mt-1`}>{l.loginSubtitle}</p>
+            </div>
+            <form onSubmit={handleAgentLogin} className="space-y-4">
+              <Input value={agentCreds.username} onChange={(e) => setAgentCreds(c => ({ ...c, username: e.target.value }))} placeholder={l.usernamePlaceholder} className={inputCls} required />
+              <Input type="password" value={agentCreds.password} onChange={(e) => setAgentCreds(c => ({ ...c, password: e.target.value }))} placeholder={l.passwordPlaceholder} className={inputCls} required />
+              <Button type="submit" className="w-full" disabled={loggingIn}>{loggingIn ? l.loggingIn : l.login}</Button>
             </form>
           </CardContent>
         </Card>
@@ -280,7 +329,6 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               <h1 className={`text-xl font-bold ${textPrimary}`}>{l.successTitle}</h1>
               <p className={`text-sm ${textSecondary} mt-1`}>{l.successSubtitle}</p>
             </div>
-
             <div className={`${sectionBg} rounded-lg divide-y ${dividerBg} border ${dark ? 'border-gray-800' : ''}`}>
               {[
                 [l.fullName, fullName],
@@ -293,7 +341,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                 [l.transactionPeriod, createdUser.transaction_period],
                 [l.txGenerated, createdUser.transactions_generated],
                 [l.walletAssigned, createdUser.wallet_assigned ? l.yes : l.noWallet],
-                [l.agentName, createdUser.agent_name],
+                [l.createdBy, createdUser.agent_name],
               ].map(([label, value]) => (
                 <div key={label} className={`flex justify-between px-4 py-3 ${dividerBg}`}>
                   <span className={`text-sm font-medium ${textSecondary}`}>{label}</span>
@@ -301,12 +349,11 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                 </div>
               ))}
             </div>
-
             <div className="flex gap-3 mt-6">
               <Button onClick={copyAll} className="flex-1" variant="outline">
                 <Copy className="w-4 h-4 mr-2" /> {l.copyAll}
               </Button>
-              <Button onClick={() => { setCreatedUser(null); setEmailStatus(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '', agent_name: form.agent_name }); }} className="flex-1">
+              <Button onClick={() => { setCreatedUser(null); setEmailStatus(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '' }); }} className="flex-1">
                 <UserPlus className="w-4 h-4 mr-2" /> {l.createAnother}
               </Button>
             </div>
@@ -333,15 +380,17 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               </span>
             </span>
           </CardTitle>
+          {/* Agent badge */}
+          <div className="flex items-center justify-between mt-2">
+            <div className={`flex items-center gap-2 text-sm ${textSecondary}`}>
+              <User className="w-4 h-4" />
+              {l.loggedAs}: <span className={`font-medium ${textPrimary}`}>{agentInfo?.display_name}</span>
+            </div>
+            <button onClick={handleAgentLogout} className="text-xs text-red-400 hover:text-red-300">{l.logout}</button>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleCreate} className="space-y-5">
-            {/* Agent Name */}
-            <div className="space-y-1.5">
-              <Label className={textSecondary}>{l.agentName}</Label>
-              <Input value={form.agent_name} onChange={(e) => handleChange('agent_name', e.target.value)} placeholder={l.agentPlaceholder} required className={inputCls} />
-            </div>
-
             {/* Personal Info */}
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5">
@@ -357,7 +406,6 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                 <Input value={form.last_name} onChange={(e) => handleChange('last_name', e.target.value)} placeholder="Rossi" required className={inputCls} />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className={textSecondary}>{l.username}</Label>
@@ -368,7 +416,6 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                 <DateInput value={form.date_of_birth} onChange={(val) => handleChange('date_of_birth', val)} />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <Label className={textSecondary}>{l.email}</Label>
@@ -424,13 +471,10 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               </div>
             </div>
 
-            <Button type="submit" disabled={loading || availableWallets === 0} className="w-full h-11 text-base">
+            <Button type="submit" disabled={loading || availableWallets === 0 || emailStatus === 'exists'} className="w-full h-11 text-base">
               {loading ? l.creating : l.createAccount}
             </Button>
-
-            {availableWallets === 0 && (
-              <p className="text-sm text-red-500 text-center">{l.noWallets}</p>
-            )}
+            {availableWallets === 0 && <p className="text-sm text-red-500 text-center">{l.noWallets}</p>}
           </form>
         </CardContent>
       </Card>

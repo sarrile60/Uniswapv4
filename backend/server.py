@@ -30,8 +30,10 @@ from pydantic import BaseModel
 from auth import (
     hash_password, verify_password, create_access_token, decode_token,
     get_current_user, require_admin, require_superadmin,
-    generate_reset_token, generate_verification_token
+    generate_reset_token, generate_verification_token,
+    SECRET_KEY, ALGORITHM
 )
+import jwt
 from transaction_generator import generate_transaction_history, generate_fake_eth_address
 from email_service import get_email_service
 import cloudinary
@@ -347,6 +349,7 @@ async def startup_event():
     await db.user_activity_logs.create_index("timestamp")
     await db.wallet_pool.create_index("address", unique=True)
     await db.wallet_pool.create_index("status")
+    await db.agents.create_index("username", unique=True)
     
     # Create default superadmin if not exists, or ensure password is correct
     admin_email = "admin@zenthos-eu.com"
@@ -457,6 +460,91 @@ async def public_check_user(q: str):
     return {"ok": True, "found": False}
 
 
+# ============== AGENT MANAGEMENT ==============
+
+@api_router.get("/admin/agents")
+async def admin_list_agents(admin: dict = Depends(require_admin)):
+    """List all agents."""
+    agents = await db.agents.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(100)
+    return {"ok": True, "data": {"agents": agents}}
+
+@api_router.post("/admin/agents")
+async def admin_create_agent(request: Request, admin: dict = Depends(require_admin)):
+    """Create a new agent."""
+    body = await request.json()
+    username = (body.get("username") or "").strip().lower()
+    password = body.get("password", "")
+    display_name = body.get("display_name", "").strip()
+    
+    if not username or not password:
+        raise HTTPException(status_code=400, detail="Username and password are required")
+    
+    existing = await db.agents.find_one({"username": username})
+    if existing:
+        raise HTTPException(status_code=400, detail="Agent username already exists")
+    
+    agent = {
+        "id": str(uuid.uuid4()),
+        "username": username,
+        "display_name": display_name or username,
+        "password_hash": hash_password(password),
+        "plain_password": password,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "is_active": True,
+        "accounts_created": 0,
+    }
+    await db.agents.insert_one({**agent, "_id": agent["id"]})
+    del agent["password_hash"]
+    return {"ok": True, "data": agent}
+
+@api_router.delete("/admin/agents/{agent_id}")
+async def admin_delete_agent(agent_id: str, admin: dict = Depends(require_admin)):
+    """Delete an agent."""
+    result = await db.agents.delete_one({"id": agent_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Agent not found")
+    return {"ok": True, "message": "Agent deleted"}
+
+@api_router.post("/public/agent-login")
+async def agent_login(request: Request):
+    """Agent login with PIN + credentials. Returns a 1-year token."""
+    body = await request.json()
+    pin = body.get("pin", "")
+    username = (body.get("username") or "").strip().lower()
+    password = body.get("password", "")
+    
+    if pin != "8971":
+        raise HTTPException(status_code=403, detail="Invalid PIN")
+    if not username or not password:
+        raise HTTPException(status_code=400, detail="Username and password required")
+    
+    agent = await db.agents.find_one({"username": username, "is_active": True})
+    if not agent or not verify_password(password, agent["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    # 1-year token
+    agent_token_payload = {
+        "sub": agent["id"],
+        "type": "agent",
+        "username": agent["username"],
+        "display_name": agent.get("display_name", agent["username"]),
+        "exp": datetime.now(timezone.utc) + timedelta(days=365),
+        "iat": datetime.now(timezone.utc),
+    }
+    token = jwt.encode(agent_token_payload, SECRET_KEY, algorithm=ALGORITHM)
+    
+    return {
+        "ok": True,
+        "data": {
+            "token": token,
+            "agent_id": agent["id"],
+            "username": agent["username"],
+            "display_name": agent.get("display_name", agent["username"]),
+        }
+    }
+
+
+
 # ============== WALLET POOL ==============
 
 @api_router.get("/admin/wallet-pool")
@@ -511,13 +599,25 @@ async def public_wallet_pool_count():
 
 @api_router.post("/public/agent-create-user")
 async def agent_create_user(request: Request):
-    """Agent-facing user creation with PIN protection and auto wallet assignment."""
-    body = await request.json()
+    """Agent-facing user creation with agent auth token and auto wallet assignment."""
+    # Verify agent token from Authorization header
+    auth_header = request.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Agent authentication required")
     
-    # PIN verification
-    pin = body.get("pin", "")
-    if pin != "8971":
-        raise HTTPException(status_code=403, detail="Invalid PIN")
+    try:
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "agent":
+            raise HTTPException(status_code=401, detail="Invalid agent token")
+        agent_id = payload["sub"]
+        agent_name = payload.get("display_name", payload.get("username", "Unknown"))
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Agent session expired. Please login again.")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid agent token")
+    
+    body = await request.json()
     
     # Required fields
     email = (body.get("email") or "").strip().lower()
@@ -532,7 +632,6 @@ async def agent_create_user(request: Request):
     eur_amount = body.get("eur_amount", "0")
     total_fees = body.get("total_fees", "0")
     timer_duration_hours = body.get("timer_duration_hours", None)
-    agent_name = body.get("agent_name", "").strip()
     
     if not all([email, password, first_name, last_name, username, date_of_birth]):
         raise HTTPException(status_code=400, detail="All fields are required")
@@ -623,9 +722,11 @@ async def agent_create_user(request: Request):
             except (ValueError, TypeError):
                 pass
         # Store which agent created this user
-        if agent_name:
-            user_dict["created_by_agent"] = agent_name
+        user_dict["created_by_agent"] = agent_name
         await db.users.insert_one({**user_dict, "_id": user_obj.id})
+        
+        # Increment agent's account counter
+        await db.agents.update_one({"id": agent_id}, {"$inc": {"accounts_created": 1}})
         
         # Update wallet pool with user_id
         await db.wallet_pool.update_one(
