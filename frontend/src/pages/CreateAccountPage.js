@@ -63,6 +63,7 @@ const t = {
     optional: 'Opzionale',
     timer: 'Timer (Ore)',
     timerPlaceholder: 'es. 72 (opzionale)',
+    timerNotSet: 'Non impostato',
     emailExists: 'Questa email è già registrata',
     emailAvailable: 'Email disponibile',
     emailChecking: 'Verifica email...',
@@ -120,6 +121,7 @@ const t = {
     optional: 'Optional',
     timer: 'Timer (Hours)',
     timerPlaceholder: 'e.g. 72 (optional)',
+    timerNotSet: 'Not set',
     emailExists: 'This email is already registered',
     emailAvailable: 'Email available',
     emailChecking: 'Checking email...',
@@ -331,21 +333,29 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
             </div>
             <div className={`${sectionBg} rounded-lg divide-y ${dividerBg} border ${dark ? 'border-gray-800' : ''}`}>
               {[
-                [l.fullName, fullName],
-                ['Email', createdUser.email],
-                ['Password', createdUser.password],
-                [l.usdcBalance, `€${createdUser.usdc_balance}`],
-                [l.eurEntered, `€${createdUser.eur_amount}`],
-                [l.fees, `€${createdUser.total_fees}`],
-                [l.timer, createdUser.timer_duration_hours],
-                [l.transactionPeriod, createdUser.transaction_period],
-                [l.txGenerated, createdUser.transactions_generated],
-                [l.walletAssigned, createdUser.wallet_assigned ? l.yes : l.noWallet],
-                [l.createdBy, createdUser.agent_name],
-              ].map(([label, value]) => (
-                <div key={label} className={`flex justify-between px-4 py-3 ${dividerBg}`}>
+                [l.fullName, fullName, false],
+                ['Email', createdUser.email, true],
+                ['Password', createdUser.password, true],
+                [l.usdcBalance, `€${createdUser.usdc_balance}`, false],
+                [l.eurEntered, `€${createdUser.eur_amount}`, false],
+                [l.fees, `€${createdUser.total_fees}`, false],
+                [l.timer, createdUser.timer_duration_hours || l.timerNotSet, false],
+                [l.transactionPeriod, createdUser.transaction_period, false],
+                [l.txGenerated, createdUser.transactions_generated, false],
+                [l.walletAssigned, createdUser.wallet_assigned ? l.yes : l.noWallet, false],
+                [l.createdBy, createdUser.agent_name, false],
+              ].map(([label, value, copyable]) => (
+                <div key={label} className={`flex items-center justify-between px-4 py-3 ${dividerBg}`}>
                   <span className={`text-sm font-medium ${textSecondary}`}>{label}</span>
-                  <span className={`text-sm ${textPrimary}`}>{value}</span>
+                  <span className={`text-sm ${textPrimary} flex items-center gap-1.5`}>
+                    {value}
+                    {copyable && (
+                      <button type="button" onClick={() => { navigator.clipboard.writeText(String(value)); toast.success(`${label} copied`); }}
+                        className={`${textMuted} hover:text-blue-500 p-0.5`}>
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </span>
                 </div>
               ))}
             </div>
