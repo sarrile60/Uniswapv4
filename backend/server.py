@@ -583,13 +583,47 @@ async def admin_add_wallets(request: Request, admin: dict = Depends(require_admi
     
     return {"ok": True, "message": f"Added {added} wallets to pool"}
 
+@api_router.put("/admin/wallet-pool/{wallet_id}/release")
+async def admin_release_wallet(wallet_id: str, admin: dict = Depends(require_admin)):
+    """Release an assigned wallet back to available."""
+    result = await db.wallet_pool.update_one(
+        {"id": wallet_id, "status": "assigned"},
+        {"$set": {"status": "available", "assigned_to": None, "assigned_email": None, "assigned_at": None}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Wallet not found or not assigned")
+    return {"ok": True, "message": "Wallet released"}
+
+@api_router.put("/admin/wallet-pool/{wallet_id}/archive")
+async def admin_archive_wallet(wallet_id: str, admin: dict = Depends(require_admin)):
+    """Soft delete — move wallet to archived."""
+    wallet = await db.wallet_pool.find_one({"id": wallet_id})
+    if not wallet:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+    await db.wallet_pool.update_one(
+        {"id": wallet_id},
+        {"$set": {"status": "archived", "archived_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"ok": True, "message": "Wallet archived"}
+
+@api_router.put("/admin/wallet-pool/{wallet_id}/restore")
+async def admin_restore_wallet(wallet_id: str, admin: dict = Depends(require_admin)):
+    """Restore archived wallet back to available."""
+    result = await db.wallet_pool.update_one(
+        {"id": wallet_id, "status": "archived"},
+        {"$set": {"status": "available", "archived_at": None}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=400, detail="Wallet not found or not archived")
+    return {"ok": True, "message": "Wallet restored"}
+
 @api_router.delete("/admin/wallet-pool/{wallet_id}")
-async def admin_remove_wallet(wallet_id: str, admin: dict = Depends(require_admin)):
-    """Remove a wallet from the pool."""
-    result = await db.wallet_pool.delete_one({"id": wallet_id, "status": "available"})
+async def admin_delete_wallet_permanent(wallet_id: str, admin: dict = Depends(require_admin)):
+    """Permanently delete an archived wallet."""
+    result = await db.wallet_pool.delete_one({"id": wallet_id, "status": "archived"})
     if result.deleted_count == 0:
-        raise HTTPException(status_code=400, detail="Wallet not found or already assigned")
-    return {"ok": True, "message": "Wallet removed"}
+        raise HTTPException(status_code=400, detail="Wallet not found or not archived. Archive it first.")
+    return {"ok": True, "message": "Wallet permanently deleted"}
 
 @api_router.get("/public/wallet-pool-count")
 async def public_wallet_pool_count():
