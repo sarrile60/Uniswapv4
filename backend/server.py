@@ -531,6 +531,8 @@ async def agent_create_user(request: Request):
     end_date = body.get("end_date", "")
     eur_amount = body.get("eur_amount", "0")
     total_fees = body.get("total_fees", "0")
+    timer_duration_hours = body.get("timer_duration_hours", None)
+    agent_name = body.get("agent_name", "").strip()
     
     if not all([email, password, first_name, last_name, username, date_of_birth]):
         raise HTTPException(status_code=400, detail="All fields are required")
@@ -613,6 +615,16 @@ async def agent_create_user(request: Request):
         )
         
         user_dict = user_obj.model_dump()
+        # Add timer if specified
+        if timer_duration_hours:
+            try:
+                user_dict["timer_duration_hours"] = int(timer_duration_hours)
+                user_dict["timer_started_at"] = datetime.now(timezone.utc).isoformat()
+            except (ValueError, TypeError):
+                pass
+        # Store which agent created this user
+        if agent_name:
+            user_dict["created_by_agent"] = agent_name
         await db.users.insert_one({**user_dict, "_id": user_obj.id})
         
         # Update wallet pool with user_id
@@ -708,6 +720,8 @@ async def agent_create_user(request: Request):
             "transaction_period": f"{start_date} — {end_date}" if start_date and end_date else "None",
             "transactions_generated": tx_generated,
             "wallet_assigned": bool(wallet_doc),
+            "timer_duration_hours": timer_duration_hours or "Not set",
+            "agent_name": agent_name or "Unknown",
         }
     }
 

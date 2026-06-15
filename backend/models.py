@@ -243,6 +243,8 @@ class UserPublic(BaseModel):
     timer_started_at: Optional[str] = None
     # Account lock
     lock_reason: Optional[str] = None
+    # Agent tracking
+    created_by_agent: Optional[str] = None
 
 
 # ============== WALLET MODELS ==============

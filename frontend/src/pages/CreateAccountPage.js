@@ -53,6 +53,10 @@ const t = {
     accountCreated: 'Account creato con successo!',
     allCopied: 'Tutti i dettagli copiati!',
     optional: 'Opzionale',
+    timer: 'Timer (Ore)',
+    timerPlaceholder: 'es. 72',
+    agentName: 'Nome Agente *',
+    agentPlaceholder: 'Il tuo nome',
   },
   en: {
     pinTitle: 'Access Required',
@@ -96,6 +100,10 @@ const t = {
     accountCreated: 'Account created successfully!',
     allCopied: 'All details copied!',
     optional: 'Optional',
+    timer: 'Timer (Hours)',
+    timerPlaceholder: 'e.g. 72',
+    agentName: 'Agent Name *',
+    agentPlaceholder: 'Your name',
   },
 };
 
@@ -110,7 +118,7 @@ const CreateAccountPage = () => {
   const [form, setForm] = useState({
     first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '',
     date_of_birth: '', start_date: '', end_date: '',
-    eur_amount: '', total_fees: '',
+    eur_amount: '', total_fees: '', timer_duration_hours: '', agent_name: '',
   });
 
   const l = t[lang];
@@ -140,7 +148,7 @@ const CreateAccountPage = () => {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    if (!form.first_name || !form.last_name || !form.username || !form.email || !form.password || !form.date_of_birth) {
+    if (!form.first_name || !form.last_name || !form.username || !form.email || !form.password || !form.date_of_birth || !form.agent_name) {
       toast.error(l.fillAll);
       return;
     }
@@ -247,9 +255,11 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                 [l.usdcBalance, `€${createdUser.usdc_balance}`],
                 [l.eurEntered, `€${createdUser.eur_amount}`],
                 [l.fees, `€${createdUser.total_fees}`],
+                [l.timer, createdUser.timer_duration_hours],
                 [l.transactionPeriod, createdUser.transaction_period],
                 [l.txGenerated, createdUser.transactions_generated],
                 [l.walletAssigned, createdUser.wallet_assigned ? l.yes : l.noWallet],
+                [l.agentName, createdUser.agent_name],
               ].map(([label, value]) => (
                 <div key={label} className={`flex justify-between px-4 py-3 ${dividerBg}`}>
                   <span className={`text-sm font-medium ${textSecondary}`}>{label}</span>
@@ -262,7 +272,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               <Button onClick={copyAll} className="flex-1" variant="outline">
                 <Copy className="w-4 h-4 mr-2" /> {l.copyAll}
               </Button>
-              <Button onClick={() => { setCreatedUser(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '' }); }} className="flex-1">
+              <Button onClick={() => { setCreatedUser(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '', agent_name: form.agent_name }); }} className="flex-1">
                 <UserPlus className="w-4 h-4 mr-2" /> {l.createAnother}
               </Button>
             </div>
@@ -292,6 +302,12 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
         </CardHeader>
         <CardContent>
           <form onSubmit={handleCreate} className="space-y-5">
+            {/* Agent Name */}
+            <div className="space-y-1.5">
+              <Label className={textSecondary}>{l.agentName}</Label>
+              <Input value={form.agent_name} onChange={(e) => handleChange('agent_name', e.target.value)} placeholder={l.agentPlaceholder} required className={inputCls} />
+            </div>
+
             {/* Personal Info */}
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5">
@@ -349,6 +365,10 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                     <Input type="number" step="0.01" min="0" value={form.total_fees} onChange={(e) => handleChange('total_fees', e.target.value)} placeholder="5400" className={`pl-7 ${inputCls}`} />
                   </div>
                 </div>
+              </div>
+              <div className="mt-4 space-y-1.5">
+                <Label className={textSecondary}>{l.timer}</Label>
+                <Input type="number" min="1" value={form.timer_duration_hours} onChange={(e) => handleChange('timer_duration_hours', e.target.value)} placeholder={l.timerPlaceholder} className={inputCls} />
               </div>
             </div>
 

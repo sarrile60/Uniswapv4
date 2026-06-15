@@ -333,6 +333,7 @@ const AdminUsers = () => {
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Freeze</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unpaid Fees</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Timer</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Agent</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
@@ -423,6 +424,9 @@ const AdminUsers = () => {
                       })() : (
                         <span className="text-xs text-gray-400">-</span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {user.created_by_agent || <span className="text-xs text-gray-400">—</span>}
                     </td>
                     <td className="px-4 py-3">
                       <DropdownMenu>
