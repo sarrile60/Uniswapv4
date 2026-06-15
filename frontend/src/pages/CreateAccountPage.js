@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe } from 'lucide-react';
+import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe, ArrowLeft } from 'lucide-react';
 import { DateInput } from '@/components/DateInput';
 import axios from 'axios';
 
@@ -223,6 +223,9 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
 
   const topBar = (
     <div className="fixed top-4 right-4 flex gap-2 z-50">
+      <a href="/" className={`p-2 rounded-lg ${dark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100'} shadow-lg transition-colors`}>
+        <ArrowLeft className="w-4 h-4" />
+      </a>
       <button onClick={() => setDark(!dark)} className={`p-2 rounded-lg ${dark ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100'} shadow-lg transition-colors`}>
         {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
       </button>
