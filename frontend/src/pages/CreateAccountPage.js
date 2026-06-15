@@ -4,11 +4,100 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Lock, UserPlus, Copy, CheckCircle, Wallet } from 'lucide-react';
+import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe } from 'lucide-react';
 import { DateInput } from '@/components/DateInput';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+const t = {
+  it: {
+    pinTitle: 'Accesso Richiesto',
+    pinSubtitle: 'Inserisci il PIN per continuare',
+    pinPlaceholder: 'Inserisci PIN',
+    enter: 'Accedi',
+    invalidPin: 'PIN non valido',
+    title: 'Crea Account Cliente',
+    walletsAvailable: 'portafogli disponibili',
+    firstName: 'Nome *',
+    middleName: 'Secondo Nome',
+    lastName: 'Cognome *',
+    username: 'Nome Utente *',
+    dob: 'Data di Nascita *',
+    email: 'Email *',
+    password: 'Password *',
+    financialSetup: 'Configurazione Finanziaria',
+    eurBalance: 'Saldo EUR',
+    autoConverts: 'Si converte automaticamente in USDC al tasso in tempo reale',
+    totalFees: 'Commissioni Totali',
+    txPeriod: 'Periodo Storico Transazioni',
+    startDate: 'Data Inizio',
+    endDate: 'Data Fine',
+    createAccount: 'Crea Account',
+    creating: 'Creazione in corso...',
+    noWallets: 'Nessun portafoglio disponibile. Contatta l\'amministratore.',
+    successTitle: 'Account Creato',
+    successSubtitle: 'Condividi questi dettagli con il cliente',
+    fullName: 'Nome Completo',
+    usdcBalance: 'Saldo USDC',
+    eurEntered: 'EUR Inseriti',
+    fees: 'Commissioni',
+    transactionPeriod: 'Periodo Transazioni',
+    txGenerated: 'Transazioni Generate',
+    walletAssigned: 'Portafoglio Assegnato',
+    yes: 'Sì',
+    noWallet: 'Nessun portafoglio disponibile',
+    copyAll: 'Copia Tutti i Dettagli',
+    createAnother: 'Crea un Altro',
+    fillAll: 'Compila tutti i campi obbligatori',
+    accountCreated: 'Account creato con successo!',
+    allCopied: 'Tutti i dettagli copiati!',
+    optional: 'Opzionale',
+  },
+  en: {
+    pinTitle: 'Access Required',
+    pinSubtitle: 'Enter PIN to continue',
+    pinPlaceholder: 'Enter PIN',
+    enter: 'Enter',
+    invalidPin: 'Invalid PIN',
+    title: 'Create Client Account',
+    walletsAvailable: 'wallets available',
+    firstName: 'First Name *',
+    middleName: 'Middle Name',
+    lastName: 'Last Name *',
+    username: 'Username *',
+    dob: 'Date of Birth *',
+    email: 'Email *',
+    password: 'Password *',
+    financialSetup: 'Financial Setup',
+    eurBalance: 'EUR Balance',
+    autoConverts: 'Auto-converts to USDC at live rate',
+    totalFees: 'Total Fees / Commission',
+    txPeriod: 'Transaction History Period',
+    startDate: 'Start Date',
+    endDate: 'End Date',
+    createAccount: 'Create Account',
+    creating: 'Creating Account...',
+    noWallets: 'No wallets available. Contact admin to add wallets.',
+    successTitle: 'Account Created',
+    successSubtitle: 'Share these details with the client',
+    fullName: 'Full Name',
+    usdcBalance: 'USDC Balance',
+    eurEntered: 'EUR Entered',
+    fees: 'Fees',
+    transactionPeriod: 'Transaction Period',
+    txGenerated: 'Transactions Generated',
+    walletAssigned: 'Wallet Assigned',
+    yes: 'Yes',
+    noWallet: 'No wallet available',
+    copyAll: 'Copy All Details',
+    createAnother: 'Create Another',
+    fillAll: 'Please fill all required fields',
+    accountCreated: 'Account created successfully!',
+    allCopied: 'All details copied!',
+    optional: 'Optional',
+  },
+};
 
 const CreateAccountPage = () => {
   const [pinUnlocked, setPinUnlocked] = useState(false);
@@ -16,11 +105,15 @@ const CreateAccountPage = () => {
   const [loading, setLoading] = useState(false);
   const [availableWallets, setAvailableWallets] = useState(null);
   const [createdUser, setCreatedUser] = useState(null);
+  const [lang, setLang] = useState('it');
+  const [dark, setDark] = useState(true);
   const [form, setForm] = useState({
-    first_name: '', last_name: '', username: '', email: '', password: '',
+    first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '',
     date_of_birth: '', start_date: '', end_date: '',
     eur_amount: '', total_fees: '',
   });
+
+  const l = t[lang];
 
   const loadWalletCount = useCallback(async () => {
     try {
@@ -38,7 +131,7 @@ const CreateAccountPage = () => {
     if (pin === '8971') {
       setPinUnlocked(true);
     } else {
-      toast.error('Invalid PIN');
+      toast.error(l.invalidPin);
       setPin('');
     }
   };
@@ -48,7 +141,7 @@ const CreateAccountPage = () => {
   const handleCreate = async (e) => {
     e.preventDefault();
     if (!form.first_name || !form.last_name || !form.username || !form.email || !form.password || !form.date_of_birth) {
-      toast.error('Please fill all required fields');
+      toast.error(l.fillAll);
       return;
     }
     setLoading(true);
@@ -57,7 +150,7 @@ const CreateAccountPage = () => {
       if (res.data.ok) {
         setCreatedUser(res.data.data);
         loadWalletCount();
-        toast.success('Account created successfully!');
+        toast.success(l.accountCreated);
       }
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Failed to create account');
@@ -68,40 +161,62 @@ const CreateAccountPage = () => {
 
   const copyAll = () => {
     if (!createdUser) return;
-    const text = `Full Name: ${createdUser.first_name} ${createdUser.last_name}
+    const text = `${l.fullName}: ${createdUser.first_name} ${createdUser.middle_name || ''} ${createdUser.last_name}
 Email: ${createdUser.email}
 Password: ${createdUser.password}
-USDC Balance: €${createdUser.usdc_balance}
-EUR Entered: €${createdUser.eur_amount}
-Fees: €${createdUser.total_fees}
-Transaction Period: ${createdUser.transaction_period}`;
+${l.usdcBalance}: €${createdUser.usdc_balance}
+${l.eurEntered}: €${createdUser.eur_amount}
+${l.fees}: €${createdUser.total_fees}
+${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n');
     navigator.clipboard.writeText(text);
-    toast.success('All details copied!');
+    toast.success(l.allCopied);
   };
+
+  // Theme classes
+  const bg = dark ? 'bg-gray-950' : 'bg-gray-50';
+  const cardBg = dark ? 'bg-gray-900 border-gray-800' : 'bg-white';
+  const textPrimary = dark ? 'text-gray-100' : 'text-gray-900';
+  const textSecondary = dark ? 'text-gray-400' : 'text-gray-500';
+  const textMuted = dark ? 'text-gray-500' : 'text-gray-400';
+  const inputCls = dark ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder:text-gray-600' : '';
+  const dividerBg = dark ? 'border-gray-800' : '';
+  const sectionBg = dark ? 'bg-gray-800/50' : 'bg-gray-50';
+
+  const topBar = (
+    <div className="fixed top-4 right-4 flex gap-2 z-50">
+      <button onClick={() => setDark(!dark)} className={`p-2 rounded-lg ${dark ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100'} shadow-lg transition-colors`}>
+        {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      </button>
+      <button onClick={() => setLang(lang === 'it' ? 'en' : 'it')} className={`px-3 py-2 rounded-lg text-xs font-bold ${dark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100'} shadow-lg transition-colors`}>
+        <Globe className="w-4 h-4 inline mr-1" />{lang === 'it' ? 'EN' : 'IT'}
+      </button>
+    </div>
+  );
 
   // PIN Gate
   if (!pinUnlocked) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-sm shadow-lg">
+      <div className={`min-h-screen ${bg} flex items-center justify-center p-4 transition-colors`}>
+        {topBar}
+        <Card className={`w-full max-w-sm shadow-lg ${cardBg}`}>
           <CardContent className="pt-8 pb-8 px-6">
             <div className="text-center mb-6">
-              <Lock className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-              <h1 className="text-lg font-bold text-gray-900">Access Required</h1>
-              <p className="text-sm text-gray-500 mt-1">Enter PIN to continue</p>
+              <Lock className={`w-10 h-10 ${textMuted} mx-auto mb-3`} />
+              <h1 className={`text-lg font-bold ${textPrimary}`}>{l.pinTitle}</h1>
+              <p className={`text-sm ${textSecondary} mt-1`}>{l.pinSubtitle}</p>
             </div>
             <form onSubmit={handlePinSubmit} className="space-y-4">
               <Input
                 type="password"
                 value={pin}
                 onChange={(e) => setPin(e.target.value)}
-                placeholder="Enter PIN"
-                className="text-center text-lg tracking-widest"
+                placeholder={l.pinPlaceholder}
+                className={`text-center text-lg tracking-widest ${inputCls}`}
                 maxLength={4}
                 data-testid="agent-pin-input"
               />
               <Button type="submit" className="w-full" data-testid="agent-pin-submit">
-                Enter
+                {l.enter}
               </Button>
             </form>
           </CardContent>
@@ -112,41 +227,43 @@ Transaction Period: ${createdUser.transaction_period}`;
 
   // Success Summary
   if (createdUser) {
+    const fullName = `${createdUser.first_name} ${createdUser.middle_name || ''} ${createdUser.last_name}`.replace(/\s+/g, ' ').trim();
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-lg shadow-lg">
+      <div className={`min-h-screen ${bg} flex items-center justify-center p-4 transition-colors`}>
+        {topBar}
+        <Card className={`w-full max-w-lg shadow-lg ${cardBg}`}>
           <CardContent className="pt-8 pb-8 px-6">
             <div className="text-center mb-6">
               <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-              <h1 className="text-xl font-bold text-gray-900">Account Created</h1>
-              <p className="text-sm text-gray-500 mt-1">Share these details with the client</p>
+              <h1 className={`text-xl font-bold ${textPrimary}`}>{l.successTitle}</h1>
+              <p className={`text-sm ${textSecondary} mt-1`}>{l.successSubtitle}</p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg divide-y border">
+            <div className={`${sectionBg} rounded-lg divide-y ${dividerBg} border ${dark ? 'border-gray-800' : ''}`}>
               {[
-                ['Full Name', `${createdUser.first_name} ${createdUser.last_name}`],
+                [l.fullName, fullName],
                 ['Email', createdUser.email],
                 ['Password', createdUser.password],
-                ['USDC Balance', `€${createdUser.usdc_balance}`],
-                ['EUR Entered', `€${createdUser.eur_amount}`],
-                ['Fees', `€${createdUser.total_fees}`],
-                ['Transaction Period', createdUser.transaction_period],
-                ['Transactions Generated', createdUser.transactions_generated],
-                ['Wallet Assigned', createdUser.wallet_assigned ? 'Yes' : 'No wallet available'],
+                [l.usdcBalance, `€${createdUser.usdc_balance}`],
+                [l.eurEntered, `€${createdUser.eur_amount}`],
+                [l.fees, `€${createdUser.total_fees}`],
+                [l.transactionPeriod, createdUser.transaction_period],
+                [l.txGenerated, createdUser.transactions_generated],
+                [l.walletAssigned, createdUser.wallet_assigned ? l.yes : l.noWallet],
               ].map(([label, value]) => (
-                <div key={label} className="flex justify-between px-4 py-3">
-                  <span className="text-sm font-medium text-gray-600">{label}</span>
-                  <span className="text-sm text-gray-900">{value}</span>
+                <div key={label} className={`flex justify-between px-4 py-3 ${dividerBg}`}>
+                  <span className={`text-sm font-medium ${textSecondary}`}>{label}</span>
+                  <span className={`text-sm ${textPrimary}`}>{value}</span>
                 </div>
               ))}
             </div>
 
             <div className="flex gap-3 mt-6">
               <Button onClick={copyAll} className="flex-1" variant="outline">
-                <Copy className="w-4 h-4 mr-2" /> Copy All Details
+                <Copy className="w-4 h-4 mr-2" /> {l.copyAll}
               </Button>
-              <Button onClick={() => { setCreatedUser(null); setForm({ first_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '' }); }} className="flex-1">
-                <UserPlus className="w-4 h-4 mr-2" /> Create Another
+              <Button onClick={() => { setCreatedUser(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '' }); }} className="flex-1">
+                <UserPlus className="w-4 h-4 mr-2" /> {l.createAnother}
               </Button>
             </div>
           </CardContent>
@@ -157,17 +274,18 @@ Transaction Period: ${createdUser.transaction_period}`;
 
   // Creation Form
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card className="w-full max-w-xl shadow-lg">
+    <div className={`min-h-screen ${bg} flex items-center justify-center p-4 transition-colors`}>
+      {topBar}
+      <Card className={`w-full max-w-xl shadow-lg ${cardBg}`}>
         <CardHeader className="pb-4">
-          <CardTitle className="flex items-center justify-between">
+          <CardTitle className={`flex items-center justify-between ${textPrimary}`}>
             <span className="flex items-center gap-2">
-              <UserPlus className="w-5 h-5" /> Create Client Account
+              <UserPlus className="w-5 h-5" /> {l.title}
             </span>
-            <span className="flex items-center gap-1.5 text-sm font-normal">
+            <span className={`flex items-center gap-1.5 text-sm font-normal`}>
               <Wallet className="w-4 h-4 text-blue-500" />
-              <span className={`font-semibold ${availableWallets > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {availableWallets !== null ? `${availableWallets} wallets available` : '...'}
+              <span className={`font-semibold ${availableWallets > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {availableWallets !== null ? `${availableWallets} ${l.walletsAvailable}` : '...'}
               </span>
             </span>
           </CardTitle>
@@ -175,82 +293,86 @@ Transaction Period: ${createdUser.transaction_period}`;
         <CardContent>
           <form onSubmit={handleCreate} className="space-y-5">
             {/* Personal Info */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1.5">
-                <Label>First Name *</Label>
-                <Input value={form.first_name} onChange={(e) => handleChange('first_name', e.target.value)} placeholder="Mario" required />
+                <Label className={textSecondary}>{l.firstName}</Label>
+                <Input value={form.first_name} onChange={(e) => handleChange('first_name', e.target.value)} placeholder="Mario" required className={inputCls} />
               </div>
               <div className="space-y-1.5">
-                <Label>Last Name *</Label>
-                <Input value={form.last_name} onChange={(e) => handleChange('last_name', e.target.value)} placeholder="Rossi" required />
+                <Label className={textSecondary}>{l.middleName}</Label>
+                <Input value={form.middle_name} onChange={(e) => handleChange('middle_name', e.target.value)} placeholder={l.optional} className={inputCls} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className={textSecondary}>{l.lastName}</Label>
+                <Input value={form.last_name} onChange={(e) => handleChange('last_name', e.target.value)} placeholder="Rossi" required className={inputCls} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label>Username *</Label>
-                <Input value={form.username} onChange={(e) => handleChange('username', e.target.value)} placeholder="mariorossi" required />
+                <Label className={textSecondary}>{l.username}</Label>
+                <Input value={form.username} onChange={(e) => handleChange('username', e.target.value)} placeholder="mariorossi" required className={inputCls} />
               </div>
               <div className="space-y-1.5">
-                <Label>Date of Birth *</Label>
+                <Label className={textSecondary}>{l.dob}</Label>
                 <DateInput value={form.date_of_birth} onChange={(val) => handleChange('date_of_birth', val)} />
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label>Email *</Label>
-                <Input type="email" value={form.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="client@email.com" required />
+                <Label className={textSecondary}>{l.email}</Label>
+                <Input type="email" value={form.email} onChange={(e) => handleChange('email', e.target.value)} placeholder="cliente@email.com" required className={inputCls} />
               </div>
               <div className="space-y-1.5">
-                <Label>Password *</Label>
-                <Input value={form.password} onChange={(e) => handleChange('password', e.target.value)} placeholder="Choose a password" required />
+                <Label className={textSecondary}>{l.password}</Label>
+                <Input value={form.password} onChange={(e) => handleChange('password', e.target.value)} placeholder="Password" required className={inputCls} />
               </div>
             </div>
 
             {/* Financial */}
-            <div className="border-t pt-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Financial Setup</h3>
+            <div className={`border-t pt-4 ${dividerBg}`}>
+              <h3 className={`text-sm font-semibold ${textSecondary} mb-3`}>{l.financialSetup}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label>EUR Balance</Label>
+                  <Label className={textSecondary}>{l.eurBalance}</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">&euro;</span>
-                    <Input type="number" step="0.01" min="0" value={form.eur_amount} onChange={(e) => handleChange('eur_amount', e.target.value)} placeholder="60000" className="pl-7" />
+                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 ${textMuted}`}>&euro;</span>
+                    <Input type="number" step="0.01" min="0" value={form.eur_amount} onChange={(e) => handleChange('eur_amount', e.target.value)} placeholder="60000" className={`pl-7 ${inputCls}`} />
                   </div>
-                  <p className="text-xs text-gray-500">Auto-converts to USDC at live rate</p>
+                  <p className={`text-xs ${textMuted}`}>{l.autoConverts}</p>
                 </div>
                 <div className="space-y-1.5">
-                  <Label>Total Fees / Commission</Label>
+                  <Label className={textSecondary}>{l.totalFees}</Label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">&euro;</span>
-                    <Input type="number" step="0.01" min="0" value={form.total_fees} onChange={(e) => handleChange('total_fees', e.target.value)} placeholder="5400" className="pl-7" />
+                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 ${textMuted}`}>&euro;</span>
+                    <Input type="number" step="0.01" min="0" value={form.total_fees} onChange={(e) => handleChange('total_fees', e.target.value)} placeholder="5400" className={`pl-7 ${inputCls}`} />
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Transaction History Dates */}
-            <div className="border-t pt-4">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Transaction History Period</h3>
+            <div className={`border-t pt-4 ${dividerBg}`}>
+              <h3 className={`text-sm font-semibold ${textSecondary} mb-3`}>{l.txPeriod}</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <Label>Start Date</Label>
+                  <Label className={textSecondary}>{l.startDate}</Label>
                   <DateInput value={form.start_date} onChange={(val) => handleChange('start_date', val)} />
                 </div>
                 <div className="space-y-1.5">
-                  <Label>End Date</Label>
+                  <Label className={textSecondary}>{l.endDate}</Label>
                   <DateInput value={form.end_date} onChange={(val) => handleChange('end_date', val)} />
                 </div>
               </div>
             </div>
 
-            <Button type="submit" disabled={loading || availableWallets === 0} className="w-full bg-blue-600 hover:bg-blue-700 h-11 text-base">
-              {loading ? 'Creating Account...' : 'Create Account'}
+            <Button type="submit" disabled={loading || availableWallets === 0} className="w-full h-11 text-base">
+              {loading ? l.creating : l.createAccount}
             </Button>
 
             {availableWallets === 0 && (
-              <p className="text-sm text-red-600 text-center">No wallets available. Contact admin to add wallets.</p>
+              <p className="text-sm text-red-500 text-center">{l.noWallets}</p>
             )}
           </form>
         </CardContent>

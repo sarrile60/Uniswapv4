@@ -523,6 +523,7 @@ async def agent_create_user(request: Request):
     email = (body.get("email") or "").strip().lower()
     password = body.get("password", "")
     first_name = body.get("first_name", "").strip()
+    middle_name = body.get("middle_name", "").strip()
     last_name = body.get("last_name", "").strip()
     username = body.get("username", "").strip().lower()
     date_of_birth = body.get("date_of_birth", "")
@@ -599,6 +600,7 @@ async def agent_create_user(request: Request):
             username=user.username,
             password_hash=hash_password(user.password),
             first_name=user.first_name,
+            middle_name=middle_name or None,
             last_name=user.last_name,
             date_of_birth=user.date_of_birth,
             role=user.role,
@@ -696,6 +698,7 @@ async def agent_create_user(request: Request):
             "email": email,
             "password": password,
             "first_name": first_name,
+            "middle_name": middle_name,
             "last_name": last_name,
             "username": username,
             "date_of_birth": date_of_birth,
