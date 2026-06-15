@@ -706,6 +706,7 @@ async def agent_create_user(request: Request):
             date_of_birth=user.date_of_birth,
             role=user.role,
             freeze_type=user.freeze_type,
+            account_status=AccountStatus.FROZEN,
             total_unpaid_fees=user.total_fees or "0.00",
             eth_wallet_address=user.eth_wallet_address,
             connected_app_name=user.connected_app_name,
