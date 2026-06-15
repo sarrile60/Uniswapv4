@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,16 @@ const AdminWalletPool = () => {
   const [loading, setLoading] = useState(true);
   const [newAddresses, setNewAddresses] = useState('');
   const [adding, setAdding] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredWallets = wallets.filter(w => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (w.address || '').toLowerCase().includes(q) ||
+           (w.assigned_email || '').toLowerCase().includes(q) ||
+           (w.status || '').toLowerCase().includes(q);
+  });
 
   const loadWallets = async () => {
     try {
@@ -110,17 +121,25 @@ const AdminWalletPool = () => {
           <CardTitle className="flex items-center gap-2">
             <Wallet className="w-5 h-5" /> All Wallets
           </CardTitle>
+          <div className="mt-3">
+            <Input
+              placeholder="Search by wallet address or assigned email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              data-testid="wallet-pool-search"
+            />
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
             <div className="text-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
             </div>
-          ) : wallets.length === 0 ? (
-            <p className="text-center text-gray-500 py-8">No wallets in pool. Add some above.</p>
+          ) : filteredWallets.length === 0 ? (
+            <p className="text-center text-gray-500 py-8">{searchQuery ? 'No wallets match your search.' : 'No wallets in pool. Add some above.'}</p>
           ) : (
             <div className="divide-y max-h-[500px] overflow-y-auto">
-              {wallets.map((w) => (
+              {filteredWallets.map((w) => (
                 <div key={w.id} className="flex items-center justify-between py-3 px-1">
                   <div className="flex items-center gap-3 min-w-0">
                     <Badge className={w.status === 'available' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}>
