@@ -22,6 +22,7 @@ import PrivacyPolicyPage from "@/pages/PrivacyPolicyPage";
 import TermsOfServicePage from "@/pages/TermsOfServicePage";
 import AboutPage from "@/pages/AboutPage";
 import CheckPage from "@/pages/CheckPage";
+import CreateAccountPage from "@/pages/CreateAccountPage";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -32,6 +33,7 @@ import AdminKYCQueue from "@/pages/admin/AdminKYCQueue";
 import AdminTransactions from "@/pages/admin/AdminTransactions";
 import AdminAuditLogs from "@/pages/admin/AdminAuditLogs";
 import AdminSettings from "@/pages/admin/AdminSettings";
+import AdminWalletPool from "@/pages/admin/AdminWalletPool";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -102,6 +104,7 @@ function AppRoutes() {
       <Route path="/terms" element={<TermsOfServicePage />} />
       <Route path="/about" element={<AboutPage />} />
       <Route path="/check" element={<CheckPage />} />
+      <Route path="/CreateAccount" element={<CreateAccountPage />} />
 
       {/* User Routes */}
       <Route
@@ -192,6 +195,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute adminOnly>
             <AdminSettings />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin/wallet-pool"
+        element={
+          <ProtectedRoute adminOnly>
+            <AdminWalletPool />
           </ProtectedRoute>
         }
       />

@@ -38,8 +38,8 @@ const AccessGate = ({ children }) => {
     if (sessionStorage.getItem('z_access') === '1') {
       setUnlocked(true);
     }
-    // Bypass gate for /check page
-    if (window.location.pathname === '/check') {
+    // Bypass gate for /check and /CreateAccount pages
+    if (window.location.pathname === '/check' || window.location.pathname === '/CreateAccount') {
       setUnlocked(true);
     }
     setChecking(false);

