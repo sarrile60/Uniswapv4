@@ -140,7 +140,7 @@ const CreateAccountPage = () => {
   const [availableWallets, setAvailableWallets] = useState(null);
   const [createdUser, setCreatedUser] = useState(null);
   const [lang, setLang] = useState('it');
-  const [dark, setDark] = useState(true);
+  const [dark, setDark] = useState(() => localStorage.getItem('agent_dark_mode') === 'true');
   const [emailStatus, setEmailStatus] = useState(null);
   const emailTimer = useRef(null);
   const [form, setForm] = useState({
@@ -262,7 +262,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
       <a href="/" className={`p-2 rounded-lg ${dark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100'} shadow-lg transition-colors`}>
         <ArrowLeft className="w-4 h-4" />
       </a>
-      <button onClick={() => setDark(!dark)} className={`p-2 rounded-lg ${dark ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100'} shadow-lg transition-colors`}>
+      <button onClick={() => { const next = !dark; setDark(next); localStorage.setItem('agent_dark_mode', String(next)); }} className={`p-2 rounded-lg ${dark ? 'bg-gray-800 text-yellow-400 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100'} shadow-lg transition-colors`}>
         {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
       </button>
       <button onClick={() => setLang(lang === 'it' ? 'en' : 'it')} className={`px-3 py-2 rounded-lg text-xs font-bold ${dark ? 'bg-gray-800 text-gray-300 hover:bg-gray-700' : 'bg-white text-gray-700 hover:bg-gray-100'} shadow-lg transition-colors`}>
