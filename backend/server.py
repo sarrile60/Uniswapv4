@@ -345,6 +345,8 @@ async def startup_event():
     await db.admin_section_seen.create_index([("admin_id", 1), ("section", 1)], unique=True)
     await db.user_activity_logs.create_index("user_id")
     await db.user_activity_logs.create_index("timestamp")
+    await db.wallet_pool.create_index("address", unique=True)
+    await db.wallet_pool.create_index("status")
     
     # Create default superadmin if not exists, or ensure password is correct
     admin_email = "admin@zenthos-eu.com"
@@ -557,63 +559,73 @@ async def agent_create_user(request: Request):
             # Fallback rate
             usdc_balance = str((Decimal(eur_amount) * Decimal("1.08")).quantize(Decimal("0.01")))
     
-    # Auto-assign wallet from pool
+    # Auto-assign wallet from pool (ATOMIC - prevents double assignment)
     wallet_doc = await db.wallet_pool.find_one_and_update(
         {"status": "available"},
         {"$set": {"status": "assigned", "assigned_email": email, "assigned_at": datetime.now(timezone.utc).isoformat()}},
     )
-    eth_wallet = wallet_doc["address"] if wallet_doc else ""
+    if not wallet_doc:
+        raise HTTPException(status_code=400, detail="No wallets available. Contact admin to add wallets to the pool.")
+    eth_wallet = wallet_doc["address"]
     
-    # Load system settings for connected app defaults
-    settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
-    connected_app_name = settings.get("default_connected_app_name", "") if settings else ""
-    connected_app_logo = settings.get("default_connected_app_logo", "") if settings else ""
-    
-    # Create the user
-    user = UserCreate(
-        email=email,
-        username=username,
-        password=password,
-        first_name=first_name,
-        last_name=last_name,
-        date_of_birth=date_of_birth,
-        role=UserRole.USER,
-        freeze_type="both",
-        initial_usdc_balance=usdc_balance,
-        initial_eur_balance="0.00",
-        total_fees=total_fees,
-        transaction_start_date=start_date or None,
-        transaction_end_date=end_date or None,
-        eth_wallet_address=eth_wallet,
-        connected_app_name=connected_app_name,
-        connected_app_logo=connected_app_logo,
-    )
-    
-    user_obj = User(
-        email=user.email,
-        username=user.username,
-        password_hash=hash_password(user.password),
-        first_name=user.first_name,
-        last_name=user.last_name,
-        date_of_birth=user.date_of_birth,
-        role=user.role,
-        freeze_type=user.freeze_type,
-        total_unpaid_fees=user.total_fees or "0.00",
-        eth_wallet_address=user.eth_wallet_address,
-        connected_app_name=user.connected_app_name,
-        connected_app_logo=user.connected_app_logo,
-        plain_password=user.password,
-    )
-    
-    user_dict = user_obj.model_dump()
-    await db.users.insert_one({**user_dict, "_id": user_obj.id})
-    
-    # Update wallet pool with user_id
-    if wallet_doc:
+    try:
+        # Load system settings for connected app defaults
+        settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
+        connected_app_name = settings.get("default_connected_app_name", "") if settings else ""
+        connected_app_logo = settings.get("default_connected_app_logo", "") if settings else ""
+        
+        # Create the user
+        user = UserCreate(
+            email=email,
+            username=username,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            date_of_birth=date_of_birth,
+            role=UserRole.USER,
+            freeze_type="both",
+            initial_usdc_balance=usdc_balance,
+            initial_eur_balance="0.00",
+            total_fees=total_fees,
+            transaction_start_date=start_date or None,
+            transaction_end_date=end_date or None,
+            eth_wallet_address=eth_wallet,
+            connected_app_name=connected_app_name,
+            connected_app_logo=connected_app_logo,
+        )
+        
+        user_obj = User(
+            email=user.email,
+            username=user.username,
+            password_hash=hash_password(user.password),
+            first_name=user.first_name,
+            last_name=user.last_name,
+            date_of_birth=user.date_of_birth,
+            role=user.role,
+            freeze_type=user.freeze_type,
+            total_unpaid_fees=user.total_fees or "0.00",
+            eth_wallet_address=user.eth_wallet_address,
+            connected_app_name=user.connected_app_name,
+            connected_app_logo=user.connected_app_logo,
+            plain_password=user.password,
+        )
+        
+        user_dict = user_obj.model_dump()
+        await db.users.insert_one({**user_dict, "_id": user_obj.id})
+        
+        # Update wallet pool with user_id
         await db.wallet_pool.update_one(
             {"id": wallet_doc["id"]},
             {"$set": {"assigned_to": user_obj.id}}
         )
+    except Exception as create_error:
+        # ROLLBACK: Release the wallet back to pool if user creation failed
+        await db.wallet_pool.update_one(
+            {"id": wallet_doc["id"]},
+            {"$set": {"status": "available", "assigned_email": None, "assigned_to": None, "assigned_at": None}}
+        )
+        logger.error(f"Agent create FAILED, wallet rolled back: {create_error}")
+        raise HTTPException(status_code=500, detail=f"Failed to create account: {str(create_error)[:200]}")
     
     # Create wallets
     usdc_wallet = Wallet(user_id=user_obj.id, asset=AssetType.USDC, balance=usdc_balance)
