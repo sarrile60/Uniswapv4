@@ -550,10 +550,13 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               <Button onClick={copyAll} className="flex-1" variant="outline">
                 <Copy className="w-4 h-4 mr-2" /> {l.copyAll}
               </Button>
-              <Button onClick={() => { setCreatedUser(null); setEmailStatus(null); setMode(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '' }); }} className="flex-1">
+              <Button onClick={() => { setCreatedUser(null); setEmailStatus(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '' }); setMode('create'); }} className="flex-1">
                 <UserPlus className="w-4 h-4 mr-2" /> {l.createAnother}
               </Button>
             </div>
+            <Button variant="outline" onClick={() => { setCreatedUser(null); setMode(null); }} className="w-full mt-3">
+              <ArrowLeft className="w-4 h-4 mr-2" /> {l.backToMenu}
+            </Button>
           </CardContent>
         </Card>
       </div>
