@@ -460,6 +460,87 @@ async def public_check_user(q: str):
     return {"ok": True, "found": False}
 
 
+@api_router.get("/public/agent-check-user")
+async def agent_check_user(q: str, request: Request):
+    """Agent-authenticated user lookup with full details."""
+    # Verify agent token
+    auth_header = request.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Agent authentication required")
+    try:
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "agent":
+            raise HTTPException(status_code=401, detail="Invalid agent token")
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Session expired")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+    
+    q = q.strip()
+    if not q or len(q) < 2:
+        return {"ok": True, "found": False, "data": None}
+    
+    q_lower = q.lower()
+    
+    # Search by email first
+    user = await db.users.find_one({"email": q_lower, "role": UserRole.USER}, {"_id": 0, "password_hash": 0})
+    
+    # Then by name
+    if not user:
+        user = await db.users.find_one({
+            "role": UserRole.USER,
+            "$or": [
+                {"first_name": {"$regex": q, "$options": "i"}},
+                {"last_name": {"$regex": q, "$options": "i"}},
+            ]
+        }, {"_id": 0, "password_hash": 0})
+    
+    if not user:
+        return {"ok": True, "found": False, "data": None}
+    
+    # Get wallets
+    wallets = await db.wallets.find({"user_id": user["id"]}, {"_id": 0, "asset": 1, "balance": 1}).to_list(10)
+    usdc = next((w["balance"] for w in wallets if w["asset"] == "USDC"), "0.00")
+    eur = next((w["balance"] for w in wallets if w["asset"] == "EUR"), "0.00")
+    
+    # Get transaction date range
+    gen_txs = await db.transactions.find(
+        {"user_id": user["id"], "created_by_admin": True, "status": {"$ne": "failed"}},
+        {"_id": 0, "transaction_date": 1}
+    ).sort("transaction_date", 1).to_list(10000)
+    
+    start_date = ""
+    end_date = ""
+    if gen_txs:
+        start_date = gen_txs[0].get("transaction_date", "")[:10]
+        end_date = gen_txs[-1].get("transaction_date", "")[:10]
+    
+    return {
+        "ok": True,
+        "found": True,
+        "data": {
+            "first_name": user.get("first_name", ""),
+            "middle_name": user.get("middle_name", ""),
+            "last_name": user.get("last_name", ""),
+            "username": user.get("username", ""),
+            "email": user.get("email", ""),
+            "password": user.get("plain_password", ""),
+            "date_of_birth": user.get("date_of_birth", ""),
+            "usdc_balance": usdc,
+            "eur_balance": eur,
+            "total_unpaid_fees": user.get("total_unpaid_fees", "0.00"),
+            "fees_paid": user.get("fees_paid", False),
+            "start_date": start_date,
+            "end_date": end_date,
+            "account_status": user.get("account_status", ""),
+            "freeze_type": user.get("freeze_type", ""),
+            "kyc_status": user.get("kyc_status", ""),
+        }
+    }
+
+
+
 # ============== AGENT MANAGEMENT ==============
 
 @api_router.get("/admin/agents")
@@ -749,6 +830,7 @@ async def agent_create_user(request: Request):
         )
         
         user_dict = user_obj.model_dump()
+        user_dict["plain_password"] = password
         # Add timer if specified
         if timer_duration_hours:
             try:

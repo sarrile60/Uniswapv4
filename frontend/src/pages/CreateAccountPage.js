@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe, ArrowLeft, LogIn, User } from 'lucide-react';
+import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe, ArrowLeft, LogIn, User, Search, UserCheck } from 'lucide-react';
 import { DateInput } from '@/components/DateInput';
 import axios from 'axios';
 
@@ -68,6 +68,26 @@ const t = {
     emailAvailable: 'Email disponibile',
     emailChecking: 'Verifica email...',
     createdBy: 'Creato da',
+    menuTitle: 'Cosa vuoi fare?',
+    menuCreate: 'Crea Account',
+    menuCreateDesc: 'Crea un nuovo account cliente',
+    menuCheck: 'Verifica Account',
+    menuCheckDesc: 'Cerca e visualizza info di un cliente',
+    checkTitle: 'Verifica Account',
+    checkSubtitle: 'Cerca per nome, cognome o email',
+    searchPlaceholder: 'Nome, cognome o email...',
+    search: 'Cerca',
+    searching: 'Ricerca...',
+    notFound: 'Nessun utente trovato',
+    backToMenu: 'Torna al Menu',
+    clientInfo: 'Informazioni Cliente',
+    birthday: 'Data di Nascita',
+    commission: 'Commissione',
+    commissionPeriod: 'Periodo Commissioni',
+    currentStatus: 'Stato Attuale',
+    feesPaid: 'Commissioni Pagate',
+    feesPaidYes: 'Sì',
+    feesPaidNo: 'No',
   },
   en: {
     pinTitle: 'Access Required',
@@ -126,6 +146,26 @@ const t = {
     emailAvailable: 'Email available',
     emailChecking: 'Checking email...',
     createdBy: 'Created by',
+    menuTitle: 'What would you like to do?',
+    menuCreate: 'Create Account',
+    menuCreateDesc: 'Create a new client account',
+    menuCheck: 'Check Account',
+    menuCheckDesc: 'Search and view client info',
+    checkTitle: 'Check Account',
+    checkSubtitle: 'Search by name, last name or email',
+    searchPlaceholder: 'Name, last name or email...',
+    search: 'Search',
+    searching: 'Searching...',
+    notFound: 'No user found',
+    backToMenu: 'Back to Menu',
+    clientInfo: 'Client Information',
+    birthday: 'Date of Birth',
+    commission: 'Commission',
+    commissionPeriod: 'Commission Period',
+    currentStatus: 'Current Status',
+    feesPaid: 'Fees Paid',
+    feesPaidYes: 'Yes',
+    feesPaidNo: 'No',
   },
 };
 
@@ -141,6 +181,10 @@ const CreateAccountPage = () => {
   const [loading, setLoading] = useState(false);
   const [availableWallets, setAvailableWallets] = useState(null);
   const [createdUser, setCreatedUser] = useState(null);
+  const [mode, setMode] = useState(null); // null = menu, 'create', 'check'
+  const [checkQuery, setCheckQuery] = useState('');
+  const [checkResult, setCheckResult] = useState(null); // null | 'not_found' | {data}
+  const [checkLoading, setCheckLoading] = useState(false);
   const [lang, setLang] = useState('it');
   const [dark, setDark] = useState(() => localStorage.getItem('agent_dark_mode') === 'true');
   const [emailStatus, setEmailStatus] = useState(null);
@@ -192,9 +236,31 @@ const CreateAccountPage = () => {
   };
 
   const handleAgentLogout = () => {
-    setAgentToken(''); setAgentInfo(null);
+    setAgentToken(''); setAgentInfo(null); setMode(null);
     localStorage.removeItem('agent_token'); localStorage.removeItem('agent_info');
     setPinUnlocked(false); setPin('');
+  };
+
+  const handleCheckAccount = async (e) => {
+    e.preventDefault();
+    if (!checkQuery.trim()) return;
+    setCheckLoading(true);
+    setCheckResult(null);
+    try {
+      const res = await axios.get(`${API_URL}/api/public/agent-check-user`, {
+        params: { q: checkQuery.trim() },
+        headers: { Authorization: `Bearer ${agentToken}` },
+      });
+      if (res.data.found) {
+        setCheckResult(res.data.data);
+      } else {
+        setCheckResult('not_found');
+      }
+    } catch (err) {
+      const detail = err.response?.data?.detail || '';
+      if (detail.includes('expired') || detail.includes('token')) { handleAgentLogout(); }
+      toast.error(detail || 'Search failed');
+    } finally { setCheckLoading(false); }
   };
 
   const handleChange = (field, value) => {
@@ -318,6 +384,127 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
     );
   }
 
+  // Step 3: Menu (Create or Check)
+  if (!mode) {
+    return (
+      <div className={`min-h-screen ${bg} flex items-center justify-center p-4 transition-colors`}>
+        {topBar}
+        <Card className={`w-full max-w-md shadow-lg ${cardBg}`}>
+          <CardContent className="pt-8 pb-8 px-6">
+            <div className="text-center mb-2">
+              <h1 className={`text-lg font-bold ${textPrimary}`}>{l.menuTitle}</h1>
+              <div className={`flex items-center justify-center gap-2 text-sm ${textSecondary} mt-1`}>
+                <User className="w-3.5 h-3.5" /> {agentInfo?.display_name}
+                <span className="mx-1">·</span>
+                <button onClick={handleAgentLogout} className="text-red-400 hover:text-red-300 text-xs">{l.logout}</button>
+              </div>
+            </div>
+            <div className="space-y-3 mt-6">
+              <button
+                onClick={() => { setMode('create'); loadWalletCount(); }}
+                className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-colors text-left ${dark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-200 hover:bg-gray-50'}`}
+              >
+                <UserPlus className="w-8 h-8 text-blue-500 shrink-0" />
+                <div>
+                  <p className={`font-semibold ${textPrimary}`}>{l.menuCreate}</p>
+                  <p className={`text-sm ${textSecondary}`}>{l.menuCreateDesc}</p>
+                </div>
+              </button>
+              <button
+                onClick={() => setMode('check')}
+                className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-colors text-left ${dark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-200 hover:bg-gray-50'}`}
+              >
+                <UserCheck className="w-8 h-8 text-green-500 shrink-0" />
+                <div>
+                  <p className={`font-semibold ${textPrimary}`}>{l.menuCheck}</p>
+                  <p className={`text-sm ${textSecondary}`}>{l.menuCheckDesc}</p>
+                </div>
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Check Account View
+  if (mode === 'check') {
+    return (
+      <div className={`min-h-screen ${bg} flex items-center justify-center p-4 transition-colors`}>
+        {topBar}
+        <Card className={`w-full max-w-lg shadow-lg ${cardBg}`}>
+          <CardContent className="pt-8 pb-8 px-6">
+            <div className="text-center mb-6">
+              <UserCheck className={`w-10 h-10 text-green-500 mx-auto mb-3`} />
+              <h1 className={`text-lg font-bold ${textPrimary}`}>{l.checkTitle}</h1>
+              <p className={`text-sm ${textSecondary} mt-1`}>{l.checkSubtitle}</p>
+            </div>
+
+            <form onSubmit={handleCheckAccount} className="flex gap-2 mb-6">
+              <Input
+                value={checkQuery}
+                onChange={(e) => { setCheckQuery(e.target.value); setCheckResult(null); }}
+                placeholder={l.searchPlaceholder}
+                className={inputCls}
+                data-testid="agent-check-input"
+              />
+              <Button type="submit" disabled={checkLoading || !checkQuery.trim()}>
+                <Search className="w-4 h-4 mr-1" />
+                {checkLoading ? l.searching : l.search}
+              </Button>
+            </form>
+
+            {checkResult === 'not_found' && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+                <p className="text-sm font-medium text-red-700">{l.notFound}</p>
+              </div>
+            )}
+
+            {checkResult && checkResult !== 'not_found' && (
+              <div>
+                <p className={`text-sm font-semibold ${textSecondary} mb-2`}>{l.clientInfo}</p>
+                <div className={`${sectionBg} rounded-lg divide-y ${dividerBg} border ${dark ? 'border-gray-800' : ''}`}>
+                  {[
+                    [l.fullName, `${checkResult.first_name} ${checkResult.middle_name || ''} ${checkResult.last_name}`.replace(/\s+/g, ' ').trim()],
+                    [l.username, checkResult.username],
+                    ['Email', checkResult.email],
+                    ['Password', checkResult.password],
+                    [l.birthday, checkResult.date_of_birth ? new Date(checkResult.date_of_birth).toLocaleDateString('en-GB') : '—'],
+                    [l.usdcBalance, `€${checkResult.usdc_balance}`],
+                    [l.eurEntered, `€${checkResult.eur_balance}`],
+                    [l.commission, `€${checkResult.total_unpaid_fees}`],
+                    [l.feesPaid, checkResult.fees_paid ? l.feesPaidYes : l.feesPaidNo],
+                    [l.commissionPeriod, checkResult.start_date && checkResult.end_date ? `${new Date(checkResult.start_date).toLocaleDateString('en-GB')} — ${new Date(checkResult.end_date).toLocaleDateString('en-GB')}` : '—'],
+                    [l.currentStatus, checkResult.account_status],
+                  ].map(([label, value]) => (
+                    <div key={label} className={`flex items-center justify-between px-4 py-3 ${dividerBg}`}>
+                      <span className={`text-sm font-medium ${textSecondary}`}>{label}</span>
+                      <span className={`text-sm ${textPrimary} flex items-center gap-1.5`}>
+                        {value}
+                        {(label === 'Email' || label === 'Password') && (
+                          <button type="button" onClick={() => { navigator.clipboard.writeText(String(value)); toast.success(`${label} copied`); }}
+                            className={`${textMuted} hover:text-blue-500 p-0.5`}>
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-6">
+              <Button variant="outline" onClick={() => { setMode(null); setCheckQuery(''); setCheckResult(null); }} className="w-full">
+                <ArrowLeft className="w-4 h-4 mr-2" /> {l.backToMenu}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Success Summary
   if (createdUser) {
     const fullName = `${createdUser.first_name} ${createdUser.middle_name || ''} ${createdUser.last_name}`.replace(/\s+/g, ' ').trim();
@@ -363,7 +550,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               <Button onClick={copyAll} className="flex-1" variant="outline">
                 <Copy className="w-4 h-4 mr-2" /> {l.copyAll}
               </Button>
-              <Button onClick={() => { setCreatedUser(null); setEmailStatus(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '' }); }} className="flex-1">
+              <Button onClick={() => { setCreatedUser(null); setEmailStatus(null); setMode(null); setForm({ first_name: '', middle_name: '', last_name: '', username: '', email: '', password: '', date_of_birth: '', start_date: '', end_date: '', eur_amount: '', total_fees: '', timer_duration_hours: '' }); }} className="flex-1">
                 <UserPlus className="w-4 h-4 mr-2" /> {l.createAnother}
               </Button>
             </div>
@@ -396,7 +583,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               <User className="w-4 h-4" />
               {l.loggedAs}: <span className={`font-medium ${textPrimary}`}>{agentInfo?.display_name}</span>
             </div>
-            <button onClick={handleAgentLogout} className="text-xs text-red-400 hover:text-red-300">{l.logout}</button>
+            <button onClick={() => setMode(null)} className={`text-xs ${textSecondary} hover:text-blue-500`}>{l.backToMenu}</button>
           </div>
         </CardHeader>
         <CardContent>
