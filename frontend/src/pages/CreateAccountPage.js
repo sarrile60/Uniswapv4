@@ -672,6 +672,9 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
               {loading ? l.creating : l.createAccount}
             </Button>
             {availableWallets === 0 && <p className="text-sm text-red-500 text-center">{l.noWallets}</p>}
+            <Button type="button" variant="outline" onClick={() => setMode(null)} className="w-full">
+              <ArrowLeft className="w-4 h-4 mr-2" /> {l.backToMenu}
+            </Button>
           </form>
         </CardContent>
       </Card>
