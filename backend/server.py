@@ -591,6 +591,7 @@ async def agent_my_clients(request: Request, q: str = ""):
             "total_unpaid_fees": u.get("total_unpaid_fees", "0.00"),
             "fees_paid": u.get("fees_paid", False),
             "account_status": u.get("account_status", ""),
+            "timer_duration_hours": u.get("timer_duration_hours", ""),
             "created_at": u.get("created_at", ""),
         })
     
@@ -609,16 +610,33 @@ async def agent_update_client(user_id: str, request: Request):
     
     body = await request.json()
     
-    allowed = ["first_name", "middle_name", "last_name", "username", "email", "date_of_birth", "total_unpaid_fees"]
+    allowed = ["first_name", "middle_name", "last_name", "username", "email", "date_of_birth", "total_unpaid_fees", "timer_duration_hours"]
     update = {}
     for key in allowed:
         if key in body and body[key] is not None:
-            update[key] = body[key].strip() if isinstance(body[key], str) else body[key]
+            val = body[key]
+            if isinstance(val, str):
+                update[key] = val.strip()
+            elif key == "timer_duration_hours":
+                try: update[key] = int(val)
+                except: pass
+            else:
+                update[key] = val
     
     # Handle password change
     if body.get("password"):
         update["password_hash"] = hash_password(body["password"])
         update["plain_password"] = body["password"]
+    
+    # Handle USDC balance change (via EUR amount)
+    if body.get("usdc_balance") is not None:
+        try:
+            new_balance = str(Decimal(body["usdc_balance"]).quantize(Decimal("0.01")))
+            await db.wallets.update_one(
+                {"user_id": user_id, "asset": "USDC"},
+                {"$set": {"balance": new_balance}}
+            )
+        except: pass
     
     if not update:
         raise HTTPException(status_code=400, detail="No fields to update")
