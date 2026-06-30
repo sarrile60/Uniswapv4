@@ -1,12 +1,18 @@
-# Test Credentials
-
-## Admin Account
-- Email: admin@zenthos-eu.com
-- Password: admin123
+# Zenthos Wallet - Test Credentials
 
 ## Access Gate
-- Passcode: DMTL610Q
+- Passcode: `zenthos2026` (case-insensitive)
 
-## Test Users
-- Timer Test: timertest2@test.com / Test1234!
-- User with timer: ashleyalt008@gmail.com (has timer_duration_hours=168)
+## Admin
+- Email: `admin@zenthos-eu.com`
+- Password: `admin123`
+
+## Agent Portal
+- PIN: `8971`
+- Route: `/CreateAccount`
+
+### Agent Accounts
+| Username | Password | Display Name |
+|----------|----------|--------------|
+| marco | agent123 | Marco Rossi |
+| fulltest_agent | (unknown) | Test Agent |
