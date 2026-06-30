@@ -586,10 +586,10 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                             {client.first_name} {client.middle_name || ''} {client.last_name}
                           </p>
                           <p className={`text-sm ${textSecondary}`}>{client.email}</p>
-                          <div className={`flex gap-4 text-xs ${textMuted} mt-1`}>
-                            <span>USDC: €{client.usdc_balance}</span>
-                            <span>{l.commission}: €{client.total_unpaid_fees}</span>
-                            <span>{client.account_status}</span>
+                          <div className={`flex gap-4 text-xs mt-1 flex-wrap`}>
+                            <span className="text-blue-500 font-semibold">USDC: €{client.usdc_balance}</span>
+                            <span className="text-orange-500 font-semibold">{l.commission}: €{client.total_unpaid_fees}</span>
+                            <span className={`font-semibold ${client.account_status === 'frozen' ? 'text-red-500' : 'text-green-500'}`}>{client.account_status}</span>
                           </div>
                         </div>
                         <Button size="sm" variant="ghost" onClick={() => startEdit(client)} className={textSecondary}>
