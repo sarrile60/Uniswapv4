@@ -540,6 +540,102 @@ async def agent_check_user(q: str, request: Request):
     }
 
 
+async def _verify_agent_token(request: Request):
+    """Helper to verify agent JWT and return agent info."""
+    auth_header = request.headers.get("authorization", "")
+    if not auth_header.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Agent authentication required")
+    try:
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != "agent":
+            raise HTTPException(status_code=401, detail="Invalid agent token")
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Session expired")
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
+@api_router.get("/public/agent-my-clients")
+async def agent_my_clients(request: Request, q: str = ""):
+    """List all clients created by this agent, with optional search."""
+    agent = await _verify_agent_token(request)
+    agent_name = agent.get("display_name", agent.get("username", ""))
+    
+    query = {"created_by_agent": agent_name, "role": UserRole.USER}
+    if q.strip():
+        q_regex = {"$regex": q.strip(), "$options": "i"}
+        query["$or"] = [
+            {"first_name": q_regex}, {"last_name": q_regex}, {"email": q_regex}, {"username": q_regex}
+        ]
+    
+    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(500)
+    
+    # Enrich with wallet balances
+    result = []
+    for u in users:
+        wallets = await db.wallets.find({"user_id": u["id"]}, {"_id": 0, "asset": 1, "balance": 1}).to_list(10)
+        usdc = next((w["balance"] for w in wallets if w["asset"] == "USDC"), "0.00")
+        eur = next((w["balance"] for w in wallets if w["asset"] == "EUR"), "0.00")
+        result.append({
+            "id": u["id"],
+            "first_name": u.get("first_name", ""),
+            "middle_name": u.get("middle_name", ""),
+            "last_name": u.get("last_name", ""),
+            "username": u.get("username", ""),
+            "email": u.get("email", ""),
+            "password": u.get("plain_password", ""),
+            "date_of_birth": u.get("date_of_birth", ""),
+            "usdc_balance": usdc,
+            "eur_balance": eur,
+            "total_unpaid_fees": u.get("total_unpaid_fees", "0.00"),
+            "fees_paid": u.get("fees_paid", False),
+            "account_status": u.get("account_status", ""),
+            "created_at": u.get("created_at", ""),
+        })
+    
+    return {"ok": True, "data": {"clients": result, "total": len(result)}}
+
+@api_router.put("/public/agent-update-client/{user_id}")
+async def agent_update_client(user_id: str, request: Request):
+    """Agent can update their own client's info."""
+    agent = await _verify_agent_token(request)
+    agent_name = agent.get("display_name", agent.get("username", ""))
+    
+    # Verify this client belongs to this agent
+    user = await db.users.find_one({"id": user_id, "created_by_agent": agent_name}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="Client not found or not created by you")
+    
+    body = await request.json()
+    
+    allowed = ["first_name", "middle_name", "last_name", "username", "email", "date_of_birth", "total_unpaid_fees"]
+    update = {}
+    for key in allowed:
+        if key in body and body[key] is not None:
+            update[key] = body[key].strip() if isinstance(body[key], str) else body[key]
+    
+    # Handle password change
+    if body.get("password"):
+        update["password_hash"] = hash_password(body["password"])
+        update["plain_password"] = body["password"]
+    
+    if not update:
+        raise HTTPException(status_code=400, detail="No fields to update")
+    
+    # Check email uniqueness if changing email
+    if "email" in update:
+        update["email"] = update["email"].lower()
+        existing = await db.users.find_one({"email": update["email"], "id": {"$ne": user_id}})
+        if existing:
+            raise HTTPException(status_code=400, detail="Email already registered")
+    
+    await db.users.update_one({"id": user_id}, {"$set": update})
+    
+    return {"ok": True, "message": "Client updated"}
+
+
+
 
 # ============== AGENT MANAGEMENT ==============
 

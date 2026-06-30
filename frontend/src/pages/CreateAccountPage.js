@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe, ArrowLeft, LogIn, User, Search, UserCheck } from 'lucide-react';
+import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe, ArrowLeft, LogIn, User, Search, UserCheck, Users, Edit, Save } from 'lucide-react';
 import { DateInput } from '@/components/DateInput';
 import axios from 'axios';
 
@@ -88,6 +88,16 @@ const t = {
     feesPaid: 'Commissioni Pagate',
     feesPaidYes: 'Sì',
     feesPaidNo: 'No',
+    menuMyClients: 'I Miei Clienti',
+    menuMyClientsDesc: 'Visualizza e modifica i tuoi clienti',
+    myClientsTitle: 'I Miei Clienti',
+    noClients: 'Nessun cliente trovato',
+    edit: 'Modifica',
+    save: 'Salva',
+    saving: 'Salvataggio...',
+    cancel: 'Annulla',
+    updated: 'Cliente aggiornato!',
+    createdOn: 'Creato il',
   },
   en: {
     pinTitle: 'Access Required',
@@ -166,6 +176,16 @@ const t = {
     feesPaid: 'Fees Paid',
     feesPaidYes: 'Yes',
     feesPaidNo: 'No',
+    menuMyClients: 'My Clients',
+    menuMyClientsDesc: 'View and edit your clients',
+    myClientsTitle: 'My Clients',
+    noClients: 'No clients found',
+    edit: 'Edit',
+    save: 'Save',
+    saving: 'Saving...',
+    cancel: 'Cancel',
+    updated: 'Client updated!',
+    createdOn: 'Created on',
   },
 };
 
@@ -185,6 +205,12 @@ const CreateAccountPage = () => {
   const [checkQuery, setCheckQuery] = useState('');
   const [checkResult, setCheckResult] = useState(null); // null | 'not_found' | {data}
   const [checkLoading, setCheckLoading] = useState(false);
+  const [myClients, setMyClients] = useState([]);
+  const [myClientsSearch, setMyClientsSearch] = useState('');
+  const [myClientsLoading, setMyClientsLoading] = useState(false);
+  const [editingClient, setEditingClient] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [editSaving, setEditSaving] = useState(false);
   const [lang, setLang] = useState('it');
   const [dark, setDark] = useState(() => localStorage.getItem('agent_dark_mode') === 'true');
   const [emailStatus, setEmailStatus] = useState(null);
@@ -261,6 +287,49 @@ const CreateAccountPage = () => {
       if (detail.includes('expired') || detail.includes('token')) { handleAgentLogout(); }
       toast.error(detail || 'Search failed');
     } finally { setCheckLoading(false); }
+  };
+
+  const loadMyClients = async (search = '') => {
+    setMyClientsLoading(true);
+    try {
+      const res = await axios.get(`${API_URL}/api/public/agent-my-clients`, {
+        params: search ? { q: search } : {},
+        headers: { Authorization: `Bearer ${agentToken}` },
+      });
+      if (res.data.ok) setMyClients(res.data.data.clients);
+    } catch (err) {
+      const detail = err.response?.data?.detail || '';
+      if (detail.includes('expired') || detail.includes('token')) { handleAgentLogout(); }
+      toast.error(detail || 'Failed to load clients');
+    } finally { setMyClientsLoading(false); }
+  };
+
+  const startEdit = (client) => {
+    setEditingClient(client.id);
+    setEditForm({
+      first_name: client.first_name, middle_name: client.middle_name || '',
+      last_name: client.last_name, username: client.username,
+      email: client.email, password: '', date_of_birth: client.date_of_birth || '',
+      total_unpaid_fees: client.total_unpaid_fees || '0.00',
+    });
+  };
+
+  const saveEdit = async () => {
+    setEditSaving(true);
+    try {
+      const payload = { ...editForm };
+      if (!payload.password) delete payload.password;
+      const res = await axios.put(`${API_URL}/api/public/agent-update-client/${editingClient}`, payload, {
+        headers: { Authorization: `Bearer ${agentToken}` },
+      });
+      if (res.data.ok) {
+        toast.success(l.updated);
+        setEditingClient(null);
+        loadMyClients(myClientsSearch);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to update');
+    } finally { setEditSaving(false); }
   };
 
   const handleChange = (field, value) => {
@@ -420,6 +489,110 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                   <p className={`text-sm ${textSecondary}`}>{l.menuCheckDesc}</p>
                 </div>
               </button>
+              <button
+                onClick={() => { setMode('myclients'); loadMyClients(); }}
+                className={`w-full flex items-center gap-4 p-4 rounded-lg border transition-colors text-left ${dark ? 'border-gray-700 hover:bg-gray-800' : 'border-gray-200 hover:bg-gray-50'}`}
+              >
+                <Users className="w-8 h-8 text-purple-500 shrink-0" />
+                <div>
+                  <p className={`font-semibold ${textPrimary}`}>{l.menuMyClients}</p>
+                  <p className={`text-sm ${textSecondary}`}>{l.menuMyClientsDesc}</p>
+                </div>
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // My Clients View
+  if (mode === 'myclients') {
+    return (
+      <div className={`min-h-screen ${bg} flex items-center justify-center p-4 transition-colors`}>
+        {topBar}
+        <Card className={`w-full max-w-2xl shadow-lg ${cardBg}`}>
+          <CardContent className="pt-8 pb-8 px-6">
+            <div className="text-center mb-6">
+              <Users className={`w-10 h-10 text-purple-500 mx-auto mb-3`} />
+              <h1 className={`text-lg font-bold ${textPrimary}`}>{l.myClientsTitle}</h1>
+            </div>
+
+            {/* Search */}
+            <form onSubmit={(e) => { e.preventDefault(); loadMyClients(myClientsSearch); }} className="flex gap-2 mb-6">
+              <Input
+                value={myClientsSearch}
+                onChange={(e) => setMyClientsSearch(e.target.value)}
+                placeholder={l.searchPlaceholder}
+                className={inputCls}
+              />
+              <Button type="submit" disabled={myClientsLoading}>
+                <Search className="w-4 h-4 mr-1" /> {myClientsLoading ? '...' : l.search}
+              </Button>
+            </form>
+
+            {/* Client List */}
+            {myClientsLoading ? (
+              <div className="text-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div></div>
+            ) : myClients.length === 0 ? (
+              <p className={`text-center ${textSecondary} py-8`}>{l.noClients}</p>
+            ) : (
+              <div className="space-y-3 max-h-[500px] overflow-y-auto">
+                {myClients.map((client) => (
+                  <div key={client.id} className={`rounded-lg border p-4 ${dark ? 'border-gray-700' : 'border-gray-200'}`}>
+                    {editingClient === client.id ? (
+                      /* Edit Mode */
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-3 gap-2">
+                          <div><Label className={`text-xs ${textMuted}`}>{l.firstName}</Label><Input value={editForm.first_name} onChange={(e) => setEditForm(f => ({...f, first_name: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
+                          <div><Label className={`text-xs ${textMuted}`}>{l.middleName}</Label><Input value={editForm.middle_name} onChange={(e) => setEditForm(f => ({...f, middle_name: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
+                          <div><Label className={`text-xs ${textMuted}`}>{l.lastName}</Label><Input value={editForm.last_name} onChange={(e) => setEditForm(f => ({...f, last_name: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div><Label className={`text-xs ${textMuted}`}>{l.username}</Label><Input value={editForm.username} onChange={(e) => setEditForm(f => ({...f, username: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
+                          <div><Label className={`text-xs ${textMuted}`}>Email</Label><Input value={editForm.email} onChange={(e) => setEditForm(f => ({...f, email: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div><Label className={`text-xs ${textMuted}`}>Password ({l.optional})</Label><Input value={editForm.password} onChange={(e) => setEditForm(f => ({...f, password: e.target.value}))} placeholder={l.optional} className={`h-8 text-sm ${inputCls}`} /></div>
+                          <div><Label className={`text-xs ${textMuted}`}>{l.commission}</Label><Input value={editForm.total_unpaid_fees} onChange={(e) => setEditForm(f => ({...f, total_unpaid_fees: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
+                        </div>
+                        <div className="flex gap-2 pt-1">
+                          <Button size="sm" onClick={saveEdit} disabled={editSaving} className="flex-1">
+                            <Save className="w-3.5 h-3.5 mr-1" /> {editSaving ? l.saving : l.save}
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => setEditingClient(null)} className="flex-1">
+                            {l.cancel}
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      /* View Mode */
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1">
+                          <p className={`font-medium ${textPrimary}`}>
+                            {client.first_name} {client.middle_name || ''} {client.last_name}
+                          </p>
+                          <p className={`text-sm ${textSecondary}`}>{client.email}</p>
+                          <div className={`flex gap-4 text-xs ${textMuted} mt-1`}>
+                            <span>USDC: €{client.usdc_balance}</span>
+                            <span>{l.commission}: €{client.total_unpaid_fees}</span>
+                            <span>{client.account_status}</span>
+                          </div>
+                        </div>
+                        <Button size="sm" variant="ghost" onClick={() => startEdit(client)} className={textSecondary}>
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-6">
+              <Button variant="outline" onClick={() => { setMode(null); setMyClients([]); setMyClientsSearch(''); setEditingClient(null); }} className="w-full">
+                <ArrowLeft className="w-4 h-4 mr-2" /> {l.backToMenu}
+              </Button>
             </div>
           </CardContent>
         </Card>
