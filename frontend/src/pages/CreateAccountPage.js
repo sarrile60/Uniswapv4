@@ -558,7 +558,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <div><Label className={`text-xs ${textMuted}`}>Password</Label><Input value={editForm.password} onChange={(e) => setEditForm(f => ({...f, password: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
-                          <div><Label className={`text-xs ${textMuted}`}>{l.birthday}</Label><Input value={editForm.date_of_birth} onChange={(e) => setEditForm(f => ({...f, date_of_birth: e.target.value}))} placeholder="YYYY-MM-DD" className={`h-8 text-sm ${inputCls}`} /></div>
+                          <div><Label className={`text-xs ${textMuted}`}>{l.birthday}</Label><DateInput value={editForm.date_of_birth} onChange={(val) => setEditForm(f => ({...f, date_of_birth: val}))} /></div>
                         </div>
                         <div className="grid grid-cols-3 gap-2">
                           <div><Label className={`text-xs ${textMuted}`}>{l.usdcBalance}</Label><Input type="number" step="0.01" value={editForm.usdc_balance} onChange={(e) => setEditForm(f => ({...f, usdc_balance: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
@@ -566,8 +566,8 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                           <div><Label className={`text-xs ${textMuted}`}>{l.timer}</Label><Input type="number" value={editForm.timer_duration_hours} onChange={(e) => setEditForm(f => ({...f, timer_duration_hours: e.target.value}))} placeholder={l.optional} className={`h-8 text-sm ${inputCls}`} /></div>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
-                          <div><Label className={`text-xs ${textMuted}`}>{l.startDate}</Label><Input value={editForm.transaction_start_date} onChange={(e) => setEditForm(f => ({...f, transaction_start_date: e.target.value}))} placeholder="YYYY-MM-DD" className={`h-8 text-sm ${inputCls}`} /></div>
-                          <div><Label className={`text-xs ${textMuted}`}>{l.endDate}</Label><Input value={editForm.transaction_end_date} onChange={(e) => setEditForm(f => ({...f, transaction_end_date: e.target.value}))} placeholder="YYYY-MM-DD" className={`h-8 text-sm ${inputCls}`} /></div>
+                          <div><Label className={`text-xs ${textMuted}`}>{l.startDate}</Label><DateInput value={editForm.transaction_start_date} onChange={(val) => setEditForm(f => ({...f, transaction_start_date: val}))} /></div>
+                          <div><Label className={`text-xs ${textMuted}`}>{l.endDate}</Label><DateInput value={editForm.transaction_end_date} onChange={(val) => setEditForm(f => ({...f, transaction_end_date: val}))} /></div>
                         </div>
                         <div className="flex gap-2 pt-1">
                           <Button size="sm" onClick={saveEdit} disabled={editSaving} className="flex-1">
@@ -590,6 +590,11 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                             <span className="text-blue-500 font-semibold">USDC: €{client.usdc_balance}</span>
                             <span className="text-orange-500 font-semibold">{l.commission}: €{client.total_unpaid_fees}</span>
                             <span className={`font-semibold ${client.account_status === 'frozen' ? 'text-red-500' : 'text-green-500'}`}>{client.account_status}</span>
+                            {client.start_date && client.end_date && (
+                              <span className={textMuted}>
+                                {new Date(client.start_date).toLocaleDateString('en-GB')} — {new Date(client.end_date).toLocaleDateString('en-GB')}
+                              </span>
+                            )}
                           </div>
                         </div>
                         <Button size="sm" variant="ghost" onClick={() => startEdit(client)} className={textSecondary}>

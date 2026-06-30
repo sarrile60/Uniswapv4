@@ -578,9 +578,9 @@ async def agent_my_clients(request: Request, q: str = ""):
         usdc = next((w["balance"] for w in wallets if w["asset"] == "USDC"), "0.00")
         eur = next((w["balance"] for w in wallets if w["asset"] == "EUR"), "0.00")
         
-        # Get transaction date range
+        # Get transaction date range (from ALL transactions, not just admin-generated)
         gen_txs = await db.transactions.find(
-            {"user_id": u["id"], "created_by_admin": True, "status": {"$ne": "failed"}},
+            {"user_id": u["id"], "status": {"$ne": "failed"}},
             {"_id": 0, "transaction_date": 1}
         ).sort("transaction_date", 1).to_list(10000)
         start_date = gen_txs[0].get("transaction_date", "")[:10] if gen_txs else ""
