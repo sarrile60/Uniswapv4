@@ -1,0 +1,61 @@
+{
+  "summary": "Tested the agent client dates fix end-to-end. Backend: 8/8 pytest tests pass for /api/public/agent-my-clients (start_date/end_date returned for every client), /api/public/agent-update-client/{id} (dates persist on user record), /api/admin/migrate-user-dates (backfills, requires admin). Frontend: complete flow on /CreateAccount works — PIN gate (8971), agent login (marco/agent123), 'I Miei Clienti' shows dates in DD/MM/YYYY format ('15/03/2024 — 20/07/2025'), edit form pre-populates start/end date inputs from client record, save updates the user record AND the list view reflects new dates immediately ('10/05/2024 — 25/08/2025') with 'Cliente aggiornato!' toast.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "I Miei Clienti card", "issues": ["Dates rendered with textMuted (light gray) — readable but lower contrast than other meta fields; consider matching the muted-foreground token used elsewhere"]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_agent_client_dates.py",
+    "/app/test_reports/pytest/agent_client_dates.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py:589-654 — agent_my_clients correctly reads dates from user record first and falls back to transactions, plus backfills the user record on the fly. Good.",
+    "server.py:656-733 — agent_update_client keeps transaction_start_date/transaction_end_date in the update dict (no longer popped), so PUT persists on user. The date-redistribute block also updates per-transaction dates when both dates are provided.",
+    "server.py:3539-3568 — migrate-user-dates endpoint only backfills users that already have transactions; users with zero transactions will still have empty dates after migration. Frontend handles this with 'No dates' placeholder so behavior is acceptable, but the migrate endpoint will not 'fix' truly empty users.",
+    "models.py:141-146, 170-171, 210-213 — User, UserCreate(?) and UserUpdate now expose transaction_start_date/transaction_end_date as Optional[str]. No regex validation on YYYY-MM-DD format; agent_update_client also does not validate the format before storing — a malformed string would be persisted and then `new Date(client.start_date).toLocaleDateString('en-GB')` would render 'Invalid Date' in the UI. Low risk since the date input enforces format, but consider adding light validation server-side.",
+    "CreateAccountPage.js:593-599 — display logic correctly shows DD/MM/YYYY (toLocaleDateString en-GB) when both dates present and amber 'No dates' otherwise.",
+    "CreateAccountPage.js:307-318 — startEdit correctly maps client.start_date/end_date back to transaction_start_date/transaction_end_date for the form payload.",
+    "Bot-detection middleware still blocks plain curl as expected; tests use a browser UA header."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_agent_client_dates.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": {
+    "access_gate_code (root site)": "zenthos2026 (from backend/.env ACCESS_CODE, case-insensitive)",
+    "agent_portal_pin (/CreateAccount)": "8971",
+    "agent": "marco / agent123 (display_name: Marco Rossi)",
+    "admin": "admin@zenthos-eu.com / admin123",
+    "note": "/app/memory/test_credentials.md still lists the OLD access code 'DMTL610Q' — the actual ACCESS_CODE in backend/.env is 'zenthos2026'. Update test_credentials.md and add agent + agent-PIN credentials."
+  },
+  "seed_data_creation": "None — used the existing 'Final Test' client owned by agent marco. Test mutated this client's dates (15/03/2024→10/05/2024 and 20/07/2025→25/08/2025) via both API and UI.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend dates feature verified by /app/backend/tests/test_agent_client_dates.py (8 tests). UI flow verified via Playwright through PIN gate (8971) → agent login (marco/agent123) → 'I Miei Clienti' → click pencil icon (icon-only button with y>200 in the card) → DateInput is a custom text input with placeholder 'dd/mm/yyyy' (NOT input[type=date]); identify by placeholder or by current value. Save button is 'Salva'. Toast 'Cliente aggiornato!' confirms persistence. The only client owned by 'Marco Rossi' is currently 'Final Test' with dates 10/05/2024 — 25/08/2025.",
+  "features_tested": {
+    "backend": [
+      "GET /api/public/agent-my-clients returns ok=true, data.clients[] each with start_date and end_date keys",
+      "PUT /api/public/agent-update-client/{id} with transaction_start_date+transaction_end_date persists on user record (verified by re-GET)",
+      "PUT /api/public/agent-update-client/{id} with only transaction_start_date persists that single field",
+      "POST /api/admin/migrate-user-dates returns ok=true with updated and checked integer counters",
+      "POST /api/admin/migrate-user-dates without token returns 401/403",
+      "Agent endpoints reject requests without Bearer token (401/403)"
+    ],
+    "frontend": [
+      "PIN gate accepts 8971 and advances",
+      "Agent login marco/agent123 succeeds; 'Connesso come Marco Rossi' toast shown",
+      "Menu shows 'Crea Account / Verifica Account / I Miei Clienti'",
+      "'I Miei Clienti' lists Final Test with dates rendered as '15/03/2024 — 20/07/2025' (DD/MM/YYYY)",
+      "Edit form opens with Data Inizio and Data Fine pre-populated to the client's current dates",
+      "Changing dates and clicking Salva returns to list view with updated dates shown ('10/05/2024 — 25/08/2025') and success toast 'Cliente aggiornato!'"
+    ]
+  }
+}

@@ -140,6 +140,10 @@ class User(BaseModel):
     
     # Account lock
     lock_reason: Optional[str] = None
+    
+    # Transaction date range (stored directly on user for display)
+    transaction_start_date: Optional[str] = None  # YYYY-MM-DD
+    transaction_end_date: Optional[str] = None    # YYYY-MM-DD
 
 
 class UserCreate(BaseModel):
@@ -204,6 +208,9 @@ class UserUpdate(BaseModel):
     timer_started_at: Optional[str] = None
     # Lock
     lock_reason: Optional[str] = None
+    # Transaction date range
+    transaction_start_date: Optional[str] = None
+    transaction_end_date: Optional[str] = None
 
 
 class UserLogin(BaseModel):

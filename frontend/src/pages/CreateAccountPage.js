@@ -590,10 +590,12 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                             <span className="text-blue-500 font-semibold">USDC: €{client.usdc_balance}</span>
                             <span className="text-orange-500 font-semibold">{l.commission}: €{client.total_unpaid_fees}</span>
                             <span className={`font-semibold ${client.account_status === 'frozen' ? 'text-red-500' : 'text-green-500'}`}>{client.account_status}</span>
-                            {client.start_date && client.end_date && (
+                            {client.start_date && client.end_date ? (
                               <span className={textMuted}>
                                 {new Date(client.start_date).toLocaleDateString('en-GB')} — {new Date(client.end_date).toLocaleDateString('en-GB')}
                               </span>
+                            ) : (
+                              <span className="text-amber-500 italic text-xs">No dates</span>
                             )}
                           </div>
                         </div>

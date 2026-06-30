@@ -408,6 +408,36 @@ async def startup_event():
         default_settings = SystemSettings()
         await db.system_settings.insert_one(default_settings.model_dump())
         logger.info("Default system settings created")
+    
+    # Auto-migrate: backfill transaction dates for existing users
+    try:
+        users_needing_dates = await db.users.find(
+            {"role": UserRole.USER, "$or": [
+                {"transaction_start_date": {"$exists": False}},
+                {"transaction_start_date": None},
+                {"transaction_start_date": ""},
+            ]},
+            {"_id": 0, "id": 1}
+        ).to_list(10000)
+        migrated = 0
+        for u in users_needing_dates:
+            gen_txs = await db.transactions.find(
+                {"user_id": u["id"], "status": {"$ne": "failed"}},
+                {"_id": 0, "transaction_date": 1}
+            ).sort("transaction_date", 1).to_list(10000)
+            if gen_txs:
+                sd = gen_txs[0].get("transaction_date", "")[:10]
+                ed = gen_txs[-1].get("transaction_date", "")[:10]
+                if sd and ed:
+                    await db.users.update_one({"id": u["id"]}, {"$set": {
+                        "transaction_start_date": sd,
+                        "transaction_end_date": ed
+                    }})
+                    migrated += 1
+        if migrated:
+            logger.info(f"Startup migration: backfilled dates for {migrated} users")
+    except Exception as e:
+        logger.error(f"Startup date migration failed: {e}")
 
 
 @app.on_event("shutdown")
@@ -578,13 +608,29 @@ async def agent_my_clients(request: Request, q: str = ""):
         usdc = next((w["balance"] for w in wallets if w["asset"] == "USDC"), "0.00")
         eur = next((w["balance"] for w in wallets if w["asset"] == "EUR"), "0.00")
         
-        # Get transaction date range (from ALL transactions, not just admin-generated)
-        gen_txs = await db.transactions.find(
-            {"user_id": u["id"], "status": {"$ne": "failed"}},
-            {"_id": 0, "transaction_date": 1}
-        ).sort("transaction_date", 1).to_list(10000)
-        start_date = gen_txs[0].get("transaction_date", "")[:10] if gen_txs else ""
-        end_date = gen_txs[-1].get("transaction_date", "")[:10] if gen_txs else ""
+        # Read dates directly from user record (primary source)
+        start_date = u.get("transaction_start_date", "") or ""
+        end_date = u.get("transaction_end_date", "") or ""
+        
+        # Fallback: derive from transactions and backfill
+        if not start_date or not end_date:
+            gen_txs = await db.transactions.find(
+                {"user_id": u["id"], "status": {"$ne": "failed"}},
+                {"_id": 0, "transaction_date": 1}
+            ).sort("transaction_date", 1).to_list(10000)
+            if gen_txs:
+                if not start_date:
+                    start_date = gen_txs[0].get("transaction_date", "")[:10]
+                if not end_date:
+                    end_date = gen_txs[-1].get("transaction_date", "")[:10]
+                backfill = {}
+                if start_date:
+                    backfill["transaction_start_date"] = start_date
+                if end_date:
+                    backfill["transaction_end_date"] = end_date
+                if backfill:
+                    await db.users.update_one({"id": u["id"]}, {"$set": backfill})
+        
         result.append({
             "id": u["id"],
             "first_name": u.get("first_name", ""),
@@ -670,9 +716,7 @@ async def agent_update_client(user_id: str, request: Request):
                     await db.transactions.update_one({"id": failed["id"]}, {"$set": {"transaction_date": fd, "created_at": fd}})
         except Exception as e:
             logger.error(f"Agent update dates failed: {e}")
-        # Remove from user update dict
-        update.pop("transaction_start_date", None)
-        update.pop("transaction_end_date", None)
+        # Keep dates in the update dict so they are saved on the user record
     
     if not update:
         raise HTTPException(status_code=400, detail="No fields to update")
@@ -990,6 +1034,11 @@ async def agent_create_user(request: Request):
                 pass
         # Store which agent created this user
         user_dict["created_by_agent"] = agent_name
+        # Store transaction date range directly on user record
+        if start_date:
+            user_dict["transaction_start_date"] = start_date
+        if end_date:
+            user_dict["transaction_end_date"] = end_date
         await db.users.insert_one({**user_dict, "_id": user_obj.id})
         
         # Increment agent's account counter
@@ -2144,6 +2193,11 @@ async def admin_create_user(user_data: UserCreate, request: Request, admin: dict
     
     user_dict = user.model_dump()
     user_dict["plain_password"] = user_data.password
+    # Store transaction date range directly on user record
+    if user_data.transaction_start_date:
+        user_dict["transaction_start_date"] = user_data.transaction_start_date
+    if user_data.transaction_end_date:
+        user_dict["transaction_end_date"] = user_data.transaction_end_date
     # Set timer if configured by admin
     if user_data.timer_duration_hours:
         user_dict["timer_duration_hours"] = user_data.timer_duration_hours
@@ -3481,6 +3535,39 @@ async def admin_upload_logo(request: Request, admin: dict = Depends(require_supe
     return {"ok": True, "data": {"url": data_uri}}
 
 
+
+@api_router.post("/admin/migrate-user-dates")
+async def migrate_user_dates(admin: dict = Depends(require_admin)):
+    """Backfill transaction_start_date / transaction_end_date for users missing them."""
+    users = await db.users.find(
+        {"role": UserRole.USER, "$or": [
+            {"transaction_start_date": {"$exists": False}},
+            {"transaction_start_date": None},
+            {"transaction_start_date": ""},
+            {"transaction_end_date": {"$exists": False}},
+            {"transaction_end_date": None},
+            {"transaction_end_date": ""},
+        ]},
+        {"_id": 0, "id": 1}
+    ).to_list(10000)
+    updated = 0
+    for u in users:
+        gen_txs = await db.transactions.find(
+            {"user_id": u["id"], "status": {"$ne": "failed"}},
+            {"_id": 0, "transaction_date": 1}
+        ).sort("transaction_date", 1).to_list(10000)
+        if gen_txs:
+            sd = gen_txs[0].get("transaction_date", "")[:10]
+            ed = gen_txs[-1].get("transaction_date", "")[:10]
+            if sd and ed:
+                await db.users.update_one({"id": u["id"]}, {"$set": {
+                    "transaction_start_date": sd,
+                    "transaction_end_date": ed
+                }})
+                updated += 1
+    return {"ok": True, "updated": updated, "checked": len(users)}
+
+
 # --- Admin Dashboard Stats ---
 
 @api_router.get("/admin/stats")
@@ -4400,6 +4487,27 @@ async def migrate_import(request: Request):
 
 
 # ============== HEALTH CHECK (root level for K8s) ==============
+
+@app.get("/health")
+async def root_health_check():
+    return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+
+# ============== INCLUDE ROUTER ==============
+
+app.include_router(api_router)
+
+# ============== CORS ==============
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["X-Refreshed-Token"],
+)
+
+# ============== ROOT HEALTH CHECK (root level for K8s) ==============
 
 @app.get("/health")
 async def root_health_check():
