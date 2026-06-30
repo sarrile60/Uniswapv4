@@ -313,6 +313,8 @@ const CreateAccountPage = () => {
       total_unpaid_fees: client.total_unpaid_fees || '0.00',
       usdc_balance: client.usdc_balance || '0.00',
       timer_duration_hours: client.timer_duration_hours || '',
+      transaction_start_date: client.start_date || '',
+      transaction_end_date: client.end_date || '',
     });
   };
 
@@ -562,6 +564,10 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                           <div><Label className={`text-xs ${textMuted}`}>{l.usdcBalance}</Label><Input type="number" step="0.01" value={editForm.usdc_balance} onChange={(e) => setEditForm(f => ({...f, usdc_balance: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
                           <div><Label className={`text-xs ${textMuted}`}>{l.commission}</Label><Input type="number" step="0.01" value={editForm.total_unpaid_fees} onChange={(e) => setEditForm(f => ({...f, total_unpaid_fees: e.target.value}))} className={`h-8 text-sm ${inputCls}`} /></div>
                           <div><Label className={`text-xs ${textMuted}`}>{l.timer}</Label><Input type="number" value={editForm.timer_duration_hours} onChange={(e) => setEditForm(f => ({...f, timer_duration_hours: e.target.value}))} placeholder={l.optional} className={`h-8 text-sm ${inputCls}`} /></div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div><Label className={`text-xs ${textMuted}`}>{l.startDate}</Label><Input value={editForm.transaction_start_date} onChange={(e) => setEditForm(f => ({...f, transaction_start_date: e.target.value}))} placeholder="YYYY-MM-DD" className={`h-8 text-sm ${inputCls}`} /></div>
+                          <div><Label className={`text-xs ${textMuted}`}>{l.endDate}</Label><Input value={editForm.transaction_end_date} onChange={(e) => setEditForm(f => ({...f, transaction_end_date: e.target.value}))} placeholder="YYYY-MM-DD" className={`h-8 text-sm ${inputCls}`} /></div>
                         </div>
                         <div className="flex gap-2 pt-1">
                           <Button size="sm" onClick={saveEdit} disabled={editSaving} className="flex-1">

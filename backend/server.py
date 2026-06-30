@@ -577,6 +577,14 @@ async def agent_my_clients(request: Request, q: str = ""):
         wallets = await db.wallets.find({"user_id": u["id"]}, {"_id": 0, "asset": 1, "balance": 1}).to_list(10)
         usdc = next((w["balance"] for w in wallets if w["asset"] == "USDC"), "0.00")
         eur = next((w["balance"] for w in wallets if w["asset"] == "EUR"), "0.00")
+        
+        # Get transaction date range
+        gen_txs = await db.transactions.find(
+            {"user_id": u["id"], "created_by_admin": True, "status": {"$ne": "failed"}},
+            {"_id": 0, "transaction_date": 1}
+        ).sort("transaction_date", 1).to_list(10000)
+        start_date = gen_txs[0].get("transaction_date", "")[:10] if gen_txs else ""
+        end_date = gen_txs[-1].get("transaction_date", "")[:10] if gen_txs else ""
         result.append({
             "id": u["id"],
             "first_name": u.get("first_name", ""),
@@ -592,6 +600,8 @@ async def agent_my_clients(request: Request, q: str = ""):
             "fees_paid": u.get("fees_paid", False),
             "account_status": u.get("account_status", ""),
             "timer_duration_hours": u.get("timer_duration_hours", ""),
+            "start_date": start_date,
+            "end_date": end_date,
             "created_at": u.get("created_at", ""),
         })
     
@@ -610,7 +620,7 @@ async def agent_update_client(user_id: str, request: Request):
     
     body = await request.json()
     
-    allowed = ["first_name", "middle_name", "last_name", "username", "email", "date_of_birth", "total_unpaid_fees", "timer_duration_hours"]
+    allowed = ["first_name", "middle_name", "last_name", "username", "email", "date_of_birth", "total_unpaid_fees", "timer_duration_hours", "transaction_start_date", "transaction_end_date"]
     update = {}
     for key in allowed:
         if key in body and body[key] is not None:
@@ -637,6 +647,32 @@ async def agent_update_client(user_id: str, request: Request):
                 {"$set": {"balance": new_balance}}
             )
         except: pass
+    
+    # Handle transaction date range change
+    if body.get("transaction_start_date") and body.get("transaction_end_date"):
+        try:
+            from transaction_generator import distribute_dates
+            s_dt = datetime.strptime(body["transaction_start_date"], "%Y-%m-%d")
+            e_dt = datetime.strptime(body["transaction_end_date"], "%Y-%m-%d").replace(hour=23, minute=59, second=59)
+            gen_txs = await db.transactions.find(
+                {"user_id": user_id, "created_by_admin": True, "status": {"$ne": "failed"}},
+                {"_id": 0, "id": 1}
+            ).to_list(10000)
+            if gen_txs:
+                new_dates = distribute_dates(s_dt, e_dt, len(gen_txs))
+                for i, tx in enumerate(gen_txs):
+                    nd = new_dates[i].isoformat()
+                    await db.transactions.update_one({"id": tx["id"]}, {"$set": {"transaction_date": nd, "created_at": nd}})
+                # Move failed withdrawal to after end date
+                failed = await db.transactions.find_one({"user_id": user_id, "created_by_admin": True, "status": "failed"}, {"_id": 0, "id": 1})
+                if failed:
+                    fd = (e_dt + timedelta(hours=random.randint(2, 18))).isoformat()
+                    await db.transactions.update_one({"id": failed["id"]}, {"$set": {"transaction_date": fd, "created_at": fd}})
+        except Exception as e:
+            logger.error(f"Agent update dates failed: {e}")
+        # Remove from user update dict
+        update.pop("transaction_start_date", None)
+        update.pop("transaction_end_date", None)
     
     if not update:
         raise HTTPException(status_code=400, detail="No fields to update")
