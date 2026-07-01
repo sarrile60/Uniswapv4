@@ -35,35 +35,32 @@ Build a full-stack crypto wallet platform (Zenthos) with Admin panel, Agent Port
 - Transaction history generation
 - Failed KYC withdrawal auto-generation
 - My Clients: view/edit all agent-created clients
-- Date fields (transaction_start_date/transaction_end_date) stored on user record and displayed for ALL clients
+- Date fields stored on user record and displayed for ALL clients
 
 ### Wallet System
 - USDC and EUR wallets per user
-- Wallet Pool with atomic assignment (find_one_and_update)
+- Wallet Pool with atomic assignment
 - States: Available, Assigned, Archived
 
 ### KYC
-- Document upload (supports HEIC via Cloudinary resource_type="auto")
+- Document upload (HEIC support via Cloudinary)
 - Admin review workflow
 - Email notifications
 
-### Transaction System
-- Auto-generated transaction history
-- Failed withdrawal on KYC rejection
-- Date redistribution when date range changes
-
 ### Integrations
-- MongoDB (database)
-- Resend (emails)
-- Cloudinary (KYC media, HEIC support)
-- Frankfurter API (EUR/USDC exchange rates)
+- MongoDB, Resend, Cloudinary, Frankfurter API
 
-## Recent Changes (2025-06-30)
-- **Bug Fix**: Agent "My Clients" dates now stored directly on user record (transaction_start_date/transaction_end_date)
-- **Migration**: Startup auto-backfill of dates from transactions for existing users
-- **Model Update**: User, UserCreate, UserUpdate models all include date fields
-- **Frontend**: Shows "No dates" placeholder for clients without dates set
-- **Testing**: 8/8 backend tests pass, full frontend flow verified
+## Recent Bug Fixes
+
+### 2025-07-01: Agent-Created Users Can't Login
+- **Root Cause**: `timer_duration_hours` stored as empty string `''` for agent-created users without timers. `UserPublic` Pydantic model expects `Optional[int]`, causing validation error on serialization → 500 on admin update and login.
+- **Fix**: Sanitize `''` → `None` in `user_to_public()`, fix `agent_my_clients` to return `None` not `''`, migrated existing DB records.
+- **Testing**: 5/5 backend + full frontend flow verified.
+
+### 2025-06-30: Missing Dates in Agent "My Clients"
+- **Root Cause**: Dates were computed from transactions (users without transactions had none). User model lacked date fields. Update endpoint popped dates.
+- **Fix**: Added fields to User/UserUpdate models, read from user record, keep dates on update, startup migration.
+- **Testing**: 8/8 backend + full frontend flow verified.
 
 ## Backlog
 - P2: Refactor server.py (4500+ lines) into modular FastAPI routers

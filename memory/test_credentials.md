@@ -16,3 +16,9 @@
 |----------|----------|--------------|
 | marco | agent123 | Marco Rossi |
 | fulltest_agent | (unknown) | Test Agent |
+
+## Test Users (agent-created)
+| Email | Password | Created By |
+|-------|----------|------------|
+| agentfinal_1781535154@test.com | testing123 | Marco Rossi |
+| fetest_bug20_1782908617@test.com | TestFE123! | Marco Rossi |

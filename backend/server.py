@@ -327,7 +327,7 @@ async def log_user_activity(user_id: str, action: str, details: str = "", ip_add
 def user_to_public(user: dict) -> dict:
     """Convert user dict to public format"""
     # Sanitize timer_duration_hours: empty string -> None (Pydantic expects int or None)
-    if user.get("timer_duration_hours") == "" or user.get("timer_duration_hours") == "":
+    if user.get("timer_duration_hours") == "":
         user = {**user, "timer_duration_hours": None}
     return UserPublic(**user).model_dump()
 
