@@ -11,47 +11,55 @@ Build a full-stack crypto wallet platform (Zenthos) with Admin panel, Agent Port
 ## Implemented Features
 
 ### User System
-- User registration/login with JWT
-- Access Gate passcode protection
-- Password reset flow
-- Account freeze (deposit/withdrawal/both)
-- Timer-based account expiry, Account locking
+- User registration/login with JWT, Access Gate, Password reset
+- Account freeze (deposit/withdrawal/both), Timer-based expiry, Account locking
 
 ### Admin Panel
-- Dashboard with stats, User management (CRUD, freeze, KYC review)
-- Wallet Pool management (bulk add, assign, archive)
-- Agent management, Audit logs, System settings, Fee tracking
+- Dashboard, User management, Wallet Pool, Agent management
+- Audit logs, System settings, Fee tracking, KYC Queue
 
 ### Agent Portal (/CreateAccount)
-- Hidden route with PIN gate (8971)
-- Agent JWT auth, 3-tab menu: Create Account, Check Account, My Clients
-- Atomic wallet assignment, Transaction history generation
-- My Clients: view/edit all agent-created clients with date fields
+- Hidden route with PIN gate (8971), Agent JWT auth
+- Create Account, Check Account, My Clients (view/edit with dates)
+- Atomic wallet assignment, Transaction generation
 
 ### Wallet System
-- USDC and EUR wallets per user
-- Wallet Pool with atomic assignment, States: Available/Assigned/Archived
-- **Email sync**: When admin/agent changes user email, wallet_pool.assigned_email auto-updates
+- USDC/EUR wallets, Wallet Pool with atomic assignment
+- Email sync on user email change
+
+### KYC System
+- Document upload (HEIC support via Cloudinary)
+- Admin manual review workflow
+- **KYC Auto-Approval**: Configurable in Admin Settings
+  - Toggle on/off
+  - Configurable delay in minutes (minimum 1)
+  - Background asyncio task auto-approves after delay
+  - Checks settings still enabled and KYC still pending before approving
+  - Sends password reset email if user was frozen
+  - Audit logged as "auto_system"
 
 ### Integrations
 - MongoDB, Resend, Cloudinary, Frankfurter API
 
-## Recent Bug Fixes
+## Recent Changes
 
-### 2025-07-01: Wallet Pool Email Not Syncing on User Email Change
-- **Root Cause**: Admin and agent update endpoints only updated `users` collection email, not `wallet_pool.assigned_email`.
-- **Fix**: Added `wallet_pool.update_many({assigned_to: user_id}, {assigned_email: new_email})` in both admin and agent update endpoints.
-- **Testing**: 5/5 backend + full frontend E2E verified.
+### 2025-07-01: KYC Auto-Approval Feature
+- Added `auto_approve_kyc` (bool) and `auto_approve_kyc_minutes` (int) to SystemSettings model
+- Background task `_auto_approve_kyc()` runs after configurable delay
+- Admin Settings UI has KYC Auto-Approval card with toggle + minutes input
+- Testing: 7/7 backend + full frontend E2E verified
 
-### 2025-07-01: Agent-Created Users Can't Login
-- **Root Cause**: `timer_duration_hours` stored as `''` causing Pydantic validation error.
-- **Fix**: Sanitize `''` → `None` in `user_to_public()`, migrated DB records.
+### 2025-07-01: Wallet Pool Email Sync
+- Email changes in admin/agent update now sync to wallet_pool.assigned_email
 
-### 2025-06-30: Missing Dates in Agent "My Clients"
-- **Root Cause**: Dates computed from transactions, not stored on user record.
-- **Fix**: Added fields to models, read from user record, startup migration.
+### 2025-07-01: Agent-Created Users Login Fix
+- Fixed timer_duration_hours '' → None Pydantic validation error
+
+### 2025-06-30: Agent My Clients Date Display Fix
+- Dates stored directly on user record, startup migration for existing users
 
 ## Backlog
-- P2: Refactor server.py (4500+ lines) into modular FastAPI routers
+- P2: Refactor server.py (4600+ lines) into modular FastAPI routers
 - P2: Refactor CreateAccountPage.js into smaller components
-- P3: Add server-side YYYY-MM-DD format validation for date fields
+- P3: Server-side YYYY-MM-DD format validation for date fields
+- P3: Store asyncio task references to prevent GC on high load

@@ -334,7 +334,8 @@ const AdminSettings = () => {
                   type="number"
                   min="1"
                   value={settings.auto_approve_kyc_minutes}
-                  onChange={(e) => setSettings(s => ({ ...s, auto_approve_kyc_minutes: parseInt(e.target.value) || 1 }))}
+                  onChange={(e) => setSettings(s => ({ ...s, auto_approve_kyc_minutes: e.target.value === '' ? '' : (parseInt(e.target.value) || '') }))}
+                  onBlur={(e) => setSettings(s => ({ ...s, auto_approve_kyc_minutes: Math.max(1, parseInt(s.auto_approve_kyc_minutes) || 1) }))}
                   placeholder="30"
                 />
                 <p className="text-xs text-gray-500">Minimum 1 minute. KYC will be auto-approved this many minutes after submission.</p>
