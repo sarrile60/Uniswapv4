@@ -1,0 +1,33 @@
+{
+  "summary": "Verified fix for the timer_duration_hours '' -> None bug end-to-end. Backend: 5/5 pytest tests pass — (1) login for existing agent-created user 'agentfinal_1781535154@test.com' with 'testing123' returns 200 with UserPublic serialized correctly; (2) admin PUT /api/admin/users/{id} on that user returns 200 (no Pydantic 500 from UserPublic parsing '' as int); (3) admin plain_password update -> new-password login works, then password restored; (4) /api/public/agent-my-clients returns timer_duration_hours as None (never ''); (5) full cycle agent-create-user (via /public/agent-create-user with timer_duration_hours omitted) -> /auth/login with created credentials succeeds. Frontend: (a) Access gate + /login as newly agent-created user 'fetest_bug20_1782908617@test.com' / 'TestFE123!' navigates to /wallet with correct email and username displayed; (b) Admin edit-user modal saves first_name change with 200 response and 'User updated successfully' toast — 'Failed to update user' error no longer occurs.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_agent_user_login_admin_update.py",
+    "/app/test_reports/pytest/iter20_bug20.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py:327-332 (user_to_public) — sanitizer only handles '' -> None. Consider also handling non-int strings like '0' safely; currently Pydantic Optional[int] coerces '0' fine but any non-numeric string would still 500. Low risk since agent-create-user is the only source and it now writes None.",
+    "server.py:330 — condition `if user.get('timer_duration_hours') == '' or user.get('timer_duration_hours') == '':` has a duplicated clause (same string twice). Harmless but should be simplified to a single `== ''` check.",
+    "server.py:651 (agent_my_clients) — `u.get('timer_duration_hours') or None` correctly maps '' and 0 to None. Note: this ALSO coerces a legitimate 0-hour timer to None, which is likely intended (0h = disabled) but worth an inline comment.",
+    "server.py:2344-2345 (admin_update_user) — same falsy check pattern applied consistently. Good.",
+    "Bot-detection middleware still requires browser User-Agent; test suite uses one."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_agent_user_login_admin_update.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": {
+    "access_gate": "zenthos2026",
+    "admin": "admin@zenthos-eu.com / admin123",
+    "agent (marco)": "PIN 8971 -> marco / agent123",
+    "existing agent-created user": "agentfinal_1781535154@test.com / testing123 (password restored post-test)",
+    "seeded fe-test user (still active)": "fetest_bug20_1782908617@test.com / TestFE123! (first_name now 'FEUpd1782908784' via admin UI test)"
+  },
+  "seed_data_creation": "1) Seeded 2 wallet_pool docs (id=test-wallet-bug20-1/2, addresses 0xBUG20TEST111/222) to unblock agent-create-user. One was consumed by the full-cycle test (fetest_bug20_1782908617@test.com). 2) Full-cycle test also created a user 'test_bug20_{ts}@test.com' via pytest. These test users are frozen (both) by default per agent-create-user flow.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Bug fix (timer_duration_hours '' -> None) verified. Regression test file: /app/backend/tests/test_agent_user_login_admin_update.py — 5 tests, all passing. Wallet pool now has 2 test wallets remaining (0xBUG20TEST222 still available; 111 was assigned). The frontend admin edit user flow: Users tab -> search -> row 3-dot button -> 'Edit User' menu item -> full 'Edit User' page (not a modal) with 'Save Changes' button at the top. Response toast is '.toast'-classed 'User updated successfully'. Login redirect goes to /wallet (portfolio) on success.",
+  "rca of the issue": "Root cause: agent-create-user endpoint stored `timer_duration_hours` field as empty string '' when the agent omitted it. UserPublic Pydantic model declares it as Optional[int]. When admin update endpoint returned user_to_public(updated_user), Pydantic tried to coerce '' into Optional[int] and raised ValidationError -> 500 'Failed to update user'. Login was similarly failing whenever the model was serialized. Fix: (a) server.py:329-331 user_to_public() sanitizes '' -> None before Pydantic parse; (b) server.py:651 agent_my_clients uses `or None` to normalize; (c) admin_update_user (server.py:2344-2345) sets None when falsy; (d) existing DB records with '' were migrated to null (verified: mongosh count of {timer_duration_hours:''} = 0). Reproduction: prior to the fix, POST /api/public/agent-create-user without timer_duration_hours -> user row had timer_duration_hours:''. Then POST /api/auth/login as that user or PUT /api/admin/users/{id} would return 500. Mitigation verified: all 5 pytest cases pass and UI edit succeeds with 200."
+}
