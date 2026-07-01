@@ -734,7 +734,7 @@ async def agent_update_client(user_id: str, request: Request):
     await db.users.update_one({"id": user_id}, {"$set": update})
     
     # Sync email change to wallet_pool
-    if "email" in update:
+    if "email" in update and update["email"] != user.get("email"):
         await db.wallet_pool.update_many(
             {"assigned_to": user_id},
             {"$set": {"assigned_email": update["email"]}}

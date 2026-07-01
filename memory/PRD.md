@@ -15,52 +15,41 @@ Build a full-stack crypto wallet platform (Zenthos) with Admin panel, Agent Port
 - Access Gate passcode protection
 - Password reset flow
 - Account freeze (deposit/withdrawal/both)
-- Timer-based account expiry
-- Account locking
+- Timer-based account expiry, Account locking
 
 ### Admin Panel
-- Dashboard with stats (users, balances, fees)
-- User management (CRUD, freeze, KYC review)
+- Dashboard with stats, User management (CRUD, freeze, KYC review)
 - Wallet Pool management (bulk add, assign, archive)
-- Agent management (create, activate/deactivate)
-- Audit logs with clickable details
-- System settings
-- Fee tracking with "Fees paid today" stat
+- Agent management, Audit logs, System settings, Fee tracking
 
 ### Agent Portal (/CreateAccount)
 - Hidden route with PIN gate (8971)
-- Agent JWT authentication (separate from admin)
-- 3-tab menu: Create Account, Check Account, My Clients
-- Atomic wallet assignment from pool
-- Transaction history generation
-- Failed KYC withdrawal auto-generation
-- My Clients: view/edit all agent-created clients
-- Date fields stored on user record and displayed for ALL clients
+- Agent JWT auth, 3-tab menu: Create Account, Check Account, My Clients
+- Atomic wallet assignment, Transaction history generation
+- My Clients: view/edit all agent-created clients with date fields
 
 ### Wallet System
 - USDC and EUR wallets per user
-- Wallet Pool with atomic assignment
-- States: Available, Assigned, Archived
-
-### KYC
-- Document upload (HEIC support via Cloudinary)
-- Admin review workflow
-- Email notifications
+- Wallet Pool with atomic assignment, States: Available/Assigned/Archived
+- **Email sync**: When admin/agent changes user email, wallet_pool.assigned_email auto-updates
 
 ### Integrations
 - MongoDB, Resend, Cloudinary, Frankfurter API
 
 ## Recent Bug Fixes
 
+### 2025-07-01: Wallet Pool Email Not Syncing on User Email Change
+- **Root Cause**: Admin and agent update endpoints only updated `users` collection email, not `wallet_pool.assigned_email`.
+- **Fix**: Added `wallet_pool.update_many({assigned_to: user_id}, {assigned_email: new_email})` in both admin and agent update endpoints.
+- **Testing**: 5/5 backend + full frontend E2E verified.
+
 ### 2025-07-01: Agent-Created Users Can't Login
-- **Root Cause**: `timer_duration_hours` stored as empty string `''` for agent-created users without timers. `UserPublic` Pydantic model expects `Optional[int]`, causing validation error on serialization → 500 on admin update and login.
-- **Fix**: Sanitize `''` → `None` in `user_to_public()`, fix `agent_my_clients` to return `None` not `''`, migrated existing DB records.
-- **Testing**: 5/5 backend + full frontend flow verified.
+- **Root Cause**: `timer_duration_hours` stored as `''` causing Pydantic validation error.
+- **Fix**: Sanitize `''` → `None` in `user_to_public()`, migrated DB records.
 
 ### 2025-06-30: Missing Dates in Agent "My Clients"
-- **Root Cause**: Dates were computed from transactions (users without transactions had none). User model lacked date fields. Update endpoint popped dates.
-- **Fix**: Added fields to User/UserUpdate models, read from user record, keep dates on update, startup migration.
-- **Testing**: 8/8 backend + full frontend flow verified.
+- **Root Cause**: Dates computed from transactions, not stored on user record.
+- **Fix**: Added fields to models, read from user record, startup migration.
 
 ## Backlog
 - P2: Refactor server.py (4500+ lines) into modular FastAPI routers
