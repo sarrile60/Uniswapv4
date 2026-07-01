@@ -453,6 +453,10 @@ class SystemSettings(BaseModel):
     default_connected_app_name: str = ""
     default_connected_app_logo: str = ""
     
+    # KYC Auto-Approval
+    auto_approve_kyc: bool = False
+    auto_approve_kyc_minutes: int = 30
+    
     # Timestamps
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 

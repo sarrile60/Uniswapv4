@@ -1,0 +1,44 @@
+{
+  "summary": "Verified KYC Auto-Approval feature end-to-end. Backend: 7/7 pytest tests pass across 2 files. GET /api/admin/settings exposes auto_approve_kyc (bool) + auto_approve_kyc_minutes (int); PUT accepts both fields, clamps minutes to >=1 (verified 0 and -5 both persist as 1), and can toggle enable/disable. Direct-call unit test of server._auto_approve_kyc(user_id, delay_seconds=0) proves: (a) skips when feature disabled, (b) approves and sets kyc_reviewed_by='auto_system' on both kyc_documents and users when pending, (c) idempotent no-op when already approved (kyc_reviewed_at unchanged on re-run). Integration test: enabled feature, POSTed /api/kyc/submit with dummy URL payload for fetest_bug20 user, and confirmed backend log contains 'Scheduled auto-approve KYC for {user_id} in 60 minutes' matching regex. Frontend E2E: bypassed access gate via sessionStorage z_access=1, logged in as admin@zenthos-eu.com, navigated to /admin/settings, saw 'KYC Auto-Approval' card at bottom with data-testid='auto-approve-kyc-toggle' + 'auto-approve-kyc-minutes'. Verified toggle ON->OFF hides the minutes input and OFF->ON restores it. Set minutes to 7, clicked 'Save Settings', reloaded page, confirmed toggle=checked and minutes=7 persisted. Restored DB to original state (auto_approve_kyc=true, minutes=5) via API.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "/admin/settings", "issues": ["Console warning: 'value prop on input should not be null'. Some controlled input in AdminSettings.js is initialized with null instead of empty string. Non-blocking but noisy."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_kyc_auto_approve.py",
+    "/app/backend/tests/test_kyc_auto_approve_schedule.py",
+    "/app/test_reports/pytest/iter22_kyc_auto_approve.xml"
+  ],
+  "action_items": [
+    "(Optional) Initialize null-defaulted controlled inputs in /app/frontend/src/pages/admin/AdminSettings.js with '' to silence React warning: 'value prop on input should not be null'.",
+    "(Optional) In server.py PUT /api/admin/settings around L3599-3604, silent 'pass' on ValueError/TypeError for auto_approve_kyc_minutes hides bad input from clients. Consider returning 400 for non-integer values so admins get feedback instead of a silent no-op."
+  ],
+  "critical_code_review_comments": [
+    "server.py:1902-1911 KYC submit reads settings inside a try/except and schedules asyncio.create_task(_auto_approve_kyc(...)). Task reference is not stored -> risk of task being garbage-collected mid-sleep on high load; consider tracking with a background task set (`_bg_tasks.add(task); task.add_done_callback(_bg_tasks.discard)`). Low risk given asyncio holds a ref while awaiting, but best-practice per Python docs.",
+    "server.py:1907 delay_seconds = max(60, minutes*60) — enforces at least 60s server-side regardless of admin setting <1 min. Good. Note this diverges from the UI which suggests 1 minute = 60s exactly (matches). But it also means an admin setting of e.g. 0 (if it slipped past clamp) would still yield 60s — resilient.",
+    "server.py:1760 & 1904 read {'id':'system_settings'} — settings are single-doc. OK, but if the doc doesn't exist and auto_approve was default True elsewhere, the schedule would be skipped. Safe.",
+    "server.py:_auto_approve_kyc L1793-1824 sends password reset email if user was frozen for unusual_activity — this correctly integrates with existing freeze flow. Good.",
+    "server.py:3598 uses bool(body['auto_approve_kyc']) — truthy coercion means '' -> False, 'false' string -> True (unexpected). Consider strict type check or pydantic model for settings PUT.",
+    "AdminSettings.js:337 uses parseInt(e.target.value)||1 which converts empty input to 1 immediately (can't clear the field to type multi-digit numbers naturally — user typing '10' from empty first sees '1'). Minor UX: consider allowing empty state during typing and clamping on blur/save.",
+    "AdminSettings.js:29 initial state auto_approve_kyc_minutes: 30 — but DB current value is 5. The initial render (before fetch completes) may briefly show 30 before hydrating. Not blocking."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_kyc_auto_approve.py",
+    "/app/backend/tests/test_kyc_auto_approve_schedule.py"
+  ],
+  "success_rate": {"backend": "100% (7/7 tests)", "frontend": "100%"},
+  "test_credentials": {
+    "access_gate": "zenthos2026 (sessionStorage z_access=1)",
+    "admin/superadmin": "admin@zenthos-eu.com / admin123",
+    "test user for kyc submit": "fetest_bug20_1782908617@test.com / TestFE123! (id=4bdc799e-4627-4b2e-b413-09c795c4ba5a)"
+  },
+  "seed_data_creation": "test_kyc_auto_approve.py creates+deletes a transient user with id TEST_AUTO_KYC_<hex> and matching kyc_documents row within a single test; cleanup runs in finally block. test_kyc_auto_approve_schedule.py temporarily sets fetest_bug20 user's kyc_status to 'not_started' to allow POST /api/kyc/submit, then restores original status. Both tests restore system_settings to their original values.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "KYC Auto-Approval regression covered by /app/backend/tests/test_kyc_auto_approve.py (6 tests: GET fields, PUT update, min clamp, disable, direct-call logic incl. skip/approve/idempotent, restore) and /app/backend/tests/test_kyc_auto_approve_schedule.py (1 test: POST /api/kyc/submit + log grep for 'Scheduled auto-approve KYC'). To rerun: pytest /app/backend/tests/test_kyc_auto_approve.py /app/backend/tests/test_kyc_auto_approve_schedule.py -v. Both use REACT_APP_BACKEND_URL. The schedule test requires MONGO_URL + DB_NAME (loaded from /app/backend/.env via `export $(grep -v ^# /app/backend/.env | xargs)` or pytest running from a shell with backend env). PUT /api/admin/settings requires SUPERADMIN (admin@zenthos-eu.com is superadmin per bootstrap). Frontend admin settings page is at /admin/settings and expects sessionStorage z_access=1 to bypass access gate + login. KYC card is at the bottom of the page; save button label is 'Save Settings'. Current DB state after this iteration: auto_approve_kyc=true, auto_approve_kyc_minutes=5.",
+  "rca of the issue": "N/A — feature verification, no defects found."
+}

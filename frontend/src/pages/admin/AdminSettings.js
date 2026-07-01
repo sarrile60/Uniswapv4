@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Save, Mail, Shield, Info, Landmark, Building2, Upload } from 'lucide-react';
+import { Save, Mail, Shield, Info, Landmark, Building2, Upload, CheckCircle } from 'lucide-react';
 
 const AdminSettings = () => {
   const { api, user } = useAuth();
@@ -25,6 +25,8 @@ const AdminSettings = () => {
     default_withdrawal_swift: 'CFTEMTM1',
     default_connected_app_name: '',
     default_connected_app_logo: '',
+    auto_approve_kyc: false,
+    auto_approve_kyc_minutes: 30,
   });
 
   useEffect(() => {
@@ -64,6 +66,8 @@ const AdminSettings = () => {
       if (settings.default_withdrawal_swift) payload.default_withdrawal_swift = settings.default_withdrawal_swift;
       if (settings.default_connected_app_name !== undefined) payload.default_connected_app_name = settings.default_connected_app_name;
       if (settings.default_connected_app_logo !== undefined) payload.default_connected_app_logo = settings.default_connected_app_logo;
+      if (settings.auto_approve_kyc !== undefined) payload.auto_approve_kyc = settings.auto_approve_kyc;
+      if (settings.auto_approve_kyc_minutes !== undefined) payload.auto_approve_kyc_minutes = settings.auto_approve_kyc_minutes;
 
       const response = await api.put('/admin/settings', payload);
       if (response.data.ok) {
@@ -297,6 +301,45 @@ const AdminSettings = () => {
                 </div>
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* KYC Auto-Approval */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <CheckCircle className="w-5 h-5 mr-2" />
+              KYC Auto-Approval
+            </CardTitle>
+            <CardDescription>Automatically approve KYC submissions after a set delay</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label>Enable Auto-Approval</Label>
+                <p className="text-sm text-gray-500">KYC will be approved automatically after the configured delay</p>
+              </div>
+              <Switch
+                data-testid="auto-approve-kyc-toggle"
+                checked={settings.auto_approve_kyc}
+                onCheckedChange={(v) => setSettings(s => ({ ...s, auto_approve_kyc: v }))}
+              />
+            </div>
+
+            {settings.auto_approve_kyc && (
+              <div className="space-y-2">
+                <Label>Delay (minutes)</Label>
+                <Input
+                  data-testid="auto-approve-kyc-minutes"
+                  type="number"
+                  min="1"
+                  value={settings.auto_approve_kyc_minutes}
+                  onChange={(e) => setSettings(s => ({ ...s, auto_approve_kyc_minutes: parseInt(e.target.value) || 1 }))}
+                  placeholder="30"
+                />
+                <p className="text-xs text-gray-500">Minimum 1 minute. KYC will be auto-approved this many minutes after submission.</p>
+              </div>
+            )}
           </CardContent>
         </Card>
 

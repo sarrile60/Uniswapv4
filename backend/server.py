@@ -1751,6 +1751,96 @@ async def upload_kyc_file(
         raise HTTPException(status_code=500, detail=f"Upload failed: {error_msg[:300]}")
 
 
+async def _auto_approve_kyc(user_id: str, delay_seconds: int):
+    """Background task: auto-approve KYC after configured delay."""
+    try:
+        await asyncio.sleep(delay_seconds)
+        
+        # Re-check settings (admin may have disabled auto-approve in the meantime)
+        settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
+        if not settings or not settings.get("auto_approve_kyc", False):
+            logger.info(f"Auto-approve KYC skipped for {user_id}: feature disabled")
+            return
+        
+        # Re-check user KYC status (admin may have manually reviewed it already)
+        user = await db.users.find_one({"id": user_id}, {"_id": 0})
+        if not user or user.get("kyc_status") != KYCStatus.PENDING:
+            logger.info(f"Auto-approve KYC skipped for {user_id}: status is {user.get('kyc_status') if user else 'not found'}")
+            return
+        
+        now = datetime.now(timezone.utc).isoformat()
+        
+        # Approve KYC document
+        await db.kyc_documents.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "status": KYCStatus.APPROVED,
+                "reviewed_by": "auto_system",
+                "reviewed_at": now,
+                "updated_at": now
+            }}
+        )
+        
+        # Prepare user update
+        user_update = {
+            "kyc_status": KYCStatus.APPROVED,
+            "kyc_reviewed_at": now,
+            "kyc_reviewed_by": "auto_system",
+            "updated_at": now
+        }
+        
+        # If approved and has freeze, unfreeze + send password reset
+        if user.get("freeze_type") in [FreezeType.UNUSUAL_ACTIVITY, FreezeType.BOTH]:
+            reset_token = generate_reset_token()
+            user_update["password_reset_token"] = reset_token
+            user_update["password_reset_expires"] = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
+            user_update["password_reset_required"] = True
+            user_update["freeze_type"] = FreezeType.NONE
+            user_update["account_status"] = AccountStatus.ACTIVE
+            
+            # Send KYC approved email with password reset link
+            try:
+                frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
+                subject, html_body = get_email_service().get_kyc_approved_email(
+                    user_name=f"{user['first_name']} {user['last_name']}",
+                    reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+                    lang=user.get("preferred_language", "en")
+                )
+                result = await get_email_service().send_email(user["email"], subject, html_body)
+                
+                email_log = EmailLog(
+                    user_id=user["id"],
+                    user_email=user["email"],
+                    email_type="password_reset",
+                    subject=subject,
+                    body=html_body,
+                    sent=result.get("success", False),
+                    sent_at=result.get("sent_at"),
+                    error=result.get("error"),
+                    resend_id=result.get("resend_id")
+                )
+                await db.email_logs.insert_one(email_log.model_dump())
+            except Exception as e:
+                logger.error(f"Auto-approve KYC email failed for {user_id}: {e}")
+        
+        await db.users.update_one({"id": user_id}, {"$set": user_update})
+        
+        # Audit log
+        await log_audit(
+            admin_id="auto_system",
+            admin_email="system@zenthos-eu.com",
+            action="kyc_approved",
+            target_type="kyc",
+            target_id=user_id,
+            details={"auto_approved": True, "delay_seconds": delay_seconds}
+        )
+        
+        logger.info(f"Auto-approved KYC for user {user_id} after {delay_seconds}s delay")
+    except Exception as e:
+        logger.error(f"Auto-approve KYC failed for {user_id}: {e}")
+
+
+
 @api_router.post("/kyc/submit")
 async def submit_kyc(kyc_data: KYCSubmit, current_user: dict = Depends(get_current_user)):
     """Submit KYC documents"""
@@ -1808,6 +1898,17 @@ async def submit_kyc(kyc_data: KYCSubmit, current_user: dict = Depends(get_curre
     )
     
     await log_user_activity(current_user["user_id"], "kyc_submit", f"KYC documents submitted ({kyc_data.id_document_type})")
+    
+    # Schedule auto-approval if enabled
+    try:
+        settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
+        if settings and settings.get("auto_approve_kyc", False):
+            delay_minutes = settings.get("auto_approve_kyc_minutes", 30)
+            delay_seconds = max(60, delay_minutes * 60)  # Minimum 1 minute
+            asyncio.create_task(_auto_approve_kyc(current_user["user_id"], delay_seconds))
+            logger.info(f"Scheduled auto-approve KYC for {current_user['user_id']} in {delay_minutes} minutes")
+    except Exception as e:
+        logger.error(f"Failed to schedule auto-approve KYC: {e}")
     
     return {"ok": True, "message": "KYC documents submitted successfully"}
 
@@ -3493,6 +3594,14 @@ async def admin_update_settings(
         update_data["default_connected_app_name"] = body["default_connected_app_name"]
     if "default_connected_app_logo" in body:
         update_data["default_connected_app_logo"] = body["default_connected_app_logo"]
+    if "auto_approve_kyc" in body:
+        update_data["auto_approve_kyc"] = bool(body["auto_approve_kyc"])
+    if "auto_approve_kyc_minutes" in body:
+        try:
+            mins = int(body["auto_approve_kyc_minutes"])
+            update_data["auto_approve_kyc_minutes"] = max(1, mins)
+        except (ValueError, TypeError):
+            pass
     
     await db.system_settings.update_one(
         {"id": "system_settings"},
