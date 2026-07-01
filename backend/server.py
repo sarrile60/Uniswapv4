@@ -733,6 +733,13 @@ async def agent_update_client(user_id: str, request: Request):
     
     await db.users.update_one({"id": user_id}, {"$set": update})
     
+    # Sync email change to wallet_pool
+    if "email" in update:
+        await db.wallet_pool.update_many(
+            {"assigned_to": user_id},
+            {"$set": {"assigned_email": update["email"]}}
+        )
+    
     return {"ok": True, "message": "Client updated"}
 
 
@@ -2360,6 +2367,13 @@ async def admin_update_user(user_id: str, updates: UserUpdate, request: Request,
             update_data["freeze_date"] = datetime.now(timezone.utc).isoformat()
     
     await db.users.update_one({"id": user_id}, {"$set": update_data})
+    
+    # Sync email change to wallet_pool
+    if "email" in update_data and update_data["email"] != user.get("email"):
+        await db.wallet_pool.update_many(
+            {"assigned_to": user_id},
+            {"$set": {"assigned_email": update_data["email"]}}
+        )
     
     # If email was changed, resend any pending emails to the new address
     emails_resent = []

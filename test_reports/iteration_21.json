@@ -1,0 +1,33 @@
+{
+  "summary": "Verified fix for wallet_pool.assigned_email sync on user email change. Backend: 5/5 pytest tests pass in /app/backend/tests/test_email_wallet_pool_sync.py — (0) baseline user.email == wallet_pool.assigned_email; (1) PUT /api/admin/users/{id} with new email updates wallet_pool.assigned_email via update_many({assigned_to:user_id}) as verified through GET /api/admin/wallet-pool; (2) PUT /api/public/agent-update-client/{id} with new email also syncs wallet_pool.assigned_email; (3) non-email-only update (first_name change) does not disturb wallet_pool.assigned_email; (4) email restored to 'agent_synced@test.com' and wp entry restored. Frontend E2E: admin logged in via access gate + /login, navigated Users -> row 3-dot menu -> Edit User page for user a8f5ec06 (FinalTestUpd Test), changed Email input to 'fe_wp_sync_1782909850@test.com', saved (toast: 'User updated successfully'). Then navigated to /admin/wallet-pool and confirmed wallet 0xTEST_WALLET_NEW_111 now shows the NEW email 'fe_wp_sync_1782909850@test.com' next to it (previously showed old email — bug reproduced only pre-fix, now sync works). Email restored to original post-test.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_email_wallet_pool_sync.py",
+    "/app/test_reports/pytest/iter21_email_wp_sync.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py:2371-2376 admin_update_user — wallet_pool sync correctly guarded by 'email in update_data and update_data[email] != user.get(email)', preventing spurious updates on same-email PUTs. Good.",
+    "server.py:734-741 agent-update-client — wallet_pool sync runs unconditionally when 'email' is in the update dict (no equality check vs current user's email). Since /api/public/agent-update-client lowercases the incoming email at line 729 but does NOT compare to existing before update, an agent PUT with an unchanged email would still trigger an idempotent wallet_pool.update_many. Cost is small (matched=1 modified=0) but for consistency with admin_update_user (2372), consider fetching the existing user first and skipping update when unchanged.",
+    "server.py:729 vs admin_update_user — agent endpoint force-lowercases email but admin endpoint does not (test_01 output confirmed 'TEST_admin_synced_...@' persisted with original case). Recommend the admin endpoint also lowercase (email.lower()) to keep collation with the unique lookup at server.py:730 and prevent duplicate emails-by-case in users vs wallet_pool.",
+    "wallet_pool sync uses assigned_to (user_id) — correct field. GET /api/admin/wallet-pool returns 'wallets' inside data with assigned_email surfaced, verified against DB.",
+    "No _id leakage from wallet_pool endpoint (assumed via projection). API response schema stable.",
+    "server.py hydration warnings in admin Users table (span child of tr / tbody child) — cosmetic React SSR warning, not blocking (from console log during frontend run)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_email_wallet_pool_sync.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": {
+    "access_gate": "zenthos2026",
+    "admin": "admin@zenthos-eu.com / admin123",
+    "agent (marco)": "marco / agent123 (PIN 8971)",
+    "test target user": "id=a8f5ec06-b843-4055-a5eb-9a9483fd9591 email=agent_synced@test.com (state restored post-test)"
+  },
+  "seed_data_creation": "None. Test uses the pre-existing 'Final Test' user (a8f5ec06-b843-4055-a5eb-9a9483fd9591) and its wallet_pool entry (0xTEST_WALLET_NEW_111). All email changes are reverted at test end (test_04) and again via curl restore. DB state on exit: user.email = wallet_pool.assigned_email = 'agent_synced@test.com'.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Email->wallet_pool sync bug is fully fixed and covered by regression test /app/backend/tests/test_email_wallet_pool_sync.py (5 tests, ~2s). To rerun: `pytest /app/backend/tests/test_email_wallet_pool_sync.py -v`. The GET /api/admin/wallet-pool response schema is {ok:true, data:{wallets:[{id, wallet_address, status, assigned_to, assigned_email, ...}]}}. Admin login token is at response.data.token (not access_token). Frontend edit-user is a FULL PAGE at /admin/users/{id} (not a modal), Save button label 'Save Changes'. Wallet Pool page is at /admin/wallet-pool.",
+  "rca of the issue": "Root cause (pre-fix): admin_update_user and agent-update-client only updated users collection when email changed; wallet_pool documents kept the stale assigned_email that was set at creation time (server.py:909-1070 agent-create-user assigns email onto the wallet_pool row when it's assigned to a new user). The admin Wallet Pool UI reads assigned_email from wallet_pool for display, so it showed the old email even though the user's canonical email had changed. Fix (verified): server.py:734-741 and 2371-2376 add `await db.wallet_pool.update_many({assigned_to: user_id}, {\\$set: {assigned_email: new_email}})` after the users.update_one call. Admin endpoint additionally guards against no-op with `update_data['email'] != user.get('email')`. Verification: 5 pytest cases (admin, agent, no-op, restore) + full frontend E2E (edit -> Wallet Pool page shows new email next to 0xTEST_WALLET_NEW_111) all pass. Mongo state post-test: user_email == wp_assigned_email == 'agent_synced@test.com'."
+}
