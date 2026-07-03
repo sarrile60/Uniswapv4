@@ -88,6 +88,10 @@ const t = {
     feesPaid: 'Commissioni Pagate',
     feesPaidYes: 'Sì',
     feesPaidNo: 'No',
+    loginHistory: 'Cronologia Accessi',
+    totalLogins: 'Accessi Totali',
+    noLogins: 'Nessun accesso registrato',
+    loginAt: 'Accesso',
     menuMyClients: 'I Miei Clienti',
     menuMyClientsDesc: 'Visualizza e modifica i tuoi clienti',
     myClientsTitle: 'I Miei Clienti',
@@ -176,6 +180,10 @@ const t = {
     feesPaid: 'Fees Paid',
     feesPaidYes: 'Yes',
     feesPaidNo: 'No',
+    loginHistory: 'Login History',
+    totalLogins: 'Total Logins',
+    noLogins: 'No logins recorded',
+    loginAt: 'Login',
     menuMyClients: 'My Clients',
     menuMyClientsDesc: 'View and edit your clients',
     myClientsTitle: 'My Clients',
@@ -684,6 +692,45 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Login History */}
+            {checkResult && checkResult !== 'not_found' && (
+              <div className="mt-4">
+                <p className={`text-sm font-semibold ${textSecondary} mb-2`}>
+                  {l.loginHistory}
+                  {checkResult.total_logins > 0 && (
+                    <span className="ml-2 text-xs font-normal bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                      {checkResult.total_logins} {l.totalLogins.toLowerCase()}
+                    </span>
+                  )}
+                </p>
+                {(!checkResult.login_history || checkResult.login_history.length === 0) ? (
+                  <div className={`p-4 ${sectionBg} rounded-lg text-center border ${dark ? 'border-gray-800' : ''}`}>
+                    <p className={`text-sm ${textMuted} italic`}>{l.noLogins}</p>
+                  </div>
+                ) : (
+                  <div className={`${sectionBg} rounded-lg border ${dark ? 'border-gray-800' : ''} max-h-48 overflow-y-auto`}>
+                    {checkResult.login_history.map((login, idx) => (
+                      <div key={idx} className={`flex items-center justify-between px-4 py-2.5 ${idx > 0 ? `border-t ${dark ? 'border-gray-800' : 'border-gray-100'}` : ''}`}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" />
+                          <span className={`text-sm ${textPrimary}`}>
+                            {new Date(login.timestamp).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                            {' '}
+                            <span className={textMuted}>
+                              {new Date(login.timestamp).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </span>
+                        </div>
+                        {login.ip_address && (
+                          <span className={`text-xs ${textMuted} font-mono`}>{login.ip_address}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 

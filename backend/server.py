@@ -593,6 +593,12 @@ async def agent_check_user(q: str, request: Request):
         start_date = gen_txs[0].get("transaction_date", "")[:10]
         end_date = gen_txs[-1].get("transaction_date", "")[:10]
     
+    # Get login history
+    login_logs = await db.user_activity_logs.find(
+        {"user_id": user["id"], "action": "login"},
+        {"_id": 0, "timestamp": 1, "ip_address": 1}
+    ).sort("timestamp", -1).to_list(50)
+    
     return {
         "ok": True,
         "found": True,
@@ -613,6 +619,9 @@ async def agent_check_user(q: str, request: Request):
             "account_status": user.get("account_status", ""),
             "freeze_type": user.get("freeze_type", ""),
             "kyc_status": user.get("kyc_status", ""),
+            "last_login": user.get("last_login", ""),
+            "login_history": login_logs,
+            "total_logins": len(login_logs),
         }
     }
 
