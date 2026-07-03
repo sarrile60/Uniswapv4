@@ -441,6 +441,48 @@ async def startup_event():
             logger.info(f"Startup migration: backfilled dates for {migrated} users")
     except Exception as e:
         logger.error(f"Startup date migration failed: {e}")
+    
+    # Load email settings from DB into EmailService singleton
+    try:
+        email_settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0, "resend_api_key": 1, "sender_email": 1})
+        if email_settings:
+            svc = get_email_service()
+            if email_settings.get("resend_api_key") and not svc.api_key:
+                svc.api_key = email_settings["resend_api_key"]
+                import resend as _resend
+                _resend.api_key = email_settings["resend_api_key"]
+                logger.info("Loaded Resend API key from DB settings")
+            if email_settings.get("sender_email"):
+                svc.sender_email = email_settings["sender_email"]
+    except Exception as e:
+        logger.error(f"Failed to load email settings from DB: {e}")
+    
+    # Re-schedule auto-approval for any pending KYC submissions that survived a restart
+    try:
+        settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
+        if settings and settings.get("auto_approve_kyc", False):
+            delay_minutes = settings.get("auto_approve_kyc_minutes", 30)
+            pending_kyc = await db.users.find(
+                {"kyc_status": KYCStatus.PENDING, "role": UserRole.USER},
+                {"_id": 0, "id": 1, "kyc_submitted_at": 1}
+            ).to_list(1000)
+            rescheduled = 0
+            for u in pending_kyc:
+                submitted_at = u.get("kyc_submitted_at")
+                if submitted_at:
+                    try:
+                        submitted_dt = datetime.fromisoformat(submitted_at)
+                        elapsed = (datetime.now(timezone.utc) - submitted_dt).total_seconds()
+                        target_delay = delay_minutes * 60
+                        remaining = max(5, target_delay - elapsed)  # At least 5 seconds
+                        asyncio.create_task(_auto_approve_kyc(u["id"], int(remaining)))
+                        rescheduled += 1
+                    except Exception:
+                        pass
+            if rescheduled:
+                logger.info(f"Startup: re-scheduled auto-approve for {rescheduled} pending KYC submissions")
+    except Exception as e:
+        logger.error(f"Startup KYC re-schedule failed: {e}")
 
 
 @app.on_event("shutdown")
