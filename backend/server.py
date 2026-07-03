@@ -447,12 +447,14 @@ async def startup_event():
         email_settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0, "resend_api_key": 1, "sender_email": 1})
         if email_settings:
             svc = get_email_service()
+            # Only load API key from DB if not already configured via env
             if email_settings.get("resend_api_key") and not svc.api_key:
                 svc.api_key = email_settings["resend_api_key"]
                 import resend as _resend
                 _resend.api_key = email_settings["resend_api_key"]
                 logger.info("Loaded Resend API key from DB settings")
-            if email_settings.get("sender_email"):
+            # Only load sender_email from DB if env var is not set
+            if email_settings.get("sender_email") and not os.environ.get("SENDER_EMAIL"):
                 svc.sender_email = email_settings["sender_email"]
     except Exception as e:
         logger.error(f"Failed to load email settings from DB: {e}")
