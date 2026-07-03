@@ -6,33 +6,31 @@ Build a full-stack crypto wallet platform (Zenthos) with Admin panel, Agent Port
 ## Core Architecture
 - **Backend**: FastAPI + MongoDB (Motor) + JWT Auth
 - **Frontend**: React SPA with Shadcn/UI
-- **Database**: MongoDB
 
 ## Implemented Features
 - User system (auth, freeze, timer, locking)
 - Admin panel (dashboard, users, KYC queue, wallet pool, agents, audit logs, settings)
-- Agent Portal (/CreateAccount with PIN 8971)
-- Wallet Pool (atomic assignment, email sync)
-- KYC (upload, manual review, auto-approval)
-- Transaction generation, PDF export
-- Italian localization, Resend emails, Cloudinary
+- Agent Portal (/CreateAccount): Create Account, Check Account (with login history), My Clients
+- Wallet Pool (atomic assignment, email sync on user email change)
+- KYC (upload, manual review, auto-approval with configurable timer)
+- Transaction generation, PDF export, Italian localization
+- Integrations: MongoDB, Resend, Cloudinary, Frankfurter API
 
-## Recent Bug Fixes
+## Recent Changes
 
-### 2025-07-03: KYC Password Reset Email Not Received
-- **Root Causes**: 
-  1. DB `system_settings.sender_email` had typo `noreply@eu-zenthos.com` (wrong domain) → Resend rejected all emails
-  2. Startup email settings loader was unconditionally overriding the correct env var with the wrong DB value
-  3. Auto-approve asyncio tasks were lost on server restart → pending KYC never got approved
-- **Fixes**:
-  - Fixed DB sender_email to `noreply@zenthos-eu.com`
-  - Startup loader only overrides sender_email from DB when env var is NOT set
-  - Added startup re-schedule: on boot, finds all pending KYC submissions and re-schedules auto-approval with remaining delay
-- **Testing**: 8/8 backend tests pass, email delivery confirmed (sent=True)
+### 2025-07-03: Client Login History in Agent Check Account
+- Agent "Verifica Account" now shows client login history (timestamps + IPs)
+- Backend returns `login_history` array and `total_logins` count
+- Frontend shows "Cronologia Accessi" with scrollable list and count badge
+- Testing: 6/6 backend + frontend E2E verified
 
-### Previous fixes: dates display, login bug, wallet email sync, KYC auto-approval feature
+### 2025-07-03: KYC Email Fix + Auto-Approve Resilience
+- Fixed DB sender_email typo, startup re-schedule of orphaned auto-approve tasks
+- EmailService now loads settings from DB on startup
+
+### Earlier: dates display, login bug, wallet email sync, KYC auto-approval feature
 
 ## Backlog
 - P2: Refactor server.py into modular routers
 - P2: Refactor CreateAccountPage.js
-- P3: Track asyncio tasks in a set to prevent GC
+- P3: Add data-testid to login history items
