@@ -102,6 +102,11 @@ const t = {
     cancel: 'Annulla',
     updated: 'Cliente aggiornato!',
     createdOn: 'Creato il',
+    skipKyc: 'Salta KYC',
+    skipKycConfirm: 'Vuoi saltare la verifica KYC per questo cliente? Riceverà un\'email per reimpostare la password.',
+    skipKycSuccess: 'KYC saltato! Email di reset password inviata.',
+    skipKycFail: 'Errore nel saltare il KYC',
+    kycApproved: 'KYC approvato',
   },
   en: {
     pinTitle: 'Access Required',
@@ -194,6 +199,11 @@ const t = {
     cancel: 'Cancel',
     updated: 'Client updated!',
     createdOn: 'Created on',
+    skipKyc: 'Skip KYC',
+    skipKycConfirm: 'Skip KYC verification for this client? They will receive a password reset email.',
+    skipKycSuccess: 'KYC skipped! Password reset email sent.',
+    skipKycFail: 'Failed to skip KYC',
+    kycApproved: 'KYC approved',
   },
 };
 
@@ -342,6 +352,21 @@ const CreateAccountPage = () => {
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Failed to update');
     } finally { setEditSaving(false); }
+  };
+
+  const handleSkipKyc = async (clientId) => {
+    if (!window.confirm(l.skipKycConfirm)) return;
+    try {
+      const res = await axios.post(`${API_URL}/api/public/agent-skip-kyc/${clientId}`, {}, {
+        headers: { Authorization: `Bearer ${agentToken}` },
+      });
+      if (res.data.ok) {
+        toast.success(l.skipKycSuccess);
+        loadMyClients(myClientsSearch);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || l.skipKycFail);
+    }
   };
 
   const handleChange = (field, value) => {
@@ -594,10 +619,22 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                             {client.first_name} {client.middle_name || ''} {client.last_name}
                           </p>
                           <p className={`text-sm ${textSecondary}`}>{client.email}</p>
-                          <div className={`flex gap-4 text-xs mt-1 flex-wrap`}>
+                          <div className={`flex gap-4 text-xs mt-1 flex-wrap items-center`}>
                             <span className="text-blue-500 font-semibold">USDC: €{client.usdc_balance}</span>
                             <span className="text-orange-500 font-semibold">{l.commission}: €{client.total_unpaid_fees}</span>
                             <span className={`font-semibold ${client.account_status === 'frozen' ? 'text-red-500' : 'text-green-500'}`}>{client.account_status}</span>
+                            {client.kyc_status === 'approved' ? (
+                              <span className="text-emerald-600 font-semibold">{l.kycApproved}</span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => handleSkipKyc(client.id)}
+                                className="text-purple-600 hover:text-purple-800 font-semibold underline underline-offset-2 cursor-pointer"
+                                data-testid={`skip-kyc-${client.id}`}
+                              >
+                                {l.skipKyc}
+                              </button>
+                            )}
                             {client.start_date && client.end_date ? (
                               <span className={textMuted}>
                                 {new Date(client.start_date).toLocaleDateString('en-GB')} — {new Date(client.end_date).toLocaleDateString('en-GB')}

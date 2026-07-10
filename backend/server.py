@@ -705,6 +705,7 @@ async def agent_my_clients(request: Request, q: str = ""):
             "start_date": start_date,
             "end_date": end_date,
             "created_at": u.get("created_at", ""),
+            "kyc_status": u.get("kyc_status", "not_started"),
         })
     
     return {"ok": True, "data": {"clients": result, "total": len(result)}}
@@ -794,6 +795,90 @@ async def agent_update_client(user_id: str, request: Request):
         )
     
     return {"ok": True, "message": "Client updated"}
+
+
+@api_router.post("/public/agent-skip-kyc/{user_id}")
+async def agent_skip_kyc(user_id: str, request: Request):
+    """Agent can skip KYC for their client. Approves KYC and sends password reset email, but keeps account frozen."""
+    agent = await _verify_agent_token(request)
+    agent_name = agent.get("display_name", agent.get("username", ""))
+    
+    # Verify this client belongs to this agent
+    user = await db.users.find_one({"id": user_id, "created_by_agent": agent_name}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="Client not found or not created by you")
+    
+    if user.get("kyc_status") == KYCStatus.APPROVED:
+        raise HTTPException(status_code=400, detail="KYC already approved")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    
+    # Approve KYC document if one exists
+    await db.kyc_documents.update_one(
+        {"user_id": user_id},
+        {"$set": {
+            "status": KYCStatus.APPROVED,
+            "reviewed_by": f"agent_skip:{agent_name}",
+            "reviewed_at": now,
+            "updated_at": now
+        }},
+        upsert=False
+    )
+    
+    # Generate password reset token
+    reset_token = generate_reset_token()
+    
+    # Update user: approve KYC + set password reset, but DO NOT change freeze_type or account_status
+    user_update = {
+        "kyc_status": KYCStatus.APPROVED,
+        "kyc_reviewed_at": now,
+        "kyc_reviewed_by": f"agent_skip:{agent_name}",
+        "password_reset_token": reset_token,
+        "password_reset_expires": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+        "password_reset_required": True,
+        "updated_at": now
+    }
+    await db.users.update_one({"id": user_id}, {"$set": user_update})
+    
+    # Send password reset email
+    email_sent = False
+    try:
+        frontend_url = os.environ.get("FRONTEND_URL", "https://zenthos-eu.com").strip().rstrip("/")
+        subject, html_body = get_email_service().get_kyc_approved_email(
+            user_name=f"{user['first_name']} {user['last_name']}",
+            reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+            lang=user.get("preferred_language", "en")
+        )
+        result = await get_email_service().send_email(user["email"], subject, html_body)
+        email_sent = result.get("success", False)
+        
+        email_log = EmailLog(
+            user_id=user["id"],
+            user_email=user["email"],
+            email_type="password_reset",
+            subject=subject,
+            body=html_body,
+            sent=email_sent,
+            sent_at=result.get("sent_at"),
+            error=result.get("error"),
+            resend_id=result.get("resend_id")
+        )
+        await db.email_logs.insert_one(email_log.model_dump())
+    except Exception as e:
+        logger.error(f"Skip KYC email failed for {user_id}: {e}")
+    
+    # Audit log
+    await log_audit(
+        admin_id=f"agent:{agent.get('sub', '')}",
+        admin_email=agent_name,
+        action="kyc_skipped",
+        target_type="kyc",
+        target_id=user_id,
+        details={"agent": agent_name, "email_sent": email_sent}
+    )
+    
+    return {"ok": True, "message": "KYC skipped", "email_sent": email_sent}
+
 
 
 
