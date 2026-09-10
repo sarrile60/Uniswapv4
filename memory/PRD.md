@@ -18,6 +18,12 @@ Build a full-stack crypto wallet platform (Zenthos) with Admin panel, Agent Port
 
 ## Recent Changes
 
+### 2026-06: Lock reason shown to locked clients at login
+- `POST /api/auth/login` and `GET /api/auth/me` return 403 `{"detail": {"code": "account_locked", "reason": "<admin text>"}}` for locked accounts (only after correct password; wrong password still 401 "Invalid credentials")
+- LoginPage shows inline red alert "Account bloccato / Account locked" with the verbatim reason (default text if empty); clears on form edit/submit
+- Locked mid-session: AuthContext stores reason in `sessionStorage.account_locked_reason`, clears token, redirects to /login where the alert is shown
+- Verified via curl + Playwright (login locked, wrong pw, in-session lock). Pending: "Straight Line" sales script (awaiting user clarification on format)
+
 ### 2025-07-10: Skip KYC in Agent My Clients
 - Agents can skip KYC for clients who have issues completing verification
 - Sets KYC to approved + sends password reset email, but keeps account frozen

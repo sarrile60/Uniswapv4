@@ -119,8 +119,14 @@ export const AuthProvider = ({ children }) => {
       console.error('Failed to load user:', error);
       // Don't clear storage on network errors - only on auth errors
       if (error.response?.status === 401 || error.response?.status === 403) {
+        const detail = error.response?.data?.detail;
+        if (detail?.code === 'account_locked') {
+          sessionStorage.setItem('account_locked_reason', detail.reason || '');
+        }
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setUser(null);
+        setWallets([]);
       }
       setIsAuthenticated(false);
     } finally {

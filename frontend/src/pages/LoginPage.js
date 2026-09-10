@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang } from '@/i18n';
@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, Lock } from 'lucide-react';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -16,14 +16,25 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [lockInfo, setLockInfo] = useState(null);
+
+  useEffect(() => {
+    const reason = sessionStorage.getItem('account_locked_reason');
+    if (reason !== null) {
+      sessionStorage.removeItem('account_locked_reason');
+      setLockInfo({ reason });
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (lockInfo) setLockInfo(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setLockInfo(null);
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
@@ -36,7 +47,12 @@ const LoginPage = () => {
         toast.error(result.error?.message || t.invalidCredentials);
       }
     } catch (error) {
-      toast.error(t.invalidCredentials);
+      const detail = error.response?.data?.detail;
+      if (detail?.code === 'account_locked') {
+        setLockInfo({ reason: detail.reason || '' });
+      } else {
+        toast.error(t.invalidCredentials);
+      }
     } finally {
       setLoading(false);
     }
@@ -90,6 +106,15 @@ const LoginPage = () => {
                 {loading ? t.loggingIn : t.loginButton}
               </Button>
             </form>
+            {lockInfo && (
+              <div role="alert" className="mt-4 rounded-lg border border-red-300 bg-red-50 p-4 flex gap-3" data-testid="account-locked-alert">
+                <Lock className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+                <div className="min-w-0">
+                  <p className="font-semibold text-red-800" data-testid="account-locked-title">{t.accountLockedTitle}</p>
+                  <p className="text-sm text-red-700 mt-1 whitespace-pre-wrap break-words" data-testid="account-locked-reason">{lockInfo.reason || t.accountLockedDefault}</p>
+                </div>
+              </div>
+            )}
             <div className="mt-6 text-center text-sm">
               <span className="text-gray-600">{t.dontHaveAccount} </span>
               <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">{t.signUp}</Link>

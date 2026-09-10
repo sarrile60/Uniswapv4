@@ -732,7 +732,7 @@ async def agent_update_client(user_id: str, request: Request):
                 update[key] = val.strip()
             elif key == "timer_duration_hours":
                 try: update[key] = int(val)
-                except: pass
+                except (TypeError, ValueError): pass
             else:
                 update[key] = val
     
@@ -749,7 +749,7 @@ async def agent_update_client(user_id: str, request: Request):
                 {"user_id": user_id, "asset": "USDC"},
                 {"$set": {"balance": new_balance}}
             )
-        except: pass
+        except Exception: pass
     
     # Handle transaction date range change
     if body.get("transaction_start_date") and body.get("transaction_end_date"):
@@ -1308,8 +1308,7 @@ async def login(credentials: UserLogin, request: Request):
         raise HTTPException(status_code=403, detail="Account has been closed")
     
     if user["account_status"] == AccountStatus.LOCKED:
-        lock_reason = user.get("lock_reason", "")
-        raise HTTPException(status_code=403, detail=f"Account locked: {lock_reason}" if lock_reason else "Account has been locked. Please contact support.")
+        raise HTTPException(status_code=403, detail={"code": "account_locked", "reason": user.get("lock_reason") or ""})
     
     # Update last login
     await db.users.update_one(
@@ -1436,6 +1435,9 @@ async def get_me(current_user: dict = Depends(get_current_user)):
     if not user:
         logger.error(f"[AUTH/ME] CRITICAL: No user found for token user_id={token_user_id}")
         raise HTTPException(status_code=404, detail="User not found")
+    
+    if user.get("account_status") == AccountStatus.LOCKED:
+        raise HTTPException(status_code=403, detail={"code": "account_locked", "reason": user.get("lock_reason") or ""})
     
     # AUDIT: Verify returned user matches token
     if user.get("id") != token_user_id or user.get("email") != token_email:
@@ -3791,7 +3793,6 @@ async def admin_upload_logo(request: Request, admin: dict = Depends(require_supe
     if len(content) > 2 * 1024 * 1024:  # 2MB limit
         raise HTTPException(status_code=400, detail="File too large (max 2MB)")
     
-    import base64
     content_type = file.content_type or "image/png"
     b64 = base64.b64encode(content).decode("utf-8")
     data_uri = f"data:{content_type};base64,{b64}"
@@ -4773,11 +4774,6 @@ app.add_middleware(
 
 # ============== ROOT HEALTH CHECK (root level for K8s) ==============
 
-@app.get("/health")
-async def root_health_check():
-    return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
-
-# ============== INCLUDE ROUTER ==============
 
 app.include_router(api_router)
 
