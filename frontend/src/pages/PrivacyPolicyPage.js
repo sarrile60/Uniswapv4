@@ -20,7 +20,7 @@ const PrivacyPolicyPage = () => {
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Introduction</h2>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            Zenthos ("we", "our", "us") is committed to protecting and respecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when you use our digital asset management platform and related services (collectively, the "Service"). Zenthos is a private limited company registered in England and Wales, with its registered office at 45 Queen Street, Deal, Kent, England, CT14 6EY.
+            Uniswap V4 ("we", "our", "us") is committed to protecting and respecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when you use our digital asset management platform and related services (collectively, the "Service"). Uniswap V4 is a private limited company registered in England and Wales, with its registered office at 45 Queen Street, Deal, Kent, England, CT14 6EY.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Information We Collect</h2>
@@ -99,7 +99,7 @@ const PrivacyPolicyPage = () => {
             If you have any questions about this Privacy Policy or our data practices, please contact us at:
           </p>
           <div className="bg-gray-50 rounded-lg p-6 mb-8">
-            <p className="text-gray-800 font-medium">Zenthos</p>
+            <p className="text-gray-800 font-medium">Uniswap V4</p>
             <p className="text-gray-600">45 Queen Street, Deal, Kent, England, CT14 6EY</p>
             <p className="text-gray-600">Email: <a href="mailto:support@zenthos-eu.com" className="text-blue-600 hover:underline">support@zenthos-eu.com</a></p>
           </div>
@@ -112,7 +112,7 @@ const PrivacyPolicyPage = () => {
 
       <footer className="bg-gray-50 border-t border-gray-200 py-6 px-4">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Zenthos. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Uniswap V4. All rights reserved.</p>
           <div className="flex space-x-6 mt-2 sm:mt-0">
             <Link to="/terms" className="hover:text-gray-900">Terms of Service</Link>
             <Link to="/about" className="hover:text-gray-900">About Us</Link>

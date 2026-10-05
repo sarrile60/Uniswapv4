@@ -1,0 +1,226 @@
+/* ============================================
+   Rockie Theme - Global App Override
+   Applied to ALL pages (dashboard, admin, etc.)
+   Only changes visual appearance, no functionality impact
+   ============================================ */
+
+/* Force dark theme on body */
+body {
+  background: #141416 !important;
+  color: #b1b5c3 !important;
+  font-family: "DM Sans", sans-serif !important;
+}
+
+/* ============ CARD OVERRIDES ============ */
+/* shadcn Card components */
+[class*="rounded-lg"][class*="border"][class*="bg-card"],
+[class*="rounded-xl"][class*="border"],
+.border.rounded-lg,
+.border.rounded-xl {
+  background: #222630 !important;
+  border-color: #23262f !important;
+  color: #b1b5c3 !important;
+}
+
+/* ============ BUTTON OVERRIDES ============ */
+/* Primary buttons */
+.bg-blue-600, .bg-blue-700, 
+[class*="bg-blue-600"], [class*="bg-blue-700"],
+button[class*="bg-blue"] {
+  background: #3772ff !important;
+  border-color: #3772ff !important;
+}
+
+.bg-blue-600:hover, .bg-blue-700:hover {
+  background: #2860e0 !important;
+}
+
+/* ============ INPUT OVERRIDES ============ */
+input[class*="border"], 
+textarea[class*="border"],
+select[class*="border"],
+[class*="form-control"] {
+  background: #18191d !important;
+  border-color: #23262f !important;
+  color: #fff !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #777e90 !important;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #3772ff !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(55, 114, 255, 0.2) !important;
+}
+
+/* ============ TEXT OVERRIDES ============ */
+.text-gray-900, .text-gray-800, .text-gray-700 {
+  color: #fff !important;
+}
+
+.text-gray-600, .text-gray-500 {
+  color: #b1b5c3 !important;
+}
+
+.text-gray-400, .text-gray-300 {
+  color: #777e90 !important;
+}
+
+/* ============ BACKGROUND OVERRIDES ============ */
+.bg-white, .bg-gray-50, .bg-gray-100 {
+  background: #141416 !important;
+}
+
+.bg-gradient-to-b {
+  background: #141416 !important;
+}
+
+.bg-gray-200 {
+  background: #23262f !important;
+}
+
+/* ============ BORDER OVERRIDES ============ */
+.border-gray-200, .border-gray-300 {
+  border-color: #23262f !important;
+}
+
+.divide-gray-200 > * + * {
+  border-color: #23262f !important;
+}
+
+/* ============ DIALOG/MODAL OVERRIDES ============ */
+[role="dialog"],
+[class*="DialogContent"],
+[data-state="open"][class*="fixed"] {
+  background: #222630 !important;
+  border-color: #23262f !important;
+  color: #b1b5c3 !important;
+}
+
+/* ============ TABLE OVERRIDES ============ */
+table {
+  color: #b1b5c3 !important;
+}
+
+table th {
+  color: #777e90 !important;
+  border-color: #23262f !important;
+}
+
+table td {
+  border-color: #23262f !important;
+  color: #fff !important;
+}
+
+table tr:hover {
+  background: #18191d !important;
+}
+
+/* ============ LABEL OVERRIDES ============ */
+label {
+  color: #fff !important;
+}
+
+/* ============ ALERT/BADGE OVERRIDES ============ */
+.bg-red-50, .bg-red-100 {
+  background: rgba(211, 53, 53, 0.15) !important;
+}
+
+.bg-green-50, .bg-green-100 {
+  background: rgba(88, 189, 125, 0.15) !important;
+}
+
+.bg-yellow-50, .bg-yellow-100, .bg-orange-50 {
+  background: rgba(247, 147, 26, 0.15) !important;
+}
+
+.bg-blue-50, .bg-blue-100 {
+  background: rgba(55, 114, 255, 0.15) !important;
+}
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #18191d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #23262f;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3772ff;
+}
+
+/* ============ WALLET DASHBOARD SPECIFIC ============ */
+/* Navigation bar at top of wallet */
+nav, [class*="nav"] {
+  border-color: #23262f !important;
+}
+
+/* Status badges */
+.text-green-600, .text-green-700, .text-green-800 {
+  color: #58bd7d !important;
+}
+
+.text-red-600, .text-red-700, .text-red-800 {
+  color: #d33535 !important;
+}
+
+.text-yellow-600, .text-yellow-700, .text-yellow-800 {
+  color: #f7931a !important;
+}
+
+.text-blue-600, .text-blue-700 {
+  color: #3772ff !important;
+}
+
+/* QR Code container */
+[class*="qr"] svg, canvas {
+  background: #fff !important;
+  padding: 8px;
+  border-radius: 8px;
+}
+
+/* ============ ADMIN LAYOUT SPECIFIC ============ */
+/* Sidebar */
+aside, [class*="sidebar"] {
+  background: #18191d !important;
+  border-color: #23262f !important;
+}
+
+/* Hover states in sidebar/nav */
+a:hover, button:hover {
+  transition: all 0.2s ease;
+}
+
+/* ============ TOAST OVERRIDES ============ */
+[data-sonner-toaster] {
+  --normal-bg: #222630 !important;
+  --normal-border: #23262f !important;
+  --normal-text: #fff !important;
+}
+
+/* ============ SELECTION HIGHLIGHT ============ */
+::selection {
+  background: rgba(55, 114, 255, 0.3);
+  color: #fff;
+}
+
+/* ============ TRANSITION ============ */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
+
+/* Don't transition transforms and opacity (performance) */
+[class*="animate"], [class*="transition"] {
+  transition-property: all;
+}

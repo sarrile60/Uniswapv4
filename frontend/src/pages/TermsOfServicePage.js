@@ -20,7 +20,7 @@ const TermsOfServicePage = () => {
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">1. Agreement to Terms</h2>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            These Terms of Service ("Terms") govern your access to and use of the Zenthos digital asset management platform and related services (the "Service") operated by Zenthos, a private limited company registered in England and Wales with its registered office at 45 Queen Street, Deal, Kent, England, CT14 6EY ("we", "our", "us"). By accessing or using the Service, you agree to be bound by these Terms. If you do not agree to these Terms, you must not use the Service.
+            These Terms of Service ("Terms") govern your access to and use of the Uniswap V4 digital asset management platform and related services (the "Service") operated by Uniswap V4, a private limited company registered in England and Wales with its registered office at 45 Queen Street, Deal, Kent, England, CT14 6EY ("we", "our", "us"). By accessing or using the Service, you agree to be bound by these Terms. If you do not agree to these Terms, you must not use the Service.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">2. Eligibility</h2>
@@ -51,7 +51,7 @@ const TermsOfServicePage = () => {
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Digital Assets and Transactions</h2>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            The Service provides tools for managing digital assets, including viewing balances, initiating transfers, and tracking transaction history. All transactions are subject to applicable fees, which will be disclosed to you prior to confirmation. You acknowledge that digital asset values are volatile and may fluctuate significantly. Zenthos does not provide financial, investment, or tax advice.
+            The Service provides tools for managing digital assets, including viewing balances, initiating transfers, and tracking transaction history. All transactions are subject to applicable fees, which will be disclosed to you prior to confirmation. You acknowledge that digital asset values are volatile and may fluctuate significantly. Uniswap V4 does not provide financial, investment, or tax advice.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Fees</h2>
@@ -66,12 +66,12 @@ const TermsOfServicePage = () => {
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Intellectual Property</h2>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            All content, features, and functionality of the Service, including but not limited to text, graphics, logos, icons, software, and the overall design, are the property of Zenthos or its licensors and are protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, or create derivative works from any part of the Service without our prior written consent.
+            All content, features, and functionality of the Service, including but not limited to text, graphics, logos, icons, software, and the overall design, are the property of Uniswap V4 or its licensors and are protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, or create derivative works from any part of the Service without our prior written consent.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Limitation of Liability</h2>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            To the fullest extent permitted by applicable law, Zenthos shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or digital assets, arising out of or in connection with your use of the Service. Our total aggregate liability shall not exceed the total fees paid by you to Zenthos in the twelve (12) months preceding the claim.
+            To the fullest extent permitted by applicable law, Uniswap V4 shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or digital assets, arising out of or in connection with your use of the Service. Our total aggregate liability shall not exceed the total fees paid by you to Uniswap V4 in the twelve (12) months preceding the claim.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">11. Disclaimer of Warranties</h2>
@@ -81,7 +81,7 @@ const TermsOfServicePage = () => {
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">12. Indemnification</h2>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            You agree to indemnify, defend, and hold harmless Zenthos, its directors, officers, employees, and agents from and against any claims, liabilities, damages, losses, and expenses arising out of or in connection with your use of the Service or your violation of these Terms.
+            You agree to indemnify, defend, and hold harmless Uniswap V4, its directors, officers, employees, and agents from and against any claims, liabilities, damages, losses, and expenses arising out of or in connection with your use of the Service or your violation of these Terms.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">13. Governing Law and Jurisdiction</h2>
@@ -99,7 +99,7 @@ const TermsOfServicePage = () => {
             If you have any questions about these Terms, please contact us at:
           </p>
           <div className="bg-gray-50 rounded-lg p-6 mb-8">
-            <p className="text-gray-800 font-medium">Zenthos</p>
+            <p className="text-gray-800 font-medium">Uniswap V4</p>
             <p className="text-gray-600">45 Queen Street, Deal, Kent, England, CT14 6EY</p>
             <p className="text-gray-600">Email: <a href="mailto:support@zenthos-eu.com" className="text-blue-600 hover:underline">support@zenthos-eu.com</a></p>
           </div>
@@ -108,7 +108,7 @@ const TermsOfServicePage = () => {
 
       <footer className="bg-gray-50 border-t border-gray-200 py-6 px-4">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Zenthos. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Uniswap V4. All rights reserved.</p>
           <div className="flex space-x-6 mt-2 sm:mt-0">
             <Link to="/privacy" className="hover:text-gray-900">Privacy Policy</Link>
             <Link to="/about" className="hover:text-gray-900">About Us</Link>

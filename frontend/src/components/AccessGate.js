@@ -11,7 +11,7 @@ const gateText = {
     button: 'Continua',
     loading: 'Verifica...',
     error: 'Codice di accesso non valido',
-    footer: 'Zenthos Piattaforma Sicura',
+    footer: 'Uniswap V4 Piattaforma Sicura',
   },
   en: {
     title: 'Restricted Access',
@@ -20,7 +20,7 @@ const gateText = {
     button: 'Continue',
     loading: 'Verifying...',
     error: 'Invalid access code',
-    footer: 'Zenthos Secure Platform',
+    footer: 'Uniswap V4 Secure Platform',
   },
 };
 

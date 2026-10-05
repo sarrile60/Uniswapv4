@@ -2,12 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang } from '@/i18n';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
-import { Eye, EyeOff, ArrowLeft, Lock } from 'lucide-react';
+import { Eye, EyeOff, Lock } from 'lucide-react';
+import './AuthPages.css';
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -19,11 +16,13 @@ const LoginPage = () => {
   const [lockInfo, setLockInfo] = useState(null);
 
   useEffect(() => {
+    document.body.classList.add('is_dark');
     const reason = sessionStorage.getItem('account_locked_reason');
     if (reason !== null) {
       sessionStorage.removeItem('account_locked_reason');
       setLockInfo({ reason });
     }
+    return () => document.body.classList.remove('is_dark');
   }, []);
 
   const handleChange = (e) => {
@@ -59,68 +58,95 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex flex-col">
-      <header className="p-4 flex items-center justify-between">
-        <Link to="/" className="inline-flex items-center text-gray-600 hover:text-gray-900">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t.back}
+    <div className="auth-page">
+      <header className="auth-header">
+        <Link to="/" className="logo-link">
+          <span className="logo-icon">🦄</span> Uniswap V4
         </Link>
-        <button
-          data-testid="login-language-toggle"
-          className="flex items-center space-x-1.5 px-2.5 py-1 text-xs font-bold rounded border border-gray-300 hover:bg-gray-100 transition text-gray-700"
-          onClick={toggleLang}
-        >
-          <span className={lang === 'en' ? 'text-gray-900' : 'text-gray-400'}>EN</span>
-          <span className="text-gray-300">|</span>
-          <span className={lang === 'it' ? 'text-gray-900' : 'text-gray-400'}>IT</span>
+        <button data-testid="login-language-toggle" className="auth-lang-toggle" onClick={toggleLang}>
+          <span className={lang === 'en' ? 'lang-active' : ''}>EN</span>
+          <span className="lang-sep">|</span>
+          <span className={lang === 'it' ? 'lang-active' : ''}>IT</span>
         </button>
       </header>
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center mb-4">
-              <span className="text-white font-bold text-xl">Z</span>
+
+      <div className="auth-main">
+        <div className="auth-card">
+          <div className="auth-lock-icon">
+            <svg width="24" height="24" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 11.76C7.68 11.76 7.41 12.02 7.41 12.34C7.41 12.67 7.68 12.93 8 12.93C8.32 12.93 8.59 12.67 8.59 12.34C8.59 12.02 8.32 11.76 8 11.76Z" fill="white"/>
+              <path d="M11.52 8.24H4.22C2.1 8.24 0.38 9.96 0.38 12.08C0.38 15.7 2.78 19.06 6.32 19.82C11.25 20.88 15.62 17.09 15.62 12.34C15.62 10.08 13.78 8.24 11.52 8.24ZM8.59 14V17.07C8.59 17.39 8.32 17.66 8 17.66C7.68 17.66 7.41 17.39 7.41 17.07V14C6.73 13.75 6.24 13.11 6.24 12.34C6.24 11.37 7.03 10.59 8 10.59C8.97 10.59 9.76 11.37 9.76 12.34C9.76 13.11 9.27 13.75 8.59 14Z" fill="white"/>
+              <path d="M8 0C5.08 0 2.73 2.36 2.73 5.27V7.32C3.2 7.17 3.7 7.07 4.22 7.07H5.07V5.27C5.07 3.66 6.38 2.34 8 2.34C9.62 2.34 10.93 3.66 10.93 5.27V7.07H11.52C12.14 7.07 12.72 7.2 13.27 7.39V5.27C13.27 2.36 10.91 0 8 0Z" fill="white"/>
+            </svg>
+          </div>
+
+          <div className="auth-url-bar">
+            <span className="url-https">https://</span>
+            <span className="url-domain">accounts.uniswapv4.com/login</span>
+          </div>
+
+          <h2 className="auth-title">{t.loginTitle || 'Login To Uniswap V4'}</h2>
+          <p className="auth-subtitle">{t.loginSubtitle || 'Welcome back! Log in now to start trading'}</p>
+
+          <form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-field">
+              <label htmlFor="email">{t.loginEmail || 'Email'}</label>
+              <input
+                id="email" name="email" type="email"
+                placeholder="Please fill in the email form."
+                value={formData.email} onChange={handleChange}
+                required autoComplete="email"
+                data-testid="login-email-input"
+              />
             </div>
-            <CardTitle className="text-2xl">{t.loginTitle}</CardTitle>
-            <CardDescription>Zenthos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">{t.loginEmail}</Label>
-                <Input id="email" name="email" type="email" placeholder="you@example.com" value={formData.email} onChange={handleChange} required autoComplete="email" data-testid="login-email-input" />
+
+            <div className="auth-field">
+              <label htmlFor="password">{t.loginPassword || 'Password'}</label>
+              <div className="input-wrapper">
+                <input
+                  id="password" name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Please enter a password."
+                  value={formData.password} onChange={handleChange}
+                  required autoComplete="current-password"
+                  data-testid="login-password-input"
+                />
+                <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">{t.loginPassword}</Label>
-                <div className="relative">
-                  <Input id="password" name="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={formData.password} onChange={handleChange} required autoComplete="current-password" data-testid="login-password-input" />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-              <div className="flex justify-end">
-                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700 font-medium" data-testid="forgot-password-link">{t.forgotPassword}</Link>
-              </div>
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading} data-testid="login-submit-button">
-                {loading ? t.loggingIn : t.loginButton}
-              </Button>
-            </form>
-            {lockInfo && (
-              <div role="alert" className="mt-4 rounded-lg border border-red-300 bg-red-50 p-4 flex gap-3" data-testid="account-locked-alert">
-                <Lock className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-                <div className="min-w-0">
-                  <p className="font-semibold text-red-800" data-testid="account-locked-title">{t.accountLockedTitle}</p>
-                  <p className="text-sm text-red-700 mt-1 whitespace-pre-wrap break-words" data-testid="account-locked-reason">{lockInfo.reason || t.accountLockedDefault}</p>
-                </div>
-              </div>
-            )}
-            <div className="mt-6 text-center text-sm">
-              <span className="text-gray-600">{t.dontHaveAccount} </span>
-              <Link to="/register" className="text-blue-600 hover:text-blue-700 font-semibold">{t.signUp}</Link>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="auth-check-row">
+              <div className="check-left">
+                <input type="checkbox" id="remember" />
+                <label htmlFor="remember">Remember Me</label>
+              </div>
+              <Link to="/forgot-password" className="forgot-link" data-testid="forgot-password-link">
+                {t.forgotPassword || 'Forgot Password?'}
+              </Link>
+            </div>
+
+            <button type="submit" className="auth-submit" disabled={loading} data-testid="login-submit-button">
+              {loading ? (t.loggingIn || 'Logging in...') : (t.loginButton || 'Login')}
+            </button>
+          </form>
+
+          {lockInfo && (
+            <div className="auth-lock-alert" role="alert" data-testid="account-locked-alert">
+              <Lock className="lock-icon" size={20} />
+              <div>
+                <p className="lock-title" data-testid="account-locked-title">{t.accountLockedTitle || 'Account Locked'}</p>
+                <p className="lock-reason" data-testid="account-locked-reason">{lockInfo.reason || t.accountLockedDefault || 'Your account has been locked.'}</p>
+              </div>
+            </div>
+          )}
+
+          <div className="auth-bottom">
+            {t.dontHaveAccount || "Not a member?"}
+            <Link to="/register">{t.signUp || 'Register'}</Link>
+          </div>
+        </div>
       </div>
     </div>
   );

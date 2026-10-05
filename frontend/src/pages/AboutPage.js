@@ -10,7 +10,7 @@ const AboutPage = () => {
           <Link to="/" className="flex items-center text-gray-600 hover:text-gray-900 mr-4">
             <ArrowLeft className="w-5 h-5" />
           </Link>
-          <h1 className="text-lg font-semibold text-gray-900">About Zenthos</h1>
+          <h1 className="text-lg font-semibold text-gray-900">About Uniswap V4</h1>
         </div>
       </header>
 
@@ -24,7 +24,7 @@ const AboutPage = () => {
             Trusted Digital Asset Management
           </h2>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-            Zenthos provides a secure, reliable platform for managing digital assets. Founded in 2023 and headquartered in the United Kingdom, we are committed to delivering institutional-grade security and a seamless user experience for individuals and businesses alike.
+            Uniswap V4 provides a secure, reliable platform for managing digital assets. Founded in 2023 and headquartered in the United Kingdom, we are committed to delivering institutional-grade security and a seamless user experience for individuals and businesses alike.
           </p>
         </div>
 
@@ -32,7 +32,7 @@ const AboutPage = () => {
         <div className="mb-16">
           <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
           <p className="text-gray-700 leading-relaxed mb-4">
-            At Zenthos, our mission is to make digital asset management accessible, transparent, and secure. We believe that financial tools should empower users with full control over their assets, backed by robust security measures and clear regulatory compliance.
+            At Uniswap V4, our mission is to make digital asset management accessible, transparent, and secure. We believe that financial tools should empower users with full control over their assets, backed by robust security measures and clear regulatory compliance.
           </p>
           <p className="text-gray-700 leading-relaxed">
             We are dedicated to building a platform where trust is earned through transparency, where security is built into every layer, and where our users can manage their digital portfolios with confidence.
@@ -83,7 +83,7 @@ const AboutPage = () => {
                 <Building className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-gray-500">Company Name</p>
-                  <p className="text-gray-900">Zenthos</p>
+                  <p className="text-gray-900">Uniswap V4</p>
                   <p className="text-sm text-gray-500">Private Limited Company</p>
                 </div>
               </div>
@@ -129,7 +129,7 @@ const AboutPage = () => {
 
       <footer className="bg-gray-50 border-t border-gray-200 py-6 px-4 mt-16">
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Zenthos. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Uniswap V4. All rights reserved.</p>
           <div className="flex space-x-6 mt-2 sm:mt-0">
             <Link to="/privacy" className="hover:text-gray-900">Privacy Policy</Link>
             <Link to="/terms" className="hover:text-gray-900">Terms of Service</Link>
