@@ -210,10 +210,34 @@ frontend:
           ✓ Outstanding Fees alert visible: $1250.00 across 44 transactions\n
           Modal auto-opening is expected behavior when freeze_type is set. User must address freeze alert before accessing other features."
 
+  - task: "Login Page - HTTPS URL Bar Removal"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LoginPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: The HTTPS URL bar (auth-url-bar element) has been successfully removed from the login page. No element with class 'auth-url-bar' exists on the page."
+
+  - task: "Login Page - Italian Translation Toggle"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LoginPage.js, /app/frontend/src/i18n.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: Language toggle is working correctly. Comprehensive testing confirmed: 1) Page loads in Italian by default (when no localStorage value exists) 2) First toggle click switches to English - localStorage updated to 'en', all text changes correctly 3) Second toggle click switches back to Italian - localStorage updated to 'it', all text changes correctly 4) Third toggle click switches to English again - pattern continues working 5) Italian translations verified: 'Accedi a Uniswap V4', 'Bentornato! Accedi ora per iniziare a fare trading', 'Accedi', 'Password dimenticata?' 6) English translations verified: 'Log In to Uniswap V4', 'Welcome back! Log in now to start trading', 'Log In', 'Forgot your password?' The toggleLang function in i18n.js correctly toggles between 'en' and 'it' and persists the choice in localStorage."
+
 metadata:
   created_by: "main_agent"
-  version: "2.0"
-  test_sequence: 2
+  version: "2.1"
+  test_sequence: 3
   run_ui: false
 
 test_plan:
@@ -227,3 +251,5 @@ agent_communication:
     message: "Fixed admin transaction creation bug. Root causes: 1) Backend crashed with 500 on empty fee/amount strings (Decimal('') throws InvalidOperation) 2) Frontend had invalid asset types (ETH, BTC) and transaction type (transfer) not supported by backend enums 3) Frontend external_wallet field wasn't mapped to counterparty_address 4) Error toast didn't properly display backend validation errors. All fixes applied and verified via curl tests. Need testing agent to verify withdrawal transaction creation through full flow."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE - All 12 tests passed successfully! Admin transaction creation is fully functional. Key verifications: 1) Withdrawal transactions (USDC/EUR) work correctly and deduct wallet balance 2) Deposit transactions add to balance properly 3) Empty fee/amount fields default to '0.00' (bug fix confirmed) 4) Invalid amounts return 400 with clear validation message 5) Invalid asset types (ETH) and transaction types (transfer) return 422 validation errors 6) Admin stats API works without quantize errors 7) All balance calculations are accurate. The withdrawal transaction bug is RESOLVED."
+  - agent: "testing"
+    message: "✅ LOGIN PAGE TESTING COMPLETE - Both fixes verified successfully: 1) HTTPS URL bar removal CONFIRMED - The auth-url-bar element has been completely removed from the login page 2) Italian translation toggle WORKING CORRECTLY - Comprehensive testing with localStorage monitoring confirmed the toggle switches between English and Italian on every click, persists the language choice, and displays all translations accurately. Both requested fixes are working as expected."

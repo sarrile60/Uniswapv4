@@ -80,11 +80,6 @@ const LoginPage = () => {
             </svg>
           </div>
 
-          <div className="auth-url-bar">
-            <span className="url-https">https://</span>
-            <span className="url-domain">accounts.uniswapv4.com/login</span>
-          </div>
-
           <h2 className="auth-title">{t.loginTitle || 'Login To Uniswap V4'}</h2>
           <p className="auth-subtitle">{t.loginSubtitle || 'Welcome back! Log in now to start trading'}</p>
 
