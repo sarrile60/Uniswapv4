@@ -354,46 +354,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Download Section */}
-      <section className="download">
-        <div className="container">
-          <div className="row">
-            <div className="col-xl-6 col-md-12">
-              <div className="download__content">
-                <h3 className="heading">Free your money & Invest with confidence</h3>
-                <p className="fs-20 decs">
-                  With Uniswap V4, you can be sure your trading skills are matched with the best tools.
-                </p>
-                <ul className="list">
-                  <li>
-                    <h6 className="title">
-                      <span className="icon-check-mark">✓</span> Buy, Sell, And Trade On The Go
-                    </h6>
-                    <p className="text">Manage your holdings from any device</p>
-                  </li>
-                  <li>
-                    <h6 className="title">
-                      <span className="icon-check-mark">✓</span> Take Control Of Your Wealth
-                    </h6>
-                    <p className="text">Rest assured you (and only you) have access to your funds</p>
-                  </li>
-                </ul>
-                <div className="group-button">
-                  <a href="#"><img src="/assets/images/icon/googleplay.png" alt="Google Play" /></a>
-                  <a href="#"><img src="/assets/images/icon/appstore.png" alt="App Store" /></a>
-                </div>
-              </div>
-            </div>
-            <div className="col-xl-6 col-md-12">
-              <div className="download__image">
-                <div className="button-scan">Scan To Download</div>
-                <img src="/assets/images/layout/download.png" alt="Download App" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials */}
       <section className="testimonials" id="testimonials">
         <div className="container">

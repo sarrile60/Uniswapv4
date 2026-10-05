@@ -225,16 +225,14 @@ function AppRoutes() {
 function App() {
   return (
     <ErrorBoundary>
-      <AccessGate>
-        <BrowserRouter>
-          <LangProvider>
-            <AuthProvider>
-              <AppRoutes />
-              <Toaster position="top-right" richColors />
-            </AuthProvider>
-          </LangProvider>
-        </BrowserRouter>
-      </AccessGate>
+      <BrowserRouter>
+        <LangProvider>
+          <AuthProvider>
+            <AppRoutes />
+            <Toaster position="top-right" richColors />
+          </AuthProvider>
+        </LangProvider>
+      </BrowserRouter>
     </ErrorBoundary>
   );
 }
