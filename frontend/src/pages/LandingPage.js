@@ -40,9 +40,9 @@ const LandingPage = () => {
   const coinTabs = ["View All", "Metaverse", "Entertainment", "Energy", "NFT", "Gaming", "Music"];
 
   const testimonials = [
-    { text: "This platform has completely transformed how I manage my crypto portfolio. The interface is clean and transactions are lightning fast.", name: "Alex Johnson", position: "Crypto Trader", avatar: "/assets/images/avt/avt-02.png" },
-    { text: "I've tried dozens of exchanges and this is by far the most user-friendly. Customer support is exceptional and security features give me peace of mind.", name: "Sarah Williams", position: "Investor", avatar: "/assets/images/avt/avt-03.png" },
-    { text: "The trading tools are professional-grade yet accessible to beginners. I've recommended this platform to everyone I know in the crypto space.", name: "Michael Chen", position: "Fund Manager", avatar: "/assets/images/avt/avt-04.png" },
+    { text: "This platform has completely transformed how I manage my crypto portfolio. The interface is clean and transactions are lightning fast.", name: "Alex Johnson", position: "Crypto Trader", avatar: null, initials: "AJ", color: "#3772ff" },
+    { text: "I've tried dozens of exchanges and this is by far the most user-friendly. Customer support is exceptional and security features give me peace of mind.", name: "Sarah Williams", position: "Investor", avatar: null, initials: "SW", color: "#58bd7d" },
+    { text: "The trading tools are professional-grade yet accessible to beginners. I've recommended this platform to everyone I know in the crypto space.", name: "Michael Chen", position: "Fund Manager", avatar: null, initials: "MC", color: "#f7931a" },
   ];
 
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -58,10 +58,14 @@ const LandingPage = () => {
                 <div className="header__left">
                   <div className="logo">
                     <Link className="light" to="/">
-                      <img src="/assets/images/logo/logo.png" alt="Uniswap V4" width="118" height="32" />
+                      <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#3772ff', letterSpacing: '-0.5px'}}>
+                        <span style={{color: '#3772ff'}}>🦄</span> Uniswap V4
+                      </span>
                     </Link>
                     <Link className="dark" to="/">
-                      <img src="/assets/images/logo/logo-dark.png" alt="Uniswap V4" width="118" height="32" />
+                      <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px'}}>
+                        <span style={{color: '#3772ff'}}>🦄</span> Uniswap V4
+                      </span>
                     </Link>
                   </div>
                   <div className="left__main">
@@ -125,16 +129,18 @@ const LandingPage = () => {
                   The easiest, safest, and fastest way to buy & sell crypto assets on a trusted exchange platform.
                 </p>
                 <Link to="/register" className="btn-action"><span>Get started now</span></Link>
-                <div className="partner">
-                  <h6>Our Partners</h6>
-                  <div className="partner__list">
-                    <div className="partner-scroll">
-                      {[1,2,3,4,5,6].map(i => (
-                        <div key={i} className="partner-item">
-                          <img src={`/assets/images/partner/logo-0${i}.png`} alt={`Partner ${i}`} />
-                        </div>
-                      ))}
-                    </div>
+                <div className="stats-row">
+                  <div className="stat-item">
+                    <h4 className="stat-number">$30B+</h4>
+                    <p className="stat-label">Trading Volume</p>
+                  </div>
+                  <div className="stat-item">
+                    <h4 className="stat-number">100+</h4>
+                    <p className="stat-label">Countries</p>
+                  </div>
+                  <div className="stat-item">
+                    <h4 className="stat-number">10M+</h4>
+                    <p className="stat-label">Verified Users</p>
                   </div>
                 </div>
               </div>
@@ -262,40 +268,40 @@ const LandingPage = () => {
               <div className="work__main">
                 <div className="work-box">
                   <div className="image">
-                    <img src="/assets/images/icon/Cloud.png" alt="Download" />
+                    <span className="work-icon">☁️</span>
                   </div>
                   <div className="content">
                     <p className="step">Step 1</p>
                     <span className="title">Create Account</span>
                     <p className="text">Sign up with your email and verify your identity to get started.</p>
                   </div>
-                  <img className="line" src="/assets/images/icon/connect-line.png" alt="" />
+                  <div className="connect-line"></div>
                 </div>
                 <div className="work-box">
                   <div className="image">
-                    <img src="/assets/images/icon/Wallet.png" alt="Wallet" />
+                    <span className="work-icon">👛</span>
                   </div>
                   <div className="content">
                     <p className="step">Step 2</p>
                     <span className="title">Connect Wallet</span>
                     <p className="text">Link your wallet to securely manage and store your digital assets.</p>
                   </div>
-                  <img className="line" src="/assets/images/icon/connect-line.png" alt="" />
+                  <div className="connect-line"></div>
                 </div>
                 <div className="work-box">
                   <div className="image">
-                    <img src="/assets/images/icon/Mining.png" alt="Trading" />
+                    <span className="work-icon">⛏️</span>
                   </div>
                   <div className="content">
                     <p className="step">Step 3</p>
                     <span className="title">Start Trading</span>
                     <p className="text">Buy, sell, and trade cryptocurrencies with competitive fees.</p>
                   </div>
-                  <img className="line" src="/assets/images/icon/connect-line.png" alt="" />
+                  <div className="connect-line"></div>
                 </div>
                 <div className="work-box">
                   <div className="image">
-                    <img src="/assets/images/icon/Comparison.png" alt="Earn" />
+                    <span className="work-icon">📊</span>
                   </div>
                   <div className="content">
                     <p className="step">Step 4</p>
@@ -316,11 +322,6 @@ const LandingPage = () => {
             <div className="col-xl-6 col-md-12">
               <div className="about_image">
                 <img className="img-main" src="/assets/images/layout/about-h1.png" alt="About Uniswap V4" />
-                <img className="icon icon-1" src="/assets/images/icon/icon-01.png" alt="" />
-                <img className="icon icon-2" src="/assets/images/icon/icon-02.png" alt="" />
-                <img className="icon icon-3" src="/assets/images/icon/icon-03.png" alt="" />
-                <img className="icon icon-4" src="/assets/images/icon/icon-04.png" alt="" />
-                <img className="icon icon-5" src="/assets/images/icon/icon-05.png" alt="" />
               </div>
             </div>
             <div className="col-xl-6 col-md-12">
@@ -366,7 +367,7 @@ const LandingPage = () => {
                 <div className="testimonial-avatars">
                   {testimonials.map((t, i) => (
                     <div key={i} className={`testimonial-avatar ${activeTestimonial === i ? "active" : ""}`} onClick={() => setActiveTestimonial(i)}>
-                      <img src={t.avatar} alt={t.name} />
+                      <div className="avatar-initials" style={{background: t.color}}>{t.initials}</div>
                     </div>
                   ))}
                 </div>
@@ -382,7 +383,7 @@ const LandingPage = () => {
                 <h6 className="text">"{testimonials[activeTestimonial].text}"</h6>
                 <div className="bottom">
                   <div className="info">
-                    <img src={testimonials[activeTestimonial].avatar} alt="" />
+                    <div className="avatar-initials" style={{background: testimonials[activeTestimonial].color}}>{testimonials[activeTestimonial].initials}</div>
                     <div className="content">
                       <h6 className="name">{testimonials[activeTestimonial].name}</h6>
                       <p className="position">{testimonials[activeTestimonial].position}</p>
@@ -422,7 +423,7 @@ const LandingPage = () => {
               <div className="col-xl-4 col-md-8">
                 <div className="info">
                   <Link to="/" className="logo">
-                    <img src="/assets/images/logo/log-footer.png" alt="Uniswap V4" />
+                    <span style={{fontSize: '20px', fontWeight: 800, color: '#fff'}}>🦄 Uniswap V4</span>
                   </Link>
                   <h6>Let's talk! 🤙</h6>
                   <ul className="list">

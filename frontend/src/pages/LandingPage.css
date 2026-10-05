@@ -291,6 +291,38 @@
   }
 }
 
+/* ============ STATS ROW ============ */
+.body-rockie .stats-row {
+  display: flex;
+  gap: 40px;
+  margin-top: 48px;
+}
+
+.body-rockie .stat-item {
+  text-align: left;
+}
+
+.body-rockie .stat-number {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--r-onsurface);
+  margin-bottom: 4px;
+}
+
+.body-rockie .stat-label {
+  font-size: 14px;
+  color: var(--r-text);
+}
+
+@media (max-width: 767px) {
+  .body-rockie .stats-row {
+    gap: 24px;
+  }
+  .body-rockie .stat-number {
+    font-size: 22px;
+  }
+}
+
 /* ============ BANNER ============ */
 .body-rockie .banner {
   padding: 140px 0 80px;
@@ -370,6 +402,8 @@
 .body-rockie .banner__image img {
   max-width: 100%;
   height: auto;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 1199px) {
@@ -1054,6 +1088,40 @@
 .body-rockie .footer__bottom p {
   color: var(--r-text);
   font-size: 14px;
+}
+
+/* ============ AVATAR INITIALS ============ */
+.body-rockie .avatar-initials {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* ============ WORK ICONS ============ */
+.body-rockie .work-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.body-rockie .connect-line {
+  position: absolute;
+  top: 40px;
+  right: -30px;
+  width: 60px;
+  height: 2px;
+  background: var(--r-line);
+  opacity: 0.5;
+}
+
+@media (max-width: 991px) {
+  .body-rockie .connect-line { display: none; }
 }
 
 /* ============ RESPONSIVE ============ */
