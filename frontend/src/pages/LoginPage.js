@@ -88,7 +88,7 @@ const LoginPage = () => {
               <label htmlFor="email">{t.loginEmail || 'Email'}</label>
               <input
                 id="email" name="email" type="email"
-                placeholder="Please fill in the email form."
+                placeholder={t.emailPlaceholder || 'Enter your email'}
                 value={formData.email} onChange={handleChange}
                 required autoComplete="email"
                 data-testid="login-email-input"
@@ -101,7 +101,7 @@ const LoginPage = () => {
                 <input
                   id="password" name="password"
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Please enter a password."
+                  placeholder={t.passwordPlaceholder || 'Enter your password'}
                   value={formData.password} onChange={handleChange}
                   required autoComplete="current-password"
                   data-testid="login-password-input"
@@ -115,7 +115,7 @@ const LoginPage = () => {
             <div className="auth-check-row">
               <div className="check-left">
                 <input type="checkbox" id="remember" />
-                <label htmlFor="remember">Remember Me</label>
+                <label htmlFor="remember">{t.rememberMe || 'Remember Me'}</label>
               </div>
               <Link to="/forgot-password" className="forgot-link" data-testid="forgot-password-link">
                 {t.forgotPassword || 'Forgot Password?'}
