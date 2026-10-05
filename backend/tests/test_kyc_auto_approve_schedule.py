@@ -13,7 +13,7 @@ import subprocess
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://email-heartbeat-fix.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://uniswap-infra.preview.emergentagent.com").rstrip("/")
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 KYCSubmitScheduleTest/1.0"
 
 ADMIN = {"email": "admin@zenthos-eu.com", "password": "admin123"}

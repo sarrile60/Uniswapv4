@@ -23,7 +23,7 @@
     "access_gate": "zenthos2026",
     "admin": "admin@zenthos-eu.com / admin123",
     "agent (marco)": "marco / agent123 (PIN 8971)",
-    "test target user": "id=a8f5ec06-b843-4055-a5eb-9a9483fd9591 email=agent_synced@test.com (state restored post-test)"
+    "test target user": "id=uniswap-infra email=agent_synced@test.com (state restored post-test)"
   },
   "seed_data_creation": "None. Test uses the pre-existing 'Final Test' user (a8f5ec06-b843-4055-a5eb-9a9483fd9591) and its wallet_pool entry (0xTEST_WALLET_NEW_111). All email changes are reverted at test end (test_04) and again via curl restore. DB state on exit: user.email = wallet_pool.assigned_email = 'agent_synced@test.com'.",
   "retest_needed": false,

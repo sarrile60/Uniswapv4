@@ -1,0 +1,800 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import AdminLayout from './AdminLayout';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { toast } from 'sonner';
+import { ArrowLeft, Info, Wallet, Calendar, User, Shield, AlertTriangle, ExternalLink, RefreshCw, CalendarIcon } from 'lucide-react';
+import { DateInput } from '@/components/DateInput';
+import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { format, parse } from 'date-fns';
+
+const AdminCreateUser = () => {
+  const navigate = useNavigate();
+  const { api } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState(1);
+  const [eurInput, setEurInput] = useState('');
+  const [exchangeRate, setExchangeRate] = useState(null);
+  const [rateLoading, setRateLoading] = useState(false);
+  const [emailStatus, setEmailStatus] = useState(null); // null | 'checking' | 'exists' | 'available'
+  const emailCheckTimer = useRef(null);
+
+  const fetchRate = useCallback(async () => {
+    setRateLoading(true);
+    try {
+      const res = await api.get('/exchange-rate');
+      if (res.data.ok) {
+        setExchangeRate(res.data.data);
+      }
+    } catch (e) {
+      console.error('Failed to fetch exchange rate:', e);
+    } finally {
+      setRateLoading(false);
+    }
+  }, [api]);
+
+  useEffect(() => {
+    fetchRate();
+  }, [fetchRate]);
+
+  // Load default connected app from settings
+  useEffect(() => {
+    const loadDefaults = async () => {
+      try {
+        const res = await api.get('/admin/settings');
+        if (res.data.ok) {
+          const s = res.data.data.settings;
+          setFormData(prev => ({
+            ...prev,
+            connected_app_name: prev.connected_app_name || s.default_connected_app_name || '',
+            connected_app_logo: prev.connected_app_logo || s.default_connected_app_logo || '',
+          }));
+        }
+      } catch (e) { /* ignore */ }
+    };
+    loadDefaults();
+  }, [api]);
+  
+  const [formData, setFormData] = useState({
+    // Step 1: Basic Info
+    first_name: '',
+    middle_name: '',
+    last_name: '',
+    email: '',
+    username: '',
+    password: '',
+    date_of_birth: '',
+    phone: '',
+    
+    // Step 2: Wallet Setup
+    eth_wallet_address: '',
+    initial_usdc_balance: '0.00',
+    initial_eur_balance: '0.00',
+    
+    // Step 3: Transaction History
+    generate_history: false,
+    total_fees: '0.00',
+    transaction_start_date: '',
+    transaction_end_date: '',
+    
+    // Step 4: Account Settings
+    freeze_type: 'both',
+    connected_app_name: '',
+    connected_app_logo: '',
+    role: 'user',
+    timer_duration_hours: '',
+  });
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (field === 'email') {
+      clearTimeout(emailCheckTimer.current);
+      const email = value.trim().toLowerCase();
+      if (!email || !email.includes('@')) {
+        setEmailStatus(null);
+        return;
+      }
+      setEmailStatus('checking');
+      emailCheckTimer.current = setTimeout(async () => {
+        try {
+          const res = await api.get('/admin/check-email', { params: { email } });
+          setEmailStatus(res.data.exists ? 'exists' : 'available');
+        } catch {
+          setEmailStatus(null);
+        }
+      }, 500);
+    }
+  };
+
+  const generateRandomPassword = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
+    let password = '';
+    for (let i = 0; i < 12; i++) {
+      password += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    handleChange('password', password);
+  };
+
+  const generateWalletAddress = () => {
+    const hex = '0123456789abcdef';
+    let address = '0x';
+    for (let i = 0; i < 40; i++) {
+      address += hex.charAt(Math.floor(Math.random() * hex.length));
+    }
+    handleChange('eth_wallet_address', address);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const payload = {
+        first_name: formData.first_name,
+        middle_name: formData.middle_name || null,
+        last_name: formData.last_name,
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+        date_of_birth: formData.date_of_birth,
+        phone: formData.phone || null,
+        eth_wallet_address: formData.eth_wallet_address || null,
+        initial_usdc_balance: formData.initial_usdc_balance,
+        initial_eur_balance: formData.initial_eur_balance,
+        total_fees: formData.generate_history ? formData.total_fees : '0.00',
+        transaction_start_date: formData.generate_history ? formData.transaction_start_date : null,
+        transaction_end_date: formData.generate_history ? formData.transaction_end_date : null,
+        freeze_type: formData.freeze_type,
+        connected_app_name: formData.connected_app_name || null,
+        connected_app_logo: formData.connected_app_logo || null,
+        role: formData.role,
+        timer_duration_hours: formData.timer_duration_hours ? parseInt(formData.timer_duration_hours) : null,
+      };
+
+      const response = await api.post('/admin/users', payload);
+
+      if (response.data.ok) {
+        toast.success('User created successfully');
+        navigate(`/admin/users/${response.data.data.user.id}`);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to create user');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isStep1Valid = () => {
+    return formData.first_name && formData.last_name && formData.email && 
+           formData.username && formData.password && formData.date_of_birth;
+  };
+
+  const isStep2Valid = () => {
+    return true; // All fields optional
+  };
+
+  const isStep3Valid = () => {
+    if (!formData.generate_history) return true;
+    return formData.transaction_start_date && formData.transaction_end_date &&
+           parseFloat(formData.initial_usdc_balance) > 0;
+  };
+
+  return (
+    <AdminLayout title="Create User">
+      <div className="max-w-3xl mx-auto">
+        <Link to="/admin/users" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Users
+        </Link>
+
+        {/* Progress Steps */}
+        <div className="flex items-center justify-center mb-8">
+          {[
+            { num: 1, label: 'Basic Info' },
+            { num: 2, label: 'Wallet' },
+            { num: 3, label: 'History' },
+            { num: 4, label: 'Settings' },
+          ].map((s, i) => (
+            <React.Fragment key={s.num}>
+              <div 
+                className={`flex flex-col items-center ${
+                  step >= s.num ? 'text-blue-600' : 'text-gray-400'
+                }`}
+              >
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium ${
+                  step >= s.num ? 'bg-blue-600 text-white' : 'bg-gray-200'
+                }`}>
+                  {s.num}
+                </div>
+                <span className="text-xs mt-1 hidden sm:block">{s.label}</span>
+              </div>
+              {i < 3 && (
+                <div className={`w-12 sm:w-20 h-1 mx-2 ${step > s.num ? 'bg-blue-600' : 'bg-gray-200'}`} />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          {/* Step 1: Basic Info */}
+          {step === 1 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <User className="w-5 h-5 mr-2" />
+                  Basic Information
+                </CardTitle>
+                <CardDescription>Enter the user's personal details</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="first_name">First Name *</Label>
+                    <Input
+                      id="first_name"
+                      value={formData.first_name}
+                      onChange={(e) => handleChange('first_name', e.target.value)}
+                      placeholder="John"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="middle_name">Middle Name</Label>
+                    <Input
+                      id="middle_name"
+                      value={formData.middle_name}
+                      onChange={(e) => handleChange('middle_name', e.target.value)}
+                      placeholder="Optional"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="last_name">Last Name *</Label>
+                    <Input
+                      id="last_name"
+                      value={formData.last_name}
+                      onChange={(e) => handleChange('last_name', e.target.value)}
+                      placeholder="Doe"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    placeholder="john@example.com"
+                    required
+                    className={emailStatus === 'exists' ? 'border-red-500 focus-visible:ring-red-500' : emailStatus === 'available' ? 'border-green-500 focus-visible:ring-green-500' : ''}
+                  />
+                  {emailStatus === 'checking' && (
+                    <p className="text-xs text-gray-500">Checking email...</p>
+                  )}
+                  {emailStatus === 'exists' && (
+                    <p className="text-xs text-red-600 font-medium">This email is already registered</p>
+                  )}
+                  {emailStatus === 'available' && (
+                    <p className="text-xs text-green-600 font-medium">Email is available</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="username">Username *</Label>
+                  <Input
+                    id="username"
+                    value={formData.username}
+                    onChange={(e) => handleChange('username', e.target.value.toLowerCase())}
+                    placeholder="johndoe"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password *</Label>
+                  <div className="flex space-x-2">
+                    <Input
+                      id="password"
+                      value={formData.password}
+                      onChange={(e) => handleChange('password', e.target.value)}
+                      placeholder="Enter password"
+                      required
+                    />
+                    <Button type="button" variant="outline" onClick={generateRandomPassword}>
+                      Generate
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="date_of_birth">Date of Birth *</Label>
+                    <DateInput
+                      id="date_of_birth"
+                      value={formData.date_of_birth}
+                      onChange={(val) => handleChange('date_of_birth', val)}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone (Optional)</Label>
+                    <Input
+                      id="phone"
+                      value={formData.phone}
+                      onChange={(e) => handleChange('phone', e.target.value)}
+                      placeholder="+1234567890"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button 
+                    type="button" 
+                    onClick={() => setStep(2)}
+                    disabled={!isStep1Valid()}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Next: Wallet Setup
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Step 2: Wallet Setup */}
+          {step === 2 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Wallet className="w-5 h-5 mr-2" />
+                  Wallet Setup
+                </CardTitle>
+                <CardDescription>Configure the user's wallet and initial balances</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="eth_wallet_address">ETH Wallet Address</Label>
+                  <div className="flex space-x-2">
+                    <Input
+                      id="eth_wallet_address"
+                      value={formData.eth_wallet_address}
+                      onChange={(e) => handleChange('eth_wallet_address', e.target.value)}
+                      placeholder="0x..."
+                      className="font-mono text-sm"
+                    />
+                    <Button type="button" variant="outline" onClick={generateWalletAddress}>
+                      Generate
+                    </Button>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    This is the USDC (ERC-20) wallet address the user will see
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="initial_usdc_balance">Initial USDC Balance</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                      <Input
+                        id="initial_usdc_balance"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.initial_usdc_balance}
+                        onChange={(e) => handleChange('initial_usdc_balance', e.target.value)}
+                        className="pl-7"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="initial_eur_balance">Initial EUR Balance</Label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">&euro;</span>
+                      <Input
+                        id="initial_eur_balance"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={formData.initial_eur_balance}
+                        onChange={(e) => handleChange('initial_eur_balance', e.target.value)}
+                        className="pl-7"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* EUR → USDC Converter */}
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-semibold text-blue-900">EUR to USDC Converter</Label>
+                    <div className="flex items-center gap-2">
+                      {exchangeRate && (
+                        <span className="text-xs text-blue-600">
+                          1 EUR = {exchangeRate.eur_usdc?.toFixed(4)} USDC
+                        </span>
+                      )}
+                      <button
+                        type="button"
+                        onClick={fetchRate}
+                        className="text-blue-500 hover:text-blue-700"
+                        title="Refresh rate"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${rateLoading ? 'animate-spin' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">&euro;</span>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Enter EUR amount"
+                        value={eurInput}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setEurInput(val);
+                          if (val && exchangeRate?.eur_usdc) {
+                            const usdc = (parseFloat(val) * exchangeRate.eur_usdc).toFixed(2);
+                            handleChange('initial_usdc_balance', usdc);
+                          }
+                        }}
+                        className="pl-7"
+                        data-testid="eur-to-usdc-input"
+                      />
+                    </div>
+                    <span className="text-blue-400 font-bold">=</span>
+                    <div className="flex-1 bg-white border rounded-md px-3 py-2 text-sm text-gray-700">
+                      {eurInput && exchangeRate?.eur_usdc
+                        ? `$ ${(parseFloat(eurInput) * exchangeRate.eur_usdc).toFixed(2)} USDC`
+                        : '$ 0.00 USDC'}
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-600">Live rate from ECB/Frankfurter. Typing here auto-fills the USDC balance above.</p>
+                </div>
+
+                <div className="flex justify-between pt-4">
+                  <Button type="button" variant="outline" onClick={() => setStep(1)}>
+                    Back
+                  </Button>
+                  <Button 
+                    type="button" 
+                    onClick={() => setStep(3)}
+                    disabled={!isStep2Valid()}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Next: Transaction History
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Step 3: Transaction History */}
+          {step === 3 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Calendar className="w-5 h-5 mr-2" />
+                  Transaction History
+                </CardTitle>
+                <CardDescription>
+                  Auto-generate realistic transaction history with unpaid fees
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <Info className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="font-medium text-blue-900">Auto-Generate History</p>
+                      <p className="text-sm text-blue-700">
+                        System will create realistic transactions that sum to the USDC balance
+                      </p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={formData.generate_history}
+                    onCheckedChange={(v) => handleChange('generate_history', v)}
+                  />
+                </div>
+
+                {formData.generate_history && (
+                  <>
+                    {parseFloat(formData.initial_usdc_balance) <= 0 && (
+                      <div className="p-4 bg-orange-50 rounded-lg">
+                        <div className="flex items-center space-x-2 text-orange-700">
+                          <AlertTriangle className="w-5 h-5" />
+                          <span>USDC balance must be greater than 0 to generate history</span>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      <Label htmlFor="total_fees">Total Unpaid Fees</Label>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <Input
+                          id="total_fees"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          value={formData.total_fees}
+                          onChange={(e) => handleChange('total_fees', e.target.value)}
+                          className="pl-7"
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Fees will be distributed across generated transactions
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Start Date *</Label>
+                        <div className="flex gap-2">
+                          <DateInput
+                            id="transaction_start_date"
+                            value={formData.transaction_start_date}
+                            onChange={(val) => handleChange('transaction_start_date', val)}
+                          />
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button type="button" variant="outline" size="icon" className="shrink-0" data-testid="start-date-picker">
+                                <CalendarIcon className="h-4 w-4" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <CalendarPicker
+                                mode="single"
+                                selected={formData.transaction_start_date ? parse(formData.transaction_start_date, 'yyyy-MM-dd', new Date()) : undefined}
+                                onSelect={(date) => {
+                                  if (date) handleChange('transaction_start_date', format(date, 'yyyy-MM-dd'));
+                                }}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>End Date *</Label>
+                        <div className="flex gap-2">
+                          <DateInput
+                            id="transaction_end_date"
+                            value={formData.transaction_end_date}
+                            onChange={(val) => handleChange('transaction_end_date', val)}
+                          />
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button type="button" variant="outline" size="icon" className="shrink-0" data-testid="end-date-picker">
+                                <CalendarIcon className="h-4 w-4" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <CalendarPicker
+                                mode="single"
+                                selected={formData.transaction_end_date ? parse(formData.transaction_end_date, 'yyyy-MM-dd', new Date()) : undefined}
+                                onSelect={(date) => {
+                                  if (date) handleChange('transaction_end_date', format(date, 'yyyy-MM-dd'));
+                                }}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 bg-gray-50 rounded-lg">
+                      <p className="text-sm text-gray-600">
+                        <strong>How it works:</strong> The system will automatically create multiple 
+                        deposit/receive/swap transactions between the start and end dates. The total 
+                        of all transactions will equal the USDC balance. Fees will be distributed 
+                        across ~60-80% of transactions.
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                <div className="flex justify-between pt-4">
+                  <Button type="button" variant="outline" onClick={() => setStep(2)}>
+                    Back
+                  </Button>
+                  <Button 
+                    type="button" 
+                    onClick={() => setStep(4)}
+                    disabled={!isStep3Valid()}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Next: Account Settings
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Step 4: Account Settings */}
+          {step === 4 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center">
+                  <Shield className="w-5 h-5 mr-2" />
+                  Account Settings
+                </CardTitle>
+                <CardDescription>
+                  Configure freeze status, connected apps, and role
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Freeze Type</Label>
+                  <Select
+                    value={formData.freeze_type}
+                    onValueChange={(v) => handleChange('freeze_type', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No Freeze (Active Account)</SelectItem>
+                      <SelectItem value="unusual_activity">
+                        Unusual Activity - Requires KYC Verification
+                      </SelectItem>
+                      <SelectItem value="inactivity">
+                        Inactivity - Account Inactive
+                      </SelectItem>
+                      <SelectItem value="both">
+                        Both - KYC Required
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {formData.freeze_type !== 'none' && (
+                    <div className="p-3 bg-orange-50 rounded-lg mt-2">
+                      <p className="text-sm text-orange-700">
+                        {formData.freeze_type === 'unusual_activity' && (
+                          <>User will see: "We detected unusual activity. Please verify your identity."</>
+                        )}
+                        {formData.freeze_type === 'inactivity' && (
+                          <>User will see: "Account frozen due to inactivity."</>
+                        )}
+                        {formData.freeze_type === 'both' && (
+                          <>User will need to complete KYC verification to reactivate their account.</>
+                        )}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="connected_app_name">Connected App Name</Label>
+                  <Input
+                    id="connected_app_name"
+                    value={formData.connected_app_name}
+                    onChange={(e) => handleChange('connected_app_name', e.target.value)}
+                    placeholder="e.g., CHIANTIN BANK"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Will appear in the "Connected Apps" section of user's wallet
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="connected_app_logo">Connected App Logo URL</Label>
+                  <Input
+                    id="connected_app_logo"
+                    value={formData.connected_app_logo}
+                    onChange={(e) => handleChange('connected_app_logo', e.target.value)}
+                    placeholder="https://example.com/logo.png"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>User Role</Label>
+                  <Select
+                    value={formData.role}
+                    onValueChange={(v) => handleChange('role', v)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="user">Regular User</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="superadmin">Super Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="timer_duration_hours">Expiry Timer (Hours)</Label>
+                  <Input
+                    id="timer_duration_hours"
+                    type="number"
+                    min="1"
+                    value={formData.timer_duration_hours}
+                    onChange={(e) => handleChange('timer_duration_hours', e.target.value)}
+                    placeholder="e.g. 48, 72, 168"
+                    data-testid="timer-duration-input"
+                  />
+                  <p className="text-xs text-gray-500">
+                    Set a countdown deadline (in hours) for fee resolution. Leave empty for no timer.
+                  </p>
+                </div>
+
+                {/* Summary */}
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-2">Summary</h4>
+                  <dl className="space-y-1 text-sm">
+                    <div className="flex justify-between">
+                      <dt className="text-gray-500">Name:</dt>
+                      <dd className="text-gray-900">{formData.first_name} {formData.last_name}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-gray-500">Email:</dt>
+                      <dd className="text-gray-900">{formData.email}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-gray-500">USDC Balance:</dt>
+                      <dd className="text-gray-900">&euro;{formData.initial_usdc_balance}</dd>
+                    </div>
+                    <div className="flex justify-between">
+                      <dt className="text-gray-500">EUR Balance:</dt>
+                      <dd className="text-gray-900">€{formData.initial_eur_balance}</dd>
+                    </div>
+                    {formData.generate_history && (
+                      <div className="flex justify-between">
+                        <dt className="text-gray-500">Total Fees:</dt>
+                        <dd className="text-gray-900">&euro;{formData.total_fees}</dd>
+                      </div>
+                    )}
+                    <div className="flex justify-between">
+                      <dt className="text-gray-500">Freeze Status:</dt>
+                      <dd className={formData.freeze_type !== 'none' ? 'text-orange-600 font-medium' : 'text-gray-900'}>
+                        {formData.freeze_type === 'none' ? 'Active' : formData.freeze_type.replace('_', ' ')}
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div className="flex justify-between pt-4">
+                  <Button type="button" variant="outline" onClick={() => setStep(3)}>
+                    Back
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    disabled={loading}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {loading ? 'Creating...' : 'Create User'}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </form>
+      </div>
+    </AdminLayout>
+  );
+};
+
+export default AdminCreateUser;

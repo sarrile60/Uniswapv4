@@ -108,7 +108,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com; "
-            "connect-src 'self' https://email-heartbeat-fix.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
+            "connect-src 'self' https://uniswap-infra.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
             "media-src 'self' blob: https://res.cloudinary.com; "
             "frame-ancestors 'none';"
         )

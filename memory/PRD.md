@@ -1,38 +1,32 @@
-# Zenthos Wallet Platform - PRD
+# UniswapV4 Deployment Package — PRD
 
-## Original Problem Statement
-Build a full-stack crypto wallet platform (Zenthos) with Admin panel, Agent Portal, Wallet Pool management, KYC flows, and Italian localization.
+## Overview
+A complete, independent copy of the Zenthos wallet platform prepared for deployment to `uniswapv4.com` on a Hostinger VPS (179.198.211.231). The original `/app` codebase is **untouched**.
 
-## Core Architecture
-- **Backend**: FastAPI + MongoDB (Motor) + JWT Auth
-- **Frontend**: React SPA with Shadcn/UI
+## What Was Built (Phase 1)
+- Full codebase copy at `/app/uniswapv4/` with all deployment configs updated
+- Backend defaults changed: admin email, DB name, sender email, frontend URL
+- Frontend email references updated to `info@uniswapv4.com`
+- Deployment scripts updated: setup-vps.sh, deploy.sh, nginx.conf, setup-nginx.sh, ecosystem.config.js
+- `.env.example` with pre-filled Resend API key
+- Comprehensive deployment README with step-by-step instructions
 
-## Implemented Features
-- User system (auth, freeze, timer, locking)
-- Admin panel (dashboard, users, KYC queue, wallet pool, agents, audit logs, settings)
-- Agent Portal (/CreateAccount): Create Account, Check Account (with login history), My Clients (with Skip KYC)
-- Wallet Pool (atomic assignment, email sync)
-- KYC (upload, manual review, auto-approval, agent skip KYC)
-- Transaction generation, PDF export, Italian localization
-- Integrations: MongoDB, Resend, Cloudinary, Frankfurter API
+## Key Config Changes (Copy Only)
+| Item | Original (untouched) | Copy (updated) |
+|------|---------------------|----------------|
+| Domain | zenthos-eu.com | uniswapv4.com |
+| VPS directory | /opt/zenthos | /opt/uniswapv4 |
+| MongoDB database | blockchain_wallet | uniswapv4-prod |
+| Admin email | admin@zenthos-eu.com | admin@uniswapv4.com |
+| PM2 process | zenthos-backend | uniswapv4-backend |
+| Sender email | noreply@zenthos-eu.com | info@uniswapv4.com |
 
-## Recent Changes
+## Next Steps (Owner)
+1. Push `/app/uniswapv4/` to https://github.com/sarrile60/Uniswapv4
+2. Point uniswapv4.com A record to 179.198.211.231
+3. Add Resend DNS records (SPF/DKIM/DMARC)
+4. SSH into VPS and run setup + deploy scripts
+5. Run Certbot for SSL
 
-### 2026-06: Lock reason shown to locked clients at login
-- `POST /api/auth/login` and `GET /api/auth/me` return 403 `{"detail": {"code": "account_locked", "reason": "<admin text>"}}` for locked accounts (only after correct password; wrong password still 401 "Invalid credentials")
-- LoginPage shows inline red alert "Account bloccato / Account locked" with the verbatim reason (default text if empty); clears on form edit/submit
-- Locked mid-session: AuthContext stores reason in `sessionStorage.account_locked_reason`, clears token, redirects to /login where the alert is shown
-- Verified via curl + Playwright (login locked, wrong pw, in-session lock). Pending: "Straight Line" sales script (awaiting user clarification on format)
-
-### 2025-07-10: Skip KYC in Agent My Clients
-- Agents can skip KYC for clients who have issues completing verification
-- Sets KYC to approved + sends password reset email, but keeps account frozen
-- Shows "Salta KYC" link for non-approved, "KYC approvato" for approved
-- Testing: 6/6 backend + frontend E2E verified
-
-### 2025-07-03: Client Login History, KYC Email Fix, Auto-Approve Resilience
-### Earlier: dates display, login bug, wallet email sync, KYC auto-approval feature
-
-## Backlog
-- P2: Refactor server.py into modular routers
-- P2: Refactor CreateAccountPage.js
+## Phase 2 (Later): UI rebranding
+## Phase 3 (Later): Monitoring, backups, CI/CD

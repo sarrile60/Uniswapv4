@@ -34,7 +34,7 @@
   "test_credentials": {
     "access_gate": "zenthos2026 (sessionStorage z_access=1)",
     "admin/superadmin": "admin@zenthos-eu.com / admin123",
-    "test user for kyc submit": "fetest_bug20_1782908617@test.com / TestFE123! (id=4bdc799e-4627-4b2e-b413-09c795c4ba5a)"
+    "test user for kyc submit": "fetest_bug20_1782908617@test.com / TestFE123! (id=uniswap-infra)"
   },
   "seed_data_creation": "test_kyc_auto_approve.py creates+deletes a transient user with id TEST_AUTO_KYC_<hex> and matching kyc_documents row within a single test; cleanup runs in finally block. test_kyc_auto_approve_schedule.py temporarily sets fetest_bug20 user's kyc_status to 'not_started' to allow POST /api/kyc/submit, then restores original status. Both tests restore system_settings to their original values.",
   "retest_needed": false,
