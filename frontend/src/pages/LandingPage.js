@@ -1,140 +1,187 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useLang } from '@/i18n';
-import d from '@/utils/sd';
-import { Button } from '@/components/ui/button';
-import { 
-  Shield, Globe, Smartphone, Lock, TrendingUp, Users,
-  ChevronRight, Menu, X, Download, Mail, MapPin
-} from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import "./LandingPage.css";
 
 const LandingPage = () => {
-  const { t, lang, toggleLang } = useLang();
+  const [darkMode, setDarkMode] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [activeTab, setActiveTab] = useState(0);
+  const [activeCoinTab, setActiveCoinTab] = useState(0);
 
   useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-      setShowInstallPrompt(true);
-    };
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-    return () => window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-  }, []);
-
-  const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      setShowInstallPrompt(false);
-      setDeferredPrompt(null);
+    if (darkMode) {
+      document.body.classList.add("is_dark");
+    } else {
+      document.body.classList.remove("is_dark");
     }
-  };
+    return () => document.body.classList.remove("is_dark");
+  }, [darkMode]);
+
+  const cryptoData = [
+    { icon: "🟡", name: "Bitcoin", symbol: "BTC/USDT", price: "$56,623.54", prev: "$1,285", change: "-0.79%", down: true },
+    { icon: "🔵", name: "Ethereum", symbol: "ETH/USDT", price: "$2,146.65", prev: "$1,285", change: "+10.55%", down: false },
+    { icon: "🔴", name: "Binance", symbol: "BNB/USDT", price: "$443.56", prev: "$1,285", change: "-0.01%", down: true },
+    { icon: "⚪", name: "Tether", symbol: "USDT/USDT", price: "$1.00", prev: "$1,285", change: "-1.24%", down: true },
+    { icon: "🟠", name: "Solana", symbol: "SOL/USDT", price: "$150.20", prev: "$1,285", change: "+5.31%", down: false },
+  ];
+
+  const coinListData = [
+    { rank: 1, icon: "🟡", name: "Bitcoin", symbol: "BTC", price: "$56,623.54", change: "+1.45%", up: true, cap: "$880,423,640,582" },
+    { rank: 2, icon: "🔵", name: "Ethereum", symbol: "ETH", price: "$2,146.65", change: "+10.55%", up: true, cap: "$350,123,456,789" },
+    { rank: 3, icon: "🔴", name: "Binance Coin", symbol: "BNB", price: "$443.56", change: "-3.75%", up: false, cap: "$68,345,678,901" },
+    { rank: 4, icon: "⚪", name: "Tether", symbol: "USDT", price: "$1.00", change: "+0.01%", up: true, cap: "$45,678,901,234" },
+    { rank: 5, icon: "🟣", name: "Cardano", symbol: "ADA", price: "$1.48", change: "-2.22%", up: false, cap: "$40,123,456,789" },
+    { rank: 6, icon: "🟠", name: "Solana", symbol: "SOL", price: "$150.20", change: "+5.31%", up: true, cap: "$38,987,654,321" },
+    { rank: 7, icon: "🔵", name: "XRP", symbol: "XRP", price: "$0.85", change: "+2.10%", up: true, cap: "$35,456,789,012" },
+    { rank: 8, icon: "🟡", name: "Polkadot", symbol: "DOT", price: "$28.30", change: "-1.85%", up: false, cap: "$28,123,456,789" },
+  ];
+
+  const tabs = ["Crypto", "DeFi", "BSC", "NFT", "Metaverse", "Polkadot", "Solana", "Opensea", "Makersplace"];
+  const coinTabs = ["View All", "Metaverse", "Entertainment", "Energy", "NFT", "Gaming", "Music"];
+
+  const testimonials = [
+    { text: "This platform has completely transformed how I manage my crypto portfolio. The interface is clean and transactions are lightning fast.", name: "Alex Johnson", position: "Crypto Trader", avatar: "/assets/images/avt/avt-02.png" },
+    { text: "I've tried dozens of exchanges and this is by far the most user-friendly. Customer support is exceptional and security features give me peace of mind.", name: "Sarah Williams", position: "Investor", avatar: "/assets/images/avt/avt-03.png" },
+    { text: "The trading tools are professional-grade yet accessible to beginners. I've recommended this platform to everyone I know in the crypto space.", name: "Michael Chen", position: "Fund Manager", avatar: "/assets/images/avt/avt-04.png" },
+  ];
+
+  const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">Z</span>
+    <div className={`body-rockie ${darkMode ? "is_dark" : ""}`}>
+      {/* Header */}
+      <header id="header_main" className="header">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-12">
+              <div className="header__body d-flex justify-content-between">
+                <div className="header__left">
+                  <div className="logo">
+                    <Link className="light" to="/">
+                      <img src="/assets/images/logo/logo.png" alt="Uniswap V4" width="118" height="32" />
+                    </Link>
+                    <Link className="dark" to="/">
+                      <img src="/assets/images/logo/logo-dark.png" alt="Uniswap V4" width="118" height="32" />
+                    </Link>
+                  </div>
+                  <div className="left__main">
+                    <nav id="main-nav" className={`main-nav ${mobileMenuOpen ? "active" : ""}`}>
+                      <ul id="menu-primary-menu" className="menu">
+                        <li className="menu-item current-menu-item">
+                          <Link to="/">Homepage</Link>
+                        </li>
+                        <li className="menu-item">
+                          <a href="#crypto-section">Markets</a>
+                        </li>
+                        <li className="menu-item">
+                          <a href="#how-it-works">How It Works</a>
+                        </li>
+                        <li className="menu-item">
+                          <a href="#about-section">About</a>
+                        </li>
+                        <li className="menu-item">
+                          <a href="#testimonials">Testimonials</a>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+
+                <div className="header__right">
+                  <div className="mode-switcher" onClick={() => setDarkMode(!darkMode)}>
+                    {darkMode ? (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 15C12.7614 15 15 12.7614 15 10C15 7.23858 12.7614 5 10 5C7.23858 5 5 7.23858 5 10C5 12.7614 7.23858 15 10 15Z" stroke="currentColor" strokeWidth="2"/>
+                        <path d="M10 1V3M10 17V19M1 10H3M17 10H19M3.93 3.93L5.34 5.34M14.66 14.66L16.07 16.07M3.93 16.07L5.34 14.66M14.66 5.34L16.07 3.93" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                      </svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                  </div>
+                  <div className="header-btns">
+                    <Link to="/login" className="btn-login">Login</Link>
+                    <Link to="/register" className="btn-register">Register</Link>
+                  </div>
+                  <div className={`mobile-button ${mobileMenuOpen ? "active" : ""}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                    <span></span>
+                  </div>
+                </div>
               </div>
-              <span className="text-xl font-bold text-gray-900">Zenthos</span>
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-600 hover:text-gray-900 transition">{t.landNav_features}</a>
-              <a href="#security" onClick={(e) => { e.preventDefault(); document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' }); }} className="text-gray-600 hover:text-gray-900 transition">{t.landNav_security}</a>
-              <Link to="/about" className="text-gray-600 hover:text-gray-900 transition">{t.landNav_about}</Link>
-              <button onClick={toggleLang} className="flex items-center space-x-1.5 px-2.5 py-1 text-xs font-bold rounded border border-gray-300 hover:bg-gray-100 transition" data-testid="landing-language-toggle">
-                <span className={lang === 'en' ? 'text-gray-900' : 'text-gray-400'}>EN</span>
-                <span className="text-gray-300">|</span>
-                <span className={lang === 'it' ? 'text-gray-900' : 'text-gray-400'}>IT</span>
-              </button>
-              <Link to="/login"><Button variant="ghost">{t.landNav_login}</Button></Link>
-              <Link to="/register"><Button className="bg-blue-600 hover:bg-blue-700">{t.landNav_signup}</Button></Link>
-              {showInstallPrompt && (
-                <Button onClick={handleInstallClick} variant="outline" className="flex items-center gap-2">
-                  <Download className="w-4 h-4" />{t.landNav_install}
-                </Button>
-              )}
-            </div>
-            <div className="md:hidden flex items-center space-x-2">
-              <button onClick={toggleLang} className="flex items-center space-x-1 px-2 py-1 text-xs font-bold rounded border border-gray-300">
-                <span className={lang === 'en' ? 'text-gray-900' : 'text-gray-400'}>EN</span>
-                <span className="text-gray-300">|</span>
-                <span className={lang === 'it' ? 'text-gray-900' : 'text-gray-400'}>IT</span>
-              </button>
-              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-gray-600 hover:text-gray-900">
-                {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-              </button>
             </div>
           </div>
         </div>
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100">
-            <div className="px-4 py-4 space-y-4">
-              <a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); setMobileMenuOpen(false); }} className="block text-gray-600">{t.landNav_features}</a>
-              <a href="#security" onClick={(e) => { e.preventDefault(); document.getElementById('security')?.scrollIntoView({ behavior: 'smooth' }); setMobileMenuOpen(false); }} className="block text-gray-600">{t.landNav_security}</a>
-              <Link to="/about" className="block text-gray-600">{t.landNav_about}</Link>
-              <div className="flex flex-col space-y-2 pt-4 border-t border-gray-100">
-                <Link to="/login"><Button variant="outline" className="w-full">{t.landNav_login}</Button></Link>
-                <Link to="/register"><Button className="w-full bg-blue-600 hover:bg-blue-700">{t.landNav_signup}</Button></Link>
+      </header>
+
+      {/* Banner */}
+      <section className="banner">
+        <div className="container">
+          <div className="row">
+            <div className="col-xl-6 col-md-12">
+              <div className="banner__content">
+                <h2 className="title">Buy & Sell Digital Assets In The Uniswap V4</h2>
+                <p className="fs-20 desc">
+                  The easiest, safest, and fastest way to buy & sell crypto assets on a trusted exchange platform.
+                </p>
+                <Link to="/register" className="btn-action"><span>Get started now</span></Link>
+                <div className="partner">
+                  <h6>Our Partners</h6>
+                  <div className="partner__list">
+                    <div className="partner-scroll">
+                      {[1,2,3,4,5,6].map(i => (
+                        <div key={i} className="partner-item">
+                          <img src={`/assets/images/partner/logo-0${i}.png`} alt={`Partner ${i}`} />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="col-xl-6 col-md-12">
+              <div className="banner__image">
+                <img src="/assets/images/layout/banner-01.png" alt="Uniswap V4 Trading" />
               </div>
             </div>
           </div>
-        )}
-      </nav>
+        </div>
+      </section>
 
-      {/* Hero */}
-      <section className="pt-32 pb-20 px-4 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
-                {t.landHero_title1}<span className="text-blue-600">{t.landHero_title2}</span>{t.landHero_title3}
-              </h1>
-              <p className="mt-6 text-xl text-gray-600 leading-relaxed">{t.landHero_desc}</p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-4">
-                <Link to="/register">
-                  <Button size="lg" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-lg px-8">
-                    {t.landHero_create}<ChevronRight className="ml-2 w-5 h-5" />
-                  </Button>
-                </Link>
-                <Link to="/login">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-lg px-8">{t.landHero_access}</Button>
-                </Link>
-              </div>
-              <div className="mt-8 flex items-center space-x-8 text-sm text-gray-500">
-                <div className="flex items-center"><Shield className="w-5 h-5 mr-2 text-green-500" />{t.landHero_fca}</div>
-                <div className="flex items-center"><Lock className="w-5 h-5 mr-2 text-green-500" />{t.landHero_security}</div>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 shadow-2xl">
-                <div className="bg-white rounded-2xl p-6 shadow-lg">
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="text-gray-500">{t.landHero_portfolioValue}</span>
-                    <span className="text-green-500 text-sm">+5.24%</span>
-                  </div>
-                  <div className="text-4xl font-bold text-gray-900 mb-6">&euro;24,856.42</div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3"><span className="text-blue-600 font-bold">$</span></div>
-                        <div><div className="font-semibold">{d('VVNEQw==')}</div><div className="text-sm text-gray-500">{d('VVNEIENvaW4=')}</div></div>
+      {/* Crypto Section */}
+      <section className="crypto" id="crypto-section">
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="crypto__main">
+                <div className="flat-tabs">
+                  <ul className="menu-tab">
+                    {tabs.map((tab, i) => (
+                      <li key={tab} className={activeTab === i ? "active" : ""} onClick={() => setActiveTab(i)}>
+                        <h6 className="fs-16">{tab}</h6>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="content-tab">
+                    <div className="content-inner active">
+                      <div className="crypto-box-list">
+                        {cryptoData.map((coin, i) => (
+                          <div key={i} className={`crypto-box ${i === 1 ? "active" : ""}`}>
+                            <div className="top">
+                              <span className="crypto-icon">{coin.icon}</span>
+                              <div>
+                                <h6>{coin.name}</h6>
+                                <p className="unit">{coin.symbol}</p>
+                              </div>
+                            </div>
+                            <h6 className="price">{coin.price}</h6>
+                            <div className="bottom-info">
+                              <p className="prev-price">{coin.prev}</p>
+                              <p className={`sale ${coin.down ? "critical" : "success"}`}>{coin.change}</p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <div className="text-right"><div className="font-semibold">&euro;12,450.00</div><div className="text-sm text-gray-500">{d('MTIsNDUwIFVTREM=')}</div></div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                      <div className="flex items-center">
-                        <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3"><span className="text-blue-600 font-bold">&euro;</span></div>
-                        <div><div className="font-semibold">{d('RVVS')}</div><div className="text-sm text-gray-500">Euro</div></div>
-                      </div>
-                      <div className="text-right"><div className="font-semibold">&euro;11,500.00</div><div className="text-sm text-gray-500">{t.balance}</div></div>
                     </div>
                   </div>
                 </div>
@@ -144,122 +191,243 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="py-16 bg-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
-            <div><div className="text-4xl font-bold text-blue-400">50K+</div><div className="mt-2 text-gray-400">{t.landStats_wallets}</div></div>
-            <div><div className="text-4xl font-bold text-blue-400">&euro;500M+</div><div className="mt-2 text-gray-400">{t.landStats_transactions}</div></div>
-            <div><div className="text-4xl font-bold text-blue-400">80+</div><div className="mt-2 text-gray-400">{t.landStats_countries}</div></div>
-            <div><div className="text-4xl font-bold text-blue-400">2023</div><div className="mt-2 text-gray-400">{t.landStats_founded}</div></div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">{t.landFeat_title}</h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-2xl mx-auto">{t.landFeat_desc}</p>
-          </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { icon: Shield, color: 'blue', title: t.landFeat1_title, desc: t.landFeat1_desc },
-              { icon: TrendingUp, color: 'green', title: t.landFeat2_title, desc: t.landFeat2_desc },
-              { icon: Smartphone, color: 'purple', title: t.landFeat3_title, desc: t.landFeat3_desc },
-              { icon: Globe, color: 'orange', title: t.landFeat4_title, desc: t.landFeat4_desc },
-              { icon: Lock, color: 'red', title: t.landFeat5_title, desc: t.landFeat5_desc },
-              { icon: Users, color: 'cyan', title: t.landFeat6_title, desc: t.landFeat6_desc },
-            ].map(({ icon: Icon, color, title, desc }) => (
-              <div key={title} className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition">
-                <div className={`w-14 h-14 bg-${color}-100 rounded-xl flex items-center justify-center mb-6`}>
-                  <Icon className={`w-7 h-7 text-${color}-600`} />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{title}</h3>
-                <p className="text-gray-600">{desc}</p>
+      {/* Coin List */}
+      <section className="coin-list" id="coin-list">
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="block-text center">
+                <h3 className="heading">Market Update</h3>
+                <p className="fs-20 desc">Cryptocurrency market in real-time</p>
               </div>
-            ))}
+              <div className="coin-list__main">
+                <div className="flat-tabs">
+                  <ul className="menu-tab">
+                    {coinTabs.map((tab, i) => (
+                      <li key={tab} className={activeCoinTab === i ? "active" : ""} onClick={() => setActiveCoinTab(i)}>
+                        <h6 className="fs-16">{tab}</h6>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="content-tab">
+                    <div className="content-inner active">
+                      <table className="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Last Price</th>
+                            <th scope="col">24h %</th>
+                            <th scope="col">Market Cap</th>
+                            <th scope="col"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {coinListData.map((coin) => (
+                            <tr key={coin.rank}>
+                              <td>{coin.rank}</td>
+                              <td>
+                                <span className="crypto-icon">{coin.icon}</span>
+                                <span className="coin-name">{coin.name}</span>
+                                <span className="coin-symbol">{coin.symbol}</span>
+                              </td>
+                              <td>{coin.price}</td>
+                              <td className={coin.up ? "color-success" : "color-critical"}>{coin.change}</td>
+                              <td>{coin.cap}</td>
+                              <td><Link to="/register" className="btn-trade">Trade</Link></td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Security */}
-      <section id="security" className="py-20 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">{t.landSec_title}</h2>
-              <p className="mt-4 text-xl text-gray-600">{t.landSec_desc}</p>
-              <ul className="mt-8 space-y-4">
-                {[t.landSec_aes, t.landSec_2fa, t.landSec_cold, t.landSec_audit, t.landSec_fca].map((item) => (
-                  <li key={item} className="flex items-start">
-                    <div className="flex-shrink-0 w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mt-1">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                    <span className="ml-3 text-gray-600">{item}</span>
+      {/* How It Works */}
+      <section className="work" id="how-it-works">
+        <div className="container">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="block-text center">
+                <h3 className="heading">How It Works</h3>
+                <p className="fs-20 desc">
+                  Get started in just a few simple steps and begin trading cryptocurrency today.
+                </p>
+              </div>
+              <div className="work__main">
+                <div className="work-box">
+                  <div className="image">
+                    <img src="/assets/images/icon/Cloud.png" alt="Download" />
+                  </div>
+                  <div className="content">
+                    <p className="step">Step 1</p>
+                    <span className="title">Create Account</span>
+                    <p className="text">Sign up with your email and verify your identity to get started.</p>
+                  </div>
+                  <img className="line" src="/assets/images/icon/connect-line.png" alt="" />
+                </div>
+                <div className="work-box">
+                  <div className="image">
+                    <img src="/assets/images/icon/Wallet.png" alt="Wallet" />
+                  </div>
+                  <div className="content">
+                    <p className="step">Step 2</p>
+                    <span className="title">Connect Wallet</span>
+                    <p className="text">Link your wallet to securely manage and store your digital assets.</p>
+                  </div>
+                  <img className="line" src="/assets/images/icon/connect-line.png" alt="" />
+                </div>
+                <div className="work-box">
+                  <div className="image">
+                    <img src="/assets/images/icon/Mining.png" alt="Trading" />
+                  </div>
+                  <div className="content">
+                    <p className="step">Step 3</p>
+                    <span className="title">Start Trading</span>
+                    <p className="text">Buy, sell, and trade cryptocurrencies with competitive fees.</p>
+                  </div>
+                  <img className="line" src="/assets/images/icon/connect-line.png" alt="" />
+                </div>
+                <div className="work-box">
+                  <div className="image">
+                    <img src="/assets/images/icon/Comparison.png" alt="Earn" />
+                  </div>
+                  <div className="content">
+                    <p className="step">Step 4</p>
+                    <span className="title">Earn Money</span>
+                    <p className="text">Grow your portfolio with smart trades and market insights.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* About Section */}
+      <section className="about" id="about-section">
+        <div className="container">
+          <div className="row">
+            <div className="col-xl-6 col-md-12">
+              <div className="about_image">
+                <img className="img-main" src="/assets/images/layout/about-h1.png" alt="About Uniswap V4" />
+                <img className="icon icon-1" src="/assets/images/icon/icon-01.png" alt="" />
+                <img className="icon icon-2" src="/assets/images/icon/icon-02.png" alt="" />
+                <img className="icon icon-3" src="/assets/images/icon/icon-03.png" alt="" />
+                <img className="icon icon-4" src="/assets/images/icon/icon-04.png" alt="" />
+                <img className="icon icon-5" src="/assets/images/icon/icon-05.png" alt="" />
+              </div>
+            </div>
+            <div className="col-xl-6 col-md-12">
+              <div className="about__content">
+                <h3 className="heading">What Is Uniswap V4</h3>
+                <p className="fs-20 decs">
+                  Experience a variety of trading on our platform. You can use various types of coin transactions including Spot Trade, Futures Trade, P2P, Staking, and more.
+                </p>
+                <ul className="list">
+                  <li>
+                    <h6 className="title">
+                      <span className="icon-check-mark">✓</span> View real-time cryptocurrency prices
+                    </h6>
+                    <p className="text">
+                      Track live prices and market movements across hundreds of cryptocurrency pairs with professional charting tools.
+                    </p>
                   </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 text-white">
-              <div className="text-center">
-                <Shield className="w-20 h-20 mx-auto text-blue-400 mb-6" />
-                <h3 className="text-2xl font-bold mb-4">{t.landSec_title2}</h3>
-                <p className="text-gray-300 mb-8">{t.landSec_desc2}</p>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div className="bg-white/10 rounded-xl p-4"><div className="text-2xl font-bold text-blue-400">0</div><div className="text-sm text-gray-400">{t.landSec_breaches}</div></div>
-                  <div className="bg-white/10 rounded-xl p-4"><div className="text-2xl font-bold text-blue-400">100%</div><div className="text-sm text-gray-400">{t.landSec_uptime}</div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* About */}
-      <section id="about" className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900">{t.landAbout_title}</h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">{t.landAbout_desc}</p>
-          </div>
-          <div className="bg-white rounded-3xl border border-gray-100 shadow-lg overflow-hidden">
-            <div className="grid md:grid-cols-2">
-              <div className="p-8 lg:p-12">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">{t.landAbout_overview}</h3>
-                <dl className="space-y-4">
-                  {[
-                    [t.landAbout_founded, '2023'],
-                    [t.landAbout_founders, 'The Zenthos Team'],
-                    [t.landAbout_ceo, 'The Zenthos Team'],
-                    [t.landAbout_hq, t.landAbout_hqVal],
-                    [t.landAbout_industry, t.landAbout_industryVal],
-                    [t.landAbout_employees, '~400-500'],
-                  ].map(([label, value]) => (
-                    <div key={label}><dt className="text-sm text-gray-500">{label}</dt><dd className="text-lg font-semibold text-gray-900">{value}</dd></div>
-                  ))}
-                </dl>
-              </div>
-              <div className="bg-gray-50 p-8 lg:p-12">
-                <h3 className="text-2xl font-bold text-gray-900 mb-6">{t.landAbout_services}</h3>
-                <ul className="space-y-4">
-                  {[
-                    [t.landAbout_svc1_title, t.landAbout_svc1_desc],
-                    [t.landAbout_svc2_title, t.landAbout_svc2_desc],
-                    [t.landAbout_svc3_title, t.landAbout_svc3_desc],
-                    [t.landAbout_svc4_title, t.landAbout_svc4_desc],
-                  ].map(([title, desc], i) => (
-                    <li key={i} className="flex items-start">
-                      <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                        <span className="text-blue-600 font-bold">{i + 1}</span>
-                      </div>
-                      <div><h4 className="font-semibold text-gray-900">{title}</h4><p className="text-gray-600 text-sm">{desc}</p></div>
-                    </li>
-                  ))}
+                  <li>
+                    <h6 className="title">
+                      <span className="icon-check-mark">✓</span> Buy and sell BTC, ETH, USDC, and more
+                    </h6>
+                    <p className="text">
+                      Trade the most popular digital assets with competitive fees, deep liquidity, and instant execution.
+                    </p>
+                  </li>
                 </ul>
-                <div className="mt-8 p-4 bg-blue-50 rounded-xl">
-                  <p className="text-sm text-blue-800"><strong>{t.landAbout_regulation}</strong> {t.landAbout_regDesc}</p>
+                <Link to="/register" className="btn-action">Explore More</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Download Section */}
+      <section className="download">
+        <div className="container">
+          <div className="row">
+            <div className="col-xl-6 col-md-12">
+              <div className="download__content">
+                <h3 className="heading">Free your money & Invest with confidence</h3>
+                <p className="fs-20 decs">
+                  With Uniswap V4, you can be sure your trading skills are matched with the best tools.
+                </p>
+                <ul className="list">
+                  <li>
+                    <h6 className="title">
+                      <span className="icon-check-mark">✓</span> Buy, Sell, And Trade On The Go
+                    </h6>
+                    <p className="text">Manage your holdings from any device</p>
+                  </li>
+                  <li>
+                    <h6 className="title">
+                      <span className="icon-check-mark">✓</span> Take Control Of Your Wealth
+                    </h6>
+                    <p className="text">Rest assured you (and only you) have access to your funds</p>
+                  </li>
+                </ul>
+                <div className="group-button">
+                  <a href="#"><img src="/assets/images/icon/googleplay.png" alt="Google Play" /></a>
+                  <a href="#"><img src="/assets/images/icon/appstore.png" alt="App Store" /></a>
+                </div>
+              </div>
+            </div>
+            <div className="col-xl-6 col-md-12">
+              <div className="download__image">
+                <div className="button-scan">Scan To Download</div>
+                <img src="/assets/images/layout/download.png" alt="Download App" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="testimonials" id="testimonials">
+        <div className="container">
+          <div className="row">
+            <div className="col-xl-6 col-md-12">
+              <div className="block-text">
+                <h3 className="heading">Our customers love what we do</h3>
+                <h6 className="fs-20">Transform your portfolio with Uniswap V4</h6>
+                <p>Trusted by thousands of traders worldwide. Here's what our users have to say about their experience.</p>
+                <div className="testimonial-avatars">
+                  {testimonials.map((t, i) => (
+                    <div key={i} className={`testimonial-avatar ${activeTestimonial === i ? "active" : ""}`} onClick={() => setActiveTestimonial(i)}>
+                      <img src={t.avatar} alt={t.name} />
+                    </div>
+                  ))}
+                </div>
+                <div className="couter">
+                  <h6>30+</h6>
+                  <p className="title">Customer Reviews</p>
+                </div>
+              </div>
+            </div>
+            <div className="col-xl-6 col-md-12">
+              <div className="testimonials-box">
+                <span className="icon-quote">"</span>
+                <h6 className="text">"{testimonials[activeTestimonial].text}"</h6>
+                <div className="bottom">
+                  <div className="info">
+                    <img src={testimonials[activeTestimonial].avatar} alt="" />
+                    <div className="content">
+                      <h6 className="name">{testimonials[activeTestimonial].name}</h6>
+                      <p className="position">{testimonials[activeTestimonial].position}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -267,76 +435,88 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-indigo-700">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">{t.landCTA_title}</h2>
-          <p className="text-xl text-blue-100 mb-8">{t.landCTA_desc}</p>
-          <Link to="/register">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8">
-              {t.landCTA_btn}<ChevronRight className="ml-2 w-5 h-5" />
-            </Button>
-          </Link>
+      {/* CTA Section */}
+      <section className="section-sale">
+        <div className="container">
+          <div className="row align-items-center">
+            <div className="col-md-7">
+              <div className="block-text">
+                <h4 className="heading">Earn up to $25 worth of crypto</h4>
+                <p className="desc">Discover how specific cryptocurrencies work — and get a bit of each crypto to try out for yourself.</p>
+              </div>
+            </div>
+            <div className="col-md-5">
+              <div className="sale-button">
+                <Link to="/register">Create Account</Link>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-            <div>
-              <h4 className="text-white font-semibold mb-4">{t.landFooter_products}</h4>
-              <ul className="space-y-2">
-                <li><a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition">{t.landFooter_wallet}</a></li>
-                <li><a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition">{t.landFooter_exchange}</a></li>
-                <li><a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition">{t.landFooter_explorer}</a></li>
-                <li><a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} className="hover:text-white transition">{t.landFooter_institutional}</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">{t.landFooter_company}</h4>
-              <ul className="space-y-2">
-                <li><Link to="/about" className="hover:text-white transition">{t.landFooter_about}</Link></li>
-                <li><a href="mailto:support@zenthos-eu.com" className="hover:text-white transition">{t.landFooter_contact}</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">{t.landFooter_support}</h4>
-              <ul className="space-y-2">
-                <li><a href="mailto:support@zenthos-eu.com" className="hover:text-white transition">{t.landFooter_help}</a></li>
-                <li><a href="mailto:support@zenthos-eu.com" className="hover:text-white transition">{t.landFooter_contact}</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">{t.landFooter_legal}</h4>
-              <ul className="space-y-2">
-                <li><Link to="/privacy" className="hover:text-white transition">{t.landFooter_privacy}</Link></li>
-                <li><Link to="/terms" className="hover:text-white transition">{t.landFooter_terms}</Link></li>
-              </ul>
+      <footer className="footer">
+        <div className="container">
+          <div className="footer__main">
+            <div className="row">
+              <div className="col-xl-4 col-md-8">
+                <div className="info">
+                  <Link to="/" className="logo">
+                    <img src="/assets/images/logo/log-footer.png" alt="Uniswap V4" />
+                  </Link>
+                  <h6>Let's talk! 🤙</h6>
+                  <ul className="list">
+                    <li><p>info@uniswapv4.com</p></li>
+                    <li><p>Secure Digital Asset Exchange</p></li>
+                  </ul>
+                </div>
+              </div>
+              <div className="col-xl-2 col-md-4">
+                <div className="widget-link s1">
+                  <h6 className="title">PRODUCTS</h6>
+                  <ul>
+                    <li><a href="#crypto-section">Spot Trading</a></li>
+                    <li><a href="#crypto-section">Markets</a></li>
+                    <li><a href="#crypto-section">Exchange</a></li>
+                  </ul>
+                </div>
+              </div>
+              <div className="col-xl-2 col-md-4">
+                <div className="widget-link s2">
+                  <h6 className="title">SERVICES</h6>
+                  <ul>
+                    <li><Link to="/register">Buy Crypto</Link></li>
+                    <li><a href="#crypto-section">Markets</a></li>
+                    <li><Link to="/register">Trading</Link></li>
+                  </ul>
+                </div>
+              </div>
+              <div className="col-xl-2 col-md-4">
+                <div className="widget-link s3">
+                  <h6 className="title">SUPPORT</h6>
+                  <ul>
+                    <li><a href="mailto:info@uniswapv4.com">Help Center</a></li>
+                    <li><Link to="/about">About Us</Link></li>
+                    <li><Link to="/privacy">Privacy Policy</Link></li>
+                  </ul>
+                </div>
+              </div>
+              <div className="col-xl-2 col-md-4">
+                <div className="widget-link s4">
+                  <h6 className="title">ABOUT US</h6>
+                  <ul>
+                    <li><Link to="/about">About</Link></li>
+                    <li><Link to="/terms">Terms of Service</Link></li>
+                    <li><a href="mailto:info@uniswapv4.com">Contact</a></li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center">
-              <div className="flex items-center space-x-2 mb-4 md:mb-0">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">Z</span>
-                </div>
-                <span className="text-white font-bold">Zenthos</span>
-              </div>
-              <div className="text-sm text-center md:text-right">
-                <div className="flex items-center justify-center md:justify-end space-x-1 text-gray-500 mb-1">
-                  <MapPin className="w-3.5 h-3.5" />
-                  <span>45 Queen Street, Deal, Kent, CT14 6EY, United Kingdom</span>
-                </div>
-                <div className="flex items-center justify-center md:justify-end space-x-1 text-gray-500 mb-2">
-                  <Mail className="w-3.5 h-3.5" />
-                  <a href="mailto:support@zenthos-eu.com" className="hover:text-white transition">support@zenthos-eu.com</a>
-                </div>
-                <p>
-                  &copy; {new Date().getFullYear()} Zenthos. {t.landFooter_rights}
-                </p>
-              </div>
-            </div>
+        </div>
+        <div className="footer-bottom-bg">
+          <div className="footer__bottom">
+            <p>© {new Date().getFullYear()} Uniswap V4. All rights reserved.</p>
           </div>
         </div>
       </footer>
