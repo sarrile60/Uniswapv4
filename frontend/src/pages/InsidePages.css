@@ -1,0 +1,395 @@
+/* ============================================
+   Rockie Theme — Inside Pages Styling
+   Wallet, Transactions, Profile, KYC
+   ============================================ */
+
+/* Main content area below fixed header */
+.body-rockie .rockie-main {
+  padding-top: 80px;
+  min-height: 100vh;
+  background: var(--r-bg) !important;
+}
+
+/* ============ INSIDE PAGE CONTAINER ============ */
+.body-rockie .inside-container {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 24px 15px;
+}
+
+/* ============ ROCKIE DARK CARDS ============ */
+.body-rockie .r-card {
+  background: var(--r-bg1) !important;
+  border: 1px solid var(--r-line) !important;
+  border-radius: 12px;
+  padding: 24px;
+  color: var(--r-text) !important;
+}
+
+.body-rockie .r-card h1,
+.body-rockie .r-card h2,
+.body-rockie .r-card h3,
+.body-rockie .r-card h4,
+.body-rockie .r-card h5,
+.body-rockie .r-card h6 {
+  color: var(--r-onsurface) !important;
+}
+
+.body-rockie .r-card-accent {
+  border-left: 3px solid var(--r-primary) !important;
+}
+
+/* ============ BALANCE DISPLAY ============ */
+.body-rockie .balance-amount {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--r-onsurface) !important;
+  letter-spacing: -0.5px;
+}
+
+.body-rockie .balance-label {
+  font-size: 14px;
+  color: var(--r-text) !important;
+  margin-bottom: 4px;
+}
+
+.body-rockie .balance-currency {
+  font-size: 16px;
+  color: var(--r-text) !important;
+  margin-left: 8px;
+  font-weight: 400;
+}
+
+/* ============ ACTION BUTTONS ============ */
+.body-rockie .r-btn {
+  padding: 12px 28px;
+  border-radius: 90px;
+  font-weight: 700;
+  font-size: 14px;
+  font-family: "DM Sans", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.body-rockie .r-btn-primary {
+  background: var(--r-primary) !important;
+  color: #fff !important;
+}
+
+.body-rockie .r-btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.body-rockie .r-btn-outline {
+  background: transparent !important;
+  border: 2px solid var(--r-line) !important;
+  color: var(--r-onsurface) !important;
+}
+
+.body-rockie .r-btn-outline:hover {
+  border-color: var(--r-primary) !important;
+  color: var(--r-primary) !important;
+}
+
+.body-rockie .r-btn-success {
+  background: var(--r-second) !important;
+  color: #fff !important;
+}
+
+.body-rockie .r-btn-danger {
+  background: #d33535 !important;
+  color: #fff !important;
+}
+
+/* ============ FORM INPUTS (inside pages) ============ */
+.body-rockie .r-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--r-surface) !important;
+  border: 1px solid var(--r-line) !important;
+  border-radius: 8px;
+  color: var(--r-onsurface) !important;
+  font-size: 15px;
+  font-family: "DM Sans", sans-serif;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.body-rockie .r-input::placeholder {
+  color: var(--r-text) !important;
+}
+
+.body-rockie .r-input:focus {
+  border-color: var(--r-primary) !important;
+  box-shadow: 0 0 0 2px rgba(55, 114, 255, 0.2);
+}
+
+.body-rockie .r-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--r-onsurface) !important;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* ============ STATUS BADGES ============ */
+.body-rockie .r-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.body-rockie .r-badge-success {
+  background: rgba(88, 189, 125, 0.15);
+  color: #58bd7d !important;
+}
+
+.body-rockie .r-badge-danger {
+  background: rgba(211, 53, 53, 0.15);
+  color: #d33535 !important;
+}
+
+.body-rockie .r-badge-warning {
+  background: rgba(247, 147, 26, 0.15);
+  color: #f7931a !important;
+}
+
+.body-rockie .r-badge-info {
+  background: rgba(55, 114, 255, 0.15);
+  color: #3772ff !important;
+}
+
+.body-rockie .r-badge-neutral {
+  background: var(--r-surface);
+  color: var(--r-text) !important;
+}
+
+/* ============ TABLES (inside pages) ============ */
+.body-rockie .r-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.body-rockie .r-table th {
+  text-align: left;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: var(--r-text) !important;
+  font-size: 13px;
+  border-bottom: 1px solid var(--r-line) !important;
+  white-space: nowrap;
+}
+
+.body-rockie .r-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--r-line) !important;
+  color: var(--r-onsurface) !important;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.body-rockie .r-table tr:hover {
+  background: var(--r-surface) !important;
+}
+
+/* ============ TABS ============ */
+.body-rockie .r-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--r-line) !important;
+}
+
+.body-rockie .r-tab {
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--r-text) !important;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.body-rockie .r-tab.active {
+  color: var(--r-primary) !important;
+  border-bottom-color: var(--r-primary);
+}
+
+.body-rockie .r-tab:hover:not(.active) {
+  color: var(--r-onsurface) !important;
+}
+
+/* ============ ALERT BANNERS ============ */
+.body-rockie .r-alert {
+  padding: 16px 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.body-rockie .r-alert-warning {
+  background: rgba(247, 147, 26, 0.1);
+  border: 1px solid rgba(247, 147, 26, 0.3);
+}
+
+.body-rockie .r-alert-danger {
+  background: rgba(211, 53, 53, 0.1);
+  border: 1px solid rgba(211, 53, 53, 0.3);
+}
+
+.body-rockie .r-alert-info {
+  background: rgba(55, 114, 255, 0.1);
+  border: 1px solid rgba(55, 114, 255, 0.3);
+}
+
+.body-rockie .r-alert-success {
+  background: rgba(88, 189, 125, 0.1);
+  border: 1px solid rgba(88, 189, 125, 0.3);
+}
+
+/* ============ MARKET OVERVIEW STRIP (wallet page) ============ */
+.body-rockie .market-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-top: 24px;
+}
+
+@media (max-width: 991px) {
+  .body-rockie .market-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .body-rockie .market-strip {
+    grid-template-columns: 1fr;
+  }
+}
+
+.body-rockie .market-strip-card {
+  background: var(--r-bg1) !important;
+  border: 1px solid var(--r-line) !important;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.body-rockie .market-strip-info {
+  flex: 1;
+}
+
+.body-rockie .market-strip-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--r-onsurface) !important;
+}
+
+.body-rockie .market-strip-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--r-onsurface) !important;
+}
+
+.body-rockie .market-strip-change {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ============ DIALOGS / MODALS (inside pages) ============ */
+.body-rockie [role="dialog"],
+.body-rockie [class*="DialogContent"] {
+  background: var(--r-bg1) !important;
+  border: 1px solid var(--r-line) !important;
+  color: var(--r-text) !important;
+  border-radius: 16px !important;
+}
+
+/* ============ SECTION HEADINGS ============ */
+.body-rockie .r-section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--r-onsurface) !important;
+  margin-bottom: 20px;
+}
+
+/* ============ GRID LAYOUTS ============ */
+.body-rockie .r-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.body-rockie .r-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 767px) {
+  .body-rockie .r-grid-2,
+  .body-rockie .r-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============ UPLOAD ZONES (KYC) ============ */
+.body-rockie .r-upload-zone {
+  border: 2px dashed var(--r-line) !important;
+  border-radius: 12px;
+  padding: 40px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  background: var(--r-surface) !important;
+}
+
+.body-rockie .r-upload-zone:hover {
+  border-color: var(--r-primary) !important;
+  background: rgba(55, 114, 255, 0.05) !important;
+}
+
+/* ============ PROGRESS BAR ============ */
+.body-rockie .r-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--r-surface);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.body-rockie .r-progress-bar {
+  height: 100%;
+  background: var(--r-primary);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 767px) {
+  .body-rockie .inside-container {
+    padding: 16px 12px;
+  }
+  .body-rockie .r-card {
+    padding: 16px;
+  }
+  .body-rockie .balance-amount {
+    font-size: 28px;
+  }
+}

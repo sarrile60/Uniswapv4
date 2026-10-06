@@ -352,41 +352,11 @@ const WalletDashboard = () => {
         </div>
       )}
 
-      {/* Header */}
-      <header className="bg-gradient-to-r from-[#1a1f3c] to-[#121530] text-white">
+      {/* Portfolio Section */}
+      <div className="bg-gradient-to-r from-[#1a1f3c] to-[#121530] text-white">
         <div className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-6">
-          {/* Top Bar */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm font-semibold text-white border-b-2 border-blue-400 pb-1">{t.wallet}</span>
-            </div>
-            <div className="flex items-center space-x-3">
-              {/* Language Toggle */}
-              <button
-                data-testid="language-toggle"
-                className="flex items-center space-x-1.5 px-2.5 py-1 text-xs font-bold rounded border border-white/30 hover:bg-white/10 transition"
-                onClick={toggleLang}
-                title={t.language}
-              >
-                <span className={`${lang === 'en' ? 'text-white' : 'text-white/40'}`}>EN</span>
-                <span className="text-white/30">|</span>
-                <span className={`${lang === 'it' ? 'text-white' : 'text-white/40'}`}>IT</span>
-              </button>
-              <button
-                data-testid="notification-bell"
-                className="p-2 hover:bg-white/10 rounded-full relative"
-                onClick={() => setShowNotifications(!showNotifications)}
-              >
-                <Bell className="w-5 h-5" />
-                {unreadCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">{unreadCount > 9 ? '9+' : unreadCount}</span>
-                )}
-              </button>
-              <Link to="/profile" className="p-2 hover:bg-white/10 rounded-full" data-testid="profile-icon">
-                <User className="w-5 h-5" />
-              </Link>
-            </div>
-          </div>
+
+          {/* Portfolio Section */}
 
           {/* Notification Dropdown */}
           {showNotifications && (
@@ -532,7 +502,7 @@ const WalletDashboard = () => {
             </button>
           </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content */}
       <main className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6 pb-24">

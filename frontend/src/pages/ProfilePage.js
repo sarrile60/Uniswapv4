@@ -85,19 +85,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-[#121530] text-white">
-        <div className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center space-x-3">
-            <button onClick={() => navigate('/wallet')} className="p-1 hover:bg-white/10 rounded-full">
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <h1 className="text-lg font-semibold">{t.profileTitle}</h1>
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen">
       <main className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-4">
         {/* Avatar & Name */}
         <div className="flex flex-col items-center text-center pb-2">

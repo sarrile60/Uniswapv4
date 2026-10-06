@@ -1,10 +1,11 @@
 import React from "react";
 import "@/App.css";
+import "@/pages/InsidePages.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { Toaster } from "@/components/ui/sonner";
 import ErrorBoundary from "@/components/ErrorBoundary";
-import AccessGate from "@/components/AccessGate";
+import RockieLayout from "@/components/RockieLayout";
 
 import { LangProvider } from "@/i18n";
 
@@ -101,18 +102,18 @@ function AppRoutes() {
       />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-      <Route path="/privacy" element={<PrivacyPolicyPage />} />
-      <Route path="/terms" element={<TermsOfServicePage />} />
-      <Route path="/about" element={<AboutPage />} />
+      <Route path="/privacy" element={<RockieLayout><PrivacyPolicyPage /></RockieLayout>} />
+      <Route path="/terms" element={<RockieLayout><TermsOfServicePage /></RockieLayout>} />
+      <Route path="/about" element={<RockieLayout><AboutPage /></RockieLayout>} />
       <Route path="/check" element={<CheckPage />} />
       <Route path="/CreateAccount" element={<CreateAccountPage />} />
 
-      {/* User Routes */}
+      {/* User Routes — wrapped with RockieLayout */}
       <Route
         path="/wallet"
         element={
           <ProtectedRoute>
-            <WalletDashboard />
+            <RockieLayout><WalletDashboard /></RockieLayout>
           </ProtectedRoute>
         }
       />
@@ -120,16 +121,16 @@ function AppRoutes() {
         path="/transactions"
         element={
           <ProtectedRoute>
-            <TransactionsPage />
+            <RockieLayout><TransactionsPage /></RockieLayout>
           </ProtectedRoute>
         }
       />
-      <Route path="/kyc" element={<KYCPage />} />
+      <Route path="/kyc" element={<RockieLayout><KYCPage /></RockieLayout>} />
       <Route
         path="/profile"
         element={
           <ProtectedRoute>
-            <ProfilePage />
+            <RockieLayout><ProfilePage /></RockieLayout>
           </ProtectedRoute>
         }
       />

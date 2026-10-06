@@ -103,19 +103,7 @@ const TransactionsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/wallet" className="flex items-center text-gray-600 hover:text-gray-900">
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              <span className="font-semibold">{t.transactions}</span>
-            </Link>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen">
       <main className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6">
         {/* Filter */}
         <div className="flex items-center space-x-2 mb-4 overflow-x-auto pb-2">

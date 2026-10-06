@@ -4,16 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 
 const TermsOfServicePage = () => {
   return (
-    <div className="min-h-screen bg-white" data-testid="terms-of-service-page">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex items-center">
-          <Link to="/" className="flex items-center text-gray-600 hover:text-gray-900 mr-4">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-lg font-semibold text-gray-900">Terms of Service</h1>
-        </div>
-      </header>
-
+    <div className="min-h-screen" data-testid="terms-of-service-page">
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         <div className="prose prose-gray max-w-none">
           <p className="text-sm text-gray-500 mb-8">Last updated: 1 January 2026</p>
