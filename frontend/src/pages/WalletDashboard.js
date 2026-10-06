@@ -711,14 +711,15 @@ const WalletDashboard = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden" style={{ background: '#18191d', borderTop: '1px solid #23262f' }}>
         <div className="max-w-lg mx-auto flex items-center justify-around py-3">
-          <button className="flex flex-col items-center text-blue-600" data-testid="nav-home">
+          <button className="flex flex-col items-center" style={{ color: '#3772ff' }} data-testid="nav-home">
             <Home className="w-5 h-5" />
             <span className="text-xs mt-1">{t.home}</span>
           </button>
           <button
-            className="flex flex-col items-center text-gray-400 hover:text-blue-600 transition"
+            className="flex flex-col items-center transition"
+            style={{ color: '#777e90' }}
             data-testid="nav-swap"
             onClick={() => setShowSwapModal(true)}
           >
@@ -736,19 +737,19 @@ const WalletDashboard = () => {
             <DialogDescription>{t.depositDesc}</DialogDescription>
           </DialogHeader>
           <div className="flex flex-col items-center py-4">
-            <div className="bg-white p-4 rounded-xl border">
+            <div style={{ background: '#fff', padding: 16, borderRadius: 12, border: '1px solid #23262f' }}>
               <QRCodeSVG value={user?.eth_wallet_address || ''} size={180} level="H" />
             </div>
             <div className="mt-4 w-full">
-              <div className="text-sm text-gray-500 mb-2">{t.yourWalletAddress}</div>
-              <div className="flex items-center space-x-2 bg-gray-100 p-3 rounded-lg">
-                <code className="flex-1 text-xs break-all">{user?.eth_wallet_address}</code>
-                <button onClick={() => copyToClipboard(user?.eth_wallet_address)} className="p-2 hover:bg-gray-200 rounded">
+              <div style={{ fontSize: '0.875rem', color: '#777e90', marginBottom: 8 }}>{t.yourWalletAddress}</div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#18191d', padding: 12, borderRadius: 8 }}>
+                <code style={{ flex: 1, fontSize: '0.75rem', wordBreak: 'break-all', color: '#b1b5c3' }}>{user?.eth_wallet_address}</code>
+                <button onClick={() => copyToClipboard(user?.eth_wallet_address)} style={{ padding: 8, borderRadius: 6, background: 'transparent', border: 'none', cursor: 'pointer', color: '#b1b5c3' }}>
                   <Copy className="w-4 h-4" />
                 </button>
               </div>
             </div>
-            <p className="text-xs text-orange-600 mt-4 text-center">{t.networkWarning}</p>
+            <p style={{ fontSize: '0.75rem', color: '#f7931a', marginTop: 16, textAlign: 'center' }}>{t.networkWarning}</p>
           </div>
         </DialogContent>
       </Dialog>

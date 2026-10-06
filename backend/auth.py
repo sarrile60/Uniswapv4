@@ -21,7 +21,7 @@ load_dotenv(Path(__file__).parent / '.env')
 # Configuration
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', secrets.token_hex(32))
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_HOURS = 168  # 7 days (no sliding session, so longer expiry needed)
+ACCESS_TOKEN_EXPIRE_HOURS = 24  # 24-hour hard expiry
 
 security = HTTPBearer(auto_error=False)
 

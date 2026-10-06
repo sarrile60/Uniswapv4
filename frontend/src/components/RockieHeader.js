@@ -1,16 +1,11 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useLang } from "@/i18n";
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
 /**
  * RockieHeader — Shared header for landing page and all inside pages.
- * Props:
- *   isLoggedIn: boolean — changes avatar/wallet behavior
- *   user: object|null — user data when logged in
- *   onLogout: function — logout handler
- *   darkMode: boolean
- *   onToggleDarkMode: function
  */
 const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = true, onToggleDarkMode }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,6 +13,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+  const { lang, toggleLang } = useLang();
 
   const toggleDropdown = (name) => {
     setActiveDropdown(activeDropdown === name ? null : name);
@@ -34,47 +30,29 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
     if (!isLoggedIn) return;
     const token = localStorage.getItem('token');
     if (!token) return;
-    
     try {
       const [nRes, cRes] = await Promise.all([
-        fetch(`${API}/api/notifications?page_size=5`, {
-          headers: { Authorization: `Bearer ${token}` }
-        }),
-        fetch(`${API}/api/notifications/unread-count`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        fetch(`${API}/api/notifications?page_size=5`, { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(`${API}/api/notifications/unread-count`, { headers: { Authorization: `Bearer ${token}` } })
       ]);
-      
-      if (nRes.ok) {
-        const nData = await nRes.json();
-        if (nData.ok) setNotifications(nData.data?.notifications || []);
-      }
-      if (cRes.ok) {
-        const cData = await cRes.json();
-        if (cData.ok) setUnreadCount(cData.data?.unread_count || 0);
-      }
-    } catch (e) {
-      // Silently fail - notifications are non-critical
-    }
+      if (nRes.ok) { const nData = await nRes.json(); if (nData.ok) setNotifications(nData.data?.notifications || []); }
+      if (cRes.ok) { const cData = await cRes.json(); if (cData.ok) setUnreadCount(cData.data?.unread_count || 0); }
+    } catch (e) { /* silent */ }
   }, [isLoggedIn]);
 
   useEffect(() => {
     fetchNotifications();
     if (isLoggedIn) {
-      const interval = setInterval(fetchNotifications, 30000); // Refresh every 30s
+      const interval = setInterval(fetchNotifications, 30000);
       return () => clearInterval(interval);
     }
   }, [fetchNotifications, isLoggedIn]);
 
-  // Mark notification as read
   const markAsRead = async (notifId) => {
     const token = localStorage.getItem('token');
     if (!token) return;
     try {
-      await fetch(`${API}/api/notifications/${notifId}/read`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await fetch(`${API}/api/notifications/${notifId}/read`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
       setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, read: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (e) { /* ignore */ }
@@ -86,7 +64,13 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
     navigate('/login');
   };
 
-  // Format time ago
+  const handleLangSelect = (selectedLang) => {
+    if ((selectedLang === 'en' && lang !== 'en') || (selectedLang === 'it' && lang !== 'it')) {
+      toggleLang();
+    }
+    setActiveDropdown(null);
+  };
+
   const timeAgo = (dateStr) => {
     if (!dateStr) return '';
     const diff = Date.now() - new Date(dateStr).getTime();
@@ -98,6 +82,11 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
     const days = Math.floor(hours / 24);
     return `${days}d ago`;
   };
+
+  // Build user initials
+  const userInitials = user
+    ? `${(user.first_name || '')[0] || ''}${(user.last_name || '')[0] || ''}`.toUpperCase() || '?'
+    : null;
 
   return (
     <header id="header_main" className="header">
@@ -184,11 +173,13 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                     <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">P2P</Link>
                   </div>
                 </div>
+
+                {/* Language Toggle — wired to i18n */}
                 <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('lang'); }}>
-                  <button className="header-dropdown-btn">EN/USD</button>
+                  <button className="header-dropdown-btn" data-testid="lang-toggle-btn">{lang === 'en' ? 'EN/USD' : 'IT/EUR'}</button>
                   <div className={`header-dropdown-menu ${activeDropdown === 'lang' ? 'show' : ''}`}>
-                    <span className="dropdown-item">English / USD</span>
-                    <span className="dropdown-item">Italiano / EUR</span>
+                    <span className={`dropdown-item ${lang === 'en' ? 'active-lang' : ''}`} style={{cursor:'pointer', fontWeight: lang === 'en' ? 700 : 400}} onClick={() => handleLangSelect('en')} data-testid="lang-en">English / USD</span>
+                    <span className={`dropdown-item ${lang === 'it' ? 'active-lang' : ''}`} style={{cursor:'pointer', fontWeight: lang === 'it' ? 700 : 400}} onClick={() => handleLangSelect('it')} data-testid="lang-it">Italiano / EUR</span>
                   </div>
                 </div>
 
@@ -208,22 +199,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                     </svg>
                     {unreadCount > 0 && (
-                      <span data-testid="notification-badge" style={{
-                        position: 'absolute',
-                        top: -4,
-                        right: -4,
-                        background: '#d33535',
-                        color: '#fff',
-                        fontSize: 10,
-                        fontWeight: 700,
-                        width: 18,
-                        height: 18,
-                        borderRadius: '50%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        border: '2px solid var(--r-bg, #141416)',
-                      }}>
+                      <span data-testid="notification-badge" style={{ position: 'absolute', top: -4, right: -4, background: '#d33535', color: '#fff', fontSize: 10, fontWeight: 700, width: 18, height: 18, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--r-bg, #141416)' }}>
                         {unreadCount > 9 ? '9+' : unreadCount}
                       </span>
                     )}
@@ -231,9 +207,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                   <div className={`header-dropdown-menu notification-menu ${activeDropdown === 'notif' ? 'show' : ''}`} style={{right: 0, minWidth: 320, maxHeight: 400, overflowY: 'auto', padding: 0}}>
                     <div style={{padding: '14px 16px', borderBottom: '1px solid var(--r-line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                       <span style={{fontWeight: 700, fontSize: 15, color: 'var(--r-onsurface)'}}>Notifications</span>
-                      {unreadCount > 0 && (
-                        <span style={{fontSize: 12, color: '#3772ff', fontWeight: 600}}>{unreadCount} new</span>
-                      )}
+                      {unreadCount > 0 && <span style={{fontSize: 12, color: '#3772ff', fontWeight: 600}}>{unreadCount} new</span>}
                     </div>
                     {!isLoggedIn ? (
                       <div style={{padding: '24px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
@@ -249,26 +223,9 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                     ) : (
                       <>
                         {notifications.map((notif) => (
-                          <div
-                            key={notif.id}
-                            onClick={() => !notif.read && markAsRead(notif.id)}
-                            style={{
-                              padding: '12px 16px',
-                              borderBottom: '1px solid var(--r-line)',
-                              background: notif.read ? 'transparent' : 'rgba(55, 114, 255, 0.05)',
-                              cursor: 'pointer',
-                              transition: 'background 0.2s',
-                            }}
-                          >
+                          <div key={notif.id} onClick={() => !notif.read && markAsRead(notif.id)} style={{ padding: '12px 16px', borderBottom: '1px solid var(--r-line)', background: notif.read ? 'transparent' : 'rgba(55, 114, 255, 0.05)', cursor: 'pointer', transition: 'background 0.2s' }}>
                             <div style={{display: 'flex', alignItems: 'flex-start', gap: 10}}>
-                              <div style={{
-                                width: 8,
-                                height: 8,
-                                borderRadius: '50%',
-                                background: notif.read ? 'transparent' : '#3772ff',
-                                marginTop: 6,
-                                flexShrink: 0,
-                              }}/>
+                              <div style={{ width: 8, height: 8, borderRadius: '50%', background: notif.read ? 'transparent' : '#3772ff', marginTop: 6, flexShrink: 0 }}/>
                               <div style={{flex: 1, minWidth: 0}}>
                                 <div style={{fontSize: 13, fontWeight: 600, color: 'var(--r-onsurface)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
                                   {notif.title || notif.message?.slice(0, 50) || 'Notification'}
@@ -283,19 +240,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                             </div>
                           </div>
                         ))}
-                        <Link
-                          to="/wallet"
-                          style={{
-                            display: 'block',
-                            padding: '12px 16px',
-                            textAlign: 'center',
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: '#3772ff',
-                          }}
-                        >
-                          View All
-                        </Link>
+                        <Link to="/wallet" style={{ display: 'block', padding: '12px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#3772ff' }}>View All</Link>
                       </>
                     )}
                   </div>
@@ -304,13 +249,11 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                 {/* Wallet Button */}
                 <Link to={isLoggedIn ? "/wallet" : "/login"} className="header-wallet-btn">Wallet</Link>
 
-                {/* User Avatar / Profile */}
+                {/* User Avatar / Profile — initials when logged in, generic icon when not */}
                 {isLoggedIn ? (
                   <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('user'); }}>
-                    <div className="header-avatar" style={{cursor:'pointer'}}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                      </svg>
+                    <div className="header-avatar" data-testid="user-avatar" style={{cursor:'pointer', fontSize: 15, fontWeight: 700, letterSpacing: '0.5px'}}>
+                      {userInitials}
                     </div>
                     <div className={`header-dropdown-menu ${activeDropdown === 'user' ? 'show' : ''}`} style={{right:0, minWidth: '180px'}}>
                       {user && <div className="dropdown-item" style={{fontWeight:700, color:'var(--r-onsurface)', cursor:'default', borderBottom:'1px solid var(--r-line)', paddingBottom:'12px', marginBottom:'4px'}}>{user.first_name} {user.last_name}</div>}

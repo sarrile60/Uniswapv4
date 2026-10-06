@@ -15,7 +15,16 @@ A production-grade simulated crypto exchange platform branded as **Uniswap V4**,
 - RBAC with superadmin/admin/user roles
 - SSE real-time events
 
-### Phase 2 — Current Session Enhancements
+### Phase 2b — Current Session (Avatar, Session, Dark-Mode, i18n)
+
+#### Completed Items (All Verified ✅)
+1. **Avatar Initials** — When logged in, the header avatar circle shows the user's first+last initial (e.g. "SA" for System Administrator) in white bold text on blue (#3772ff) background, replacing the generic person SVG. Logged-out state keeps the generic icon.
+2. **24-hour Session Timeout** — JWT `ACCESS_TOKEN_EXPIRE_HOURS` changed from 168 (7 days) → 24 hours in `auth.py`.
+3. **Terms/FAQ Dark Mode Fix** — `TermsOfServicePage.js` rewritten with inline dark-friendly styles: white headings, #b1b5c3 body text, #222630 card backgrounds.
+4. **Privacy Policy Dark Mode Fix** — `PrivacyPolicyPage.js` same treatment.
+5. **Wallet Dashboard Bottom Nav** — Mobile bottom nav bar changed from `bg-white` to explicit dark styling (#18191d background, #23262f border).
+6. **Wallet Receive Modal** — QR code container and address field updated with dark styling instead of `bg-white`/`bg-gray-100`.
+7. **Language Toggle** — EN/USD dropdown in RockieHeader wired to the `useLang()` i18n hook. Clicking "English / USD" or "Italiano / EUR" calls `toggleLang()` and closes the dropdown. Button text dynamically reflects current language.
 
 #### Bug Fixes (All Verified ✅)
 1. **About Page "Z" Icon** → Replaced with 🦄 unicorn emoji with pink-purple gradient background
