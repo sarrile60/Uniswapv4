@@ -2,18 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useLang } from '@/i18n';
 
-const S = {
-  h2: { fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: 16 },
-  p: { color: '#b1b5c3', marginBottom: 24, lineHeight: 1.7 },
-  p3: { color: '#b1b5c3', marginBottom: 12, lineHeight: 1.7 },
-  li: { color: '#b1b5c3', lineHeight: 1.7, marginBottom: 8 },
-  a: { color: '#3772ff' },
-  card: { background: '#222630', borderRadius: 12, padding: 24, marginBottom: 32 },
-  cardTitle: { color: '#fff', fontWeight: 500 },
-  cardText: { color: '#b1b5c3' },
-  sub: { fontSize: '0.875rem', color: '#777e90', marginBottom: 32 },
-};
-
 const content = {
   en: [
     { h: '1. Agreement to Terms', p: 'These Terms of Service (\u201cTerms\u201d) govern your access to and use of the Uniswap V4 digital asset management platform and related services (the \u201cService\u201d) operated by Uniswap V4, a private limited company registered in England and Wales with its registered office at 45 Queen Street, Deal, Kent, England, CT14 6EY (\u201cwe\u201d, \u201cour\u201d, \u201cus\u201d). By accessing or using the Service, you agree to be bound by these Terms. If you do not agree to these Terms, you must not use the Service.' },
@@ -33,20 +21,20 @@ const content = {
     { h: '15. Contact Us', p: 'If you have any questions about these Terms, please contact us at:' },
   ],
   it: [
-    { h: '1. Accettazione dei Termini', p: 'I presenti Termini di Servizio (\u201cTermini\u201d) regolano l\u2019accesso e l\u2019utilizzo della piattaforma di gestione di asset digitali Uniswap V4 e dei servizi correlati (il \u201cServizio\u201d) gestiti da Uniswap V4, una societ\u00e0 a responsabilit\u00e0 limitata registrata in Inghilterra e Galles con sede legale presso 45 Queen Street, Deal, Kent, Inghilterra, CT14 6EY (\u201cnoi\u201d, \u201cnostro\u201d). Accedendo o utilizzando il Servizio, accetti di essere vincolato da questi Termini. Se non accetti questi Termini, non devi utilizzare il Servizio.' },
-    { h: '2. Requisiti di Idoneit\u00e0', p: 'Per utilizzare il Servizio, devi avere almeno 18 anni di et\u00e0 e la capacit\u00e0 giuridica per stipulare un contratto vincolante. Registrandoti per un account, dichiari e garantisci di soddisfare questi requisiti. Ci riserviamo il diritto di richiedere una prova dell\u2019et\u00e0 o dell\u2019identit\u00e0 in qualsiasi momento.' },
+    { h: '1. Accettazione dei Termini', p: 'I presenti Termini di Servizio (\u201cTermini\u201d) regolano l\u2019accesso e l\u2019utilizzo della piattaforma di gestione di asset digitali Uniswap V4 e dei servizi correlati (il \u201cServizio\u201d) gestiti da Uniswap V4, una societ\u00e0 a responsabilit\u00e0 limitata registrata in Inghilterra e Galles con sede legale presso 45 Queen Street, Deal, Kent, Inghilterra, CT14 6EY (\u201cnoi\u201d, \u201cnostro\u201d). Accedendo o utilizzando il Servizio, accetti di essere vincolato da questi Termini.' },
+    { h: '2. Requisiti di Idoneit\u00e0', p: 'Per utilizzare il Servizio, devi avere almeno 18 anni di et\u00e0 e la capacit\u00e0 giuridica per stipulare un contratto vincolante. Registrandoti per un account, dichiari e garantisci di soddisfare questi requisiti.' },
     { h: '3. Registrazione dell\u2019Account', p: 'Per accedere a determinate funzionalit\u00e0 del Servizio, devi creare un account fornendo informazioni accurate e complete. Sei responsabile della riservatezza delle tue credenziali e di tutte le attivit\u00e0 che si verificano sotto il tuo account.' },
-    { h: '4. Verifica dell\u2019Identit\u00e0 (KYC)', p: 'Per conformarci alle normative antiriciclaggio (AML) e di adeguata verifica della clientela (KYC) applicabili, potremmo richiederti di presentare documenti di verifica dell\u2019identit\u00e0, tra cui un documento d\u2019identit\u00e0, prova di residenza e un video selfie per la verifica della vivacit\u00e0.' },
-    { h: '5. Utilizzo del Servizio', p: 'Accetti di utilizzare il Servizio solo per scopi leciti e in conformit\u00e0 con i presenti Termini. Non devi utilizzare il Servizio per scopi fraudolenti, illegali o non autorizzati, tentare di ottenere accesso non autorizzato, interferire con il Servizio, caricare codice dannoso, impersonare persone o utilizzare il Servizio per riciclaggio di denaro o finanziamento del terrorismo.' },
-    { h: '6. Asset Digitali e Transazioni', p: 'Il Servizio fornisce strumenti per la gestione di asset digitali, inclusa la visualizzazione dei saldi, l\u2019avvio di trasferimenti e il monitoraggio della cronologia delle transazioni. Tutte le transazioni sono soggette alle commissioni applicabili. Riconosci che i valori degli asset digitali sono volatili e possono fluttuare significativamente. Uniswap V4 non fornisce consulenza finanziaria, di investimento o fiscale.' },
-    { h: '7. Commissioni', p: 'Alcune funzionalit\u00e0 del Servizio possono essere soggette a commissioni. Tutte le commissioni applicabili verranno visualizzate prima della conferma della transazione. Ci riserviamo il diritto di modificare la nostra struttura tariffaria in qualsiasi momento, con preavviso.' },
-    { h: '8. Sospensione e Cessazione dell\u2019Account', p: 'Ci riserviamo il diritto di sospendere o terminare il tuo account a nostra discrezione se riteniamo ragionevolmente che tu abbia violato i presenti Termini, svolto attivit\u00e0 fraudolente o illegali, o se richiesto dalla legge o dalla normativa.' },
-    { h: '9. Propriet\u00e0 Intellettuale', p: 'Tutti i contenuti, le funzionalit\u00e0 e le caratteristiche del Servizio sono di propriet\u00e0 di Uniswap V4 o dei suoi licenzianti e sono protetti da diritti d\u2019autore, marchi e altre leggi sulla propriet\u00e0 intellettuale. Non puoi riprodurre, distribuire o creare opere derivate senza il nostro previo consenso scritto.' },
-    { h: '10. Limitazione di Responsabilit\u00e0', p: 'Nella misura massima consentita dalla legge applicabile, Uniswap V4 non sar\u00e0 responsabile per danni indiretti, incidentali, speciali, consequenziali o punitivi derivanti dal tuo utilizzo del Servizio.' },
-    { h: '11. Esclusione di Garanzie', p: 'Il Servizio \u00e8 fornito \u201ccos\u00ec com\u2019\u00e8\u201d e \u201ccome disponibile\u201d senza garanzie di alcun tipo, espresse o implicite.' },
-    { h: '12. Indennizzo', p: 'Accetti di indennizzare, difendere e manlevare Uniswap V4, i suoi amministratori, funzionari, dipendenti e agenti da qualsiasi reclamo, responsabilit\u00e0, danno, perdita e spesa derivante dal tuo utilizzo del Servizio o dalla violazione di questi Termini.' },
-    { h: '13. Legge Applicabile', p: 'I presenti Termini sono disciplinati e interpretati in conformit\u00e0 con le leggi di Inghilterra e Galles. Qualsiasi controversia sar\u00e0 soggetta alla giurisdizione esclusiva dei tribunali di Inghilterra e Galles.' },
-    { h: '14. Modifiche ai Termini', p: 'Possiamo rivedere questi Termini in qualsiasi momento aggiornando questa pagina. Le modifiche sostanziali ti verranno comunicate via email o attraverso il Servizio.' },
+    { h: '4. Verifica dell\u2019Identit\u00e0 (KYC)', p: 'Per conformarci alle normative antiriciclaggio (AML) e di adeguata verifica della clientela (KYC) applicabili, potremmo richiederti di presentare documenti di verifica dell\u2019identit\u00e0.' },
+    { h: '5. Utilizzo del Servizio', p: 'Accetti di utilizzare il Servizio solo per scopi leciti e in conformit\u00e0 con i presenti Termini. Non devi utilizzare il Servizio per scopi fraudolenti, illegali o non autorizzati.' },
+    { h: '6. Asset Digitali e Transazioni', p: 'Il Servizio fornisce strumenti per la gestione di asset digitali. Tutte le transazioni sono soggette alle commissioni applicabili. Riconosci che i valori degli asset digitali sono volatili. Uniswap V4 non fornisce consulenza finanziaria.' },
+    { h: '7. Commissioni', p: 'Alcune funzionalit\u00e0 del Servizio possono essere soggette a commissioni. Tutte le commissioni applicabili verranno visualizzate prima della conferma della transazione.' },
+    { h: '8. Sospensione e Cessazione', p: 'Ci riserviamo il diritto di sospendere o terminare il tuo account a nostra discrezione se riteniamo ragionevolmente che tu abbia violato i presenti Termini.' },
+    { h: '9. Propriet\u00e0 Intellettuale', p: 'Tutti i contenuti, le funzionalit\u00e0 e le caratteristiche del Servizio sono di propriet\u00e0 di Uniswap V4 o dei suoi licenzianti e sono protetti da diritti d\u2019autore e marchi.' },
+    { h: '10. Limitazione di Responsabilit\u00e0', p: 'Nella misura massima consentita dalla legge, Uniswap V4 non sar\u00e0 responsabile per danni indiretti, incidentali, speciali o punitivi derivanti dal tuo utilizzo del Servizio.' },
+    { h: '11. Esclusione di Garanzie', p: 'Il Servizio \u00e8 fornito \u201ccos\u00ec com\u2019\u00e8\u201d senza garanzie di alcun tipo, espresse o implicite.' },
+    { h: '12. Indennizzo', p: 'Accetti di indennizzare e manlevare Uniswap V4 da qualsiasi reclamo, responsabilit\u00e0, danno e spesa derivante dal tuo utilizzo del Servizio.' },
+    { h: '13. Legge Applicabile', p: 'I presenti Termini sono disciplinati dalle leggi di Inghilterra e Galles. Qualsiasi controversia sar\u00e0 soggetta alla giurisdizione esclusiva dei tribunali di Inghilterra e Galles.' },
+    { h: '14. Modifiche ai Termini', p: 'Possiamo rivedere questi Termini in qualsiasi momento aggiornando questa pagina.' },
     { h: '15. Contattaci', p: 'Se hai domande su questi Termini, contattaci a:' },
   ],
 };
@@ -62,33 +50,33 @@ const TermsOfServicePage = () => {
   const m = meta[lang] || meta.en;
 
   return (
-    <div className="min-h-screen" data-testid="terms-of-service-page" style={{ background: '#141416', color: '#b1b5c3' }}>
+    <div className="min-h-screen" data-testid="terms-of-service-page" style={{ background: 'var(--r-bg)', color: 'var(--r-text)' }}>
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
-        <p style={S.sub}>{m.updated}</p>
+        <p style={{ fontSize: '0.875rem', color: 'var(--r-text)', marginBottom: 32, opacity: 0.7 }}>{m.updated}</p>
         {sections.map((sec, i) => (
           <React.Fragment key={i}>
-            <h2 style={S.h2}>{sec.h}</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 16 }}>{sec.h}</h2>
             {i === sections.length - 1 ? (
               <>
-                <p style={S.p3}>{sec.p}</p>
-                <div style={S.card}>
-                  <p style={S.cardTitle}>Uniswap V4</p>
-                  <p style={S.cardText}>45 Queen Street, Deal, Kent, England, CT14 6EY</p>
-                  <p style={S.cardText}>Email: <a href="mailto:info@uniswapv4.com" style={S.a}>info@uniswapv4.com</a></p>
+                <p style={{ color: 'var(--r-text)', marginBottom: 12, lineHeight: 1.7 }}>{sec.p}</p>
+                <div style={{ background: 'var(--r-bg1)', border: '1px solid var(--r-line)', borderRadius: 12, padding: 24, marginBottom: 32 }}>
+                  <p style={{ color: 'var(--r-onsurface)', fontWeight: 500 }}>Uniswap V4</p>
+                  <p style={{ color: 'var(--r-text)' }}>45 Queen Street, Deal, Kent, England, CT14 6EY</p>
+                  <p style={{ color: 'var(--r-text)' }}>Email: <a href="mailto:info@uniswapv4.com" style={{ color: '#3772ff' }}>info@uniswapv4.com</a></p>
                 </div>
               </>
             ) : (
-              <p style={S.p}>{sec.p}</p>
+              <p style={{ color: 'var(--r-text)', marginBottom: 24, lineHeight: 1.7 }}>{sec.p}</p>
             )}
           </React.Fragment>
         ))}
       </main>
-      <footer style={{ background: '#18191d', borderTop: '1px solid #23262f', padding: '24px 16px' }}>
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center" style={{ fontSize: '0.875rem', color: '#777e90' }}>
+      <footer style={{ background: 'var(--r-surface)', borderTop: '1px solid var(--r-line)', padding: '24px 16px' }}>
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center" style={{ fontSize: '0.875rem', color: 'var(--r-text)' }}>
           <p>{m.rights.replace('{y}', new Date().getFullYear())}</p>
           <div className="flex space-x-6 mt-2 sm:mt-0">
-            <Link to="/privacy" style={{ color: '#777e90' }}>{m.privacy}</Link>
-            <Link to="/about" style={{ color: '#777e90' }}>{m.aboutUs}</Link>
+            <Link to="/privacy" style={{ color: 'var(--r-text)' }}>{m.privacy}</Link>
+            <Link to="/about" style={{ color: 'var(--r-text)' }}>{m.aboutUs}</Link>
           </div>
         </div>
       </footer>

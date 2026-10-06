@@ -51,32 +51,32 @@ const AboutPage = () => {
   const t = txt[lang] || txt.en;
 
   return (
-    <div className="min-h-screen" data-testid="about-page" style={{ background: '#141416', color: '#b1b5c3' }}>
+    <div className="min-h-screen" data-testid="about-page" style={{ background: 'var(--r-bg)', color: 'var(--r-text)' }}>
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         <div className="text-center mb-16">
           <div style={{ width: 64, height: 64, background: 'linear-gradient(135deg, #ec4899, #7c3aed)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
             <span style={{ fontSize: 32 }}>🦄</span>
           </div>
-          <h2 style={{ fontSize: '2.25rem', fontWeight: 700, color: '#fff', marginBottom: 16 }}>{t.heroTitle}</h2>
-          <p style={{ fontSize: '1.125rem', color: '#b1b5c3', maxWidth: 640, margin: '0 auto', lineHeight: 1.6 }}>{t.heroDesc}</p>
+          <h2 style={{ fontSize: '2.25rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 16 }}>{t.heroTitle}</h2>
+          <p style={{ fontSize: '1.125rem', color: 'var(--r-text)', maxWidth: 640, margin: '0 auto', lineHeight: 1.6 }}>{t.heroDesc}</p>
         </div>
 
         <div className="mb-16">
-          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: 16 }}>{t.missionTitle}</h3>
-          <p style={{ color: '#b1b5c3', lineHeight: 1.6, marginBottom: 16 }}>{t.missionP1}</p>
-          <p style={{ color: '#b1b5c3', lineHeight: 1.6 }}>{t.missionP2}</p>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 16 }}>{t.missionTitle}</h3>
+          <p style={{ color: 'var(--r-text)', lineHeight: 1.6, marginBottom: 16 }}>{t.missionP1}</p>
+          <p style={{ color: 'var(--r-text)', lineHeight: 1.6 }}>{t.missionP2}</p>
         </div>
 
         <div className="mb-16">
-          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: 32 }}>{t.guidesTitle}</h3>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 32 }}>{t.guidesTitle}</h3>
           <div className="grid sm:grid-cols-2 gap-6">
             {t.values.map((v, i) => {
               const Icon = icons[i];
               return (
-                <div key={i} style={{ background: '#222630', borderRadius: 12, padding: 24 }}>
+                <div key={i} style={{ background: 'var(--r-bg1)', border: '1px solid var(--r-line)', borderRadius: 12, padding: 24 }}>
                   <Icon style={{ width: 32, height: 32, color: '#3772ff', marginBottom: 12 }} />
-                  <h4 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#fff', marginBottom: 8 }}>{v.title}</h4>
-                  <p style={{ fontSize: '0.875rem', color: '#b1b5c3', lineHeight: 1.6 }}>{v.text}</p>
+                  <h4 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--r-onsurface)', marginBottom: 8 }}>{v.title}</h4>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--r-text)', lineHeight: 1.6 }}>{v.text}</p>
                 </div>
               );
             })}
@@ -84,47 +84,47 @@ const AboutPage = () => {
         </div>
 
         <div className="mb-16">
-          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: 24 }}>{t.companyTitle}</h3>
-          <div style={{ background: '#222630', borderRadius: 12, padding: 32 }}>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 24 }}>{t.companyTitle}</h3>
+          <div style={{ background: 'var(--r-bg1)', border: '1px solid var(--r-line)', borderRadius: 12, padding: 32 }}>
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="flex items-start space-x-3">
-                <Building style={{ width: 20, height: 20, color: '#777e90', marginTop: 2, flexShrink: 0 }} />
+                <Building style={{ width: 20, height: 20, color: 'var(--r-text)', marginTop: 2, flexShrink: 0 }} />
                 <div>
-                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#777e90' }}>{t.companyName}</p>
-                  <p style={{ color: '#fff' }}>Uniswap V4</p>
-                  <p style={{ fontSize: '0.875rem', color: '#777e90' }}>{t.companyType}</p>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--r-text)' }}>{t.companyName}</p>
+                  <p style={{ color: 'var(--r-onsurface)' }}>Uniswap V4</p>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--r-text)' }}>{t.companyType}</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <MapPin style={{ width: 20, height: 20, color: '#777e90', marginTop: 2, flexShrink: 0 }} />
+                <MapPin style={{ width: 20, height: 20, color: 'var(--r-text)', marginTop: 2, flexShrink: 0 }} />
                 <div>
-                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#777e90' }}>{t.office}</p>
-                  <p style={{ color: '#fff' }}>45 Queen Street</p>
-                  <p style={{ fontSize: '0.875rem', color: '#b1b5c3' }}>Deal, Kent, England, CT14 6EY</p>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--r-text)' }}>{t.office}</p>
+                  <p style={{ color: 'var(--r-onsurface)' }}>45 Queen Street</p>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--r-text)' }}>Deal, Kent, England, CT14 6EY</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <Mail style={{ width: 20, height: 20, color: '#777e90', marginTop: 2, flexShrink: 0 }} />
+                <Mail style={{ width: 20, height: 20, color: 'var(--r-text)', marginTop: 2, flexShrink: 0 }} />
                 <div>
-                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#777e90' }}>{t.contact}</p>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--r-text)' }}>{t.contact}</p>
                   <a href="mailto:info@uniswapv4.com" style={{ color: '#3772ff' }}>info@uniswapv4.com</a>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <Shield style={{ width: 20, height: 20, color: '#777e90', marginTop: 2, flexShrink: 0 }} />
+                <Shield style={{ width: 20, height: 20, color: 'var(--r-text)', marginTop: 2, flexShrink: 0 }} />
                 <div>
-                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#777e90' }}>{t.incorporated}</p>
-                  <p style={{ color: '#fff' }}>2023</p>
-                  <p style={{ fontSize: '0.875rem', color: '#777e90' }}>United Kingdom</p>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--r-text)' }}>{t.incorporated}</p>
+                  <p style={{ color: 'var(--r-onsurface)' }}>2023</p>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--r-text)' }}>United Kingdom</p>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div style={{ textAlign: 'center', background: 'rgba(55, 114, 255, 0.1)', borderRadius: 12, padding: 32 }}>
-          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff', marginBottom: 12 }}>{t.ctaTitle}</h3>
-          <p style={{ color: '#b1b5c3', marginBottom: 16 }}>{t.ctaDesc}</p>
+        <div style={{ textAlign: 'center', background: 'rgba(55, 114, 255, 0.08)', border: '1px solid rgba(55, 114, 255, 0.15)', borderRadius: 12, padding: 32 }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 12 }}>{t.ctaTitle}</h3>
+          <p style={{ color: 'var(--r-text)', marginBottom: 16 }}>{t.ctaDesc}</p>
           <a href="mailto:info@uniswapv4.com" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: '#3772ff', color: '#fff', fontWeight: 500, padding: '10px 24px', textDecoration: 'none' }}>
             <Mail style={{ width: 16, height: 16, marginRight: 8 }} />
             {t.ctaBtn}
@@ -132,12 +132,12 @@ const AboutPage = () => {
         </div>
       </main>
 
-      <footer style={{ background: '#18191d', borderTop: '1px solid #23262f', padding: '24px 16px', marginTop: 64 }}>
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center" style={{ fontSize: '0.875rem', color: '#777e90' }}>
+      <footer style={{ background: 'var(--r-surface)', borderTop: '1px solid var(--r-line)', padding: '24px 16px', marginTop: 64 }}>
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center" style={{ fontSize: '0.875rem', color: 'var(--r-text)' }}>
           <p>{t.rights.replace('{y}', new Date().getFullYear())}</p>
           <div className="flex space-x-6 mt-2 sm:mt-0">
-            <Link to="/privacy" style={{ color: '#777e90' }}>{t.privacy}</Link>
-            <Link to="/terms" style={{ color: '#777e90' }}>{t.terms}</Link>
+            <Link to="/privacy" style={{ color: 'var(--r-text)' }}>{t.privacy}</Link>
+            <Link to="/terms" style={{ color: 'var(--r-text)' }}>{t.terms}</Link>
           </div>
         </div>
       </footer>

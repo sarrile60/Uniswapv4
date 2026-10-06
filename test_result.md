@@ -510,6 +510,42 @@ frontend:
         agent: "testing"
         comment: "✅ WALLET DARK MODE APPEARANCE VERIFIED - Comprehensive testing confirms the wallet page has polished dark mode styling as specified. RESULTS: ✅ Page background: rgb(15, 16, 23) = #0f1017 (deep dark) - CORRECT ✅ Card backgrounds: rgb(30, 34, 48) = #1e2230 (refined dark blue) - CORRECT ✅ Card borders: rgba(255, 255, 255, 0.06) (subtle/soft semi-transparent) - CORRECT ✅ Portfolio section: Dark blue gradient from rgb(26, 31, 60) to rgb(18, 21, 48) - CORRECT ✅ Text contrast: Proper contrast with bright white/light for headings and medium gray for labels. DETAILED VERIFICATION: Both asset cards (USDC and EUR) have the refined dark blue background #1e2230 (rgb(30, 34, 48)) which is NOT harsh dark gray. Card borders are subtle with semi-transparent white (rgba(255, 255, 255, 0.06)) which are NOT hard lines. The page background is deep dark #0f1017 (rgb(15, 16, 23)). Text has good contrast with white headings and gray labels. Screenshot: test2_wallet_dark_mode.png. The wallet dark mode appearance improvement is COMPLETE and VERIFIED with all specified colors correctly implemented."
 
+  - task: "About Page - Dark AND Light Mode Text Visibility"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/AboutPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ ABOUT PAGE DARK/LIGHT MODE VERIFIED - Comprehensive testing confirms headings are clearly visible in BOTH dark and light modes. DARK MODE (default): Main heading 'Gestione Affidabile di Asset Digitali' displays with light text color rgb(240, 242, 245) on dark background - clearly visible and readable ✅. All section headings ('La Nostra Missione', 'I Nostri Valori', 'Informazioni Aziendali') are white and clearly visible ✅. LIGHT MODE: Main heading displays with DARK text color rgb(35, 38, 47) on WHITE background - clearly readable, NOT white on white ✅. All section headings are dark text on light background - fully readable ✅. The page uses CSS variables (--r-onsurface) which correctly switch between light text (#f0f2f5) in dark mode and dark text (#23262f) in light mode. Mode toggle works correctly via .mode-switcher button. Screenshots: test1_about_dark_mode.png, test1_about_light_mode.png. The About page text visibility fix is COMPLETE and VERIFIED in both modes."
+
+  - task: "Terms Page - Dark AND Light Mode Text Visibility"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/TermsOfServicePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TERMS PAGE DARK/LIGHT MODE VERIFIED - Comprehensive testing confirms all text is clearly visible in BOTH dark and light modes. DARK MODE (default): Headings display with light text color rgb(240, 242, 245) - clearly visible ✅. First heading '1. Accettazione dei Termini' verified readable ✅. All section headings and body text are clearly visible on dark background ✅. LIGHT MODE: Headings display with DARK text color rgb(35, 38, 47) on light background - clearly readable, NOT invisible ✅. All text has proper contrast and is fully readable ✅. The page uses CSS variables (--r-onsurface, --r-text) which correctly switch between light colors in dark mode and dark colors in light mode. Mode toggle works correctly. Screenshots: test2_terms_dark_mode.png, test2_terms_light_mode.png. The Terms page text visibility fix is COMPLETE and VERIFIED in both modes."
+
+  - task: "Landing Page - Scroll Reveal Animations"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LandingPage.js, /app/frontend/src/pages/LandingPage.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ LANDING PAGE SCROLL ANIMATIONS VERIFIED - Comprehensive testing confirms scroll reveal animations are working correctly. BANNER SECTION: Banner is visible immediately (opacity: 1, transform: none) ✅. Banner does NOT have 'reveal' class - correctly visible on page load ✅. REVEAL SECTIONS: Found 7 sections with 'reveal' class ✅. Before scrolling: 0 sections visible (all have opacity: 0, translateY(40px)) ✅. After scrolling down: 6 sections became visible and gained 'visible' class ✅. Sections that animated in: partners, crypto-section, coin-list, how-it-works, about-section, testimonials ✅. ANIMATION BEHAVIOR: Sections start hidden with opacity: 0 and translateY(40px) ✅. When scrolled into viewport, IntersectionObserver adds 'visible' class ✅. Sections fade in (opacity: 0 → 1) and slide up (translateY(40px) → 0) with smooth cubic-bezier transition ✅. Animation threshold: 0.1 with rootMargin: '0px 0px -50px 0px' ✅. JavaScript implementation verified in LandingPage.js lines 29-42 ✅. CSS implementation verified in LandingPage.css lines 14-23 ✅. Screenshots: test3_landing_initial.png (before scroll), test3_landing_after_scroll.png (after scroll showing visible sections). The scroll reveal animation implementation is COMPLETE and VERIFIED."
+
 metadata:
   created_by: "main_agent"
   version: "3.3"
@@ -518,7 +554,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Notification dropdown Italian translation and wallet dark mode appearance - both fixes verified successfully"
+    - "About page dark/light mode, Terms page dark/light mode, and Landing page scroll animations - all three fixes verified successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -574,3 +610,6 @@ agent_communication:
     message: "✅ LANDING PAGE HERO & PARTNERS SECTION TESTING COMPLETE - ALL 3 TESTS PASSED (100%) - Comprehensive testing of updated Uniswap V4 landing page hero and partners section completed successfully at desktop viewport 1920x800. DETAILED RESULTS: TEST 1 (Hero Image - 3D Crypto Illustration): ✅ PASSED - Banner image verified: Source URL is Unsplash photo-1651054558996-03455fe2702f ✅. Image shows 3D crypto illustration with cryptocurrency logos (Bitcoin, Ethereum, Binance, Tether, etc.) on 3D rendered blocks ✅. Image is NOT a stock chart screenshot ✅. Alt text: 'Uniswap V4 Crypto' ✅. Screenshot: test1_hero_image.png. TEST 2 (Partners Section - 'I Nostri Partner'): ✅ PASSED - Partners section found below banner ✅. Title displays 'I Nostri Partner' (Italian for 'Our Partners') ✅. All 5 expected partner logos present: Coinbase ✅, Blockchain ✅, MetaMask ✅, Ledger ✅, Chainalysis ✅. Partners displayed in horizontal row (flexDirection: row) ✅. Subtle/muted styling verified: text opacity 0.6, shape opacity 0.15-0.3 ✅. Screenshot: test2_partners_section.png. TEST 3 (Overall Layout Flow): ✅ PASSED - Page structure verified: Banner (top=0px, height=760px) → Partners (top=760px, height=151px) → Crypto Cards (top=911px, height=272px) → Trading Table ✅. Correct order confirmed: Banner → Partners → Crypto Cards → Trading Table ✅. No significant overlaps detected (0.39px overlap between Partners and Crypto Cards is negligible CSS rounding) ✅. No misalignment issues ✅. Screenshots: test3_layout_top.png (Banner + Partners), test3_layout_middle.png (Partners → Crypto Cards), test3_layout_bottom.png (Crypto Cards → Trading Table). VERIFICATION SUMMARY: ✅ Hero image is 3D crypto illustration (NOT stock chart) ✅ Partners section displays 'I Nostri Partner' with all 5 partner logos ✅ Partners have subtle/muted styling as specified ✅ Page flow is correct with no overlaps or misalignments ✅ All visual elements render correctly at 1920x800 viewport. OVERALL RESULT: 100% pass rate (all 3 major tests passed). The landing page hero and partners section implementation is COMPLETE and VERIFIED. No critical issues found."
   - agent: "testing"
     message: "✅ TWO FIXES VERIFICATION COMPLETE - ALL TESTS PASSED (100%) - Comprehensive testing of two requested fixes on Uniswap V4 platform completed successfully. FIX 1 (Notification Dropdown Italian Translation): ✅ PASSED - Tested both logged-in and not-logged-in states. NOT LOGGED IN: Dropdown header shows 'Notifiche' (Italian) ✅, message shows 'Accedi per vedere le notifiche' (Italian) ✅. LOGGED IN (Empty State): Dropdown header shows 'Notifiche' (Italian) ✅, empty state message shows 'Nessuna notifica ancora' (Italian, NOT 'No notifications yet') ✅. NO English text present in either state. Default language is IT/EUR as expected. Screenshots: test1a_notification_not_logged_in.png, test1b_notification_logged_in.png. FIX 2 (Wallet Dark Mode Appearance): ✅ PASSED - Wallet page has polished dark mode styling with all specified colors correctly implemented. Page background: #0f1017 (deep dark) ✅. Card backgrounds: #1e2230 (refined dark blue, NOT harsh dark gray) ✅. Card borders: rgba(255, 255, 255, 0.06) (subtle/soft semi-transparent, NOT hard lines) ✅. Portfolio section: Dark blue gradient ✅. Text contrast: Bright white/light for headings, medium gray for labels ✅. Both USDC and EUR asset cards verified with correct styling. Screenshot: test2_wallet_dark_mode.png. OVERALL RESULT: 100% pass rate - both fixes are working correctly as specified. No issues found."
+
+  - agent: "testing"
+    message: "✅ THREE FIXES VERIFICATION COMPLETE - ALL TESTS PASSED (100%) - Comprehensive testing of three requested fixes on Uniswap V4 platform completed successfully at desktop viewport 1920x800. FIX 1 (About Page - Dark AND Light Mode): ✅ PASSED - Dark mode (default): Main heading 'Gestione Affidabile di Asset Digitali' clearly visible with light text rgb(240, 242, 245) on dark background. Light mode: Heading displays DARK text rgb(35, 38, 47) on WHITE background - clearly readable, NOT white on white. All section headings visible in both modes. Mode toggle works correctly. Screenshots: test1_about_dark_mode.png, test1_about_light_mode.png. FIX 2 (Terms Page - Dark AND Light Mode): ✅ PASSED - Dark mode: Heading '1. Accettazione dei Termini' clearly visible with light text rgb(240, 242, 245). Light mode: Headings display DARK text rgb(35, 38, 47) on light background - clearly readable, NOT invisible. All text has proper contrast in both modes. Screenshots: test2_terms_dark_mode.png, test2_terms_light_mode.png. FIX 3 (Landing Page Scroll Animations): ✅ PASSED - Banner section visible immediately (opacity: 1, no 'reveal' class) - NOT hidden. Found 7 sections with 'reveal' class. Before scrolling: 0 sections visible. After scrolling: 6 sections became visible (partners, crypto-section, coin-list, how-it-works, about-section, testimonials). Sections animate in correctly with fade up effect (opacity: 0→1, translateY(40px)→0). IntersectionObserver working correctly. Screenshots: test3_landing_initial.png, test3_landing_after_scroll.png. OVERALL RESULT: 100% pass rate - all three fixes are working correctly as specified. No issues found."

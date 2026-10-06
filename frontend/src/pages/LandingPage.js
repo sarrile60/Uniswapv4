@@ -26,6 +26,22 @@ const LandingPage = () => {
     return () => document.body.classList.remove("is_dark");
   }, [darkMode]);
 
+  // Scroll reveal animation
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    
+    const els = document.querySelectorAll('.reveal');
+    els.forEach(el => observer.observe(el));
+    return () => els.forEach(el => observer.unobserve(el));
+  }, []);
+
+
   // Load favorites from localStorage (scoped to user email)
   useEffect(() => {
     if (isAuthenticated && user?.email) {
@@ -195,7 +211,7 @@ const LandingPage = () => {
       </section>
 
       {/* Partners */}
-      <section className="partners">
+      <section className="partners reveal">
         <div className="container">
           <div className="partners__content">
             <h6 className="partners__title">{lang === 'it' ? 'I Nostri Partner' : 'Our Partners'}</h6>
@@ -217,7 +233,7 @@ const LandingPage = () => {
       </section>
 
       {/* Crypto Section - Top Cards */}
-      <section className="crypto" id="crypto-section">
+      <section className="crypto reveal" id="crypto-section">
         <div className="container">
           <div className="row">
             <div className="col-md-12">
@@ -262,7 +278,7 @@ const LandingPage = () => {
       </section>
 
       {/* Coin List - Full Trading Table */}
-      <section className="coin-list" id="coin-list">
+      <section className="coin-list reveal" id="coin-list">
         <div className="container">
           <div className="row">
             <div className="col-md-12">
@@ -380,7 +396,7 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works */}
-      <section className="work" id="how-it-works">
+      <section className="work reveal" id="how-it-works">
         <div className="container">
           <div className="row">
             <div className="col-md-12">
@@ -431,7 +447,7 @@ const LandingPage = () => {
       </section>
 
       {/* About Section */}
-      <section className="about" id="about-section">
+      <section className="about reveal" id="about-section">
         <div className="container">
           <div className="row">
             <div className="col-xl-6 col-md-12">
@@ -461,7 +477,7 @@ const LandingPage = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="testimonials" id="testimonials">
+      <section className="testimonials reveal" id="testimonials">
         <div className="container">
           <div className="row">
             <div className="col-xl-6 col-md-12">
@@ -510,7 +526,7 @@ const LandingPage = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="section-sale">
+      <section className="section-sale reveal">
         <div className="container">
           <div className="row align-items-center">
             <div className="col-md-7">
