@@ -708,28 +708,19 @@
   color: #fff;
 }
 
+
+/* Crypto Box Cards - New Rockie Layout */
 .body-rockie .crypto-box-list {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
 @media (max-width: 1199px) {
-  .body-rockie .crypto-box-list {
-    grid-template-columns: repeat(3, 1fr);
-  }
+  .body-rockie .crypto-box-list { grid-template-columns: repeat(2, 1fr); }
 }
-
-@media (max-width: 767px) {
-  .body-rockie .crypto-box-list {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 480px) {
-  .body-rockie .crypto-box-list {
-    grid-template-columns: 1fr;
-  }
+  .body-rockie .crypto-box-list { grid-template-columns: 1fr; }
 }
 
 .body-rockie .crypto-box {
@@ -737,141 +728,257 @@
   border-radius: 12px;
   padding: 20px;
   transition: all 0.3s;
-  border: 1px solid transparent;
+  border: 1px solid var(--r-line) !important;
 }
 
 .body-rockie .crypto-box:hover,
 .body-rockie .crypto-box.active {
-  border-color: var(--r-primary);
+  border-color: var(--r-primary) !important;
   box-shadow: 0 4px 24px rgba(55, 114, 255, 0.1);
 }
 
-.body-rockie .crypto-box .top {
+.body-rockie .crypto-box-top {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
 }
 
-.body-rockie .crypto-icon {
-  font-size: 24px;
-  display: inline-flex;
-  align-items: center;
-  margin-right: 8px;
-}
-
-.body-rockie .crypto-box .top h6 {
-  font-size: 16px;
-}
-
-.body-rockie .crypto-box .top .unit {
-  font-size: 12px;
-  color: var(--r-text) !important;
-}
-
-.body-rockie .crypto-box .price {
-  font-size: 20px;
-  margin-bottom: 8px;
-}
-
-.body-rockie .crypto-box .bottom-info {
+.body-rockie .crypto-box-left {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
 }
 
-.body-rockie .crypto-box .prev-price {
-  font-size: 14px;
+.body-rockie .crypto-box-name {
+  font-size: 15px;
+  color: var(--r-onsurface) !important;
+  white-space: nowrap;
+}
+
+.body-rockie .crypto-box-badge {
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.body-rockie .crypto-box-badge.success {
+  background: rgba(88, 189, 125, 0.15);
+  color: #58bd7d !important;
+}
+
+.body-rockie .crypto-box-badge.critical {
+  background: rgba(211, 53, 53, 0.15);
+  color: #d33535 !important;
+}
+
+.body-rockie .crypto-box-bottom {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.body-rockie .crypto-box-price {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--r-onsurface) !important;
+}
+
+.body-rockie .crypto-box-pair {
+  font-size: 13px;
   color: var(--r-text) !important;
+  font-weight: 500;
 }
 
-.body-rockie .sale.success {
-  color: var(--r-second);
-  font-weight: 700;
-}
-
-.body-rockie .sale.critical {
-  color: var(--r-danger);
-  font-weight: 700;
-}
-
-/* ============ COIN LIST ============ */
+/* ============ COIN LIST / MARKET TABLE ============ */
 .body-rockie .coin-list {
-  padding: 80px 0;
+  padding: 40px 0 80px;
   background: var(--r-bg) !important;
 }
 
-.body-rockie .block-text {
-  margin-bottom: 40px;
+/* Market Main Tabs (Favorites / Derivatives / Spot) */
+.body-rockie .market-main-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--r-line) !important;
+  padding-bottom: 0;
 }
 
-.body-rockie .block-text .heading {
-  font-size: 36px;
-  margin-bottom: 12px;
-}
-
-.body-rockie .block-text .desc {
+.body-rockie .market-main-tab {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
   color: var(--r-text) !important;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
 }
 
-.body-rockie .coin-list .table {
+.body-rockie .market-main-tab.active {
+  color: #fff !important;
+  background: var(--r-primary);
+  border-radius: 4px 4px 0 0;
+}
+
+.body-rockie .market-main-tab:hover:not(.active) {
+  color: var(--r-onsurface) !important;
+}
+
+/* Market Sub Tabs (All / Inverse Perpetual / etc.) */
+.body-rockie .market-sub-tabs {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--r-line) !important;
+}
+
+.body-rockie .market-sub-tab {
+  padding: 0;
+  background: none;
+  border: none;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--r-text) !important;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  padding-bottom: 4px;
+}
+
+.body-rockie .market-sub-tab.active {
+  color: var(--r-onsurface) !important;
+  border-bottom-color: var(--r-primary);
+}
+
+/* Market Filter Tabs (Hot / New / DeFi / NFT) */
+.body-rockie .market-filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.body-rockie .market-filter-tab {
+  padding: 6px 16px;
+  background: none;
+  border: none;
+  font-family: "DM Sans", sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--r-text) !important;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.body-rockie .market-filter-tab.active {
+  background: var(--r-primary);
+  color: #fff !important;
+}
+
+/* Market Table */
+.body-rockie .market-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.body-rockie .coin-list .table th {
+.body-rockie .market-table th {
   text-align: left;
-  padding: 16px;
-  font-weight: 700;
+  padding: 12px 16px;
+  font-weight: 600;
   color: var(--r-text) !important;
-  font-size: 14px;
+  font-size: 13px;
   border-bottom: 1px solid var(--r-line) !important;
+  white-space: nowrap;
 }
 
-.body-rockie .coin-list .table td {
-  padding: 16px;
+.body-rockie .market-table td {
+  padding: 14px 16px;
   border-bottom: 1px solid var(--r-line) !important;
   color: var(--r-onsurface) !important;
   font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
-.body-rockie .coin-list .table tr:hover {
+.body-rockie .market-table tr:hover {
   background: var(--r-surface) !important;
 }
 
-.body-rockie .coin-name {
+.body-rockie .market-table .td-pair {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.body-rockie .market-table .coin-name {
   font-weight: 700;
-  margin-right: 8px;
+  color: var(--r-onsurface) !important;
 }
 
-.body-rockie .coin-symbol {
+.body-rockie .market-table .coin-symbol {
   color: var(--r-text) !important;
-  font-size: 14px;
+  font-size: 12px;
+  margin-left: 4px;
 }
 
-.body-rockie .color-success { color: var(--r-second); font-weight: 700; }
-.body-rockie .color-critical { color: var(--r-danger); font-weight: 700; }
+.body-rockie .star-icon {
+  color: var(--r-text) !important;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.body-rockie .star-icon:hover {
+  color: #f7931a !important;
+}
+
+.body-rockie .color-success { color: #58bd7d !important; font-weight: 700; }
+.body-rockie .color-critical { color: #d33535 !important; font-weight: 700; }
 
 .body-rockie .btn-trade {
   padding: 6px 20px;
-  border-radius: 24px;
-  background: var(--r-primary);
-  color: #fff !important;
-  font-size: 14px;
-  font-weight: 700;
+  border-radius: 4px;
+  background: transparent;
+  border: 1px solid var(--r-text);
+  color: var(--r-onsurface) !important;
+  font-size: 13px;
+  font-weight: 600;
   transition: all 0.3s;
 }
 
 .body-rockie .btn-trade:hover {
-  opacity: 0.85;
+  background: var(--r-primary);
+  border-color: var(--r-primary);
+  color: #fff !important;
 }
 
 @media (max-width: 767px) {
-  .body-rockie .coin-list .table {
-    display: block;
+  .body-rockie .coin-list__main {
     overflow-x: auto;
-    white-space: nowrap;
   }
+  .body-rockie .market-table {
+    min-width: 900px;
+  }
+  .body-rockie .market-sub-tabs,
+  .body-rockie .market-filter-tabs {
+    flex-wrap: wrap;
+  }
+}
+
+/* BITUSDT nav alignment */
+.body-rockie .bitusdt-item a {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0;
 }
 
 /* ============ HOW IT WORKS ============ */

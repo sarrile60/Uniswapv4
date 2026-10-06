@@ -30,27 +30,55 @@ const LandingPage = () => {
     return () => document.body.classList.remove("is_dark");
   }, [darkMode]);
 
+  // SVG coin icons as inline components
+  const CoinIcon = ({ symbol, size = 32 }) => {
+    const colors = { BTC: '#f7931a', ETH: '#627eea', BNB: '#f3ba2f', USDT: '#26a17b', ADA: '#0033ad', SOL: '#9945ff', XRP: '#23292f', DOT: '#e6007a' };
+    const bg = colors[symbol] || '#3772ff';
+    return (
+      <span className="coin-icon-circle" style={{ width: size, height: size, background: bg, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: '#fff', fontSize: size * 0.4, fontWeight: 800, flexShrink: 0 }}>
+        {symbol.charAt(0)}
+      </span>
+    );
+  };
+
+  // Mini sparkline SVG
+  const Sparkline = ({ up }) => {
+    const color = up ? '#58bd7d' : '#d33535';
+    const path = up 
+      ? 'M0 20 L5 18 L10 15 L15 17 L20 12 L25 14 L30 10 L35 8 L40 11 L45 6 L50 4 L55 7 L60 3'
+      : 'M0 4 L5 6 L10 8 L15 5 L20 10 L25 8 L30 13 L35 15 L40 12 L45 17 L50 19 L55 16 L60 20';
+    return (
+      <svg width="60" height="24" viewBox="0 0 60 24" fill="none" style={{ display: 'block' }}>
+        <path d={path} stroke={color} strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    );
+  };
+
   const cryptoData = [
-    { icon: "🟡", name: "Bitcoin", symbol: "BTC/USDT", price: "$56,623.54", prev: "$1,285", change: "-0.79%", down: true },
-    { icon: "🔵", name: "Ethereum", symbol: "ETH/USDT", price: "$2,146.65", prev: "$1,285", change: "+10.55%", down: false },
-    { icon: "🔴", name: "Binance", symbol: "BNB/USDT", price: "$443.56", prev: "$1,285", change: "-0.01%", down: true },
-    { icon: "⚪", name: "Tether", symbol: "USDT/USDT", price: "$1.00", prev: "$1,285", change: "-1.24%", down: true },
-    { icon: "🟠", name: "Solana", symbol: "SOL/USDT", price: "$150.20", prev: "$1,285", change: "+5.31%", down: false },
+    { symbol: "BTC", name: "Bitcoin", pair: "BTC", price: "USD 53,260.20", change: "+7.2%", up: true },
+    { symbol: "ETH", name: "Ethereum", pair: "ETH", price: "USD 53,260.20", change: "-1.8%", up: false },
+    { symbol: "USDT", name: "Tether", pair: "USDT", price: "USD 53,260.20", change: "+3.54%", up: true },
+    { symbol: "BNB", name: "Binance", pair: "BNB", price: "USD 53,260.20", change: "+3.24%", up: true },
   ];
 
   const coinListData = [
-    { rank: 1, icon: "🟡", name: "Bitcoin", symbol: "BTC", price: "$56,623.54", change: "+1.45%", up: true, cap: "$880,423,640,582" },
-    { rank: 2, icon: "🔵", name: "Ethereum", symbol: "ETH", price: "$2,146.65", change: "+10.55%", up: true, cap: "$350,123,456,789" },
-    { rank: 3, icon: "🔴", name: "Binance Coin", symbol: "BNB", price: "$443.56", change: "-3.75%", up: false, cap: "$68,345,678,901" },
-    { rank: 4, icon: "⚪", name: "Tether", symbol: "USDT", price: "$1.00", change: "+0.01%", up: true, cap: "$45,678,901,234" },
-    { rank: 5, icon: "🟣", name: "Cardano", symbol: "ADA", price: "$1.48", change: "-2.22%", up: false, cap: "$40,123,456,789" },
-    { rank: 6, icon: "🟠", name: "Solana", symbol: "SOL", price: "$150.20", change: "+5.31%", up: true, cap: "$38,987,654,321" },
-    { rank: 7, icon: "🔵", name: "XRP", symbol: "XRP", price: "$0.85", change: "+2.10%", up: true, cap: "$35,456,789,012" },
-    { rank: 8, icon: "🟡", name: "Polkadot", symbol: "DOT", price: "$28.30", change: "-1.85%", up: false, cap: "$28,123,456,789" },
+    { rank: 1, symbol: "BTC", name: "Bitcoin", pair: "BTC", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
+    { rank: 2, symbol: "ETH", name: "Ethereum", pair: "ETH", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
+    { rank: 3, symbol: "BNB", name: "BNB", pair: "BNB/USD", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
+    { rank: 4, symbol: "USDT", name: "Tether", pair: "USDT/USD", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
+    { rank: 5, symbol: "ADA", name: "Cardano", pair: "ADA", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
+    { rank: 6, symbol: "SOL", name: "Solana", pair: "SOL", lastTraded: "2.236", change: "+5.31%", up: true, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
+    { rank: 7, symbol: "XRP", name: "XRP", pair: "XRP", lastTraded: "2.236", change: "+2.10%", up: true, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
+    { rank: 8, symbol: "DOT", name: "Polkadot", pair: "DOT", lastTraded: "2.236", change: "-1.85%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
   ];
 
   const tabs = ["Crypto", "DeFi", "BSC", "NFT", "Metaverse", "Polkadot", "Solana", "Opensea", "Makersplace"];
-  const coinTabs = ["View All", "Metaverse", "Entertainment", "Energy", "NFT", "Gaming", "Music"];
+  const marketMainTabs = ["Favorites", "Derivatives", "Spot"];
+  const marketSubTabs = ["All", "Inverse Perpetual", "USDT Perpetual", "Inverse Futures"];
+  const marketFilterTabs = ["Hot", "New", "DeFi", "NFT"];
+  const [activeMarketMain, setActiveMarketMain] = useState(1); // Derivatives active
+  const [activeMarketSub, setActiveMarketSub] = useState(0);
+  const [activeMarketFilter, setActiveMarketFilter] = useState(0);
 
   const testimonials = [
     { text: "This platform has completely transformed how I manage my crypto portfolio. The interface is clean and transactions are lightning fast.", name: "Alex Johnson", position: "Crypto Trader", avatar: null, initials: "AJ", color: "#3772ff" },
@@ -115,10 +143,10 @@ const LandingPage = () => {
                         </li>
 
                         {/* BITUSDT Hot Pair */}
-                        <li className="menu-item">
-                          <Link to="/register" className="hot-pair">
+                        <li className="menu-item bitusdt-item">
+                          <Link to="/register">
                             BITUSDT
-                            <svg className="fire-icon" width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginLeft: '4px', verticalAlign: 'middle', marginBottom: '2px'}}>
                               <path d="M6.76 3.2C6.69 3.14 6.6 3.11 6.51 3.12C6.42 3.14 6.34 3.19 6.3 3.28C6.15 3.56 5.96 3.82 5.74 4.05C5.77 3.89 5.78 3.72 5.78 3.55C5.78 3.23 5.73 2.9 5.65 2.56C5.37 1.47 4.63 0.55 3.63 0.03C3.54-0.01 3.44-0.01 3.35 0.04C3.27 0.08 3.21 0.17 3.2 0.27C3.13 1.26 2.62 2.16 1.8 2.75L1.71 2.81C1.19 3.19 0.77 3.67 0.48 4.23C0.19 4.8 0.04 5.41 0.04 6.04C0.04 6.36 0.08 6.69 0.17 7.03C0.62 8.78 2.19 10 4 10C6.18 10 7.96 8.22 7.96 6.04C7.96 4.96 7.53 3.95 6.76 3.2Z" fill="#3772FF"/>
                             </svg>
                           </Link>
@@ -251,7 +279,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Crypto Section */}
+      {/* Crypto Section - Top Cards */}
       <section className="crypto" id="crypto-section">
         <div className="container">
           <div className="row">
@@ -269,18 +297,20 @@ const LandingPage = () => {
                     <div className="content-inner active">
                       <div className="crypto-box-list">
                         {cryptoData.map((coin, i) => (
-                          <div key={i} className={`crypto-box ${i === 1 ? "active" : ""}`}>
-                            <div className="top">
-                              <span className="crypto-icon">{coin.icon}</span>
-                              <div>
-                                <h6>{coin.name}</h6>
-                                <p className="unit">{coin.symbol}</p>
+                          <div key={i} className={`crypto-box ${i === 0 ? "active" : ""}`}>
+                            <div className="crypto-box-top">
+                              <div className="crypto-box-left">
+                                <CoinIcon symbol={coin.symbol} size={40} />
+                                <div className="crypto-box-info">
+                                  <h6 className="crypto-box-name">{coin.name}</h6>
+                                </div>
                               </div>
+                              <Sparkline up={coin.up} />
+                              <span className={`crypto-box-badge ${coin.up ? "success" : "critical"}`}>{coin.change}</span>
                             </div>
-                            <h6 className="price">{coin.price}</h6>
-                            <div className="bottom-info">
-                              <p className="prev-price">{coin.prev}</p>
-                              <p className={`sale ${coin.down ? "critical" : "success"}`}>{coin.change}</p>
+                            <div className="crypto-box-bottom">
+                              <h6 className="crypto-box-price">{coin.price}</h6>
+                              <span className="crypto-box-pair">{coin.pair}</span>
                             </div>
                           </div>
                         ))}
@@ -294,57 +324,76 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Coin List */}
+      {/* Coin List - Full Trading Table */}
       <section className="coin-list" id="coin-list">
         <div className="container">
           <div className="row">
             <div className="col-md-12">
-              <div className="block-text center">
-                <h3 className="heading">Market Update</h3>
-                <p className="fs-20 desc">Cryptocurrency market in real-time</p>
+              {/* Main Tabs: Favorites / Derivatives / Spot */}
+              <div className="market-main-tabs">
+                {marketMainTabs.map((tab, i) => (
+                  <button key={tab} className={`market-main-tab ${activeMarketMain === i ? "active" : ""}`} onClick={() => setActiveMarketMain(i)}>
+                    {tab}
+                  </button>
+                ))}
               </div>
+
+              {/* Sub Tabs: All / Inverse Perpetual / etc. */}
+              <div className="market-sub-tabs">
+                {marketSubTabs.map((tab, i) => (
+                  <button key={tab} className={`market-sub-tab ${activeMarketSub === i ? "active" : ""}`} onClick={() => setActiveMarketSub(i)}>
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              {/* Filter Tabs: Hot / New / DeFi / NFT */}
+              <div className="market-filter-tabs">
+                {marketFilterTabs.map((tab, i) => (
+                  <button key={tab} className={`market-filter-tab ${activeMarketFilter === i ? "active" : ""}`} onClick={() => setActiveMarketFilter(i)}>
+                    {tab}
+                  </button>
+                ))}
+              </div>
+
+              {/* Table */}
               <div className="coin-list__main">
-                <div className="flat-tabs">
-                  <ul className="menu-tab">
-                    {coinTabs.map((tab, i) => (
-                      <li key={tab} className={activeCoinTab === i ? "active" : ""} onClick={() => setActiveCoinTab(i)}>
-                        <h6 className="fs-16">{tab}</h6>
-                      </li>
+                <table className="table market-table">
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>#</th>
+                      <th>Trading Pairs</th>
+                      <th>Last Traded</th>
+                      <th>24H Change%</th>
+                      <th>24H High</th>
+                      <th>24H Low</th>
+                      <th>24H Turnover</th>
+                      <th>Chart</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {coinListData.map((coin) => (
+                      <tr key={coin.rank}>
+                        <td><span className="star-icon">☆</span></td>
+                        <td>{coin.rank}</td>
+                        <td className="td-pair">
+                          <CoinIcon symbol={coin.symbol} size={28} />
+                          <span className="coin-name">{coin.name}</span>
+                          <span className="coin-symbol">{coin.pair}</span>
+                        </td>
+                        <td>{coin.lastTraded}</td>
+                        <td className={coin.up ? "color-success" : "color-critical"}>{coin.change}</td>
+                        <td>{coin.high}</td>
+                        <td>{coin.low}</td>
+                        <td>{coin.turnover}</td>
+                        <td><Sparkline up={coin.up} /></td>
+                        <td><Link to="/register" className="btn-trade">Trade</Link></td>
+                      </tr>
                     ))}
-                  </ul>
-                  <div className="content-tab">
-                    <div className="content-inner active">
-                      <table className="table">
-                        <thead>
-                          <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Name</th>
-                            <th scope="col">Last Price</th>
-                            <th scope="col">24h %</th>
-                            <th scope="col">Market Cap</th>
-                            <th scope="col"></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {coinListData.map((coin) => (
-                            <tr key={coin.rank}>
-                              <td>{coin.rank}</td>
-                              <td>
-                                <span className="crypto-icon">{coin.icon}</span>
-                                <span className="coin-name">{coin.name}</span>
-                                <span className="coin-symbol">{coin.symbol}</span>
-                              </td>
-                              <td>{coin.price}</td>
-                              <td className={coin.up ? "color-success" : "color-critical"}>{coin.change}</td>
-                              <td>{coin.cap}</td>
-                              <td><Link to="/register" className="btn-trade">Trade</Link></td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
