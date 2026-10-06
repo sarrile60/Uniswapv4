@@ -187,8 +187,30 @@ const LandingPage = () => {
             </div>
             <div className="col-xl-6 col-md-12">
               <div className="banner__image">
-                <img src="/assets/images/layout/banner-01.png" alt="Uniswap V4 Trading" />
+                <img src="https://images.unsplash.com/photo-1651054558996-03455fe2702f?w=700&h=600&fit=crop&q=80" alt="Uniswap V4 Crypto" style={{borderRadius: 16, maxWidth: '100%'}} />
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Partners */}
+      <section className="partners">
+        <div className="container">
+          <div className="partners__content">
+            <h6 className="partners__title">{lang === 'it' ? 'I Nostri Partner' : 'Our Partners'}</h6>
+            <div className="partners__list">
+              {[
+                { name: 'CoinBase', svg: <svg width="120" height="28" viewBox="0 0 120 28"><circle cx="14" cy="14" r="12" fill="currentColor" opacity="0.15"/><circle cx="14" cy="14" r="7" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.5"/><text x="32" y="19" fontSize="15" fontWeight="700" fill="currentColor" opacity="0.6">Coinbase</text></svg> },
+                { name: 'Blockchain', svg: <svg width="130" height="28" viewBox="0 0 130 28"><rect x="2" y="6" width="16" height="16" rx="3" fill="currentColor" opacity="0.2"/><rect x="8" y="2" width="16" height="16" rx="3" fill="currentColor" opacity="0.15"/><text x="30" y="19" fontSize="14" fontWeight="700" fill="currentColor" opacity="0.6">Blockchain</text></svg> },
+                { name: 'MetaMask', svg: <svg width="120" height="28" viewBox="0 0 120 28"><polygon points="14,2 26,10 22,24 6,24 2,10" fill="currentColor" opacity="0.15"/><text x="32" y="19" fontSize="14" fontWeight="700" fill="currentColor" opacity="0.6">MetaMask</text></svg> },
+                { name: 'Ledger', svg: <svg width="100" height="28" viewBox="0 0 100 28"><rect x="2" y="4" width="20" height="20" rx="2" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3"/><rect x="10" y="12" width="12" height="12" fill="currentColor" opacity="0.15"/><text x="28" y="19" fontSize="14" fontWeight="700" fill="currentColor" opacity="0.6">Ledger</text></svg> },
+                { name: 'Chainalysis', svg: <svg width="130" height="28" viewBox="0 0 130 28"><circle cx="14" cy="14" r="10" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3"/><path d="M8 14 L14 8 L20 14 L14 20 Z" fill="currentColor" opacity="0.15"/><text x="30" y="19" fontSize="14" fontWeight="700" fill="currentColor" opacity="0.6">Chainalysis</text></svg> },
+              ].map((p, i) => (
+                <div key={i} className="partner-logo" title={p.name}>
+                  {p.svg}
+                </div>
+              ))}
             </div>
           </div>
         </div>
