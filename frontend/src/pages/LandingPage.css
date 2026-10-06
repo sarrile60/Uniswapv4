@@ -976,9 +976,12 @@
 
 /* BITUSDT nav alignment */
 .body-rockie .bitusdt-item a {
-  display: inline-flex !important;
-  align-items: center;
-  gap: 0;
+  display: inline !important;
+}
+
+.body-rockie .bitusdt-item a svg {
+  vertical-align: middle;
+  display: inline;
 }
 
 /* ============ HOW IT WORKS ============ */

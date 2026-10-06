@@ -264,10 +264,22 @@ frontend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE ROCKIE THEME VERIFICATION COMPLETE - Full landing page testing completed successfully. All requested elements verified and working correctly. HEADER: ✓ BITUSDT present in navigation between Blog and Pages ✓ Blue fire icon (#3772FF) displayed correctly next to BITUSDT ✓ Proper alignment with other nav items. CRYPTO PRICE CARDS: ✓ 4 cards displayed (Bitcoin, Ethereum, Tether, Binance) ✓ Each card has: colored circle icon, coin name, sparkline chart, percentage badge, USD price, pair symbol ✓ Bitcoin card has orange 'B' icon ✓ Ethereum card has blue 'E' icon ✓ Category tabs present: Crypto, DeFi, BSC, NFT, Metaverse, Polkadot, Solana, Opensea, Makersplace. MARKET TABLE: ✓ 3 main tabs: Favorites, Derivatives (ACTIVE), Spot ✓ Sub-tabs: All (ACTIVE), Inverse Perpetual, USDT Perpetual, Inverse Futures ✓ Filter tabs: Hot (ACTIVE), New, DeFi, NFT ✓ Table columns: star icon, #, Trading Pairs, Last Traded, 24H Change%, 24H High, 24H Low, 24H Turnover, Chart, Trade button ✓ 8 rows of crypto data: Bitcoin, Ethereum, BNB, Tether, Cardano, Solana, XRP, Polkadot ✓ Each row has colored circle icon, sparkline chart, Trade button ✓ Star (☆) icon in first column. LIGHT MODE: ✓ Mode toggle switches correctly ✓ Crypto cards readable: white background, dark text (rgb(35, 38, 47)) ✓ Market table readable: dark text on light background ✓ No invisible text issues. Screenshots: 01_header_bitusdt.png, 02_crypto_cards.png, 03_market_table_dark.png, 04_market_table_light.png. Landing page perfectly matches Rockie theme specification."
 
+  - task: "Landing Page Header - BITUSDT Vertical Alignment Verification"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LandingPage.js, /app/frontend/src/pages/LandingPage.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ BITUSDT VERTICAL ALIGNMENT VERIFIED - Comprehensive measurement testing confirms perfect alignment. MEASUREMENTS: Blog link top=16.80px, BITUSDT link top=16.80px, Pages link top=16.80px. ALIGNMENT DIFFERENCES: Blog ↔ BITUSDT: 0.00px, Blog ↔ Pages: 0.00px, BITUSDT ↔ Pages: 0.00px. All three navigation items are perfectly aligned with 0px difference (well within the 2px tolerance requirement). CSS PROPERTIES: All three links have identical styling - padding=8px 16px, margin=0px, verticalAlign=baseline, lineHeight=22.4px. CONCLUSION: BITUSDT sits on the exact same horizontal line as Blog and Pages. Visual verification screenshot confirms all three elements are on the same baseline. Test PASSED with perfect alignment."
+
 metadata:
   created_by: "main_agent"
-  version: "2.2"
-  test_sequence: 4
+  version: "2.3"
+  test_sequence: 5
   run_ui: false
 
 test_plan:
@@ -291,3 +303,5 @@ agent_communication:
     message: "✅ MARKET TABLE LIGHT MODE TEXT VISIBILITY VERIFIED - Comprehensive testing confirms the fix is working perfectly. The market table text is now fully visible in BOTH light and dark modes. In LIGHT MODE: All table headers and data are clearly visible with dark text on white background (Bitcoin $56,623.54 +1.45%, Ethereum $2,146.65 +10.55%, all 8 rows readable). In DARK MODE: All table content is clearly visible with white text on dark background. Color coding works correctly (green for positive, red for negative). Mode toggle switches seamlessly between light and dark modes. Crypto price cards are also readable in both modes. Screenshots captured showing full visibility in both modes. The light mode text visibility issue is RESOLVED."
   - agent: "testing"
     message: "✅ COMPREHENSIVE ROCKIE THEME LANDING PAGE VERIFICATION COMPLETE - Full end-to-end testing of all requested elements completed successfully. HEADER BITUSDT: ✓ BITUSDT correctly positioned between Blog and Pages ✓ Blue fire icon (#3772FF) displayed next to BITUSDT ✓ Proper vertical alignment with other nav items. CRYPTO PRICE CARDS: ✓ 4 cards in a row (Bitcoin, Ethereum, Tether, Binance) ✓ Each card has: colored circle icon with letter, coin name, sparkline chart, percentage badge, USD price, pair symbol ✓ Bitcoin card has orange 'B' icon ✓ Ethereum card has blue 'E' icon ✓ Category tabs: Crypto, DeFi, BSC, NFT, Metaverse, Polkadot, Solana, Opensea, Makersplace. MARKET TABLE: ✓ 3 main tabs: Favorites, Derivatives (ACTIVE/highlighted), Spot ✓ Sub-tabs: All (ACTIVE), Inverse Perpetual, USDT Perpetual, Inverse Futures ✓ Filter row: Hot (ACTIVE), New, DeFi, NFT ✓ All table columns present: star icon, #, Trading Pairs, Last Traded, 24H Change%, 24H High, 24H Low, 24H Turnover, Chart, Trade button ✓ 8 rows of crypto data: Bitcoin, Ethereum, BNB, Tether, Cardano, Solana, XRP, Polkadot ✓ Each row has colored circle coin icon, sparkline chart, Trade button ✓ Star (☆) icon in first column for favorites. LIGHT MODE: ✓ Mode toggle switches correctly between dark and light modes ✓ Crypto cards readable in light mode: white background, dark text (rgb(35, 38, 47)) ✓ Market table readable in light mode: dark text on light background ✓ No invisible text issues in either mode. Screenshots captured: 01_header_bitusdt.png, 02_crypto_cards.png, 03_market_table_dark.png, 04_market_table_light.png. The landing page perfectly matches the original Rockie theme specification with all elements working correctly."
+  - agent: "testing"
+    message: "✅ BITUSDT VERTICAL ALIGNMENT TEST COMPLETE - Precise measurement testing confirms perfect alignment of BITUSDT with neighboring navigation items. RESULTS: All three navigation links (Blog, BITUSDT, Pages) have identical vertical positioning at top=16.80px with 0.00px difference between them (well within the 2px tolerance requirement). All links share identical CSS properties (padding=8px 16px, margin=0px, verticalAlign=baseline, lineHeight=22.4px). Visual verification screenshot confirms BITUSDT sits on the exact same horizontal line as Blog and Pages. Test PASSED - BITUSDT vertical alignment is correct."
