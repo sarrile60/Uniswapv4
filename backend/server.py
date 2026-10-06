@@ -35,7 +35,7 @@ from auth import (
 )
 import jwt
 from transaction_generator import generate_transaction_history, generate_fake_eth_address
-from email_service import get_email_service
+from email_service import get_email_service, RESEND_AVAILABLE
 import cloudinary
 import cloudinary.uploader
 import base64
@@ -3302,6 +3302,53 @@ async def admin_review_kyc(
     }
 
 
+
+@api_router.get("/admin/email-status")
+async def admin_email_status(admin: dict = Depends(require_admin)):
+    """Check email service configuration status (admin only)"""
+    svc = get_email_service()
+    import resend as _resend_mod
+    return {
+        "ok": True,
+        "data": {
+            "resend_available": RESEND_AVAILABLE,
+            "is_configured": svc.is_configured(),
+            "has_api_key": bool(svc.api_key),
+            "api_key_preview": f"{svc.api_key[:8]}...{svc.api_key[-4:]}" if svc.api_key and len(svc.api_key) > 12 else ("set" if svc.api_key else "NOT SET"),
+            "sender_email": svc.sender_email,
+            "sender_name": svc.sender_name,
+            "reply_to": svc.reply_to,
+            "resend_module_key_set": bool(getattr(_resend_mod, 'api_key', None)),
+        }
+    }
+
+@api_router.post("/admin/test-email")
+async def admin_test_email(request: Request, admin: dict = Depends(require_admin)):
+    """Send a test email (admin only)"""
+    body = await request.json()
+    to_email = body.get("to_email", admin["email"])
+    svc = get_email_service()
+    
+    if not svc.is_configured():
+        return {"ok": False, "error": "Email service not configured", "details": {
+            "resend_available": RESEND_AVAILABLE,
+            "has_api_key": bool(svc.api_key),
+            "sender_email": svc.sender_email,
+        }}
+    
+    from email_service import _wrap
+    html = _wrap("""
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Test Email</h2>
+    <p style="color:#555555;">This is a test email from Uniswap V4.</p>
+    <p style="color:#555555;">If you received this, email delivery is working correctly.</p>
+    <p style="color:#333333;font-weight:600;margin-top:16px;">The Uniswap V4 Team</p>
+    """)
+    
+    result = await svc.send_email(to_email, "Test Email - Uniswap V4", html)
+    return {"ok": result.get("success", False), "result": result}
+
+
+
 # --- Admin Freeze/Email Controls ---
 
 @api_router.post("/admin/users/{user_id}/send-email")
@@ -3733,7 +3780,11 @@ async def admin_update_settings(
         update_data["allow_registration"] = body["allow_registration"]
     if "resend_api_key" in body and body["resend_api_key"]:
         update_data["resend_api_key"] = body["resend_api_key"]
-        get_email_service().api_key = body["resend_api_key"]
+        svc = get_email_service()
+        svc.api_key = body["resend_api_key"]
+        if RESEND_AVAILABLE:
+            import resend as _resend
+            _resend.api_key = body["resend_api_key"]
     if "sender_email" in body and body["sender_email"]:
         update_data["sender_email"] = body["sender_email"]
         get_email_service().sender_email = body["sender_email"]
