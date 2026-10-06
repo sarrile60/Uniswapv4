@@ -81,13 +81,30 @@ const LandingPage = () => {
     return `${vol.toLocaleString()}(USD)`;
   };
 
-  // Derive display data from live market data
-  const cryptoData = (marketData.length >= 4 ? marketData.slice(0, 4) : [
-    { symbol: "BTC", name: "Bitcoin", price: 0, change_24h: 0 },
-    { symbol: "ETH", name: "Ethereum", price: 0, change_24h: 0 },
-    { symbol: "USDT", name: "Tether", price: 0, change_24h: 0 },
-    { symbol: "BNB", name: "BNB", price: 0, change_24h: 0 },
-  ]).map(coin => ({
+  // Category-to-symbols mapping for top card filters
+  const tabSymbols = {
+    0: ['BTC','ETH','USDT','BNB'],         // Crypto — top 4
+    1: ['ETH','ADA','SOL','DOT'],           // DeFi
+    2: ['BNB','USDT','ADA','DOT'],          // BSC
+    3: ['SOL','ETH','BNB','DOT'],           // NFT
+    4: ['ETH','SOL','ADA','DOT'],           // Metaverse
+    5: ['DOT','ETH','ADA','SOL'],           // Polkadot ecosystem
+    6: ['SOL','ETH','BTC','USDT'],          // Solana ecosystem
+    7: ['ETH','SOL','BNB','ADA'],           // Opensea
+    8: ['ETH','SOL','BTC','ADA'],           // Makersplace
+  };
+
+  // Derive display data from live market data — filtered by active category tab
+  const activeSymbols = tabSymbols[activeTab] || tabSymbols[0];
+  const cryptoData = (marketData.length > 0
+    ? marketData.filter(c => activeSymbols.includes(c.symbol)).slice(0, 4)
+    : [
+      { symbol: "BTC", name: "Bitcoin", price: 0, change_24h: 0 },
+      { symbol: "ETH", name: "Ethereum", price: 0, change_24h: 0 },
+      { symbol: "USDT", name: "Tether", price: 0, change_24h: 0 },
+      { symbol: "BNB", name: "BNB", price: 0, change_24h: 0 },
+    ]
+  ).map(coin => ({
     symbol: coin.symbol,
     name: coin.name,
     pair: coin.symbol,
@@ -123,6 +140,7 @@ const LandingPage = () => {
   };
 
   const tabs = ["Crypto", "DeFi", "BSC", "NFT", "Metaverse", "Polkadot", "Solana", "Opensea", "Makersplace"];
+
   const marketMainTabs = [t.land_favorites, t.land_derivatives, t.land_spot];
   const marketSubTabs = [t.land_all, t.land_inversePerpetual, t.land_usdtPerpetual, t.land_inverseFutures];
   const marketFilterTabs = [t.land_hot, t.land_new, t.land_defi, t.land_nft];

@@ -13,7 +13,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
-  const { lang, toggleLang } = useLang();
+  const { lang, t, toggleLang } = useLang();
 
   const toggleDropdown = (name) => {
     setActiveDropdown(activeDropdown === name ? null : name);
@@ -111,26 +111,26 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                   <nav id="main-nav" className={`main-nav ${mobileMenuOpen ? "active" : ""}`}>
                     <ul id="menu-primary-menu" className="menu">
                       <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('buy'); }}>
-                        <a href="#!">Buy Crypto</a>
+                        <a href="#!">{t.nav_buyCrypto}</a>
                         <ul className={`sub-menu ${activeDropdown === 'buy' ? 'show' : ''}`}>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>Buy Crypto Select</Link></li>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>Buy Crypto Confirm</Link></li>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>Buy Crypto Details</Link></li>
+                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_buyCryptoSelect}</Link></li>
+                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_buyCryptoConfirm}</Link></li>
+                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_buyCryptoDetails}</Link></li>
                         </ul>
                       </li>
                       <li className="menu-item">
-                        <Link to={isLoggedIn ? "/wallet" : "/#crypto-section"}>Markets</Link>
+                        <Link to={isLoggedIn ? "/wallet" : "/#crypto-section"}>{t.nav_markets}</Link>
                       </li>
                       <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('sell'); }}>
-                        <a href="#!">Sell Crypto</a>
+                        <a href="#!">{t.nav_sellCrypto}</a>
                         <ul className={`sub-menu ${activeDropdown === 'sell' ? 'show' : ''}`}>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>Sell Crypto Select</Link></li>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>Sell Crypto Confirm</Link></li>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>Sell Crypto Details</Link></li>
+                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_sellCryptoSelect}</Link></li>
+                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_sellCryptoConfirm}</Link></li>
+                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_sellCryptoDetails}</Link></li>
                         </ul>
                       </li>
                       <li className="menu-item">
-                        <Link to={isLoggedIn ? "/wallet" : "/#about-section"}>Blog</Link>
+                        <Link to={isLoggedIn ? "/wallet" : "/#about-section"}>{t.nav_blog}</Link>
                       </li>
                       <li className="menu-item bitusdt-item">
                         <Link to={isLoggedIn ? "/wallet" : "/register"}>
@@ -141,13 +141,13 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                         </Link>
                       </li>
                       <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('pages'); }}>
-                        <a href="#!">Pages</a>
+                        <a href="#!">{t.nav_pages}</a>
                         <ul className={`sub-menu ${activeDropdown === 'pages' ? 'show' : ''}`}>
-                          <li className="menu-item"><Link to="/about">About</Link></li>
-                          <li className="menu-item"><Link to="/login">Login</Link></li>
-                          <li className="menu-item"><Link to="/register">Register</Link></li>
-                          <li className="menu-item"><a href="mailto:info@uniswapv4.com">Contact</a></li>
-                          <li className="menu-item"><Link to="/terms">FAQ</Link></li>
+                          <li className="menu-item"><Link to="/about">{t.nav_about}</Link></li>
+                          <li className="menu-item"><Link to="/login">{t.nav_login}</Link></li>
+                          <li className="menu-item"><Link to="/register">{t.nav_register}</Link></li>
+                          <li className="menu-item"><a href="mailto:info@uniswapv4.com">{t.nav_contact}</a></li>
+                          <li className="menu-item"><Link to="/terms">{t.nav_faq}</Link></li>
                         </ul>
                       </li>
                     </ul>
@@ -157,19 +157,19 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
 
               <div className="header__right">
                 <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('assets'); }}>
-                  <button className="header-dropdown-btn">Assets</button>
+                  <button className="header-dropdown-btn">{t.nav_assets}</button>
                   <div className={`header-dropdown-menu ${activeDropdown === 'assets' ? 'show' : ''}`}>
-                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">Visa Card</Link>
-                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">Crypto Loans</Link>
-                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">Pay</Link>
+                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_visaCard}</Link>
+                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_cryptoLoans}</Link>
+                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_pay}</Link>
                   </div>
                 </div>
                 <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('orders'); }}>
-                  <button className="header-dropdown-btn">Orders & Trades</button>
+                  <button className="header-dropdown-btn">{t.nav_ordersTrades}</button>
                   <div className={`header-dropdown-menu ${activeDropdown === 'orders' ? 'show' : ''}`}>
-                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">Convert</Link>
-                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">Spot</Link>
-                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">Margin</Link>
+                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_convert}</Link>
+                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_spot}</Link>
+                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_margin}</Link>
                     <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">P2P</Link>
                   </div>
                 </div>
@@ -206,7 +206,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                   </div>
                   <div className={`header-dropdown-menu notification-menu ${activeDropdown === 'notif' ? 'show' : ''}`} style={{right: 0, minWidth: 320, maxHeight: 400, overflowY: 'auto', padding: 0}}>
                     <div style={{padding: '14px 16px', borderBottom: '1px solid var(--r-line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <span style={{fontWeight: 700, fontSize: 15, color: 'var(--r-onsurface)'}}>Notifications</span>
+                      <span style={{fontWeight: 700, fontSize: 15, color: 'var(--r-onsurface)'}}>{t.nav_notifications}</span>
                       {unreadCount > 0 && <span style={{fontSize: 12, color: '#3772ff', fontWeight: 600}}>{unreadCount} new</span>}
                     </div>
                     {!isLoggedIn ? (
@@ -247,7 +247,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                 </div>
 
                 {/* Wallet Button */}
-                <Link to={isLoggedIn ? "/wallet" : "/login"} className="header-wallet-btn">Wallet</Link>
+                <Link to={isLoggedIn ? "/wallet" : "/login"} className="header-wallet-btn">{t.nav_wallet}</Link>
 
                 {/* User Avatar / Profile — initials when logged in, generic icon when not */}
                 {isLoggedIn ? (

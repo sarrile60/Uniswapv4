@@ -121,6 +121,16 @@ const translations = {
     land_testimonial1: 'This platform has completely transformed how I manage my crypto portfolio. The interface is clean and transactions are lightning fast.',
     land_testimonial2: "I've tried dozens of exchanges and this is by far the most user-friendly. Customer support is exceptional and security features give me peace of mind.",
     land_testimonial3: 'The trading tools are professional-grade yet accessible to beginners. I\'ve recommended this platform to everyone I know in the crypto space.',
+    // Header nav
+    nav_buyCrypto: 'Buy Crypto', nav_buyCryptoSelect: 'Buy Crypto Select', nav_buyCryptoConfirm: 'Buy Crypto Confirm', nav_buyCryptoDetails: 'Buy Crypto Details',
+    nav_markets: 'Markets',
+    nav_sellCrypto: 'Sell Crypto', nav_sellCryptoSelect: 'Sell Crypto Select', nav_sellCryptoConfirm: 'Sell Crypto Confirm', nav_sellCryptoDetails: 'Sell Crypto Details',
+    nav_blog: 'Blog',
+    nav_pages: 'Pages', nav_about: 'About', nav_login: 'Login', nav_register: 'Register', nav_contact: 'Contact', nav_faq: 'FAQ',
+    nav_assets: 'Assets', nav_visaCard: 'Visa Card', nav_cryptoLoans: 'Crypto Loans', nav_pay: 'Pay',
+    nav_ordersTrades: 'Orders & Trades', nav_convert: 'Convert', nav_spot: 'Spot', nav_margin: 'Margin',
+    nav_wallet: 'Wallet', nav_notifications: 'Notifications',
+    nav_createAccount: 'Create Account',
   },
   it: {
     wallet: d('UG9ydGFmb2dsaW8='), home: 'Home', swap: 'Scambia', profile: 'Profilo',
@@ -206,7 +216,7 @@ const translations = {
     land_testimonialHeading: 'I nostri clienti amano quello che facciamo', land_testimonialSub: 'Trasforma il tuo portafoglio con Uniswap V4', land_testimonialDesc: 'Affidato da migliaia di trader in tutto il mondo. Ecco cosa dicono i nostri utenti della loro esperienza.',
     land_customerReviews: 'Recensioni Clienti',
     land_ctaTitle: 'Guadagna fino a $25 in crypto', land_ctaDesc: 'Scopri come funzionano le criptovalute specifiche — e prova ogni crypto da solo.',
-    land_createAccount: 'Crea Account',
+    land_createAccount: 'Crea un Conto',
     land_footerTalk: 'Parliamo! \ud83e\udd19', land_footerSecure: 'Exchange di Asset Digitali Sicuro',
     land_products: 'PRODOTTI', land_services: 'SERVIZI', land_support: 'SUPPORTO', land_aboutUs: 'CHI SIAMO',
     land_spotTrading: 'Trading Spot', land_markets: 'Mercati', land_exchange: 'Exchange', land_buyCrypto: 'Compra Crypto', land_trading: 'Trading', land_helpCenter: 'Centro Assistenza', land_about: 'Chi Siamo', land_privacyPolicy: 'Informativa Privacy', land_termsOfService: 'Termini di Servizio', land_contact: 'Contatti',
@@ -223,6 +233,16 @@ const translations = {
     land_testimonial1: 'Questa piattaforma ha completamente trasformato il modo in cui gestisco il mio portafoglio crypto. L\'interfaccia è pulita e le transazioni sono velocissime.',
     land_testimonial2: 'Ho provato decine di exchange e questo è di gran lunga il più intuitivo. L\'assistenza clienti è eccezionale e le funzioni di sicurezza mi danno tranquillità.',
     land_testimonial3: 'Gli strumenti di trading sono di livello professionale ma accessibili anche ai principianti. Ho consigliato questa piattaforma a tutti quelli che conosco nel mondo crypto.',
+    // Header nav
+    nav_buyCrypto: 'Compra Crypto', nav_buyCryptoSelect: 'Seleziona Crypto', nav_buyCryptoConfirm: 'Conferma Acquisto', nav_buyCryptoDetails: 'Dettagli Acquisto',
+    nav_markets: 'Mercati',
+    nav_sellCrypto: 'Vendi Crypto', nav_sellCryptoSelect: 'Seleziona Vendita', nav_sellCryptoConfirm: 'Conferma Vendita', nav_sellCryptoDetails: 'Dettagli Vendita',
+    nav_blog: 'Blog',
+    nav_pages: 'Pagine', nav_about: 'Chi Siamo', nav_login: 'Accedi', nav_register: 'Registrati', nav_contact: 'Contatti', nav_faq: 'FAQ',
+    nav_assets: 'Asset', nav_visaCard: 'Carta Visa', nav_cryptoLoans: 'Prestiti Crypto', nav_pay: 'Paga',
+    nav_ordersTrades: 'Ordini e Scambi', nav_convert: 'Converti', nav_spot: 'Spot', nav_margin: 'Margine',
+    nav_wallet: 'Portafoglio', nav_notifications: 'Notifiche',
+    nav_createAccount: 'Crea un Conto',
   }
 };
 
