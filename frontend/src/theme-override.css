@@ -1,7 +1,8 @@
 /* ============================================
    Rockie Theme - Global App Override
-   Applied to ALL pages (dashboard, admin, etc.)
-   Only changes visual appearance, no functionality impact
+   Applied to dashboard, admin, auth pages etc.
+   SCOPED: Does NOT apply inside .body-rockie (landing page)
+   which has its own dark/light mode CSS variables.
    ============================================ */
 
 /* Force dark theme on body */
@@ -11,19 +12,24 @@ body {
   font-family: "DM Sans", sans-serif !important;
 }
 
+/* Landing page manages its own bg via CSS vars */
+body:has(.body-rockie) {
+  background: transparent !important;
+  color: inherit !important;
+}
+
 /* ============ CARD OVERRIDES ============ */
-/* shadcn Card components */
-[class*="rounded-lg"][class*="border"][class*="bg-card"],
-[class*="rounded-xl"][class*="border"],
-.border.rounded-lg,
-.border.rounded-xl {
+/* Only apply to non-landing pages */
+body:not(:has(.body-rockie)) [class*="rounded-lg"][class*="border"][class*="bg-card"],
+body:not(:has(.body-rockie)) [class*="rounded-xl"][class*="border"],
+body:not(:has(.body-rockie)) .border.rounded-lg,
+body:not(:has(.body-rockie)) .border.rounded-xl {
   background: #222630 !important;
   border-color: #23262f !important;
   color: #b1b5c3 !important;
 }
 
 /* ============ BUTTON OVERRIDES ============ */
-/* Primary buttons */
 .bg-blue-600, .bg-blue-700, 
 [class*="bg-blue-600"], [class*="bg-blue-700"],
 button[class*="bg-blue"] {
@@ -35,58 +41,67 @@ button[class*="bg-blue"] {
   background: #2860e0 !important;
 }
 
-/* ============ INPUT OVERRIDES ============ */
-input[class*="border"], 
-textarea[class*="border"],
-select[class*="border"],
-[class*="form-control"] {
+/* ============ INPUT OVERRIDES (non-landing pages) ============ */
+body:not(:has(.body-rockie)) input[class*="border"], 
+body:not(:has(.body-rockie)) textarea[class*="border"],
+body:not(:has(.body-rockie)) select[class*="border"] {
   background: #18191d !important;
   border-color: #23262f !important;
   color: #fff !important;
 }
 
-input::placeholder, textarea::placeholder {
+body:not(:has(.body-rockie)) input::placeholder, 
+body:not(:has(.body-rockie)) textarea::placeholder {
   color: #777e90 !important;
 }
 
-input:focus, textarea:focus, select:focus {
+body:not(:has(.body-rockie)) input:focus, 
+body:not(:has(.body-rockie)) textarea:focus, 
+body:not(:has(.body-rockie)) select:focus {
   border-color: #3772ff !important;
   outline: none !important;
   box-shadow: 0 0 0 2px rgba(55, 114, 255, 0.2) !important;
 }
 
-/* ============ TEXT OVERRIDES ============ */
-.text-gray-900, .text-gray-800, .text-gray-700 {
+/* ============ TEXT OVERRIDES (non-landing pages) ============ */
+body:not(:has(.body-rockie)) .text-gray-900, 
+body:not(:has(.body-rockie)) .text-gray-800, 
+body:not(:has(.body-rockie)) .text-gray-700 {
   color: #fff !important;
 }
 
-.text-gray-600, .text-gray-500 {
+body:not(:has(.body-rockie)) .text-gray-600, 
+body:not(:has(.body-rockie)) .text-gray-500 {
   color: #b1b5c3 !important;
 }
 
-.text-gray-400, .text-gray-300 {
+body:not(:has(.body-rockie)) .text-gray-400, 
+body:not(:has(.body-rockie)) .text-gray-300 {
   color: #777e90 !important;
 }
 
-/* ============ BACKGROUND OVERRIDES ============ */
-.bg-white, .bg-gray-50, .bg-gray-100 {
+/* ============ BACKGROUND OVERRIDES (non-landing pages) ============ */
+body:not(:has(.body-rockie)) .bg-white, 
+body:not(:has(.body-rockie)) .bg-gray-50, 
+body:not(:has(.body-rockie)) .bg-gray-100 {
   background: #141416 !important;
 }
 
-.bg-gradient-to-b {
+body:not(:has(.body-rockie)) .bg-gradient-to-b {
   background: #141416 !important;
 }
 
-.bg-gray-200 {
+body:not(:has(.body-rockie)) .bg-gray-200 {
   background: #23262f !important;
 }
 
-/* ============ BORDER OVERRIDES ============ */
-.border-gray-200, .border-gray-300 {
+/* ============ BORDER OVERRIDES (non-landing) ============ */
+body:not(:has(.body-rockie)) .border-gray-200, 
+body:not(:has(.body-rockie)) .border-gray-300 {
   border-color: #23262f !important;
 }
 
-.divide-gray-200 > * + * {
+body:not(:has(.body-rockie)) .divide-gray-200 > * + * {
   border-color: #23262f !important;
 }
 
@@ -99,27 +114,28 @@ input:focus, textarea:focus, select:focus {
   color: #b1b5c3 !important;
 }
 
-/* ============ TABLE OVERRIDES ============ */
-table {
+/* ============ TABLE OVERRIDES (non-landing) ============ */
+/* Use body-level class check to avoid landing page conflicts */
+body:not(:has(.body-rockie)) table {
   color: #b1b5c3 !important;
 }
 
-table th {
+body:not(:has(.body-rockie)) table th {
   color: #777e90 !important;
   border-color: #23262f !important;
 }
 
-table td {
+body:not(:has(.body-rockie)) table td {
   border-color: #23262f !important;
   color: #fff !important;
 }
 
-table tr:hover {
+body:not(:has(.body-rockie)) table tr:hover {
   background: #18191d !important;
 }
 
-/* ============ LABEL OVERRIDES ============ */
-label {
+/* ============ LABEL OVERRIDES (non-landing) ============ */
+body:not(:has(.body-rockie)) label {
   color: #fff !important;
 }
 
@@ -158,13 +174,7 @@ label {
   background: #3772ff;
 }
 
-/* ============ WALLET DASHBOARD SPECIFIC ============ */
-/* Navigation bar at top of wallet */
-nav, [class*="nav"] {
-  border-color: #23262f !important;
-}
-
-/* Status badges */
+/* ============ STATUS COLORS ============ */
 .text-green-600, .text-green-700, .text-green-800 {
   color: #58bd7d !important;
 }
@@ -181,23 +191,11 @@ nav, [class*="nav"] {
   color: #3772ff !important;
 }
 
-/* QR Code container */
-[class*="qr"] svg, canvas {
-  background: #fff !important;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-/* ============ ADMIN LAYOUT SPECIFIC ============ */
-/* Sidebar */
-aside, [class*="sidebar"] {
+/* ============ ADMIN SIDEBAR ============ */
+body:not(:has(.body-rockie)) aside, 
+body:not(:has(.body-rockie)) [class*="sidebar"] {
   background: #18191d !important;
   border-color: #23262f !important;
-}
-
-/* Hover states in sidebar/nav */
-a:hover, button:hover {
-  transition: all 0.2s ease;
 }
 
 /* ============ TOAST OVERRIDES ============ */
@@ -207,20 +205,8 @@ a:hover, button:hover {
   --normal-text: #fff !important;
 }
 
-/* ============ SELECTION HIGHLIGHT ============ */
+/* ============ SELECTION ============ */
 ::selection {
   background: rgba(55, 114, 255, 0.3);
   color: #fff;
-}
-
-/* ============ TRANSITION ============ */
-*, *::before, *::after {
-  transition-property: background-color, border-color, color;
-  transition-duration: 0.15s;
-  transition-timing-function: ease;
-}
-
-/* Don't transition transforms and opacity (performance) */
-[class*="animate"], [class*="transition"] {
-  transition-property: all;
 }

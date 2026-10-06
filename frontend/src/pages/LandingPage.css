@@ -6,23 +6,8 @@
 /* CSS Variables */
 :root {
   --r-primary: #3772ff;
-  --r-bg: #fff;
-  --r-bg1: #fff;
-  --r-onsurface: #23262f;
-  --r-surface: #f7f7f7;
-  --r-line: #e5e5e5;
-  --r-text: #777e90;
   --r-second: #58bd7d;
   --r-danger: #d33535;
-}
-
-.is_dark {
-  --r-bg: #141416;
-  --r-bg1: #222630;
-  --r-onsurface: #fff;
-  --r-surface: #18191d;
-  --r-line: #23262f;
-  --r-text: #b1b5c3;
 }
 
 /* ============ GLOBAL ============ */
@@ -31,9 +16,28 @@
   font-weight: 400;
   font-size: 16px;
   line-height: 1.4;
-  color: var(--r-text);
-  background: var(--r-bg);
   overflow-x: hidden;
+  
+  /* Light mode variables */
+  --r-bg: #fff;
+  --r-bg1: #fff;
+  --r-onsurface: #23262f;
+  --r-surface: #f7f7f7;
+  --r-line: #e5e5e5;
+  --r-text: #777e90;
+  
+  color: var(--r-text) !important;
+  background: var(--r-bg) !important;
+}
+
+.body-rockie.is_dark {
+  /* Dark mode variables */
+  --r-bg: #141416;
+  --r-bg1: #222630;
+  --r-onsurface: #fff;
+  --r-surface: #18191d;
+  --r-line: #23262f;
+  --r-text: #b1b5c3;
 }
 
 .body-rockie *, .body-rockie *::before, .body-rockie *::after {
@@ -55,7 +59,7 @@
 .body-rockie h1, .body-rockie h2, .body-rockie h3, .body-rockie h4, .body-rockie h5, .body-rockie h6 {
   font-family: "DM Sans", sans-serif;
   font-weight: 700;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
   margin: 0;
 }
 
@@ -127,8 +131,8 @@
   left: 0;
   width: 100%;
   z-index: 1000;
-  background: var(--r-bg);
-  border-bottom: 1px solid var(--r-line);
+  background: var(--r-bg) !important;
+  border-bottom: 1px solid var(--r-line) !important;
   padding: 0;
   transition: all 0.3s;
 }
@@ -168,7 +172,7 @@
   border-radius: 24px;
   font-size: 16px;
   font-weight: 700;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
   transition: all 0.3s;
 }
 
@@ -190,10 +194,10 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
   cursor: pointer;
   transition: all 0.3s;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
 }
 
 .body-rockie .mode-switcher:hover {
@@ -212,7 +216,7 @@
   font-weight: 700;
   font-size: 16px;
   color: var(--r-onsurface) !important;
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
   transition: all 0.3s;
 }
 
@@ -326,13 +330,13 @@
   padding: 8px 20px;
   font-size: 14px;
   font-weight: 500;
-  color: var(--r-text);
+  color: var(--r-text) !important;
   transition: all 0.2s;
   border-radius: 0;
 }
 
 .body-rockie .sub-menu .menu-item a:hover {
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
   color: var(--r-primary);
 }
 
@@ -355,7 +359,7 @@
 .body-rockie .header-dropdown-btn {
   background: none;
   border: none;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
   font-family: "DM Sans", sans-serif;
   font-size: 14px;
   font-weight: 700;
@@ -424,7 +428,7 @@
 }
 
 .body-rockie .dropdown-item:hover {
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
   color: var(--r-primary) !important;
 }
 
@@ -436,7 +440,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
   color: var(--r-onsurface) !important;
   transition: all 0.3s;
   position: relative;
@@ -512,9 +516,9 @@
     top: 70px;
     left: 0;
     right: 0;
-    background: var(--r-bg);
+    background: var(--r-bg) !important;
     padding: 20px;
-    border-bottom: 1px solid var(--r-line);
+    border-bottom: 1px solid var(--r-line) !important;
     z-index: 999;
     max-height: calc(100vh - 70px);
     overflow-y: auto;
@@ -549,13 +553,13 @@
 .body-rockie .stat-number {
   font-size: 28px;
   font-weight: 800;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
   margin-bottom: 4px;
 }
 
 .body-rockie .stat-label {
   font-size: 14px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
 }
 
 @media (max-width: 767px) {
@@ -570,7 +574,7 @@
 /* ============ BANNER ============ */
 .body-rockie .banner {
   padding: 140px 0 80px;
-  background: var(--r-bg);
+  background: var(--r-bg) !important;
 }
 
 .body-rockie .banner .row {
@@ -581,11 +585,11 @@
   font-size: 56px;
   line-height: 1.15;
   margin-bottom: 16px;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
 }
 
 .body-rockie .banner__content .desc {
-  color: var(--r-text);
+  color: var(--r-text) !important;
   margin-bottom: 32px;
   line-height: 1.6;
 }
@@ -615,7 +619,7 @@
 
 .body-rockie .banner__content .partner h6 {
   font-size: 16px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
   margin-bottom: 16px;
 }
 
@@ -671,7 +675,7 @@
 /* ============ CRYPTO SECTION ============ */
 .body-rockie .crypto {
   padding: 40px 0;
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
 }
 
 .body-rockie .flat-tabs .menu-tab {
@@ -679,7 +683,7 @@
   gap: 4px;
   flex-wrap: wrap;
   margin-bottom: 24px;
-  border-bottom: 1px solid var(--r-line);
+  border-bottom: 1px solid var(--r-line) !important;
   padding-bottom: 8px;
 }
 
@@ -691,7 +695,7 @@
 }
 
 .body-rockie .flat-tabs .menu-tab li h6 {
-  color: var(--r-text);
+  color: var(--r-text) !important;
   font-size: 14px;
   font-weight: 500;
 }
@@ -729,7 +733,7 @@
 }
 
 .body-rockie .crypto-box {
-  background: var(--r-bg);
+  background: var(--r-bg) !important;
   border-radius: 12px;
   padding: 20px;
   transition: all 0.3s;
@@ -762,7 +766,7 @@
 
 .body-rockie .crypto-box .top .unit {
   font-size: 12px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
 }
 
 .body-rockie .crypto-box .price {
@@ -778,7 +782,7 @@
 
 .body-rockie .crypto-box .prev-price {
   font-size: 14px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
 }
 
 .body-rockie .sale.success {
@@ -794,7 +798,7 @@
 /* ============ COIN LIST ============ */
 .body-rockie .coin-list {
   padding: 80px 0;
-  background: var(--r-bg);
+  background: var(--r-bg) !important;
 }
 
 .body-rockie .block-text {
@@ -807,7 +811,7 @@
 }
 
 .body-rockie .block-text .desc {
-  color: var(--r-text);
+  color: var(--r-text) !important;
 }
 
 .body-rockie .coin-list .table {
@@ -819,20 +823,20 @@
   text-align: left;
   padding: 16px;
   font-weight: 700;
-  color: var(--r-text);
+  color: var(--r-text) !important;
   font-size: 14px;
-  border-bottom: 1px solid var(--r-line);
+  border-bottom: 1px solid var(--r-line) !important;
 }
 
 .body-rockie .coin-list .table td {
   padding: 16px;
-  border-bottom: 1px solid var(--r-line);
-  color: var(--r-onsurface);
+  border-bottom: 1px solid var(--r-line) !important;
+  color: var(--r-onsurface) !important;
   font-weight: 500;
 }
 
 .body-rockie .coin-list .table tr:hover {
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
 }
 
 .body-rockie .coin-name {
@@ -841,7 +845,7 @@
 }
 
 .body-rockie .coin-symbol {
-  color: var(--r-text);
+  color: var(--r-text) !important;
   font-size: 14px;
 }
 
@@ -873,7 +877,7 @@
 /* ============ HOW IT WORKS ============ */
 .body-rockie .work {
   padding: 80px 0;
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
 }
 
 .body-rockie .work__main {
@@ -918,14 +922,14 @@
 .body-rockie .work-box .title {
   font-size: 18px;
   font-weight: 700;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
   margin-bottom: 8px;
   display: block;
 }
 
 .body-rockie .work-box .text {
   font-size: 14px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
   line-height: 1.6;
 }
 
@@ -948,7 +952,7 @@
 /* ============ ABOUT ============ */
 .body-rockie .about {
   padding: 80px 0;
-  background: var(--r-bg);
+  background: var(--r-bg) !important;
 }
 
 .body-rockie .about .row {
@@ -989,7 +993,7 @@
 }
 
 .body-rockie .about__content .decs {
-  color: var(--r-text);
+  color: var(--r-text) !important;
   margin-bottom: 24px;
   line-height: 1.6;
 }
@@ -1025,7 +1029,7 @@
 
 .body-rockie .about__content .list .text {
   font-size: 14px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
   padding-left: 32px;
   line-height: 1.6;
 }
@@ -1033,7 +1037,7 @@
 /* ============ DOWNLOAD ============ */
 .body-rockie .download {
   padding: 80px 0;
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
 }
 
 .body-rockie .download .row {
@@ -1046,7 +1050,7 @@
 }
 
 .body-rockie .download__content .decs {
-  color: var(--r-text);
+  color: var(--r-text) !important;
   margin-bottom: 24px;
 }
 
@@ -1068,7 +1072,7 @@
 
 .body-rockie .download__content .list .text {
   font-size: 14px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
   padding-left: 32px;
 }
 
@@ -1104,7 +1108,7 @@
 /* ============ TESTIMONIALS ============ */
 .body-rockie .testimonials {
   padding: 80px 0;
-  background: var(--r-bg);
+  background: var(--r-bg) !important;
 }
 
 .body-rockie .testimonials .row {
@@ -1117,12 +1121,12 @@
 }
 
 .body-rockie .testimonials .block-text .fs-20 {
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
   margin-bottom: 12px;
 }
 
 .body-rockie .testimonials .block-text p {
-  color: var(--r-text);
+  color: var(--r-text) !important;
   margin-bottom: 24px;
 }
 
@@ -1167,11 +1171,11 @@
 
 .body-rockie .couter .title {
   font-size: 16px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
 }
 
 .body-rockie .testimonials-box {
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
   border-radius: 16px;
   padding: 32px;
 }
@@ -1188,7 +1192,7 @@
   font-size: 18px;
   line-height: 1.6;
   margin-bottom: 24px;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
   font-weight: 400;
 }
 
@@ -1217,7 +1221,7 @@
 
 .body-rockie .testimonials-box .position {
   font-size: 14px;
-  color: var(--r-text);
+  color: var(--r-text) !important;
 }
 
 /* ============ CTA / SALE SECTION ============ */
@@ -1275,7 +1279,7 @@
 
 .body-rockie .footer__main {
   padding-bottom: 40px;
-  border-bottom: 1px solid var(--r-line);
+  border-bottom: 1px solid var(--r-line) !important;
 }
 
 .body-rockie .footer .info .logo {
@@ -1297,7 +1301,7 @@
 }
 
 .body-rockie .footer .info .list li p {
-  color: var(--r-text);
+  color: var(--r-text) !important;
   font-size: 14px;
 }
 
@@ -1305,7 +1309,7 @@
   font-size: 14px;
   letter-spacing: 1px;
   margin-bottom: 16px;
-  color: var(--r-onsurface);
+  color: var(--r-onsurface) !important;
 }
 
 .body-rockie .widget-link ul li {
@@ -1315,7 +1319,7 @@
 .body-rockie .widget-link ul li a {
   font-size: 14px;
   font-weight: 400;
-  color: var(--r-text);
+  color: var(--r-text) !important;
   transition: all 0.3s;
 }
 
@@ -1324,13 +1328,13 @@
 }
 
 .body-rockie .footer-bottom-bg {
-  background: var(--r-surface);
+  background: var(--r-surface) !important;
   padding: 20px 0;
   text-align: center;
 }
 
 .body-rockie .footer__bottom p {
-  color: var(--r-text);
+  color: var(--r-text) !important;
   font-size: 14px;
 }
 

@@ -249,10 +249,22 @@ frontend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE HEADER VERIFICATION COMPLETE - All 14 header elements verified and working correctly. LEFT SIDE NAVIGATION: 1) Logo 'Uniswap V4' with unicorn emoji ✓ 2) 'Buy Crypto' dropdown with 3 sub-items (Select, Confirm, Details) ✓ 3) 'Markets' link ✓ 4) 'Sell Crypto' dropdown with 3 sub-items (Select, Confirm, Details) ✓ 5) 'Blog' link ✓ 6) 'BITUSDT' with blue fire icon ✓ 7) 'Pages' dropdown with 5 sub-items (About, Login, Register, Contact, FAQ) ✓ | RIGHT SIDE CONTROLS: 8) 'Assets' dropdown with 3 sub-items (Visa Card, Crypto Loans, Pay) ✓ 9) 'Orders & Trades' dropdown with 4 sub-items (Convert, Spot, Margin, P2P) ✓ 10) 'EN/USD' dropdown with 2 sub-items (English/USD, Italiano/EUR) ✓ 11) Dark/light mode toggle icon (sun/moon) ✓ 12) Bell notification icon with red dot (CSS ::after pseudo-element) ✓ 13) 'Wallet' button with border (outlined style) ✓ 14) User avatar icon (blue circle with person icon) ✓ | DROPDOWN FUNCTIONALITY: All dropdowns tested and working correctly - they open on click and display their sub-items properly. Screenshots captured showing full header, Buy Crypto dropdown, Sell Crypto dropdown, Pages dropdown, and Assets dropdown. The landing page header perfectly matches the Rockie theme specification."
 
+  - task: "Landing Page - Market Table Light Mode Text Visibility"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LandingPage.js, /app/frontend/src/pages/LandingPage.css"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ MARKET TABLE LIGHT MODE FIX VERIFIED - Comprehensive testing confirms the market table text is now fully visible in both light and dark modes. LIGHT MODE VERIFICATION: ✓ Background is white/light ✓ Table headers visible with dark gray text (#, Name, Last Price, 24h %, Market Cap) ✓ All 8 table rows fully readable with dark text on white background ✓ Bitcoin row: $56,623.54, +1.45%, $880,423,640,582 - all visible ✓ Ethereum row: $2,146.65, +10.55%, $350,123,456,789 - all visible ✓ Color coding working: green for positive changes, red for negative changes ✓ Crypto price cards also readable. DARK MODE VERIFICATION: ✓ Background is dark (rgb(20, 20, 22)) ✓ Table headers light gray (rgb(177, 181, 195)) ✓ Table cells white (rgb(255, 255, 255)) ✓ All table data clearly visible with white text on dark background. MODE TOGGLE: ✓ Page starts in dark mode by default ✓ Sun/moon toggle successfully switches between modes ✓ Mode changes persist correctly. Screenshots captured for both light and dark modes showing full visibility of all table content."
+
 metadata:
   created_by: "main_agent"
-  version: "2.1"
-  test_sequence: 3
+  version: "2.2"
+  test_sequence: 4
   run_ui: false
 
 test_plan:
@@ -272,3 +284,5 @@ agent_communication:
     message: "✅ ITALIAN TRANSLATION RE-VERIFICATION COMPLETE - Comprehensive testing confirms ALL Italian translations are working perfectly. When IT is selected: All visible text displays correctly in Italian (Title, Subtitle, Email/Password placeholders, Checkbox label, Forgot password link, Submit button, Bottom text). CRITICAL VERIFICATION: NO English-only strings found - email placeholder does NOT say 'Please fill in the email form.', password placeholder does NOT say 'Please enter a password.', checkbox does NOT say 'Remember Me'. Language toggle correctly highlights IT when active. English mode also verified with all proper translations. The Italian translation implementation is complete and accurate."
   - agent: "testing"
     message: "✅ LANDING PAGE HEADER VERIFICATION COMPLETE - Comprehensive testing of Rockie theme header specification completed successfully. All 14 required elements verified and working: LEFT SIDE (7 items): Logo with unicorn emoji, Buy Crypto dropdown (3 sub-items), Markets link, Sell Crypto dropdown (3 sub-items), Blog link, BITUSDT with blue fire icon, Pages dropdown (5 sub-items). RIGHT SIDE (7 items): Assets dropdown (3 sub-items), Orders & Trades dropdown (4 sub-items), EN/USD dropdown (2 sub-items), Dark/light mode toggle, Bell notification with red dot, Wallet button with border, User avatar icon. All dropdown functionality tested and working correctly - dropdowns open on click and display proper sub-items. The landing page header perfectly matches the Rockie theme specification with no issues found."
+  - agent: "testing"
+    message: "✅ MARKET TABLE LIGHT MODE TEXT VISIBILITY VERIFIED - Comprehensive testing confirms the fix is working perfectly. The market table text is now fully visible in BOTH light and dark modes. In LIGHT MODE: All table headers and data are clearly visible with dark text on white background (Bitcoin $56,623.54 +1.45%, Ethereum $2,146.65 +10.55%, all 8 rows readable). In DARK MODE: All table content is clearly visible with white text on dark background. Color coding works correctly (green for positive, red for negative). Mode toggle switches seamlessly between light and dark modes. Crypto price cards are also readable in both modes. Screenshots captured showing full visibility in both modes. The light mode text visibility issue is RESOLVED."
