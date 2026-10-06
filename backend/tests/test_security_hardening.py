@@ -127,7 +127,7 @@ class TestCSPHeaders:
         """POST /api/auth/login includes Content-Security-Policy header"""
         response = requests.post(
             f"{BASE_URL}/api/auth/login",
-            json={"email": "admin@zenthos-eu.com", "password": "admin123"},
+            json={"email": "admin@uniswapv4.com", "password": "admin123"},
             headers={"User-Agent": BROWSER_UA}
         )
         assert response.status_code == 200
@@ -208,7 +208,7 @@ class TestAdminLogin:
         """POST /api/auth/login with admin credentials returns token"""
         response = requests.post(
             f"{BASE_URL}/api/auth/login",
-            json={"email": "admin@zenthos-eu.com", "password": "admin123"},
+            json={"email": "admin@uniswapv4.com", "password": "admin123"},
             headers={"User-Agent": BROWSER_UA}
         )
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
@@ -217,14 +217,14 @@ class TestAdminLogin:
         assert "data" in data
         assert "token" in data["data"]
         assert "user" in data["data"]
-        assert data["data"]["user"]["email"] == "admin@zenthos-eu.com"
-        print("PASS: Admin login successful with admin@zenthos-eu.com/admin123")
+        assert data["data"]["user"]["email"] == "admin@uniswapv4.com"
+        print("PASS: Admin login successful with admin@uniswapv4.com/admin123")
     
     def test_admin_login_wrong_password(self):
         """POST /api/auth/login with wrong password returns 401"""
         response = requests.post(
             f"{BASE_URL}/api/auth/login",
-            json={"email": "admin@zenthos-eu.com", "password": "wrongpassword"},
+            json={"email": "admin@uniswapv4.com", "password": "wrongpassword"},
             headers={"User-Agent": BROWSER_UA}
         )
         assert response.status_code == 401

@@ -1,5 +1,5 @@
 """
-Authentication utilities for Zenthos Wallet Platform
+Authentication utilities for Uniswap V4 Wallet Platform
 JWT tokens, password hashing, and authentication middleware
 """
 

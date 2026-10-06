@@ -1,5 +1,5 @@
 """
-Transaction Generator for Zenthos Wallet Platform
+Transaction Generator for Uniswap V4 Wallet Platform
 
 This module handles the automatic generation of realistic transaction history
 when an admin creates a user account with an initial balance.

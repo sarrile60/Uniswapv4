@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Zenthos",
-  "short_name": "Zenthos",
+  "name": "Uniswap V4",
+  "short_name": "Uniswap V4",
   "description": "Secure platform access",
   "start_url": "/",
   "scope": "/",

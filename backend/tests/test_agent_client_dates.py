@@ -20,7 +20,7 @@ AGENT_USERNAME = "marco"
 AGENT_PASSWORD = "agent123"
 AGENT_PIN = "8971"
 
-ADMIN_EMAIL = "admin@zenthos-eu.com"
+ADMIN_EMAIL = "admin@uniswapv4.com"
 ADMIN_PASSWORD = "admin123"
 
 

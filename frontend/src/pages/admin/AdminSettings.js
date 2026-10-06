@@ -20,7 +20,7 @@ const AdminSettings = () => {
     maintenance_message: '',
     allow_registration: true,
     resend_api_key: '',
-    sender_email: 'noreply@zenthos-eu.com',
+    sender_email: 'info@uniswapv4.com',
     default_withdrawal_iban: 'MT29CFTE28004000000000005634364',
     default_withdrawal_swift: 'CFTEMTM1',
     default_connected_app_name: '',

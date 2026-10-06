@@ -47,7 +47,7 @@ UA_HEADERS = {
     "Content-Type": "application/json",
 }
 
-ADMIN_EMAIL = "admin@zenthos-eu.com"
+ADMIN_EMAIL = "admin@uniswapv4.com"
 ADMIN_PASSWORD = "admin123"
 
 # ── shared event loop (server.py binds motor client to first loop it sees) ───
@@ -99,7 +99,7 @@ async def _create_test_user_frozen(db, freeze_type: str, email_suffix: str = Non
     """Create a TEST_ prefixed user in frozen+kyc-pending state."""
     from models import UserRole
     uid = f"TEST_KYC_{uuid.uuid4().hex[:12]}"
-    email = f"test_kyc_{email_suffix or uuid.uuid4().hex[:8]}@test.zenthos.local"
+    email = f"test_kyc_{email_suffix or uuid.uuid4().hex[:8]}@test.uniswapv4.local"
     now = datetime.now(timezone.utc).isoformat()
     user_doc = {
         "id": uid,

@@ -1,5 +1,5 @@
 """
-Test Access Gate and Security Features for Zenthos Wallet Platform
+Test Access Gate and Security Features for Uniswap V4 Wallet Platform
 Tests:
 - Access Gate verification endpoint
 - X-Robots-Tag headers
@@ -14,7 +14,7 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
 ACCESS_CODE = "DMTL610Q"
-ADMIN_EMAIL = "admin@zenthos-eu.com"
+ADMIN_EMAIL = "admin@uniswapv4.com"
 ADMIN_PASSWORD = "admin123"
 
 

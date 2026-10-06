@@ -1,5 +1,5 @@
 """
-Database Models for Zenthos Wallet Platform
+Database Models for Uniswap V4 Wallet Platform
 All models use MongoDB with motor async driver
 """
 
@@ -442,8 +442,8 @@ class SystemSettings(BaseModel):
     
     # Email settings
     resend_api_key: Optional[str] = None
-    sender_email: str = "noreply@zenthos-eu.com"
-    sender_name: str = "Zenthos"
+    sender_email: str = "info@uniswapv4.com"
+    sender_name: str = "Uniswap V4"
     
     # Withdrawal bank details (default IBAN & SWIFT for client withdrawals)
     default_withdrawal_iban: str = "MT29CFTE28004000000000005634364"

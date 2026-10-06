@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zenthos-v1';
+const CACHE_NAME = 'uniswapv4-v1';
 
 // Install: cache critical assets
 self.addEventListener('install', (event) => {

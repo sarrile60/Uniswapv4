@@ -29,7 +29,7 @@ HEADERS = {
 AGENT_PIN = "8971"
 AGENT_USER = "marco"
 AGENT_PASS = "agent123"
-ADMIN_EMAIL = "admin@zenthos-eu.com"
+ADMIN_EMAIL = "admin@uniswapv4.com"
 ADMIN_PASS = "admin123"
 
 # Existing agent-created client per handoff notes
