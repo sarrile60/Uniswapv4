@@ -8,6 +8,19 @@ const LandingPage = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [activeCoinTab, setActiveCoinTab] = useState(0);
 
+  const [activeDropdown, setActiveDropdown] = useState(null);
+
+  const toggleDropdown = (name) => {
+    setActiveDropdown(activeDropdown === name ? null : name);
+  };
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => setActiveDropdown(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   useEffect(() => {
     if (darkMode) {
       document.body.classList.add("is_dark");
@@ -71,20 +84,56 @@ const LandingPage = () => {
                   <div className="left__main">
                     <nav id="main-nav" className={`main-nav ${mobileMenuOpen ? "active" : ""}`}>
                       <ul id="menu-primary-menu" className="menu">
-                        <li className="menu-item current-menu-item">
-                          <Link to="/">Homepage</Link>
+                        {/* Buy Crypto Dropdown */}
+                        <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('buy'); }}>
+                          <a href="#!">Buy Crypto</a>
+                          <ul className={`sub-menu ${activeDropdown === 'buy' ? 'show' : ''}`}>
+                            <li className="menu-item"><Link to="/register">Buy Crypto Select</Link></li>
+                            <li className="menu-item"><Link to="/register">Buy Crypto Confirm</Link></li>
+                            <li className="menu-item"><Link to="/register">Buy Crypto Details</Link></li>
+                          </ul>
                         </li>
+
+                        {/* Markets */}
                         <li className="menu-item">
                           <a href="#crypto-section">Markets</a>
                         </li>
-                        <li className="menu-item">
-                          <a href="#how-it-works">How It Works</a>
+
+                        {/* Sell Crypto Dropdown */}
+                        <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('sell'); }}>
+                          <a href="#!">Sell Crypto</a>
+                          <ul className={`sub-menu ${activeDropdown === 'sell' ? 'show' : ''}`}>
+                            <li className="menu-item"><Link to="/register">Sell Crypto Select</Link></li>
+                            <li className="menu-item"><Link to="/register">Sell Crypto Confirm</Link></li>
+                            <li className="menu-item"><Link to="/register">Sell Crypto Details</Link></li>
+                          </ul>
                         </li>
+
+                        {/* Blog */}
                         <li className="menu-item">
-                          <a href="#about-section">About</a>
+                          <a href="#about-section">Blog</a>
                         </li>
+
+                        {/* BITUSDT Hot Pair */}
                         <li className="menu-item">
-                          <a href="#testimonials">Testimonials</a>
+                          <Link to="/register" className="hot-pair">
+                            BITUSDT
+                            <svg className="fire-icon" width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path d="M6.76 3.2C6.69 3.14 6.6 3.11 6.51 3.12C6.42 3.14 6.34 3.19 6.3 3.28C6.15 3.56 5.96 3.82 5.74 4.05C5.77 3.89 5.78 3.72 5.78 3.55C5.78 3.23 5.73 2.9 5.65 2.56C5.37 1.47 4.63 0.55 3.63 0.03C3.54-0.01 3.44-0.01 3.35 0.04C3.27 0.08 3.21 0.17 3.2 0.27C3.13 1.26 2.62 2.16 1.8 2.75L1.71 2.81C1.19 3.19 0.77 3.67 0.48 4.23C0.19 4.8 0.04 5.41 0.04 6.04C0.04 6.36 0.08 6.69 0.17 7.03C0.62 8.78 2.19 10 4 10C6.18 10 7.96 8.22 7.96 6.04C7.96 4.96 7.53 3.95 6.76 3.2Z" fill="#3772FF"/>
+                            </svg>
+                          </Link>
+                        </li>
+
+                        {/* Pages Dropdown */}
+                        <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('pages'); }}>
+                          <a href="#!">Pages</a>
+                          <ul className={`sub-menu ${activeDropdown === 'pages' ? 'show' : ''}`}>
+                            <li className="menu-item"><Link to="/about">About</Link></li>
+                            <li className="menu-item"><Link to="/login">Login</Link></li>
+                            <li className="menu-item"><Link to="/register">Register</Link></li>
+                            <li className="menu-item"><a href="mailto:info@uniswapv4.com">Contact</a></li>
+                            <li className="menu-item"><Link to="/terms">FAQ</Link></li>
+                          </ul>
                         </li>
                       </ul>
                     </nav>
@@ -92,6 +141,37 @@ const LandingPage = () => {
                 </div>
 
                 <div className="header__right">
+                  {/* Assets Dropdown */}
+                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('assets'); }}>
+                    <button className="header-dropdown-btn">Assets</button>
+                    <div className={`header-dropdown-menu ${activeDropdown === 'assets' ? 'show' : ''}`}>
+                      <Link to="/register" className="dropdown-item">Visa Card</Link>
+                      <Link to="/register" className="dropdown-item">Crypto Loans</Link>
+                      <Link to="/register" className="dropdown-item">Pay</Link>
+                    </div>
+                  </div>
+
+                  {/* Orders & Trades Dropdown */}
+                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('orders'); }}>
+                    <button className="header-dropdown-btn">Orders & Trades</button>
+                    <div className={`header-dropdown-menu ${activeDropdown === 'orders' ? 'show' : ''}`}>
+                      <Link to="/register" className="dropdown-item">Convert</Link>
+                      <Link to="/register" className="dropdown-item">Spot</Link>
+                      <Link to="/register" className="dropdown-item">Margin</Link>
+                      <Link to="/register" className="dropdown-item">P2P</Link>
+                    </div>
+                  </div>
+
+                  {/* EN/USD Selector */}
+                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('lang'); }}>
+                    <button className="header-dropdown-btn">EN/USD</button>
+                    <div className={`header-dropdown-menu ${activeDropdown === 'lang' ? 'show' : ''}`}>
+                      <span className="dropdown-item">English / USD</span>
+                      <span className="dropdown-item">Italiano / EUR</span>
+                    </div>
+                  </div>
+
+                  {/* Dark/Light Mode Toggle */}
                   <div className="mode-switcher" onClick={() => setDarkMode(!darkMode)}>
                     {darkMode ? (
                       <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -104,10 +184,27 @@ const LandingPage = () => {
                       </svg>
                     )}
                   </div>
-                  <div className="header-btns">
-                    <Link to="/login" className="btn-login">Login</Link>
-                    <Link to="/register" className="btn-register">Register</Link>
-                  </div>
+
+                  {/* Notification Bell */}
+                  <Link to="/login" className="header-icon-btn" title="Notifications">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                  </Link>
+
+                  {/* Wallet Button */}
+                  <Link to="/login" className="header-wallet-btn">Wallet</Link>
+
+                  {/* User Avatar */}
+                  <Link to="/login" className="header-avatar" title="Profile">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </Link>
+
+                  {/* Mobile Hamburger */}
                   <div className={`mobile-button ${mobileMenuOpen ? "active" : ""}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
                     <span></span>
                   </div>

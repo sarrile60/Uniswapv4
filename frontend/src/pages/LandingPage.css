@@ -235,6 +235,7 @@
   opacity: 0.9;
 }
 
+
 /* Mobile button */
 .body-rockie .mobile-button {
   display: none;
@@ -272,10 +273,239 @@
   transform: none;
 }
 
+/* ============ NAV DROPDOWNS ============ */
+.body-rockie .menu-item-has-children {
+  position: relative;
+}
+
+.body-rockie .menu-item-has-children > a::after {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  margin-left: 6px;
+  vertical-align: middle;
+  margin-bottom: 2px;
+  opacity: 0.6;
+}
+
+.body-rockie .sub-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 200px;
+  background: var(--r-bg1);
+  border: 1px solid var(--r-line);
+  border-radius: 8px;
+  padding: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: all 0.2s ease;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.body-rockie .sub-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.body-rockie .menu-item-has-children:hover .sub-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.body-rockie .sub-menu .menu-item a {
+  display: block;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--r-text);
+  transition: all 0.2s;
+  border-radius: 0;
+}
+
+.body-rockie .sub-menu .menu-item a:hover {
+  background: var(--r-surface);
+  color: var(--r-primary);
+}
+
+/* Hot Pair Link */
+.body-rockie .hot-pair {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+}
+
+.body-rockie .fire-icon {
+  margin-left: 2px;
+}
+
+/* ============ HEADER RIGHT DROPDOWNS ============ */
+.body-rockie .header-dropdown {
+  position: relative;
+}
+
+.body-rockie .header-dropdown-btn {
+  background: none;
+  border: none;
+  color: var(--r-onsurface);
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.body-rockie .header-dropdown-btn::after {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  margin-left: 6px;
+  margin-bottom: 2px;
+  opacity: 0.5;
+}
+
+.body-rockie .header-dropdown-btn:hover {
+  color: var(--r-primary);
+}
+
+.body-rockie .header-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: var(--r-bg1);
+  border: 1px solid var(--r-line);
+  border-radius: 8px;
+  padding: 8px 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(8px);
+  transition: all 0.2s ease;
+  z-index: 100;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.body-rockie .header-dropdown-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.body-rockie .header-dropdown:hover .header-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.body-rockie .dropdown-item {
+  display: block;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--r-text) !important;
+  transition: all 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.body-rockie .dropdown-item:hover {
+  background: var(--r-surface);
+  color: var(--r-primary) !important;
+}
+
+/* ============ HEADER ICON BUTTONS ============ */
+.body-rockie .header-icon-btn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--r-surface);
+  color: var(--r-onsurface) !important;
+  transition: all 0.3s;
+  position: relative;
+}
+
+.body-rockie .header-icon-btn:hover {
+  background: var(--r-primary);
+  color: #fff !important;
+}
+
+.body-rockie .header-icon-btn::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #d33535;
+  border-radius: 50%;
+  border: 2px solid var(--r-bg);
+}
+
+/* ============ WALLET BUTTON ============ */
+.body-rockie .header-wallet-btn {
+  padding: 8px 20px;
+  border: 2px solid var(--r-onsurface);
+  border-radius: 90px;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--r-onsurface) !important;
+  transition: all 0.3s;
+  white-space: nowrap;
+}
+
+.body-rockie .header-wallet-btn:hover {
+  border-color: var(--r-primary);
+  color: var(--r-primary) !important;
+}
+
+/* ============ USER AVATAR ============ */
+.body-rockie .header-avatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--r-primary);
+  color: #fff !important;
+  transition: all 0.3s;
+}
+
+.body-rockie .header-avatar:hover {
+  opacity: 0.85;
+}
+
+/* ============ RESPONSIVE HEADER ============ */
+@media (max-width: 1199px) {
+  .body-rockie .header-dropdown,
+  .body-rockie .header-wallet-btn,
+  .body-rockie .header-avatar,
+  .body-rockie .header-icon-btn {
+    display: none;
+  }
+}
+
 @media (max-width: 991px) {
   .body-rockie .left__main { display: none; }
   .body-rockie .mobile-button { display: flex; }
-  .body-rockie .header-btns { display: none; }
   .body-rockie .main-nav.active {
     display: block;
     position: fixed;
@@ -285,11 +515,25 @@
     background: var(--r-bg);
     padding: 20px;
     border-bottom: 1px solid var(--r-line);
+    z-index: 999;
+    max-height: calc(100vh - 70px);
+    overflow-y: auto;
   }
   .body-rockie .main-nav.active .menu {
     flex-direction: column;
   }
+  .body-rockie .main-nav.active .sub-menu {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    box-shadow: none;
+    border: none;
+    padding-left: 16px;
+    background: transparent;
+  }
 }
+
 
 /* ============ STATS ROW ============ */
 .body-rockie .stats-row {
