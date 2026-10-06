@@ -131,6 +131,7 @@ const translations = {
     nav_ordersTrades: 'Orders & Trades', nav_convert: 'Convert', nav_spot: 'Spot', nav_margin: 'Margin',
     nav_wallet: 'Wallet', nav_notifications: 'Notifications',
     nav_transactions: 'Transactions', nav_profile: 'Profile', nav_kycVerification: 'KYC Verification', nav_logout: 'Logout',
+    nav_noNotifications: 'No notifications yet', nav_loginToSee: 'to see notifications', nav_viewAll: 'View All', nav_new: 'new',
     nav_createAccount: 'Create Account',
   },
   it: {
@@ -244,6 +245,7 @@ const translations = {
     nav_ordersTrades: 'Ordini e Scambi', nav_convert: 'Converti', nav_spot: 'Spot', nav_margin: 'Margine',
     nav_wallet: 'Portafoglio', nav_notifications: 'Notifiche',
     nav_transactions: 'Transazioni', nav_profile: 'Profilo', nav_kycVerification: 'Verifica Identità', nav_logout: 'Esci',
+    nav_noNotifications: 'Nessuna notifica ancora', nav_loginToSee: 'per vedere le notifiche', nav_viewAll: 'Vedi Tutto', nav_new: 'nuove',
     nav_createAccount: 'Crea un Conto',
   }
 };

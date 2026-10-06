@@ -88,79 +88,86 @@ body:has(.body-rockie) {
   color: inherit !important;
 }
 
-/* Cards */
+/* Cards — refined dark appearance with subtle shadow */
 .body-rockie.is_dark [class*="rounded-lg"][class*="border"],
 .body-rockie.is_dark [class*="rounded-xl"][class*="border"],
 .body-rockie.is_dark .border.rounded-lg,
 .body-rockie.is_dark .border.rounded-xl {
-  background: #222630 !important;
-  border-color: #23262f !important;
-  color: #b1b5c3 !important;
+  background: #1e2230 !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  color: #c3c7d0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Inputs */
+/* Inputs — deeper dark with cleaner focus */
 .body-rockie.is_dark input[class*="border"],
 .body-rockie.is_dark textarea[class*="border"],
 .body-rockie.is_dark select[class*="border"] {
-  background: #18191d !important;
-  border-color: #23262f !important;
+  background: #13141a !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
   color: #fff !important;
 }
 .body-rockie.is_dark input::placeholder,
-.body-rockie.is_dark textarea::placeholder { color: #777e90 !important; }
+.body-rockie.is_dark textarea::placeholder { color: #555c6e !important; }
 .body-rockie.is_dark input:focus,
 .body-rockie.is_dark textarea:focus,
 .body-rockie.is_dark select:focus {
   border-color: #3772ff !important;
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(55, 114, 255, 0.2) !important;
+  box-shadow: 0 0 0 3px rgba(55, 114, 255, 0.15) !important;
 }
 
-/* Text colors */
+/* Text colors — improved contrast */
 .body-rockie.is_dark .text-gray-900,
 .body-rockie.is_dark .text-gray-800,
-.body-rockie.is_dark .text-gray-700 { color: #fff !important; }
+.body-rockie.is_dark .text-gray-700 { color: #f0f2f5 !important; }
 .body-rockie.is_dark .text-gray-600,
-.body-rockie.is_dark .text-gray-500 { color: #b1b5c3 !important; }
+.body-rockie.is_dark .text-gray-500 { color: #9ca3b4 !important; }
 .body-rockie.is_dark .text-gray-400,
-.body-rockie.is_dark .text-gray-300 { color: #777e90 !important; }
+.body-rockie.is_dark .text-gray-300 { color: #6b7280 !important; }
 
-/* Backgrounds */
+/* Backgrounds — richer dark tones */
 .body-rockie.is_dark .bg-white,
 .body-rockie.is_dark .bg-gray-50,
-.body-rockie.is_dark .bg-gray-100 { background: #141416 !important; }
-.body-rockie.is_dark .bg-gradient-to-b { background: #141416 !important; }
-.body-rockie.is_dark .bg-gray-200 { background: #23262f !important; }
+.body-rockie.is_dark .bg-gray-100 { background: #0f1017 !important; }
+.body-rockie.is_dark .bg-gradient-to-b { background: #0f1017 !important; }
+.body-rockie.is_dark .bg-gray-200 { background: #1a1d28 !important; }
 
-/* Borders */
+/* Borders — softer */
 .body-rockie.is_dark .border-gray-200,
-.body-rockie.is_dark .border-gray-300 { border-color: #23262f !important; }
-.body-rockie.is_dark .divide-gray-200 > * + * { border-color: #23262f !important; }
+.body-rockie.is_dark .border-gray-300 { border-color: rgba(255, 255, 255, 0.06) !important; }
+.body-rockie.is_dark .divide-gray-200 > * + * { border-color: rgba(255, 255, 255, 0.06) !important; }
 
 /* Tables */
-.body-rockie.is_dark table { color: #b1b5c3 !important; }
-.body-rockie.is_dark table th { color: #777e90 !important; border-color: #23262f !important; }
-.body-rockie.is_dark table td { border-color: #23262f !important; color: #fff !important; }
-.body-rockie.is_dark table tr:hover { background: #18191d !important; }
+.body-rockie.is_dark table { color: #c3c7d0 !important; }
+.body-rockie.is_dark table th { color: #6b7280 !important; border-color: rgba(255, 255, 255, 0.06) !important; }
+.body-rockie.is_dark table td { border-color: rgba(255, 255, 255, 0.06) !important; color: #f0f2f5 !important; }
+.body-rockie.is_dark table tr:hover { background: rgba(55, 114, 255, 0.04) !important; }
 
 /* Labels */
-.body-rockie.is_dark label { color: #fff !important; }
+.body-rockie.is_dark label { color: #e0e2e8 !important; }
 
-/* Alert/badge dark overrides */
+/* Alert/badge — cleaner, more vibrant backgrounds */
 .body-rockie.is_dark .bg-red-50,
-.body-rockie.is_dark .bg-red-100 { background: rgba(211, 53, 53, 0.15) !important; }
+.body-rockie.is_dark .bg-red-100 { background: rgba(239, 68, 68, 0.08) !important; border-color: rgba(239, 68, 68, 0.15) !important; }
 .body-rockie.is_dark .bg-green-50,
-.body-rockie.is_dark .bg-green-100 { background: rgba(88, 189, 125, 0.15) !important; }
+.body-rockie.is_dark .bg-green-100 { background: rgba(34, 197, 94, 0.08) !important; border-color: rgba(34, 197, 94, 0.15) !important; }
 .body-rockie.is_dark .bg-yellow-50,
 .body-rockie.is_dark .bg-yellow-100,
-.body-rockie.is_dark .bg-orange-50 { background: rgba(247, 147, 26, 0.15) !important; }
+.body-rockie.is_dark .bg-orange-50 { background: rgba(251, 146, 60, 0.08) !important; border-color: rgba(251, 146, 60, 0.15) !important; }
 .body-rockie.is_dark .bg-blue-50,
-.body-rockie.is_dark .bg-blue-100 { background: rgba(55, 114, 255, 0.15) !important; }
+.body-rockie.is_dark .bg-blue-100 { background: rgba(55, 114, 255, 0.08) !important; border-color: rgba(55, 114, 255, 0.15) !important; }
 
-/* Status text colors — dark mode only */
+/* Orange alert specific — cleaner look */
+.body-rockie.is_dark .border-orange-200 { border-color: rgba(251, 146, 60, 0.2) !important; }
+.body-rockie.is_dark .text-orange-800,
+.body-rockie.is_dark .text-orange-700 { color: #fb923c !important; }
+.body-rockie.is_dark .text-orange-500 { color: #f59e0b !important; }
+
+/* Status text colors — vibrant */
 .body-rockie.is_dark .text-green-600,
 .body-rockie.is_dark .text-green-700,
-.body-rockie.is_dark .text-green-800 { color: #58bd7d !important; }
+.body-rockie.is_dark .text-green-800 { color: #22c55e !important; }
 .body-rockie.is_dark .text-red-600,
 .body-rockie.is_dark .text-red-700,
 .body-rockie.is_dark .text-red-800 { color: #d33535 !important; }
@@ -211,9 +218,10 @@ body:not(:has(.body-rockie)) .text-yellow-800 { color: #f7931a !important; }
 .body-rockie.is_dark [role="dialog"],
 .body-rockie.is_dark [class*="DialogContent"],
 .body-rockie.is_dark [data-state="open"][class*="fixed"] {
-  background: #222630 !important;
-  border-color: #23262f !important;
-  color: #b1b5c3 !important;
+  background: #1e2230 !important;
+  border-color: rgba(255, 255, 255, 0.06) !important;
+  color: #c3c7d0 !important;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
 }
 /* Admin dialogs always dark */
 body:not(:has(.body-rockie)) [role="dialog"],
@@ -238,9 +246,9 @@ body:not(:has(.body-rockie))::-webkit-scrollbar-thumb:hover { background: #3772f
 /* ============ TOAST OVERRIDES ============ */
 .body-rockie.is_dark [data-sonner-toaster],
 body:not(:has(.body-rockie)) [data-sonner-toaster] {
-  --normal-bg: #222630 !important;
-  --normal-border: #23262f !important;
-  --normal-text: #fff !important;
+  --normal-bg: #1e2230 !important;
+  --normal-border: rgba(255, 255, 255, 0.06) !important;
+  --normal-text: #f0f2f5 !important;
 }
 
 /* ============ SELECTION ============ */

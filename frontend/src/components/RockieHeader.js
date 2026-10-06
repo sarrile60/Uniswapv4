@@ -207,18 +207,18 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                   <div className={`header-dropdown-menu notification-menu ${activeDropdown === 'notif' ? 'show' : ''}`} style={{right: 0, minWidth: 320, maxHeight: 400, overflowY: 'auto', padding: 0}}>
                     <div style={{padding: '14px 16px', borderBottom: '1px solid var(--r-line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                       <span style={{fontWeight: 700, fontSize: 15, color: 'var(--r-onsurface)'}}>{t.nav_notifications}</span>
-                      {unreadCount > 0 && <span style={{fontSize: 12, color: '#3772ff', fontWeight: 600}}>{unreadCount} new</span>}
+                      {unreadCount > 0 && <span style={{fontSize: 12, color: '#3772ff', fontWeight: 600}}>{unreadCount} {t.nav_new}</span>}
                     </div>
                     {!isLoggedIn ? (
                       <div style={{padding: '24px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
-                        <Link to="/login" style={{color: '#3772ff', fontWeight: 600}}>Log in</Link> to see notifications
+                        <Link to="/login" style={{color: '#3772ff', fontWeight: 600}}>{t.nav_login}</Link> {t.nav_loginToSee}
                       </div>
                     ) : notifications.length === 0 ? (
                       <div style={{padding: '32px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--r-text)" strokeWidth="1.5" style={{margin: '0 auto 8px', display: 'block', opacity: 0.5}}>
                           <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                         </svg>
-                        No notifications yet
+                        {t.nav_noNotifications}
                       </div>
                     ) : (
                       <>
@@ -240,7 +240,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                             </div>
                           </div>
                         ))}
-                        <Link to="/wallet" style={{ display: 'block', padding: '12px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#3772ff' }}>View All</Link>
+                        <Link to="/wallet" style={{ display: 'block', padding: '12px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#3772ff' }}>{t.nav_viewAll}</Link>
                       </>
                     )}
                   </div>

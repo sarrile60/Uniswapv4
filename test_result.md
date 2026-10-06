@@ -486,15 +486,39 @@ frontend:
         agent: "testing"
         comment: "✅ LANDING PAGE HERO & PARTNERS SECTION TESTING COMPLETE - ALL 3 TESTS PASSED (100%) - Comprehensive testing of updated Uniswap V4 landing page hero and partners section completed successfully at desktop viewport 1920x800. DETAILED RESULTS: TEST 1 (Hero Image - 3D Crypto Illustration): ✅ PASSED - Banner image verified: Source URL is Unsplash photo-1651054558996-03455fe2702f ✅. Image shows 3D crypto illustration with cryptocurrency logos (Bitcoin, Ethereum, Binance, Tether, etc.) on 3D rendered blocks ✅. Image is NOT a stock chart screenshot ✅. Alt text: 'Uniswap V4 Crypto' ✅. Screenshot: test1_hero_image.png. TEST 2 (Partners Section - 'I Nostri Partner'): ✅ PASSED - Partners section found below banner ✅. Title displays 'I Nostri Partner' (Italian for 'Our Partners') ✅. All 5 expected partner logos present: Coinbase ✅, Blockchain ✅, MetaMask ✅, Ledger ✅, Chainalysis ✅. Partners displayed in horizontal row (flexDirection: row) ✅. Subtle/muted styling verified: text opacity 0.6, shape opacity 0.15-0.3 ✅. Screenshot: test2_partners_section.png. TEST 3 (Overall Layout Flow): ✅ PASSED - Page structure verified: Banner (top=0px, height=760px) → Partners (top=760px, height=151px) → Crypto Cards (top=911px, height=272px) → Trading Table ✅. Correct order confirmed: Banner → Partners → Crypto Cards → Trading Table ✅. No significant overlaps detected (0.39px overlap between Partners and Crypto Cards is negligible CSS rounding) ✅. No misalignment issues ✅. Screenshots: test3_layout_top.png (Banner + Partners), test3_layout_middle.png (Partners → Crypto Cards), test3_layout_bottom.png (Crypto Cards → Trading Table). VERIFICATION SUMMARY: ✅ Hero image is 3D crypto illustration (NOT stock chart) ✅ Partners section displays 'I Nostri Partner' with all 5 partner logos ✅ Partners have subtle/muted styling as specified ✅ Page flow is correct with no overlaps or misalignments ✅ All visual elements render correctly at 1920x800 viewport. OVERALL RESULT: 100% pass rate (all 3 major tests passed). The landing page hero and partners section implementation is COMPLETE and VERIFIED. No critical issues found."
 
+  - task: "Notification Dropdown Italian Translation"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/RockieHeader.js, /app/frontend/src/i18n.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ NOTIFICATION DROPDOWN ITALIAN TRANSLATION VERIFIED - Comprehensive testing completed successfully for both logged-in and not-logged-in states. TEST 1A (Not Logged In): ✅ PASSED - Dropdown header displays 'Notifiche' (Italian) ✅. Not-logged-in message displays 'Accedi per vedere le notifiche' (Italian) ✅. NO English text present. Screenshot: test1a_notification_not_logged_in.png. TEST 1B (Logged In - Empty State): ✅ PASSED - Dropdown header displays 'Notifiche' (Italian) ✅. Empty state message displays 'Nessuna notifica ancora' (Italian, NOT 'No notifications yet') ✅. NO English text present. Screenshot: test1b_notification_logged_in.png. VERIFICATION: Default language is IT/EUR as expected. All notification dropdown text is correctly translated to Italian. The translation key 'nav_noNotifications' correctly maps to 'Nessuna notifica ancora' in Italian (line 248 of i18n.js). Both states (logged-in and not-logged-in) display proper Italian translations with no English text leakage. The notification dropdown Italian translation is COMPLETE and VERIFIED."
+
+  - task: "Wallet Dark Mode Appearance Improvement"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/WalletDashboard.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ WALLET DARK MODE APPEARANCE VERIFIED - Comprehensive testing confirms the wallet page has polished dark mode styling as specified. RESULTS: ✅ Page background: rgb(15, 16, 23) = #0f1017 (deep dark) - CORRECT ✅ Card backgrounds: rgb(30, 34, 48) = #1e2230 (refined dark blue) - CORRECT ✅ Card borders: rgba(255, 255, 255, 0.06) (subtle/soft semi-transparent) - CORRECT ✅ Portfolio section: Dark blue gradient from rgb(26, 31, 60) to rgb(18, 21, 48) - CORRECT ✅ Text contrast: Proper contrast with bright white/light for headings and medium gray for labels. DETAILED VERIFICATION: Both asset cards (USDC and EUR) have the refined dark blue background #1e2230 (rgb(30, 34, 48)) which is NOT harsh dark gray. Card borders are subtle with semi-transparent white (rgba(255, 255, 255, 0.06)) which are NOT hard lines. The page background is deep dark #0f1017 (rgb(15, 16, 23)). Text has good contrast with white headings and gray labels. Screenshot: test2_wallet_dark_mode.png. The wallet dark mode appearance improvement is COMPLETE and VERIFIED with all specified colors correctly implemented."
+
 metadata:
   created_by: "main_agent"
-  version: "3.2"
-  test_sequence: 14
+  version: "3.3"
+  test_sequence: 15
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Landing page hero and partners section testing completed successfully - all 3 tests passed"
+    - "Notification dropdown Italian translation and wallet dark mode appearance - both fixes verified successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -548,3 +572,5 @@ agent_communication:
     message: "Updated landing page hero and partners section. Changes: 1) Hero image replaced with 3D crypto illustration from Unsplash (photo-1651054558996-03455fe2702f) showing cryptocurrency logos/elements in 3D render style 2) Added 'I Nostri Partner' (Our Partners) section below banner with 5 partner logos: Coinbase, Blockchain, MetaMask, Ledger, Chainalysis 3) Partners displayed in horizontal row with subtle/muted styling (opacity 0.6 for text, 0.15-0.3 for shapes) 4) Page flow: Banner → Partners → Crypto Cards → Trading Table. Need testing agent to verify all 3 test scenarios at desktop viewport 1920x800."
   - agent: "testing"
     message: "✅ LANDING PAGE HERO & PARTNERS SECTION TESTING COMPLETE - ALL 3 TESTS PASSED (100%) - Comprehensive testing of updated Uniswap V4 landing page hero and partners section completed successfully at desktop viewport 1920x800. DETAILED RESULTS: TEST 1 (Hero Image - 3D Crypto Illustration): ✅ PASSED - Banner image verified: Source URL is Unsplash photo-1651054558996-03455fe2702f ✅. Image shows 3D crypto illustration with cryptocurrency logos (Bitcoin, Ethereum, Binance, Tether, etc.) on 3D rendered blocks ✅. Image is NOT a stock chart screenshot ✅. Alt text: 'Uniswap V4 Crypto' ✅. Screenshot: test1_hero_image.png. TEST 2 (Partners Section - 'I Nostri Partner'): ✅ PASSED - Partners section found below banner ✅. Title displays 'I Nostri Partner' (Italian for 'Our Partners') ✅. All 5 expected partner logos present: Coinbase ✅, Blockchain ✅, MetaMask ✅, Ledger ✅, Chainalysis ✅. Partners displayed in horizontal row (flexDirection: row) ✅. Subtle/muted styling verified: text opacity 0.6, shape opacity 0.15-0.3 ✅. Screenshot: test2_partners_section.png. TEST 3 (Overall Layout Flow): ✅ PASSED - Page structure verified: Banner (top=0px, height=760px) → Partners (top=760px, height=151px) → Crypto Cards (top=911px, height=272px) → Trading Table ✅. Correct order confirmed: Banner → Partners → Crypto Cards → Trading Table ✅. No significant overlaps detected (0.39px overlap between Partners and Crypto Cards is negligible CSS rounding) ✅. No misalignment issues ✅. Screenshots: test3_layout_top.png (Banner + Partners), test3_layout_middle.png (Partners → Crypto Cards), test3_layout_bottom.png (Crypto Cards → Trading Table). VERIFICATION SUMMARY: ✅ Hero image is 3D crypto illustration (NOT stock chart) ✅ Partners section displays 'I Nostri Partner' with all 5 partner logos ✅ Partners have subtle/muted styling as specified ✅ Page flow is correct with no overlaps or misalignments ✅ All visual elements render correctly at 1920x800 viewport. OVERALL RESULT: 100% pass rate (all 3 major tests passed). The landing page hero and partners section implementation is COMPLETE and VERIFIED. No critical issues found."
+  - agent: "testing"
+    message: "✅ TWO FIXES VERIFICATION COMPLETE - ALL TESTS PASSED (100%) - Comprehensive testing of two requested fixes on Uniswap V4 platform completed successfully. FIX 1 (Notification Dropdown Italian Translation): ✅ PASSED - Tested both logged-in and not-logged-in states. NOT LOGGED IN: Dropdown header shows 'Notifiche' (Italian) ✅, message shows 'Accedi per vedere le notifiche' (Italian) ✅. LOGGED IN (Empty State): Dropdown header shows 'Notifiche' (Italian) ✅, empty state message shows 'Nessuna notifica ancora' (Italian, NOT 'No notifications yet') ✅. NO English text present in either state. Default language is IT/EUR as expected. Screenshots: test1a_notification_not_logged_in.png, test1b_notification_logged_in.png. FIX 2 (Wallet Dark Mode Appearance): ✅ PASSED - Wallet page has polished dark mode styling with all specified colors correctly implemented. Page background: #0f1017 (deep dark) ✅. Card backgrounds: #1e2230 (refined dark blue, NOT harsh dark gray) ✅. Card borders: rgba(255, 255, 255, 0.06) (subtle/soft semi-transparent, NOT hard lines) ✅. Portfolio section: Dark blue gradient ✅. Text contrast: Bright white/light for headings, medium gray for labels ✅. Both USDC and EUR asset cards verified with correct styling. Screenshot: test2_wallet_dark_mode.png. OVERALL RESULT: 100% pass rate - both fixes are working correctly as specified. No issues found."

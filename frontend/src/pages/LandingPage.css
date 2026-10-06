@@ -31,13 +31,13 @@
 }
 
 .body-rockie.is_dark {
-  /* Dark mode variables */
-  --r-bg: #141416;
-  --r-bg1: #222630;
-  --r-onsurface: #fff;
-  --r-surface: #18191d;
-  --r-line: #23262f;
-  --r-text: #b1b5c3;
+  /* Dark mode variables — refined palette */
+  --r-bg: #0f1017;
+  --r-bg1: #1e2230;
+  --r-onsurface: #f0f2f5;
+  --r-surface: #13141a;
+  --r-line: rgba(255, 255, 255, 0.06);
+  --r-text: #9ca3b4;
 }
 
 .body-rockie *, .body-rockie *::before, .body-rockie *::after {
