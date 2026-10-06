@@ -130,6 +130,7 @@ const translations = {
     nav_assets: 'Assets', nav_visaCard: 'Visa Card', nav_cryptoLoans: 'Crypto Loans', nav_pay: 'Pay',
     nav_ordersTrades: 'Orders & Trades', nav_convert: 'Convert', nav_spot: 'Spot', nav_margin: 'Margin',
     nav_wallet: 'Wallet', nav_notifications: 'Notifications',
+    nav_transactions: 'Transactions', nav_profile: 'Profile', nav_kycVerification: 'KYC Verification', nav_logout: 'Logout',
     nav_createAccount: 'Create Account',
   },
   it: {
@@ -242,6 +243,7 @@ const translations = {
     nav_assets: 'Asset', nav_visaCard: 'Carta Visa', nav_cryptoLoans: 'Prestiti Crypto', nav_pay: 'Paga',
     nav_ordersTrades: 'Ordini e Scambi', nav_convert: 'Converti', nav_spot: 'Spot', nav_margin: 'Margine',
     nav_wallet: 'Portafoglio', nav_notifications: 'Notifiche',
+    nav_transactions: 'Transazioni', nav_profile: 'Profilo', nav_kycVerification: 'Verifica Identità', nav_logout: 'Esci',
     nav_createAccount: 'Crea un Conto',
   }
 };

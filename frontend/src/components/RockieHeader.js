@@ -257,11 +257,11 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                     </div>
                     <div className={`header-dropdown-menu ${activeDropdown === 'user' ? 'show' : ''}`} style={{right:0, minWidth: '180px'}}>
                       {user && <div className="dropdown-item" style={{fontWeight:700, color:'var(--r-onsurface)', cursor:'default', borderBottom:'1px solid var(--r-line)', paddingBottom:'12px', marginBottom:'4px'}}>{user.first_name} {user.last_name}</div>}
-                      <Link to="/wallet" className="dropdown-item">💰 Wallet</Link>
-                      <Link to="/transactions" className="dropdown-item">📋 Transactions</Link>
-                      <Link to="/profile" className="dropdown-item">👤 Profile</Link>
-                      <Link to="/kyc" className="dropdown-item">🔒 KYC Verification</Link>
-                      <div className="dropdown-item" onClick={handleLogout} style={{color:'#d33535', cursor:'pointer', borderTop:'1px solid var(--r-line)', marginTop:'4px', paddingTop:'12px'}}>🚪 Logout</div>
+                      <Link to="/wallet" className="dropdown-item">💰 {t.nav_wallet}</Link>
+                      <Link to="/transactions" className="dropdown-item">📋 {t.nav_transactions || 'Transactions'}</Link>
+                      <Link to="/profile" className="dropdown-item">👤 {t.nav_profile || 'Profile'}</Link>
+                      <Link to="/kyc" className="dropdown-item">🔒 {t.nav_kycVerification || 'KYC Verification'}</Link>
+                      <div className="dropdown-item" onClick={handleLogout} style={{color:'#d33535', cursor:'pointer', borderTop:'1px solid var(--r-line)', marginTop:'4px', paddingTop:'12px'}}>🚪 {t.nav_logout || 'Logout'}</div>
                     </div>
                   </div>
                 ) : (
