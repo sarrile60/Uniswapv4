@@ -10,7 +10,10 @@ import "@/pages/LandingPage.css";
  */
 const RockieLayout = ({ children }) => {
   const { user, logout } = useAuth();
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('theme_mode');
+    return saved === 'light' ? false : true;
+  });
 
   useEffect(() => {
     if (darkMode) {
@@ -21,6 +24,14 @@ const RockieLayout = ({ children }) => {
     return () => document.body.classList.remove("is_dark");
   }, [darkMode]);
 
+  const toggleDarkMode = () => {
+    setDarkMode(prev => {
+      const next = !prev;
+      localStorage.setItem('theme_mode', next ? 'dark' : 'light');
+      return next;
+    });
+  };
+
   return (
     <div className={`body-rockie ${darkMode ? "is_dark" : ""}`}>
       <RockieHeader
@@ -28,7 +39,7 @@ const RockieLayout = ({ children }) => {
         user={user}
         onLogout={logout}
         darkMode={darkMode}
-        onToggleDarkMode={() => setDarkMode(!darkMode)}
+        onToggleDarkMode={toggleDarkMode}
       />
       <main className="rockie-main">
         {children}

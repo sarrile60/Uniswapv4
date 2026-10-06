@@ -546,15 +546,27 @@ frontend:
         agent: "testing"
         comment: "✅ LANDING PAGE SCROLL ANIMATIONS VERIFIED - Comprehensive testing confirms scroll reveal animations are working correctly. BANNER SECTION: Banner is visible immediately (opacity: 1, transform: none) ✅. Banner does NOT have 'reveal' class - correctly visible on page load ✅. REVEAL SECTIONS: Found 7 sections with 'reveal' class ✅. Before scrolling: 0 sections visible (all have opacity: 0, translateY(40px)) ✅. After scrolling down: 6 sections became visible and gained 'visible' class ✅. Sections that animated in: partners, crypto-section, coin-list, how-it-works, about-section, testimonials ✅. ANIMATION BEHAVIOR: Sections start hidden with opacity: 0 and translateY(40px) ✅. When scrolled into viewport, IntersectionObserver adds 'visible' class ✅. Sections fade in (opacity: 0 → 1) and slide up (translateY(40px) → 0) with smooth cubic-bezier transition ✅. Animation threshold: 0.1 with rootMargin: '0px 0px -50px 0px' ✅. JavaScript implementation verified in LandingPage.js lines 29-42 ✅. CSS implementation verified in LandingPage.css lines 14-23 ✅. Screenshots: test3_landing_initial.png (before scroll), test3_landing_after_scroll.png (after scroll showing visible sections). The scroll reveal animation implementation is COMPLETE and VERIFIED."
 
+  - task: "Dark/Light Mode Persistence Across Pages"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/RockieLayout.js, /app/frontend/src/pages/LandingPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ DARK/LIGHT MODE PERSISTENCE VERIFIED - ALL 4 TESTS PASSED (100%) - Comprehensive testing confirms theme preference persists correctly across page navigation using localStorage. DETAILED RESULTS: TEST 1 (Default Dark Mode): ✅ PASSED - Page loads in DARK mode by default when localStorage 'theme_mode' is cleared. Body and wrapper have 'is_dark' class. localStorage theme_mode: null (defaults to dark). TEST 2 (Light Mode Persistence - About): ✅ PASSED - Toggled to light mode on landing page using .mode-switcher button. localStorage updated to 'light'. Navigated to /about page. About page correctly loads in LIGHT mode (no 'is_dark' class, white background rgb(255, 255, 255)). localStorage theme_mode: 'light'. Preference persisted across navigation. TEST 3 (Light Mode Persistence - Terms): ✅ PASSED - Navigated to /terms page. Terms page correctly loads in LIGHT mode (no 'is_dark' class). localStorage theme_mode: 'light'. Preference persisted across second navigation. TEST 4 (Dark Mode Persistence - Landing): ✅ PASSED - Toggled back to dark mode on Terms page. localStorage updated to 'dark'. Navigated back to landing page (/). Landing page correctly loads in DARK mode (has 'is_dark' class). localStorage theme_mode: 'dark'. Preference persisted back to landing page. IMPLEMENTATION VERIFIED: Both LandingPage.js (lines 12-15, 180) and RockieLayout.js (lines 13-16, 27-33) correctly read from localStorage.getItem('theme_mode') on mount and write to localStorage.setItem('theme_mode', value) on toggle. Default is dark mode when no value exists or value is not 'light'. Theme state is properly synchronized across all pages using the same localStorage key. Screenshots: test1_default_dark_mode.png, test2_about_light_mode.png, test3_terms_light_mode.png, test4_landing_dark_mode.png. OVERALL RESULT: 4/4 tests passed. Dark/light mode persistence is working correctly across all pages (landing, about, terms, privacy, wallet, transactions, profile)."
+
 metadata:
   created_by: "main_agent"
-  version: "3.3"
-  test_sequence: 15
+  version: "3.4"
+  test_sequence: 16
   run_ui: false
 
 test_plan:
   current_focus:
-    - "About page dark/light mode, Terms page dark/light mode, and Landing page scroll animations - all three fixes verified successfully"
+    - "Dark/light mode persistence across pages - verified successfully with all 4 tests passed"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -613,3 +625,6 @@ agent_communication:
 
   - agent: "testing"
     message: "✅ THREE FIXES VERIFICATION COMPLETE - ALL TESTS PASSED (100%) - Comprehensive testing of three requested fixes on Uniswap V4 platform completed successfully at desktop viewport 1920x800. FIX 1 (About Page - Dark AND Light Mode): ✅ PASSED - Dark mode (default): Main heading 'Gestione Affidabile di Asset Digitali' clearly visible with light text rgb(240, 242, 245) on dark background. Light mode: Heading displays DARK text rgb(35, 38, 47) on WHITE background - clearly readable, NOT white on white. All section headings visible in both modes. Mode toggle works correctly. Screenshots: test1_about_dark_mode.png, test1_about_light_mode.png. FIX 2 (Terms Page - Dark AND Light Mode): ✅ PASSED - Dark mode: Heading '1. Accettazione dei Termini' clearly visible with light text rgb(240, 242, 245). Light mode: Headings display DARK text rgb(35, 38, 47) on light background - clearly readable, NOT invisible. All text has proper contrast in both modes. Screenshots: test2_terms_dark_mode.png, test2_terms_light_mode.png. FIX 3 (Landing Page Scroll Animations): ✅ PASSED - Banner section visible immediately (opacity: 1, no 'reveal' class) - NOT hidden. Found 7 sections with 'reveal' class. Before scrolling: 0 sections visible. After scrolling: 6 sections became visible (partners, crypto-section, coin-list, how-it-works, about-section, testimonials). Sections animate in correctly with fade up effect (opacity: 0→1, translateY(40px)→0). IntersectionObserver working correctly. Screenshots: test3_landing_initial.png, test3_landing_after_scroll.png. OVERALL RESULT: 100% pass rate - all three fixes are working correctly as specified. No issues found."
+
+  - agent: "testing"
+    message: "✅ DARK/LIGHT MODE PERSISTENCE TESTING COMPLETE - ALL 4 TESTS PASSED (100%) - Comprehensive testing confirms theme preference persists correctly across all pages using localStorage 'theme_mode'. RESULTS: TEST 1 (Default Dark Mode): ✅ PASSED - Page loads in DARK mode by default when localStorage is cleared. Body/wrapper have 'is_dark' class. TEST 2 (Light Mode → About): ✅ PASSED - Toggled to light on landing page, navigated to /about, About page correctly loads in LIGHT mode (white background, no 'is_dark' class). localStorage: 'light'. TEST 3 (Light Mode → Terms): ✅ PASSED - Navigated to /terms, Terms page correctly loads in LIGHT mode. Preference persisted across second navigation. TEST 4 (Dark Mode → Landing): ✅ PASSED - Toggled to dark on Terms page, navigated to landing page, Landing page correctly loads in DARK mode. localStorage: 'dark'. IMPLEMENTATION: Both LandingPage.js and RockieLayout.js correctly read/write to localStorage.getItem('theme_mode'). Default is dark when no value exists. Theme synchronized across all pages. Screenshots: test1_default_dark_mode.png, test2_about_light_mode.png, test3_terms_light_mode.png, test4_landing_dark_mode.png. OVERALL: 4/4 tests passed. Dark/light mode persistence working correctly."

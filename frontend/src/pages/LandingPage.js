@@ -9,7 +9,10 @@ import "./LandingPage.css";
 const API = process.env.REACT_APP_BACKEND_URL;
 
 const LandingPage = () => {
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('theme_mode');
+    return saved === 'light' ? false : true;
+  });
   const [activeTab, setActiveTab] = useState(0);
   const [marketData, setMarketData] = useState([]);
   const [marketLoading, setMarketLoading] = useState(true);
@@ -174,7 +177,7 @@ const LandingPage = () => {
 
   return (
     <div className={`body-rockie ${darkMode ? "is_dark" : ""}`}>
-      <RockieHeader isLoggedIn={!!user} user={user} onLogout={logout} darkMode={darkMode} onToggleDarkMode={() => setDarkMode(!darkMode)} />
+      <RockieHeader isLoggedIn={!!user} user={user} onLogout={logout} darkMode={darkMode} onToggleDarkMode={() => { setDarkMode(prev => { const next = !prev; localStorage.setItem('theme_mode', next ? 'dark' : 'light'); return next; }); }} />
 
       {/* Banner */}
       <section className="banner">
