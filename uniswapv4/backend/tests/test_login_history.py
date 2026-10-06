@@ -3,7 +3,7 @@ import os
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://uniswap-infra.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://uniswap-v4-preview.preview.emergentagent.com").rstrip("/")
 
 HEADERS = {
     "Content-Type": "application/json",

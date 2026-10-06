@@ -5,7 +5,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://uniswap-infra.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://uniswap-v4-preview.preview.emergentagent.com')
 
 class TestAdminBadges:
     """Test Admin badge system API"""

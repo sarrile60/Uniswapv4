@@ -463,6 +463,15 @@
   border: 2px solid var(--r-bg);
 }
 
+/* ============ NOTIFICATION DROPDOWN ============ */
+.body-rockie .notification-dropdown .notification-menu {
+  border-radius: 12px;
+  overflow: hidden;
+}
+.body-rockie .notification-dropdown .notification-menu > div:hover {
+  background: var(--r-surface) !important;
+}
+
 /* ============ WALLET BUTTON ============ */
 .body-rockie .header-wallet-btn {
   padding: 8px 20px;
@@ -499,16 +508,20 @@
 
 /* ============ RESPONSIVE HEADER ============ */
 @media (max-width: 1199px) {
-  .body-rockie .header-dropdown,
+  .body-rockie .header-dropdown:not(.notification-dropdown),
   .body-rockie .header-wallet-btn,
   .body-rockie .header-avatar,
-  .body-rockie .header-icon-btn {
+  .body-rockie .header-icon-btn:not([data-testid="notification-bell"]) {
     display: none;
   }
 }
 
 @media (max-width: 991px) {
   .body-rockie .left__main { display: none; }
+  .body-rockie .left__main:has(.main-nav.active) { 
+    display: block !important; 
+    position: static; 
+  }
   .body-rockie .mobile-button { display: flex; }
   .body-rockie .main-nav.active {
     display: block;

@@ -11,7 +11,7 @@ import os
 from decimal import Decimal
 
 # Backend URL from frontend/.env
-BACKEND_URL = "https://uniswap-infra.preview.emergentagent.com/api"
+BACKEND_URL = "https://uniswap-v4-preview.preview.emergentagent.com/api"
 
 # Admin credentials
 ADMIN_EMAIL = "admin@x-zenthos.com"

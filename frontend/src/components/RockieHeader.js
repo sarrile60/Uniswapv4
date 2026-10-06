@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 /**
  * RockieHeader — Shared header for landing page and all inside pages.
@@ -13,6 +15,8 @@ import { Link, useNavigate } from "react-router-dom";
 const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = true, onToggleDarkMode }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
 
   const toggleDropdown = (name) => {
@@ -25,10 +29,74 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
     return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
+  // Fetch notifications when logged in
+  const fetchNotifications = useCallback(async () => {
+    if (!isLoggedIn) return;
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    
+    try {
+      const [nRes, cRes] = await Promise.all([
+        fetch(`${API}/api/notifications?page_size=5`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        fetch(`${API}/api/notifications/unread-count`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+      
+      if (nRes.ok) {
+        const nData = await nRes.json();
+        if (nData.ok) setNotifications(nData.data?.notifications || []);
+      }
+      if (cRes.ok) {
+        const cData = await cRes.json();
+        if (cData.ok) setUnreadCount(cData.data?.unread_count || 0);
+      }
+    } catch (e) {
+      // Silently fail - notifications are non-critical
+    }
+  }, [isLoggedIn]);
+
+  useEffect(() => {
+    fetchNotifications();
+    if (isLoggedIn) {
+      const interval = setInterval(fetchNotifications, 30000); // Refresh every 30s
+      return () => clearInterval(interval);
+    }
+  }, [fetchNotifications, isLoggedIn]);
+
+  // Mark notification as read
+  const markAsRead = async (notifId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    try {
+      await fetch(`${API}/api/notifications/${notifId}/read`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setNotifications(prev => prev.map(n => n.id === notifId ? { ...n, read: true } : n));
+      setUnreadCount(prev => Math.max(0, prev - 1));
+    } catch (e) { /* ignore */ }
+  };
+
   const handleLogout = () => {
     setActiveDropdown(null);
     if (onLogout) onLogout();
     navigate('/login');
+  };
+
+  // Format time ago
+  const timeAgo = (dateStr) => {
+    if (!dateStr) return '';
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'Just now';
+    if (mins < 60) return `${mins}m ago`;
+    const hours = Math.floor(mins / 60);
+    if (hours < 24) return `${hours}h ago`;
+    const days = Math.floor(hours / 24);
+    return `${days}d ago`;
   };
 
   return (
@@ -133,12 +201,105 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                   )}
                 </div>
 
-                {/* Notification Bell */}
-                <Link to={isLoggedIn ? "/wallet" : "/login"} className="header-icon-btn" title="Notifications">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                  </svg>
-                </Link>
+                {/* Notification Bell with Dropdown */}
+                <div className="header-dropdown notification-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('notif'); }} style={{position: 'relative'}}>
+                  <div className="header-icon-btn" title="Notifications" style={{cursor: 'pointer', position: 'relative'}} data-testid="notification-bell">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                    {unreadCount > 0 && (
+                      <span data-testid="notification-badge" style={{
+                        position: 'absolute',
+                        top: -4,
+                        right: -4,
+                        background: '#d33535',
+                        color: '#fff',
+                        fontSize: 10,
+                        fontWeight: 700,
+                        width: 18,
+                        height: 18,
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        border: '2px solid var(--r-bg, #141416)',
+                      }}>
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <div className={`header-dropdown-menu notification-menu ${activeDropdown === 'notif' ? 'show' : ''}`} style={{right: 0, minWidth: 320, maxHeight: 400, overflowY: 'auto', padding: 0}}>
+                    <div style={{padding: '14px 16px', borderBottom: '1px solid var(--r-line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                      <span style={{fontWeight: 700, fontSize: 15, color: 'var(--r-onsurface)'}}>Notifications</span>
+                      {unreadCount > 0 && (
+                        <span style={{fontSize: 12, color: '#3772ff', fontWeight: 600}}>{unreadCount} new</span>
+                      )}
+                    </div>
+                    {!isLoggedIn ? (
+                      <div style={{padding: '24px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
+                        <Link to="/login" style={{color: '#3772ff', fontWeight: 600}}>Log in</Link> to see notifications
+                      </div>
+                    ) : notifications.length === 0 ? (
+                      <div style={{padding: '32px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--r-text)" strokeWidth="1.5" style={{margin: '0 auto 8px', display: 'block', opacity: 0.5}}>
+                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                        </svg>
+                        No notifications yet
+                      </div>
+                    ) : (
+                      <>
+                        {notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            onClick={() => !notif.read && markAsRead(notif.id)}
+                            style={{
+                              padding: '12px 16px',
+                              borderBottom: '1px solid var(--r-line)',
+                              background: notif.read ? 'transparent' : 'rgba(55, 114, 255, 0.05)',
+                              cursor: 'pointer',
+                              transition: 'background 0.2s',
+                            }}
+                          >
+                            <div style={{display: 'flex', alignItems: 'flex-start', gap: 10}}>
+                              <div style={{
+                                width: 8,
+                                height: 8,
+                                borderRadius: '50%',
+                                background: notif.read ? 'transparent' : '#3772ff',
+                                marginTop: 6,
+                                flexShrink: 0,
+                              }}/>
+                              <div style={{flex: 1, minWidth: 0}}>
+                                <div style={{fontSize: 13, fontWeight: 600, color: 'var(--r-onsurface)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                                  {notif.title || notif.message?.slice(0, 50) || 'Notification'}
+                                </div>
+                                <div style={{fontSize: 12, color: 'var(--r-text)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>
+                                  {notif.message}
+                                </div>
+                                <div style={{fontSize: 11, color: 'var(--r-text)', opacity: 0.7, marginTop: 4}}>
+                                  {timeAgo(notif.created_at)}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        <Link
+                          to="/wallet"
+                          style={{
+                            display: 'block',
+                            padding: '12px 16px',
+                            textAlign: 'center',
+                            fontSize: 13,
+                            fontWeight: 600,
+                            color: '#3772ff',
+                          }}
+                        >
+                          View All
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
 
                 {/* Wallet Button */}
                 <Link to={isLoggedIn ? "/wallet" : "/login"} className="header-wallet-btn">Wallet</Link>

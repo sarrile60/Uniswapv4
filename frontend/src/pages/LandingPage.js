@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import RockieHeader from "@/components/RockieHeader";
+import CryptoIcon from "@/components/CryptoIcons";
 import "./LandingPage.css";
+
+const API = process.env.REACT_APP_BACKEND_URL;
 
 const LandingPage = () => {
   const [darkMode, setDarkMode] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
+  const [marketData, setMarketData] = useState([]);
+  const [marketLoading, setMarketLoading] = useState(true);
 
   useEffect(() => {
     if (darkMode) {
@@ -16,16 +21,67 @@ const LandingPage = () => {
     return () => document.body.classList.remove("is_dark");
   }, [darkMode]);
 
-  // SVG coin icons as inline components
-  const CoinIcon = ({ symbol, size = 32 }) => {
-    const colors = { BTC: '#f7931a', ETH: '#627eea', BNB: '#f3ba2f', USDT: '#26a17b', ADA: '#0033ad', SOL: '#9945ff', XRP: '#23292f', DOT: '#e6007a' };
-    const bg = colors[symbol] || '#3772ff';
-    return (
-      <span className="coin-icon-circle" style={{ width: size, height: size, background: bg, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: '50%', color: '#fff', fontSize: size * 0.4, fontWeight: 800, flexShrink: 0 }}>
-        {symbol.charAt(0)}
-      </span>
-    );
+  // Fetch live market data
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const res = await fetch(`${API}/api/market/prices`);
+        const json = await res.json();
+        if (json.ok && json.data && json.data.length > 0) {
+          setMarketData(json.data);
+        }
+      } catch (e) {
+        console.error("Failed to fetch market prices:", e);
+      } finally {
+        setMarketLoading(false);
+      }
+    };
+    fetchPrices();
+    // Refresh every 60 seconds
+    const interval = setInterval(fetchPrices, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Helper functions for formatting
+  const formatPrice = (price) => {
+    if (price >= 1000) return price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (price >= 1) return price.toFixed(2);
+    return price.toFixed(4);
   };
+  
+  const formatVolume = (vol) => {
+    if (vol >= 1e9) return `${(vol / 1e9).toFixed(2)}B(USD)`;
+    if (vol >= 1e6) return `${(vol / 1e6).toFixed(2)}M(USD)`;
+    return `${vol.toLocaleString()}(USD)`;
+  };
+
+  // Derive display data from live market data
+  const cryptoData = (marketData.length >= 4 ? marketData.slice(0, 4) : [
+    { symbol: "BTC", name: "Bitcoin", price: 0, change_24h: 0 },
+    { symbol: "ETH", name: "Ethereum", price: 0, change_24h: 0 },
+    { symbol: "USDT", name: "Tether", price: 0, change_24h: 0 },
+    { symbol: "BNB", name: "BNB", price: 0, change_24h: 0 },
+  ]).map(coin => ({
+    symbol: coin.symbol,
+    name: coin.name,
+    pair: coin.symbol,
+    price: `USD ${formatPrice(coin.price)}`,
+    change: `${coin.change_24h >= 0 ? "+" : ""}${coin.change_24h}%`,
+    up: coin.change_24h >= 0,
+  }));
+
+  const coinListData = (marketData.length > 0 ? marketData : []).map((coin, i) => ({
+    rank: i + 1,
+    symbol: coin.symbol,
+    name: coin.name,
+    pair: coin.symbol,
+    lastTraded: formatPrice(coin.price),
+    change: `${coin.change_24h >= 0 ? "+" : ""}${coin.change_24h}%`,
+    up: coin.change_24h >= 0,
+    high: formatPrice(coin.high_24h),
+    low: formatPrice(coin.low_24h),
+    turnover: formatVolume(coin.volume_24h),
+  }));
 
   // Mini sparkline SVG
   const Sparkline = ({ up }) => {
@@ -39,24 +95,6 @@ const LandingPage = () => {
       </svg>
     );
   };
-
-  const cryptoData = [
-    { symbol: "BTC", name: "Bitcoin", pair: "BTC", price: "USD 53,260.20", change: "+7.2%", up: true },
-    { symbol: "ETH", name: "Ethereum", pair: "ETH", price: "USD 53,260.20", change: "-1.8%", up: false },
-    { symbol: "USDT", name: "Tether", pair: "USDT", price: "USD 53,260.20", change: "+3.54%", up: true },
-    { symbol: "BNB", name: "Binance", pair: "BNB", price: "USD 53,260.20", change: "+3.24%", up: true },
-  ];
-
-  const coinListData = [
-    { rank: 1, symbol: "BTC", name: "Bitcoin", pair: "BTC", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
-    { rank: 2, symbol: "ETH", name: "Ethereum", pair: "ETH", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
-    { rank: 3, symbol: "BNB", name: "BNB", pair: "BNB/USD", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
-    { rank: 4, symbol: "USDT", name: "Tether", pair: "USDT/USD", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
-    { rank: 5, symbol: "ADA", name: "Cardano", pair: "ADA", lastTraded: "2.236", change: "-3.33%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
-    { rank: 6, symbol: "SOL", name: "Solana", pair: "SOL", lastTraded: "2.236", change: "+5.31%", up: true, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
-    { rank: 7, symbol: "XRP", name: "XRP", pair: "XRP", lastTraded: "2.236", change: "+2.10%", up: true, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
-    { rank: 8, symbol: "DOT", name: "Polkadot", pair: "DOT", lastTraded: "2.236", change: "-1.85%", up: false, high: "62,749.00", low: "57,600.00", turnover: "5.04B(USD)" },
-  ];
 
   const tabs = ["Crypto", "DeFi", "BSC", "NFT", "Metaverse", "Polkadot", "Solana", "Opensea", "Makersplace"];
   const marketMainTabs = ["Favorites", "Derivatives", "Spot"];
@@ -135,7 +173,7 @@ const LandingPage = () => {
                           <div key={i} className={`crypto-box ${i === 0 ? "active" : ""}`}>
                             <div className="crypto-box-top">
                               <div className="crypto-box-left">
-                                <CoinIcon symbol={coin.symbol} size={40} />
+                                <CryptoIcon symbol={coin.symbol} size={40} />
                                 <div className="crypto-box-info">
                                   <h6 className="crypto-box-name">{coin.name}</h6>
                                 </div>
@@ -214,7 +252,7 @@ const LandingPage = () => {
                         <td><span className="star-icon">☆</span></td>
                         <td>{coin.rank}</td>
                         <td className="td-pair">
-                          <CoinIcon symbol={coin.symbol} size={28} />
+                          <CryptoIcon symbol={coin.symbol} size={28} />
                           <span className="coin-name">{coin.name}</span>
                           <span className="coin-symbol">{coin.pair}</span>
                         </td>

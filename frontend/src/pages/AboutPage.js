@@ -1,104 +1,88 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Shield, Globe, Users, Lock, Mail, MapPin, Building } from 'lucide-react';
+import { Shield, Globe, Users, Lock, Mail, MapPin, Building } from 'lucide-react';
 
 const AboutPage = () => {
   return (
-    <div className="min-h-screen" data-testid="about-page">
+    <div className="min-h-screen" data-testid="about-page" style={{ background: '#141416', color: '#b1b5c3' }}>
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         {/* Hero section */}
         <div className="text-center mb-16">
-          <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <span className="text-white font-bold text-3xl">Z</span>
+          <div style={{ width: 64, height: 64, background: 'linear-gradient(135deg, #ec4899, #7c3aed)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <span style={{ fontSize: 32 }}>🦄</span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+          <h2 style={{ fontSize: '2.25rem', fontWeight: 700, color: '#fff', marginBottom: 16 }}>
             Trusted Digital Asset Management
           </h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p style={{ fontSize: '1.125rem', color: '#b1b5c3', maxWidth: 640, margin: '0 auto', lineHeight: 1.6 }}>
             Uniswap V4 provides a secure, reliable platform for managing digital assets. Founded in 2023 and headquartered in the United Kingdom, we are committed to delivering institutional-grade security and a seamless user experience for individuals and businesses alike.
           </p>
         </div>
 
         {/* Mission */}
         <div className="mb-16">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h3>
-          <p className="text-gray-700 leading-relaxed mb-4">
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: 16 }}>Our Mission</h3>
+          <p style={{ color: '#b1b5c3', lineHeight: 1.6, marginBottom: 16 }}>
             At Uniswap V4, our mission is to make digital asset management accessible, transparent, and secure. We believe that financial tools should empower users with full control over their assets, backed by robust security measures and clear regulatory compliance.
           </p>
-          <p className="text-gray-700 leading-relaxed">
+          <p style={{ color: '#b1b5c3', lineHeight: 1.6 }}>
             We are dedicated to building a platform where trust is earned through transparency, where security is built into every layer, and where our users can manage their digital portfolios with confidence.
           </p>
         </div>
 
         {/* Values */}
         <div className="mb-16">
-          <h3 className="text-2xl font-bold text-gray-900 mb-8">What Guides Us</h3>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: 32 }}>What Guides Us</h3>
           <div className="grid sm:grid-cols-2 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6">
-              <Shield className="w-8 h-8 text-blue-600 mb-3" />
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Security First</h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Every feature we build starts with security. From encrypted data storage to rigorous identity verification, safeguarding your assets and personal information is our highest priority.
-              </p>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-6">
-              <Lock className="w-8 h-8 text-blue-600 mb-3" />
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Regulatory Compliance</h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                We adhere to applicable anti-money laundering (AML) and know your customer (KYC) regulations, ensuring that our platform operates within the bounds of UK and international financial law.
-              </p>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-6">
-              <Users className="w-8 h-8 text-blue-600 mb-3" />
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">User-Centred Design</h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                We design our platform with real users in mind. From onboarding to daily use, every interaction is crafted for clarity, simplicity, and reliability across all devices.
-              </p>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-6">
-              <Globe className="w-8 h-8 text-blue-600 mb-3" />
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Transparency</h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                We believe in open communication with our users. Our fee structures, policies, and operational practices are clearly documented and readily available.
-              </p>
-            </div>
+            {[
+              { icon: Shield, title: 'Security First', text: 'Every feature we build starts with security. From encrypted data storage to rigorous identity verification, safeguarding your assets and personal information is our highest priority.' },
+              { icon: Lock, title: 'Regulatory Compliance', text: 'We adhere to applicable anti-money laundering (AML) and know your customer (KYC) regulations, ensuring that our platform operates within the bounds of UK and international financial law.' },
+              { icon: Users, title: 'User-Centred Design', text: 'We design our platform with real users in mind. From onboarding to daily use, every interaction is crafted for clarity, simplicity, and reliability across all devices.' },
+              { icon: Globe, title: 'Transparency', text: 'We believe in open communication with our users. Our fee structures, policies, and operational practices are clearly documented and readily available.' },
+            ].map(({ icon: Icon, title, text }, i) => (
+              <div key={i} style={{ background: '#222630', borderRadius: 12, padding: 24 }}>
+                <Icon style={{ width: 32, height: 32, color: '#3772ff', marginBottom: 12 }} />
+                <h4 style={{ fontSize: '1.125rem', fontWeight: 600, color: '#fff', marginBottom: 8 }}>{title}</h4>
+                <p style={{ fontSize: '0.875rem', color: '#b1b5c3', lineHeight: 1.6 }}>{text}</p>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* Company details */}
         <div className="mb-16">
-          <h3 className="text-2xl font-bold text-gray-900 mb-6">Company Information</h3>
-          <div className="bg-gray-50 rounded-xl p-8">
+          <h3 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#fff', marginBottom: 24 }}>Company Information</h3>
+          <div style={{ background: '#222630', borderRadius: 12, padding: 32 }}>
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="flex items-start space-x-3">
-                <Building className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <Building style={{ width: 20, height: 20, color: '#777e90', marginTop: 2, flexShrink: 0 }} />
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Company Name</p>
-                  <p className="text-gray-900">Uniswap V4</p>
-                  <p className="text-sm text-gray-500">Private Limited Company</p>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#777e90' }}>Company Name</p>
+                  <p style={{ color: '#fff' }}>Uniswap V4</p>
+                  <p style={{ fontSize: '0.875rem', color: '#777e90' }}>Private Limited Company</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <MapPin className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <MapPin style={{ width: 20, height: 20, color: '#777e90', marginTop: 2, flexShrink: 0 }} />
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Registered Office</p>
-                  <p className="text-gray-900">45 Queen Street</p>
-                  <p className="text-gray-600">Deal, Kent, England, CT14 6EY</p>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#777e90' }}>Registered Office</p>
+                  <p style={{ color: '#fff' }}>45 Queen Street</p>
+                  <p style={{ fontSize: '0.875rem', color: '#b1b5c3' }}>Deal, Kent, England, CT14 6EY</p>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <Mail className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <Mail style={{ width: 20, height: 20, color: '#777e90', marginTop: 2, flexShrink: 0 }} />
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Contact</p>
-                  <a href="mailto:info@uniswapv4.com" className="text-blue-600 hover:underline">info@uniswapv4.com</a>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#777e90' }}>Contact</p>
+                  <a href="mailto:info@uniswapv4.com" style={{ color: '#3772ff' }}>info@uniswapv4.com</a>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <Shield className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
+                <Shield style={{ width: 20, height: 20, color: '#777e90', marginTop: 2, flexShrink: 0 }} />
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Incorporated</p>
-                  <p className="text-gray-900">2023</p>
-                  <p className="text-sm text-gray-500">United Kingdom</p>
+                  <p style={{ fontSize: '0.875rem', fontWeight: 500, color: '#777e90' }}>Incorporated</p>
+                  <p style={{ color: '#fff' }}>2023</p>
+                  <p style={{ fontSize: '0.875rem', color: '#777e90' }}>United Kingdom</p>
                 </div>
               </div>
             </div>
@@ -106,24 +90,24 @@ const AboutPage = () => {
         </div>
 
         {/* Contact CTA */}
-        <div className="text-center bg-blue-50 rounded-xl p-8">
-          <h3 className="text-xl font-bold text-gray-900 mb-3">Get in Touch</h3>
-          <p className="text-gray-600 mb-4">
+        <div style={{ textAlign: 'center', background: 'rgba(55, 114, 255, 0.1)', borderRadius: 12, padding: 32 }}>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#fff', marginBottom: 12 }}>Get in Touch</h3>
+          <p style={{ color: '#b1b5c3', marginBottom: 16 }}>
             Have questions or need support? Our team is here to help.
           </p>
-          <a href="mailto:info@uniswapv4.com" className="inline-flex items-center justify-center rounded-md bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 transition-colors">
-            <Mail className="w-4 h-4 mr-2" />
+          <a href="mailto:info@uniswapv4.com" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: '#3772ff', color: '#fff', fontWeight: 500, padding: '10px 24px', textDecoration: 'none', transition: 'all 0.3s' }}>
+            <Mail style={{ width: 16, height: 16, marginRight: 8 }} />
             Contact Support
           </a>
         </div>
       </main>
 
-      <footer className="bg-gray-50 border-t border-gray-200 py-6 px-4 mt-16">
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center text-sm text-gray-500">
+      <footer style={{ background: '#18191d', borderTop: '1px solid #23262f', padding: '24px 16px', marginTop: 64 }}>
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center" style={{ fontSize: '0.875rem', color: '#777e90' }}>
           <p>&copy; {new Date().getFullYear()} Uniswap V4. All rights reserved.</p>
           <div className="flex space-x-6 mt-2 sm:mt-0">
-            <Link to="/privacy" className="hover:text-gray-900">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-gray-900">Terms of Service</Link>
+            <Link to="/privacy" style={{ color: '#777e90' }}>Privacy Policy</Link>
+            <Link to="/terms" style={{ color: '#777e90' }}>Terms of Service</Link>
           </div>
         </div>
       </footer>

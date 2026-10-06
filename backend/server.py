@@ -108,7 +108,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com; "
-            "connect-src 'self' https://uniswap-infra.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
+            "connect-src 'self' https://uniswap-v4-preview.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
             "media-src 'self' blob: https://res.cloudinary.com; "
             "frame-ancestors 'none';"
         )
@@ -4749,6 +4749,81 @@ async def migrate_import(request: Request):
     
     return {"ok": True, "collection": collection_name, "imported": len(cleaned)}
 
+
+
+# ============== MARKET DATA (REAL-TIME PRICES) ==============
+
+import httpx as _httpx
+import time as _time
+
+# Simple in-memory cache for market data
+_market_cache = {"data": None, "timestamp": 0, "ttl": 60}  # 60 second TTL
+
+COINGECKO_IDS = {
+    "bitcoin": "BTC",
+    "ethereum": "ETH",
+    "tether": "USDT",
+    "binancecoin": "BNB",
+    "cardano": "ADA",
+    "solana": "SOL",
+    "ripple": "XRP",
+    "polkadot": "DOT",
+}
+
+@api_router.get("/market/prices")
+async def get_market_prices():
+    """Get real-time cryptocurrency prices from CoinGecko (cached 60s)."""
+    now = _time.time()
+    
+    # Return cached data if still fresh
+    if _market_cache["data"] and (now - _market_cache["timestamp"]) < _market_cache["ttl"]:
+        return {"ok": True, "data": _market_cache["data"], "cached": True}
+    
+    try:
+        coin_ids = ",".join(COINGECKO_IDS.keys())
+        url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h"
+        
+        async with _httpx.AsyncClient(timeout=10.0) as client:
+            resp = await client.get(url, headers={
+                "Accept": "application/json",
+                "User-Agent": "UniswapV4-Platform/1.0"
+            })
+            resp.raise_for_status()
+            raw_data = resp.json()
+        
+        # Transform to our format
+        prices = []
+        for coin in raw_data:
+            symbol = COINGECKO_IDS.get(coin.get("id", ""), coin.get("symbol", "").upper())
+            prices.append({
+                "symbol": symbol,
+                "name": coin.get("name", ""),
+                "price": round(coin.get("current_price", 0), 2),
+                "change_24h": round(coin.get("price_change_percentage_24h", 0) or 0, 2),
+                "high_24h": round(coin.get("high_24h", 0) or 0, 2),
+                "low_24h": round(coin.get("low_24h", 0) or 0, 2),
+                "volume_24h": round(coin.get("total_volume", 0) or 0, 0),
+                "market_cap": round(coin.get("market_cap", 0) or 0, 0),
+                "image": coin.get("image", ""),
+                "last_updated": coin.get("last_updated", ""),
+            })
+        
+        # Sort by market cap (same order as input)
+        symbol_order = list(COINGECKO_IDS.values())
+        prices.sort(key=lambda x: symbol_order.index(x["symbol"]) if x["symbol"] in symbol_order else 999)
+        
+        _market_cache["data"] = prices
+        _market_cache["timestamp"] = now
+        
+        return {"ok": True, "data": prices, "cached": False}
+    
+    except Exception as e:
+        logger.error(f"Failed to fetch market data: {e}")
+        # Return stale cache if available
+        if _market_cache["data"]:
+            return {"ok": True, "data": _market_cache["data"], "cached": True, "stale": True}
+        # Fallback static data
+        return {"ok": True, "data": [], "error": "Unable to fetch live prices"}
 
 
 # ============== HEALTH CHECK (root level for K8s) ==============

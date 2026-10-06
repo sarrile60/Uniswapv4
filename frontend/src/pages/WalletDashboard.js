@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { QRCodeSVG } from 'qrcode.react';
+import CryptoIcon from '@/components/CryptoIcons';
 import {
   User,
   RefreshCw,
@@ -581,8 +582,8 @@ const WalletDashboard = () => {
           <Card data-testid="usdc-asset-card" className="p-4 hover:shadow-md transition cursor-pointer" onClick={() => navigate('/transactions')}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-bold text-lg">$</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                  <CryptoIcon symbol="USDC" size={40} />
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">USDC</div>
@@ -606,8 +607,8 @@ const WalletDashboard = () => {
           <Card data-testid="eur-asset-card" className="p-4 hover:shadow-md transition cursor-pointer" onClick={() => navigate('/transactions')}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <span className="text-green-600 font-bold text-lg">&euro;</span>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center">
+                  <CryptoIcon symbol="EUR" size={40} />
                 </div>
                 <div>
                   <div className="font-semibold text-gray-900">EUR</div>
