@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import RockieHeader from "@/components/RockieHeader";
 import CryptoIcon from "@/components/CryptoIcons";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLang } from "@/i18n";
 import "./LandingPage.css";
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -11,6 +13,8 @@ const LandingPage = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [marketData, setMarketData] = useState([]);
   const [marketLoading, setMarketLoading] = useState(true);
+  const { user, logout } = useAuth();
+  const { t } = useLang();
 
   useEffect(() => {
     if (darkMode) {
@@ -114,7 +118,7 @@ const LandingPage = () => {
 
   return (
     <div className={`body-rockie ${darkMode ? "is_dark" : ""}`}>
-      <RockieHeader darkMode={darkMode} onToggleDarkMode={() => setDarkMode(!darkMode)} />
+      <RockieHeader isLoggedIn={!!user} user={user} onLogout={logout} darkMode={darkMode} onToggleDarkMode={() => setDarkMode(!darkMode)} />
 
       {/* Banner */}
       <section className="banner">
@@ -122,23 +126,21 @@ const LandingPage = () => {
           <div className="row">
             <div className="col-xl-6 col-md-12">
               <div className="banner__content">
-                <h2 className="title">Buy & Sell Digital Assets In The Uniswap V4</h2>
-                <p className="fs-20 desc">
-                  The easiest, safest, and fastest way to buy & sell crypto assets on a trusted exchange platform.
-                </p>
-                <Link to="/register" className="btn-action"><span>Get started now</span></Link>
+                <h2 className="title">{t.land_bannerTitle}</h2>
+                <p className="fs-20 desc">{t.land_bannerDesc}</p>
+                <Link to="/register" className="btn-action"><span>{t.land_getStarted}</span></Link>
                 <div className="stats-row">
                   <div className="stat-item">
                     <h4 className="stat-number">$30B+</h4>
-                    <p className="stat-label">Trading Volume</p>
+                    <p className="stat-label">{t.land_tradingVolume}</p>
                   </div>
                   <div className="stat-item">
                     <h4 className="stat-number">100+</h4>
-                    <p className="stat-label">Countries</p>
+                    <p className="stat-label">{t.land_countries}</p>
                   </div>
                   <div className="stat-item">
                     <h4 className="stat-number">10M+</h4>
-                    <p className="stat-label">Verified Users</p>
+                    <p className="stat-label">{t.land_verifiedUsers}</p>
                   </div>
                 </div>
               </div>
@@ -279,53 +281,43 @@ const LandingPage = () => {
           <div className="row">
             <div className="col-md-12">
               <div className="block-text center">
-                <h3 className="heading">How It Works</h3>
-                <p className="fs-20 desc">
-                  Get started in just a few simple steps and begin trading cryptocurrency today.
-                </p>
+                <h3 className="heading">{t.land_howItWorks}</h3>
+                <p className="fs-20 desc">{t.land_howItWorksDesc}</p>
               </div>
               <div className="work__main">
                 <div className="work-box">
-                  <div className="image">
-                    <span className="work-icon">☁️</span>
-                  </div>
+                  <div className="image"><span className="work-icon">☁️</span></div>
                   <div className="content">
                     <p className="step">Step 1</p>
-                    <span className="title">Create Account</span>
-                    <p className="text">Sign up with your email and verify your identity to get started.</p>
+                    <span className="title">{t.land_step1}</span>
+                    <p className="text">{t.land_step1Desc}</p>
                   </div>
                   <div className="connect-line"></div>
                 </div>
                 <div className="work-box">
-                  <div className="image">
-                    <span className="work-icon">👛</span>
-                  </div>
+                  <div className="image"><span className="work-icon">👛</span></div>
                   <div className="content">
                     <p className="step">Step 2</p>
-                    <span className="title">Connect Wallet</span>
-                    <p className="text">Link your wallet to securely manage and store your digital assets.</p>
+                    <span className="title">{t.land_step2}</span>
+                    <p className="text">{t.land_step2Desc}</p>
                   </div>
                   <div className="connect-line"></div>
                 </div>
                 <div className="work-box">
-                  <div className="image">
-                    <span className="work-icon">⛏️</span>
-                  </div>
+                  <div className="image"><span className="work-icon">⛏️</span></div>
                   <div className="content">
                     <p className="step">Step 3</p>
-                    <span className="title">Start Trading</span>
-                    <p className="text">Buy, sell, and trade cryptocurrencies with competitive fees.</p>
+                    <span className="title">{t.land_step3}</span>
+                    <p className="text">{t.land_step3Desc}</p>
                   </div>
                   <div className="connect-line"></div>
                 </div>
                 <div className="work-box">
-                  <div className="image">
-                    <span className="work-icon">📊</span>
-                  </div>
+                  <div className="image"><span className="work-icon">📊</span></div>
                   <div className="content">
                     <p className="step">Step 4</p>
-                    <span className="title">Earn Money</span>
-                    <p className="text">Grow your portfolio with smart trades and market insights.</p>
+                    <span className="title">{t.land_step4}</span>
+                    <p className="text">{t.land_step4Desc}</p>
                   </div>
                 </div>
               </div>
@@ -345,29 +337,19 @@ const LandingPage = () => {
             </div>
             <div className="col-xl-6 col-md-12">
               <div className="about__content">
-                <h3 className="heading">What Is Uniswap V4</h3>
-                <p className="fs-20 decs">
-                  Experience a variety of trading on our platform. You can use various types of coin transactions including Spot Trade, Futures Trade, P2P, Staking, and more.
-                </p>
+                <h3 className="heading">{t.land_whatIs}</h3>
+                <p className="fs-20 decs">{t.land_whatIsDesc}</p>
                 <ul className="list">
                   <li>
-                    <h6 className="title">
-                      <span className="icon-check-mark">✓</span> View real-time cryptocurrency prices
-                    </h6>
-                    <p className="text">
-                      Track live prices and market movements across hundreds of cryptocurrency pairs with professional charting tools.
-                    </p>
+                    <h6 className="title"><span className="icon-check-mark">✓</span> {t.land_feature1}</h6>
+                    <p className="text">{t.land_feature1Desc}</p>
                   </li>
                   <li>
-                    <h6 className="title">
-                      <span className="icon-check-mark">✓</span> Buy and sell BTC, ETH, USDC, and more
-                    </h6>
-                    <p className="text">
-                      Trade the most popular digital assets with competitive fees, deep liquidity, and instant execution.
-                    </p>
+                    <h6 className="title"><span className="icon-check-mark">✓</span> {t.land_feature2}</h6>
+                    <p className="text">{t.land_feature2Desc}</p>
                   </li>
                 </ul>
-                <Link to="/register" className="btn-action">Explore More</Link>
+                <Link to="/register" className="btn-action">{t.land_exploreMore}</Link>
               </div>
             </div>
           </div>
@@ -380,9 +362,9 @@ const LandingPage = () => {
           <div className="row">
             <div className="col-xl-6 col-md-12">
               <div className="block-text">
-                <h3 className="heading">Our customers love what we do</h3>
-                <h6 className="fs-20">Transform your portfolio with Uniswap V4</h6>
-                <p>Trusted by thousands of traders worldwide. Here's what our users have to say about their experience.</p>
+                <h3 className="heading">{t.land_testimonialHeading}</h3>
+                <h6 className="fs-20">{t.land_testimonialSub}</h6>
+                <p>{t.land_testimonialDesc}</p>
                 <div className="testimonial-avatars">
                   {testimonials.map((t, i) => (
                     <div key={i} className={`testimonial-avatar ${activeTestimonial === i ? "active" : ""}`} onClick={() => setActiveTestimonial(i)}>
@@ -392,7 +374,7 @@ const LandingPage = () => {
                 </div>
                 <div className="couter">
                   <h6>30+</h6>
-                  <p className="title">Customer Reviews</p>
+                  <p className="title">{t.land_customerReviews}</p>
                 </div>
               </div>
             </div>
@@ -421,13 +403,13 @@ const LandingPage = () => {
           <div className="row align-items-center">
             <div className="col-md-7">
               <div className="block-text">
-                <h4 className="heading">Earn up to $25 worth of crypto</h4>
-                <p className="desc">Discover how specific cryptocurrencies work — and get a bit of each crypto to try out for yourself.</p>
+                <h4 className="heading">{t.land_ctaTitle}</h4>
+                <p className="desc">{t.land_ctaDesc}</p>
               </div>
             </div>
             <div className="col-md-5">
               <div className="sale-button">
-                <Link to="/register">Create Account</Link>
+                <Link to="/register">{t.land_createAccount}</Link>
               </div>
             </div>
           </div>
@@ -444,50 +426,50 @@ const LandingPage = () => {
                   <Link to="/" className="logo">
                     <span style={{fontSize: '20px', fontWeight: 800, color: '#fff'}}>🦄 Uniswap V4</span>
                   </Link>
-                  <h6>Let's talk! 🤙</h6>
+                  <h6>{t.land_footerTalk}</h6>
                   <ul className="list">
                     <li><p>info@uniswapv4.com</p></li>
-                    <li><p>Secure Digital Asset Exchange</p></li>
+                    <li><p>{t.land_footerSecure}</p></li>
                   </ul>
                 </div>
               </div>
               <div className="col-xl-2 col-md-4">
                 <div className="widget-link s1">
-                  <h6 className="title">PRODUCTS</h6>
+                  <h6 className="title">{t.land_products}</h6>
                   <ul>
-                    <li><a href="#crypto-section">Spot Trading</a></li>
-                    <li><a href="#crypto-section">Markets</a></li>
-                    <li><a href="#crypto-section">Exchange</a></li>
+                    <li><a href="#crypto-section">{t.land_spotTrading}</a></li>
+                    <li><a href="#crypto-section">{t.land_markets}</a></li>
+                    <li><a href="#crypto-section">{t.land_exchange}</a></li>
                   </ul>
                 </div>
               </div>
               <div className="col-xl-2 col-md-4">
                 <div className="widget-link s2">
-                  <h6 className="title">SERVICES</h6>
+                  <h6 className="title">{t.land_services}</h6>
                   <ul>
-                    <li><Link to="/register">Buy Crypto</Link></li>
-                    <li><a href="#crypto-section">Markets</a></li>
-                    <li><Link to="/register">Trading</Link></li>
+                    <li><Link to="/register">{t.land_buyCrypto}</Link></li>
+                    <li><a href="#crypto-section">{t.land_markets}</a></li>
+                    <li><Link to="/register">{t.land_trading}</Link></li>
                   </ul>
                 </div>
               </div>
               <div className="col-xl-2 col-md-4">
                 <div className="widget-link s3">
-                  <h6 className="title">SUPPORT</h6>
+                  <h6 className="title">{t.land_support}</h6>
                   <ul>
-                    <li><a href="mailto:info@uniswapv4.com">Help Center</a></li>
-                    <li><Link to="/about">About Us</Link></li>
-                    <li><Link to="/privacy">Privacy Policy</Link></li>
+                    <li><a href="mailto:info@uniswapv4.com">{t.land_helpCenter}</a></li>
+                    <li><Link to="/about">{t.land_about}</Link></li>
+                    <li><Link to="/privacy">{t.land_privacyPolicy}</Link></li>
                   </ul>
                 </div>
               </div>
               <div className="col-xl-2 col-md-4">
                 <div className="widget-link s4">
-                  <h6 className="title">ABOUT US</h6>
+                  <h6 className="title">{t.land_aboutUs}</h6>
                   <ul>
-                    <li><Link to="/about">About</Link></li>
-                    <li><Link to="/terms">Terms of Service</Link></li>
-                    <li><a href="mailto:info@uniswapv4.com">Contact</a></li>
+                    <li><Link to="/about">{t.land_about}</Link></li>
+                    <li><Link to="/terms">{t.land_termsOfService}</Link></li>
+                    <li><a href="mailto:info@uniswapv4.com">{t.land_contact}</a></li>
                   </ul>
                 </div>
               </div>

@@ -1,34 +1,29 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import RockieHeader from "@/components/RockieHeader";
 import "@/pages/LandingPage.css";
 
 /**
  * RockieLayout — Wrapper for all user-facing inside pages.
- * Provides the Rockie header + dark theme + footer.
+ * Always dark mode for inner pages (wallet, profile, transactions, etc.)
  * Admin pages do NOT use this wrapper.
  */
 const RockieLayout = ({ children }) => {
   const { user, logout } = useAuth();
-  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
-    if (darkMode) {
-      document.body.classList.add("is_dark");
-    } else {
-      document.body.classList.remove("is_dark");
-    }
+    document.body.classList.add("is_dark");
     return () => document.body.classList.remove("is_dark");
-  }, [darkMode]);
+  }, []);
 
   return (
-    <div className={`body-rockie ${darkMode ? "is_dark" : ""}`}>
+    <div className="body-rockie is_dark">
       <RockieHeader
         isLoggedIn={!!user}
         user={user}
         onLogout={logout}
-        darkMode={darkMode}
-        onToggleDarkMode={() => setDarkMode(!darkMode)}
+        darkMode={true}
+        onToggleDarkMode={() => {}} /* no-op: inner pages are always dark */
       />
       <main className="rockie-main">
         {children}

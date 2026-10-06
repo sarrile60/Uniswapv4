@@ -506,6 +506,17 @@ async def health_check():
 
 # ============== AUTH ROUTES ==============
 
+@api_router.post("/auth/refresh-token")
+async def refresh_token(current_user: dict = Depends(get_current_user)):
+    """Issue a fresh JWT token for the active user (sliding session refresh)."""
+    new_token = create_access_token(
+        user_id=current_user["user_id"],
+        email=current_user["email"],
+        role=current_user["role"]
+    )
+    return {"ok": True, "token": new_token}
+
+
 @api_router.get("/public/check-user")
 async def public_check_user(q: str):
     """Public endpoint to check if a user is registered by name or email."""

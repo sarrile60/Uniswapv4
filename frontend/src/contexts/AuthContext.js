@@ -33,12 +33,22 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// Handle responses - token refresh disabled to prevent session corruption
+// Handle responses — auto-redirect on 401 (expired session)
 api.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
+    if (error.response?.status === 401 && !isRedirecting) {
+      const path = window.location.pathname;
+      // Don't redirect on public pages or login page
+      if (path !== '/login' && path !== '/register' && path !== '/' && !path.startsWith('/reset')) {
+        isRedirecting = true;
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    }
     return Promise.reject(error);
   }
 );
@@ -140,20 +150,39 @@ export const AuthProvider = ({ children }) => {
   }, [loadUser]);
 
   // Heartbeat ping every 30s for non-admin users (online tracking)
+  // + Sliding session refresh every 10 minutes
   useEffect(() => {
     if (!isAuthenticated || !user) return;
-    if (user.role === 'admin' || user.role === 'superadmin') return;
     
     const sendHeartbeat = () => {
-      api.post('/auth/heartbeat').catch(() => {});
+      if (user.role !== 'admin' && user.role !== 'superadmin') {
+        api.post('/auth/heartbeat').catch(() => {});
+      }
     };
     
-    // Send immediately on login
+    const refreshSession = async () => {
+      try {
+        const res = await api.post('/auth/refresh-token');
+        if (res.data.ok && res.data.token) {
+          localStorage.setItem('token', res.data.token);
+        }
+      } catch (e) {
+        // If 401 (expired), the interceptor will handle redirect
+      }
+    };
+    
+    // Send heartbeat immediately on login
     sendHeartbeat();
     
-    // Then every 30 seconds
-    const interval = setInterval(sendHeartbeat, 30000);
-    return () => clearInterval(interval);
+    // Heartbeat every 30 seconds
+    const heartbeatInterval = setInterval(sendHeartbeat, 30000);
+    // Refresh token every 10 minutes to keep session alive
+    const refreshInterval = setInterval(refreshSession, 10 * 60 * 1000);
+    
+    return () => {
+      clearInterval(heartbeatInterval);
+      clearInterval(refreshInterval);
+    };
   }, [isAuthenticated, user?.id]);
 
   const login = async (email, password) => {
