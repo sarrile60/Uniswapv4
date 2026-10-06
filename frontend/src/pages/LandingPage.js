@@ -13,8 +13,9 @@ const LandingPage = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [marketData, setMarketData] = useState([]);
   const [marketLoading, setMarketLoading] = useState(true);
-  const { user, logout } = useAuth();
-  const { t } = useLang();
+  const { user, logout, isAuthenticated } = useAuth();
+  const { t, lang } = useLang();
+  const [favorites, setFavorites] = useState([]);
 
   useEffect(() => {
     if (darkMode) {
@@ -24,6 +25,27 @@ const LandingPage = () => {
     }
     return () => document.body.classList.remove("is_dark");
   }, [darkMode]);
+
+  // Load favorites from localStorage (scoped to user email)
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      const key = `favorites_${user.email}`;
+      try { setFavorites(JSON.parse(localStorage.getItem(key)) || []); } catch { setFavorites([]); }
+    } else {
+      setFavorites([]);
+    }
+  }, [isAuthenticated, user?.email]);
+
+  const toggleFavorite = (symbol) => {
+    if (!isAuthenticated) { alert(t.land_loginToFavorite); return; }
+    const key = `favorites_${user.email}`;
+    setFavorites(prev => {
+      const next = prev.includes(symbol) ? prev.filter(s => s !== symbol) : [...prev, symbol];
+      localStorage.setItem(key, JSON.stringify(next));
+      return next;
+    });
+  };
+
 
   // Fetch live market data
   useEffect(() => {
@@ -101,17 +123,17 @@ const LandingPage = () => {
   };
 
   const tabs = ["Crypto", "DeFi", "BSC", "NFT", "Metaverse", "Polkadot", "Solana", "Opensea", "Makersplace"];
-  const marketMainTabs = ["Favorites", "Derivatives", "Spot"];
-  const marketSubTabs = ["All", "Inverse Perpetual", "USDT Perpetual", "Inverse Futures"];
-  const marketFilterTabs = ["Hot", "New", "DeFi", "NFT"];
+  const marketMainTabs = [t.land_favorites, t.land_derivatives, t.land_spot];
+  const marketSubTabs = [t.land_all, t.land_inversePerpetual, t.land_usdtPerpetual, t.land_inverseFutures];
+  const marketFilterTabs = [t.land_hot, t.land_new, t.land_defi, t.land_nft];
   const [activeMarketMain, setActiveMarketMain] = useState(1); // Derivatives active
   const [activeMarketSub, setActiveMarketSub] = useState(0);
   const [activeMarketFilter, setActiveMarketFilter] = useState(0);
 
   const testimonials = [
-    { text: "This platform has completely transformed how I manage my crypto portfolio. The interface is clean and transactions are lightning fast.", name: "Alex Johnson", position: "Crypto Trader", avatar: null, initials: "AJ", color: "#3772ff" },
-    { text: "I've tried dozens of exchanges and this is by far the most user-friendly. Customer support is exceptional and security features give me peace of mind.", name: "Sarah Williams", position: "Investor", avatar: null, initials: "SW", color: "#58bd7d" },
-    { text: "The trading tools are professional-grade yet accessible to beginners. I've recommended this platform to everyone I know in the crypto space.", name: "Michael Chen", position: "Fund Manager", avatar: null, initials: "MC", color: "#f7931a" },
+    { text: t.land_testimonial1, name: "Alex Johnson", position: "Crypto Trader", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face", initials: "AJ", color: "#3772ff" },
+    { text: t.land_testimonial2, name: "Sarah Williams", position: "Investor", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&crop=face", initials: "SW", color: "#58bd7d" },
+    { text: t.land_testimonial3, name: "Michael Chen", position: "Fund Manager", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face", initials: "MC", color: "#f7931a" },
   ];
 
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -131,15 +153,15 @@ const LandingPage = () => {
                 <Link to="/register" className="btn-action"><span>{t.land_getStarted}</span></Link>
                 <div className="stats-row">
                   <div className="stat-item">
-                    <h4 className="stat-number">$30B+</h4>
+                    <h4 className="stat-number">{t.land_stat1}</h4>
                     <p className="stat-label">{t.land_tradingVolume}</p>
                   </div>
                   <div className="stat-item">
-                    <h4 className="stat-number">100+</h4>
+                    <h4 className="stat-number">{t.land_stat2}</h4>
                     <p className="stat-label">{t.land_countries}</p>
                   </div>
                   <div className="stat-item">
-                    <h4 className="stat-number">10M+</h4>
+                    <h4 className="stat-number">{t.land_stat3}</h4>
                     <p className="stat-label">{t.land_verifiedUsers}</p>
                   </div>
                 </div>
@@ -213,16 +235,18 @@ const LandingPage = () => {
                 ))}
               </div>
 
-              {/* Sub Tabs: All / Inverse Perpetual / etc. */}
-              <div className="market-sub-tabs">
-                {marketSubTabs.map((tab, i) => (
-                  <button key={tab} className={`market-sub-tab ${activeMarketSub === i ? "active" : ""}`} onClick={() => setActiveMarketSub(i)}>
-                    {tab}
-                  </button>
-                ))}
-              </div>
+              {/* Sub Tabs — only show for Derivatives (index 1) */}
+              {activeMarketMain === 1 && (
+                <div className="market-sub-tabs">
+                  {marketSubTabs.map((tab, i) => (
+                    <button key={tab} className={`market-sub-tab ${activeMarketSub === i ? "active" : ""}`} onClick={() => setActiveMarketSub(i)}>
+                      {tab}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-              {/* Filter Tabs: Hot / New / DeFi / NFT */}
+              {/* Filter Tabs */}
               <div className="market-filter-tabs">
                 {marketFilterTabs.map((tab, i) => (
                   <button key={tab} className={`market-filter-tab ${activeMarketFilter === i ? "active" : ""}`} onClick={() => setActiveMarketFilter(i)}>
@@ -233,42 +257,82 @@ const LandingPage = () => {
 
               {/* Table */}
               <div className="coin-list__main">
-                <table className="table market-table">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>#</th>
-                      <th>Trading Pairs</th>
-                      <th>Last Traded</th>
-                      <th>24H Change%</th>
-                      <th>24H High</th>
-                      <th>24H Low</th>
-                      <th>24H Turnover</th>
-                      <th>Chart</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {coinListData.map((coin) => (
-                      <tr key={coin.rank}>
-                        <td><span className="star-icon">☆</span></td>
-                        <td>{coin.rank}</td>
-                        <td className="td-pair">
-                          <CryptoIcon symbol={coin.symbol} size={28} />
-                          <span className="coin-name">{coin.name}</span>
-                          <span className="coin-symbol">{coin.pair}</span>
-                        </td>
-                        <td>{coin.lastTraded}</td>
-                        <td className={coin.up ? "color-success" : "color-critical"}>{coin.change}</td>
-                        <td>{coin.high}</td>
-                        <td>{coin.low}</td>
-                        <td>{coin.turnover}</td>
-                        <td><Sparkline up={coin.up} /></td>
-                        <td><Link to="/register" className="btn-trade">Trade</Link></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                {(() => {
+                  // DeFi coins: ETH, ADA, SOL, DOT; NFT: SOL, ETH; New: SOL, DOT, XRP
+                  const defiSymbols = ['ETH','ADA','SOL','DOT'];
+                  const nftSymbols = ['SOL','ETH','BNB'];
+                  const newSymbols = ['SOL','DOT','XRP','ADA'];
+
+                  let displayData = coinListData;
+
+                  // Favorites tab (index 0)
+                  if (activeMarketMain === 0) {
+                    displayData = coinListData.filter(c => favorites.includes(c.symbol));
+                  }
+
+                  // Apply filter tabs
+                  if (activeMarketFilter === 1) displayData = displayData.filter(c => newSymbols.includes(c.symbol));
+                  else if (activeMarketFilter === 2) displayData = displayData.filter(c => defiSymbols.includes(c.symbol));
+                  else if (activeMarketFilter === 3) displayData = displayData.filter(c => nftSymbols.includes(c.symbol));
+
+                  // Sub-tab filters for Derivatives
+                  if (activeMarketMain === 1 && activeMarketSub === 1) displayData = displayData.filter(c => ['BTC','ETH','XRP'].includes(c.symbol));
+                  else if (activeMarketMain === 1 && activeMarketSub === 2) displayData = displayData.filter(c => ['BTC','ETH','BNB','SOL','USDT'].includes(c.symbol));
+                  else if (activeMarketMain === 1 && activeMarketSub === 3) displayData = displayData.filter(c => ['BTC','ETH','DOT','ADA'].includes(c.symbol));
+
+                  if (activeMarketMain === 0 && displayData.length === 0) {
+                    return <div style={{textAlign:'center', padding:'40px 0', color:'var(--r-text)', fontSize:14}}>{t.land_noFavorites}</div>;
+                  }
+
+                  return (
+                    <table className="table market-table">
+                      <thead>
+                        <tr>
+                          <th style={{width:40}}></th>
+                          <th style={{width:40}}>#</th>
+                          <th>{t.land_tradingPairs}</th>
+                          <th>{t.land_lastTraded}</th>
+                          <th>{t.land_24hChange}</th>
+                          <th>{t.land_24hHigh}</th>
+                          <th>{t.land_24hLow}</th>
+                          <th>{t.land_24hTurnover}</th>
+                          <th>{t.land_chart}</th>
+                          <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {displayData.map((coin, idx) => (
+                          <tr key={coin.symbol}>
+                            <td>
+                              <span
+                                className="star-icon"
+                                style={{ cursor:'pointer', color: favorites.includes(coin.symbol) ? '#f7931a' : undefined }}
+                                onClick={() => toggleFavorite(coin.symbol)}
+                              >
+                                {favorites.includes(coin.symbol) ? '★' : '☆'}
+                              </span>
+                            </td>
+                            <td>{idx + 1}</td>
+                            <td>
+                              <div className="td-pair">
+                                <CryptoIcon symbol={coin.symbol} size={28} />
+                                <span className="coin-name">{coin.name}</span>
+                                <span className="coin-symbol">{coin.pair}</span>
+                              </div>
+                            </td>
+                            <td>{coin.lastTraded}</td>
+                            <td className={coin.up ? "color-success" : "color-critical"}>{coin.change}</td>
+                            <td>{coin.high}</td>
+                            <td>{coin.low}</td>
+                            <td>{coin.turnover}</td>
+                            <td><Sparkline up={coin.up} /></td>
+                            <td><Link to="/register" className="btn-trade">{t.land_trade}</Link></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  );
+                })()}
               </div>
             </div>
           </div>
@@ -366,9 +430,13 @@ const LandingPage = () => {
                 <h6 className="fs-20">{t.land_testimonialSub}</h6>
                 <p>{t.land_testimonialDesc}</p>
                 <div className="testimonial-avatars">
-                  {testimonials.map((t, i) => (
+                  {testimonials.map((tm, i) => (
                     <div key={i} className={`testimonial-avatar ${activeTestimonial === i ? "active" : ""}`} onClick={() => setActiveTestimonial(i)}>
-                      <div className="avatar-initials" style={{background: t.color}}>{t.initials}</div>
+                      {tm.avatar ? (
+                        <img src={tm.avatar} alt={tm.name} style={{width:48,height:48,borderRadius:'50%',objectFit:'cover'}} />
+                      ) : (
+                        <div className="avatar-initials" style={{background: tm.color}}>{tm.initials}</div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -384,7 +452,11 @@ const LandingPage = () => {
                 <h6 className="text">"{testimonials[activeTestimonial].text}"</h6>
                 <div className="bottom">
                   <div className="info">
-                    <div className="avatar-initials" style={{background: testimonials[activeTestimonial].color}}>{testimonials[activeTestimonial].initials}</div>
+                    {testimonials[activeTestimonial].avatar ? (
+                      <img src={testimonials[activeTestimonial].avatar} alt={testimonials[activeTestimonial].name} style={{width:48,height:48,borderRadius:'50%',objectFit:'cover'}} />
+                    ) : (
+                      <div className="avatar-initials" style={{background: testimonials[activeTestimonial].color}}>{testimonials[activeTestimonial].initials}</div>
+                    )}
                     <div className="content">
                       <h6 className="name">{testimonials[activeTestimonial].name}</h6>
                       <p className="position">{testimonials[activeTestimonial].position}</p>
@@ -478,7 +550,7 @@ const LandingPage = () => {
         </div>
         <div className="footer-bottom-bg">
           <div className="footer__bottom">
-            <p>© {new Date().getFullYear()} Uniswap V4. All rights reserved.</p>
+            <p>{t.land_footerRights.replace('{year}', new Date().getFullYear())}</p>
           </div>
         </div>
       </footer>

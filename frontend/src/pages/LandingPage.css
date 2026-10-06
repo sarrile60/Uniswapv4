@@ -921,6 +921,7 @@
   font-weight: 500;
   font-size: 14px;
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 .body-rockie .market-table tr:hover {
@@ -928,9 +929,10 @@
 }
 
 .body-rockie .market-table .td-pair {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
+  vertical-align: middle;
 }
 
 .body-rockie .market-table .coin-name {

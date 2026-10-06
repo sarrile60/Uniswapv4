@@ -108,6 +108,19 @@ const translations = {
     land_footerTalk: "Let's talk! \ud83e\udd19", land_footerSecure: 'Secure Digital Asset Exchange',
     land_products: 'PRODUCTS', land_services: 'SERVICES', land_support: 'SUPPORT', land_aboutUs: 'ABOUT US',
     land_spotTrading: 'Spot Trading', land_markets: 'Markets', land_exchange: 'Exchange', land_buyCrypto: 'Buy Crypto', land_trading: 'Trading', land_helpCenter: 'Help Center', land_about: 'About', land_privacyPolicy: 'Privacy Policy', land_termsOfService: 'Terms of Service', land_contact: 'Contact',
+    // Table & Tabs
+    land_favorites: 'Favorites', land_derivatives: 'Derivatives', land_spot: 'Spot',
+    land_all: 'All', land_inversePerpetual: 'Inverse Perpetual', land_usdtPerpetual: 'USDT Perpetual', land_inverseFutures: 'Inverse Futures',
+    land_hot: 'Hot', land_new: 'New', land_defi: 'DeFi', land_nft: 'NFT',
+    land_tradingPairs: 'Trading Pairs', land_lastTraded: 'Last Traded', land_24hChange: '24H Change%', land_24hHigh: '24H High', land_24hLow: '24H Low', land_24hTurnover: '24H Turnover', land_chart: 'Chart', land_trade: 'Trade',
+    land_loginToFavorite: 'Log in to save favorites',
+    land_noFavorites: 'No favorites yet. Click the star icon to add.',
+    land_footerRights: '© {year} Uniswap V4. All rights reserved.',
+    land_stat1: '$30B+', land_stat2: '100+', land_stat3: '10M+',
+    // Testimonials EN
+    land_testimonial1: 'This platform has completely transformed how I manage my crypto portfolio. The interface is clean and transactions are lightning fast.',
+    land_testimonial2: "I've tried dozens of exchanges and this is by far the most user-friendly. Customer support is exceptional and security features give me peace of mind.",
+    land_testimonial3: 'The trading tools are professional-grade yet accessible to beginners. I\'ve recommended this platform to everyone I know in the crypto space.',
   },
   it: {
     wallet: d('UG9ydGFmb2dsaW8='), home: 'Home', swap: 'Scambia', profile: 'Profilo',
@@ -197,6 +210,19 @@ const translations = {
     land_footerTalk: 'Parliamo! \ud83e\udd19', land_footerSecure: 'Exchange di Asset Digitali Sicuro',
     land_products: 'PRODOTTI', land_services: 'SERVIZI', land_support: 'SUPPORTO', land_aboutUs: 'CHI SIAMO',
     land_spotTrading: 'Trading Spot', land_markets: 'Mercati', land_exchange: 'Exchange', land_buyCrypto: 'Compra Crypto', land_trading: 'Trading', land_helpCenter: 'Centro Assistenza', land_about: 'Chi Siamo', land_privacyPolicy: 'Informativa Privacy', land_termsOfService: 'Termini di Servizio', land_contact: 'Contatti',
+    // Table & Tabs
+    land_favorites: 'Preferiti', land_derivatives: 'Derivati', land_spot: 'Spot',
+    land_all: 'Tutti', land_inversePerpetual: 'Perpetuo Inverso', land_usdtPerpetual: 'Perpetuo USDT', land_inverseFutures: 'Futures Inversi',
+    land_hot: 'Popolari', land_new: 'Nuovi', land_defi: 'DeFi', land_nft: 'NFT',
+    land_tradingPairs: 'Coppie di Trading', land_lastTraded: 'Ultimo Prezzo', land_24hChange: 'Variaz. 24H', land_24hHigh: 'Massimo 24H', land_24hLow: 'Minimo 24H', land_24hTurnover: 'Volume 24H', land_chart: 'Grafico', land_trade: 'Scambia',
+    land_loginToFavorite: 'Accedi per salvare i preferiti',
+    land_noFavorites: 'Nessun preferito ancora. Clicca sulla stella per aggiungere.',
+    land_footerRights: '© {year} Uniswap V4. Tutti i diritti riservati.',
+    land_stat1: '€28Mrd+', land_stat2: '100+', land_stat3: '10M+',
+    // Testimonials IT
+    land_testimonial1: 'Questa piattaforma ha completamente trasformato il modo in cui gestisco il mio portafoglio crypto. L\'interfaccia è pulita e le transazioni sono velocissime.',
+    land_testimonial2: 'Ho provato decine di exchange e questo è di gran lunga il più intuitivo. L\'assistenza clienti è eccezionale e le funzioni di sicurezza mi danno tranquillità.',
+    land_testimonial3: 'Gli strumenti di trading sono di livello professionale ma accessibili anche ai principianti. Ho consigliato questa piattaforma a tutti quelli che conosco nel mondo crypto.',
   }
 };
 
