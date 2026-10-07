@@ -94,6 +94,7 @@ const WalletDashboard = () => {
   const [recentTxs, setRecentTxs] = useState([]);
   const [portfolioSparkline, setPortfolioSparkline] = useState([]);
   const [chartTimeframe, setChartTimeframe] = useState('1W');
+  const [chartLoading, setChartLoading] = useState(false);
   const sseRef = useRef(null);
 
   // SSE real-time connection
@@ -215,17 +216,23 @@ const WalletDashboard = () => {
     loadRecentTxs();
   }, []);
 
-  // Fetch portfolio sparkline (BTC 7d as proxy for portfolio performance)
+  // Fetch portfolio chart data — different data per timeframe
   useEffect(() => {
-    const fetchSparkline = async () => {
+    const daysMap = { '1D': 1, '1W': 7, '1M': 30, '3M': 90 };
+    const days = daysMap[chartTimeframe] || 7;
+    const fetchChart = async () => {
+      setChartLoading(true);
       try {
-        const res = await fetch(`${API}/api/market/coin/BTC`);
+        const res = await fetch(`${API}/api/market/chart/BTC?days=${days}`);
         const json = await res.json();
-        if (json.ok && json.data?.sparkline_7d) setPortfolioSparkline(json.data.sparkline_7d);
-      } catch {}
+        if (json.ok && json.data?.prices?.length > 0) {
+          setPortfolioSparkline(json.data.prices);
+        }
+      } catch { /* silent */ }
+      finally { setChartLoading(false); }
     };
-    fetchSparkline();
-  }, []);
+    fetchChart();
+  }, [chartTimeframe]);
 
 
 
@@ -444,9 +451,12 @@ const WalletDashboard = () => {
                     </button>
                   ))}
                 </div>
-                {(() => {
-                  const len = portfolioSparkline.length;
-                  const sliced = chartTimeframe === '1D' ? portfolioSparkline.slice(-24) : chartTimeframe === '1W' ? portfolioSparkline : chartTimeframe === '1M' ? portfolioSparkline : portfolioSparkline;
+                {chartLoading ? (
+                  <div style={{height:120,display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    <RefreshCw className="w-5 h-5 animate-spin" style={{color:'var(--r-text)',opacity:0.5}} />
+                  </div>
+                ) : (() => {
+                  const sliced = portfolioSparkline;
                   const min = Math.min(...sliced);
                   const max = Math.max(...sliced);
                   const range = max - min || 1;

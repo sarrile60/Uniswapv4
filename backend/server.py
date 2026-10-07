@@ -4945,6 +4945,57 @@ async def get_coin_detail(symbol: str):
         raise HTTPException(status_code=502, detail="Failed to fetch coin data")
 
 
+# Cache for market chart data (per symbol + days)
+_chart_cache = {}
+
+@api_router.get("/market/chart/{symbol}")
+async def get_market_chart(symbol: str, days: int = 7):
+    """Get historical price chart data for a coin. days: 1, 7, 30, 90."""
+    symbol = symbol.upper()
+    cg_id = _SYMBOL_TO_CG.get(symbol)
+    if not cg_id:
+        raise HTTPException(status_code=404, detail=f"Coin {symbol} not found")
+    
+    # Clamp days to allowed values
+    if days not in (1, 7, 30, 90):
+        days = 7
+    
+    cache_key = f"{symbol}_{days}"
+    now = _time.time()
+    # Cache TTL: 1D=120s, 1W=300s, 1M/3M=600s
+    ttl = 120 if days == 1 else 300 if days == 7 else 600
+    cached = _chart_cache.get(cache_key)
+    if cached and (now - cached["ts"]) < ttl:
+        return {"ok": True, "data": cached["data"], "cached": True}
+    
+    try:
+        async with _httpx.AsyncClient(timeout=15.0) as client:
+            url = f"https://api.coingecko.com/api/v3/coins/{cg_id}/market_chart?vs_currency=usd&days={days}"
+            resp = await client.get(url, headers={"Accept": "application/json", "User-Agent": "UniswapV4-Platform/1.0"})
+            resp.raise_for_status()
+            data = resp.json()
+        
+        # Extract just the price points
+        prices = [p[1] for p in data.get("prices", [])]
+        
+        result = {
+            "symbol": symbol,
+            "days": days,
+            "prices": prices,
+            "count": len(prices),
+        }
+        
+        _chart_cache[cache_key] = {"data": result, "ts": now}
+        return {"ok": True, "data": result}
+    
+    except Exception as e:
+        logger.error(f"Failed to fetch chart for {symbol} ({days}d): {e}")
+        if cached:
+            return {"ok": True, "data": cached["data"], "cached": True, "stale": True}
+        raise HTTPException(status_code=502, detail="Failed to fetch chart data")
+
+
+
 # ============== HEALTH CHECK (root level for K8s) ==============
 
 @app.get("/health")
