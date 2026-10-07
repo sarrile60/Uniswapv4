@@ -22,12 +22,12 @@ const CoinPicker = ({ selectedCoin, setSelectedCoin, setShowCoinPicker, marketPr
   );
   return (
     <div style={{
-      position: 'absolute', inset: 0, background: 'var(--r-bg, #141416)', zIndex: 10,
+      position: 'absolute', inset: 0, background: '#1b1d25', zIndex: 10,
       display: 'flex', flexDirection: 'column', borderRadius: 16,
     }}>
       <div style={{ padding: '20px 24px 12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <h3 style={{ fontSize: 18, fontWeight: 700, color: 'var(--r-onsurface)' }}>{selectLabel}</h3>
-        <button onClick={() => setShowCoinPicker(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--r-text)', padding: 4 }}>
+        <h3 style={{ fontSize: 18, fontWeight: 700, color: '#fff' }}>{selectLabel}</h3>
+        <button onClick={() => setShowCoinPicker(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#8a8f9e', padding: 4 }}>
           <X size={20} />
         </button>
       </div>
@@ -40,8 +40,8 @@ const CoinPicker = ({ selectedCoin, setSelectedCoin, setShowCoinPicker, marketPr
           autoFocus
           style={{
             width: '100%', padding: '10px 14px', borderRadius: 10,
-            border: '1px solid var(--r-line)', background: 'var(--r-surface)',
-            color: 'var(--r-onsurface)', fontSize: 14, outline: 'none',
+            border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)',
+            color: '#fff', fontSize: 14, outline: 'none',
           }}
         />
       </div>
@@ -58,19 +58,19 @@ const CoinPicker = ({ selectedCoin, setSelectedCoin, setShowCoinPicker, marketPr
               style={{
                 display: 'flex', alignItems: 'center', gap: 12, width: '100%',
                 padding: '12px', borderRadius: 12, border: 'none', cursor: 'pointer',
-                background: selectedCoin === coin ? 'rgba(55,114,255,0.08)' : 'transparent',
+                background: selectedCoin === coin ? 'rgba(55,114,255,0.12)' : 'transparent',
                 transition: 'background 0.15s',
               }}
-              onMouseEnter={e => { if (selectedCoin !== coin) e.currentTarget.style.background = 'var(--r-surface)'; }}
+              onMouseEnter={e => { if (selectedCoin !== coin) e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
               onMouseLeave={e => { if (selectedCoin !== coin) e.currentTarget.style.background = 'transparent'; }}
             >
               <CryptoIcon symbol={coin} size={36} />
               <div style={{ flex: 1, textAlign: 'left' }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--r-onsurface)' }}>{COIN_NAMES[coin] || coin}</div>
-                <div style={{ fontSize: 12, color: 'var(--r-text)' }}>{coin}</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: '#fff' }}>{COIN_NAMES[coin] || coin}</div>
+                <div style={{ fontSize: 12, color: '#8a8f9e' }}>{coin}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--r-onsurface)' }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: '#e4e6ed' }}>
                   ${price.toLocaleString('en-US', { maximumFractionDigits: 2 })}
                 </div>
                 <div style={{ fontSize: 12, fontWeight: 600, color: change >= 0 ? '#22c55e' : '#ef4444' }}>
@@ -192,13 +192,12 @@ const TradeModal = ({ open, onClose }) => {
 
   return createPortal(
     <>
-      {/* Backdrop */}
+      {/* Backdrop — no blur for performance */}
       <div
         onClick={handleClose}
         style={{
-          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
-          zIndex: 99998, backdropFilter: 'blur(4px)',
-          animation: 'fadeIn 0.2s ease',
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)',
+          zIndex: 99998,
         }}
       />
 
@@ -211,13 +210,14 @@ const TradeModal = ({ open, onClose }) => {
           transform: 'translate(-50%, -50%)',
           width: '100%', maxWidth: 440,
           maxHeight: '90vh',
-          background: 'var(--r-bg, #141416)',
+          background: '#1b1d25',
           borderRadius: 20,
-          boxShadow: '0 25px 60px rgba(0,0,0,0.4)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 25px 60px rgba(0,0,0,0.6)',
           zIndex: 99999,
           display: 'flex', flexDirection: 'column',
           overflow: 'hidden',
-          animation: 'tradeModalSlideUp 0.3s ease',
+          animation: 'tradeModalSlideUp 0.25s ease',
         }}
       >
         {/* Header */}
@@ -225,15 +225,15 @@ const TradeModal = ({ open, onClose }) => {
           padding: '20px 24px 0',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
-          <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--r-onsurface)', margin: 0 }}>
+          <h2 style={{ fontSize: 20, fontWeight: 700, color: '#fff', margin: 0 }}>
             {step === 3 ? tr.errorTitle : step === 2 ? tr.orderSummary : tr.trade}
           </h2>
           <button
             onClick={handleClose}
             data-testid="trade-modal-close"
             style={{
-              background: 'var(--r-surface)', border: 'none', cursor: 'pointer',
-              color: 'var(--r-text)', width: 36, height: 36, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.08)', border: 'none', cursor: 'pointer',
+              color: '#adb1bc', width: 36, height: 36, borderRadius: '50%',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'background 0.15s',
             }}
@@ -246,7 +246,7 @@ const TradeModal = ({ open, onClose }) => {
         {step === 1 && (
           <div style={{
             display: 'flex', margin: '16px 24px 0', padding: 4,
-            background: 'var(--r-surface)', borderRadius: 12,
+            background: 'rgba(255,255,255,0.06)', borderRadius: 12,
           }}>
             {['buy', 'sell'].map(t_key => (
               <button
@@ -259,7 +259,7 @@ const TradeModal = ({ open, onClose }) => {
                   background: tab === t_key
                     ? (t_key === 'buy' ? '#22c55e' : '#ef4444')
                     : 'transparent',
-                  color: tab === t_key ? '#fff' : 'var(--r-text)',
+                  color: tab === t_key ? '#fff' : '#8a8f9e',
                 }}
               >
                 {t_key === 'buy' ? tr.buy : tr.sell}
@@ -276,13 +276,13 @@ const TradeModal = ({ open, onClose }) => {
             <div style={{ textAlign: 'center', padding: '12px 0' }}>
               <div style={{
                 width: 64, height: 64, borderRadius: '50%',
-                background: isBuy ? 'rgba(245,158,11,0.12)' : 'rgba(239,68,68,0.12)',
+                background: isBuy ? 'rgba(245,158,11,0.15)' : 'rgba(239,68,68,0.15)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 margin: '0 auto 20px',
               }}>
                 <ShieldAlert size={32} style={{ color: isBuy ? '#f59e0b' : '#ef4444' }} />
               </div>
-              <p style={{ fontSize: 14, color: 'var(--r-text)', lineHeight: 1.7, marginBottom: 28, maxWidth: 340, margin: '0 auto 28px' }}>
+              <p style={{ fontSize: 14, color: '#b1b5c3', lineHeight: 1.7, marginBottom: 28, maxWidth: 340, margin: '0 auto 28px' }}>
                 {isBuy ? tr.buyErrorMsg : tr.sellErrorMsg}
               </p>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
@@ -292,7 +292,6 @@ const TradeModal = ({ open, onClose }) => {
                   style={{
                     padding: '12px 24px', borderRadius: 12, background: '#3772ff',
                     color: '#fff', fontSize: 14, fontWeight: 600, textDecoration: 'none',
-                    transition: 'opacity 0.15s',
                   }}
                 >
                   {tr.contactSupport}
@@ -301,7 +300,7 @@ const TradeModal = ({ open, onClose }) => {
                   onClick={handleClose}
                   style={{
                     padding: '12px 24px', borderRadius: 12, background: 'transparent',
-                    border: '1px solid var(--r-line)', color: 'var(--r-text)',
+                    border: '1px solid rgba(255,255,255,0.12)', color: '#b1b5c3',
                     fontSize: 14, fontWeight: 600, cursor: 'pointer',
                   }}
                 >
@@ -316,15 +315,16 @@ const TradeModal = ({ open, onClose }) => {
             <div>
               {/* Order info card */}
               <div style={{
-                background: 'var(--r-surface)', borderRadius: 14, padding: 20, marginBottom: 20,
+                background: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: 20, marginBottom: 20,
+                border: '1px solid rgba(255,255,255,0.06)',
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                   <CryptoIcon symbol={selectedCoin} size={40} />
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 17, color: 'var(--r-onsurface)' }}>
+                    <div style={{ fontWeight: 700, fontSize: 17, color: '#fff' }}>
                       {isBuy ? tr.buying : tr.selling} {COIN_NAMES[selectedCoin] || selectedCoin}
                     </div>
-                    <div style={{ fontSize: 13, color: 'var(--r-text)' }}>{selectedCoin}</div>
+                    <div style={{ fontSize: 13, color: '#8a8f9e' }}>{selectedCoin}</div>
                   </div>
                 </div>
 
@@ -343,12 +343,12 @@ const TradeModal = ({ open, onClose }) => {
                   <div key={i} style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                     padding: '10px 0',
-                    borderBottom: i < arr.length - 1 ? '1px solid var(--r-line)' : 'none',
+                    borderBottom: i < arr.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
                   }}>
-                    <span style={{ fontSize: 14, color: 'var(--r-text)' }}>{label}</span>
+                    <span style={{ fontSize: 14, color: '#8a8f9e' }}>{label}</span>
                     <span style={{
                       fontSize: 14, fontWeight: i === arr.length - 1 ? 700 : 600,
-                      color: i === arr.length - 1 ? (isBuy ? '#22c55e' : '#3772ff') : 'var(--r-onsurface)',
+                      color: i === arr.length - 1 ? (isBuy ? '#22c55e' : '#3772ff') : '#e4e6ed',
                     }}>{value}</span>
                   </div>
                 ))}
@@ -362,7 +362,6 @@ const TradeModal = ({ open, onClose }) => {
                   width: '100%', padding: '14px', borderRadius: 14, border: 'none',
                   fontSize: 15, fontWeight: 700, cursor: 'pointer', marginBottom: 10,
                   background: isBuy ? '#22c55e' : '#ef4444', color: '#fff',
-                  transition: 'opacity 0.15s',
                 }}
               >
                 {isBuy ? tr.confirmPurchase : tr.confirmSale}
@@ -370,8 +369,9 @@ const TradeModal = ({ open, onClose }) => {
               <button
                 onClick={() => setStep(1)}
                 style={{
-                  width: '100%', padding: '12px', borderRadius: 14, border: '1px solid var(--r-line)',
-                  background: 'transparent', color: 'var(--r-text)', fontSize: 14,
+                  width: '100%', padding: '12px', borderRadius: 14,
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  background: 'transparent', color: '#b1b5c3', fontSize: 14,
                   fontWeight: 600, cursor: 'pointer',
                 }}
               >
@@ -388,7 +388,7 @@ const TradeModal = ({ open, onClose }) => {
 
               {/* Asset Selector */}
               <div style={{ marginBottom: 20 }}>
-                <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--r-text)', display: 'block', marginBottom: 8 }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: '#b1b5c3', display: 'block', marginBottom: 8 }}>
                   {tr.selectAsset}
                 </label>
                 <button
@@ -397,40 +397,39 @@ const TradeModal = ({ open, onClose }) => {
                   style={{
                     width: '100%', display: 'flex', alignItems: 'center', gap: 12,
                     padding: '12px 16px', borderRadius: 14,
-                    border: '1px solid var(--r-line)', background: 'var(--r-surface)',
+                    border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)',
                     cursor: 'pointer', transition: 'border-color 0.15s',
                   }}
                 >
                   <CryptoIcon symbol={selectedCoin} size={36} />
                   <div style={{ flex: 1, textAlign: 'left' }}>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--r-onsurface)' }}>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: '#fff' }}>
                       {COIN_NAMES[selectedCoin] || selectedCoin}
                     </div>
-                    <div style={{ fontSize: 12, color: 'var(--r-text)' }}>
+                    <div style={{ fontSize: 12, color: '#8a8f9e' }}>
                       {tr.currentPrice}: ${coinPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}
                       <span style={{ marginLeft: 8, color: coinChange >= 0 ? '#22c55e' : '#ef4444', fontWeight: 600 }}>
                         {coinChange >= 0 ? '+' : ''}{coinChange.toFixed(2)}%
                       </span>
                     </div>
                   </div>
-                  <ChevronDown size={18} style={{ color: 'var(--r-text)' }} />
+                  <ChevronDown size={18} style={{ color: '#8a8f9e' }} />
                 </button>
               </div>
 
               {/* Amount Input */}
               <div style={{ marginBottom: 20 }}>
-                <label style={{ fontSize: 13, fontWeight: 600, color: 'var(--r-text)', display: 'block', marginBottom: 8 }}>
+                <label style={{ fontSize: 13, fontWeight: 600, color: '#b1b5c3', display: 'block', marginBottom: 8 }}>
                   {isBuy ? tr.amountEur : `${tr.amountCrypto} (${selectedCoin})`}
                 </label>
                 <div style={{
                   display: 'flex', alignItems: 'center',
-                  border: '1px solid var(--r-line)', borderRadius: 14,
-                  background: 'var(--r-surface)', overflow: 'hidden',
-                  transition: 'border-color 0.15s',
+                  border: '1px solid rgba(255,255,255,0.1)', borderRadius: 14,
+                  background: 'rgba(255,255,255,0.04)', overflow: 'hidden',
                 }}>
                   <span style={{
                     padding: '0 0 0 16px', fontSize: 20, fontWeight: 700,
-                    color: 'var(--r-text)', opacity: 0.5,
+                    color: '#8a8f9e',
                   }}>
                     {isBuy ? '€' : ''}
                   </span>
@@ -444,14 +443,14 @@ const TradeModal = ({ open, onClose }) => {
                     step="any"
                     style={{
                       flex: 1, padding: '14px 16px 14px 8px', border: 'none',
-                      background: 'transparent', color: 'var(--r-onsurface)',
+                      background: 'transparent', color: '#fff',
                       fontSize: 20, fontWeight: 700, outline: 'none',
                       width: '100%',
                     }}
                   />
                   <span style={{
                     padding: '0 16px 0 0', fontSize: 14, fontWeight: 600,
-                    color: 'var(--r-text)',
+                    color: '#8a8f9e',
                   }}>
                     {isBuy ? 'EUR' : selectedCoin}
                   </span>
@@ -461,11 +460,12 @@ const TradeModal = ({ open, onClose }) => {
               {/* Live Quote */}
               {amountNum > 0 && (
                 <div style={{
-                  background: 'var(--r-surface)', borderRadius: 14, padding: '14px 16px',
+                  background: 'rgba(255,255,255,0.04)', borderRadius: 14, padding: '14px 16px',
                   marginBottom: 20, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                  border: '1px solid rgba(255,255,255,0.06)',
                 }}>
                   <div>
-                    <div style={{ fontSize: 12, color: 'var(--r-text)', marginBottom: 4 }}>{tr.estimated}</div>
+                    <div style={{ fontSize: 12, color: '#8a8f9e', marginBottom: 4 }}>{tr.estimated}</div>
                     <div style={{ fontSize: 18, fontWeight: 700, color: isBuy ? '#22c55e' : '#3772ff' }}>
                       {isBuy
                         ? `${estimatedReceive.toFixed(6)} ${selectedCoin}`
@@ -478,7 +478,7 @@ const TradeModal = ({ open, onClose }) => {
                     title="Refresh"
                     style={{
                       background: 'none', border: 'none', cursor: 'pointer',
-                      color: 'var(--r-text)', opacity: 0.6, padding: 4,
+                      color: '#8a8f9e', padding: 4,
                     }}
                   >
                     <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
@@ -494,8 +494,8 @@ const TradeModal = ({ open, onClose }) => {
                 style={{
                   width: '100%', padding: '14px', borderRadius: 14, border: 'none',
                   fontSize: 15, fontWeight: 700, cursor: canPreview ? 'pointer' : 'default',
-                  background: canPreview ? '#3772ff' : 'var(--r-surface)',
-                  color: canPreview ? '#fff' : 'var(--r-text)',
+                  background: canPreview ? '#3772ff' : 'rgba(255,255,255,0.06)',
+                  color: canPreview ? '#fff' : '#8a8f9e',
                   opacity: canPreview ? 1 : 0.5,
                   transition: 'all 0.2s',
                   display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
@@ -512,10 +512,6 @@ const TradeModal = ({ open, onClose }) => {
         @keyframes tradeModalSlideUp {
           from { opacity: 0; transform: translate(-50%, -46%); }
           to { opacity: 1; transform: translate(-50%, -50%); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
         }
       `}</style>
     </>,

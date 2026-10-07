@@ -140,27 +140,21 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
 
                         {/* === TRADE BUTTON (replaces Buy/Sell dropdowns) === */}
                         <li className="menu-item">
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setTradeModalOpen(true); }}
-                            data-testid="header-trade-btn"
-                            style={{
-                              background: '#3772ff',
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: 10,
-                              padding: '8px 22px',
-                              fontSize: 14,
-                              fontWeight: 700,
-                              cursor: 'pointer',
-                              letterSpacing: '0.3px',
-                              transition: 'all 0.2s',
-                              boxShadow: '0 2px 8px rgba(55,114,255,0.25)',
+                          <a
+                            href="#!"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              if (isLoggedIn) {
+                                setTradeModalOpen(true);
+                              } else {
+                                navigate('/login');
+                              }
                             }}
-                            onMouseEnter={e => { e.currentTarget.style.background = '#2860e0'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(55,114,255,0.4)'; }}
-                            onMouseLeave={e => { e.currentTarget.style.background = '#3772ff'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(55,114,255,0.25)'; }}
+                            data-testid="header-trade-btn"
                           >
                             Trade
-                          </button>
+                          </a>
                         </li>
 
                         <li className="menu-item">
