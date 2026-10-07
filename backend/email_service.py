@@ -20,10 +20,18 @@ except ImportError:
     logger.warning("Resend package not installed. Email functionality will be limited.")
 
 
-def _wrap(content: str) -> str:
+def _wrap(content: str, lang: str = "en") -> str:
     """Wrap email content in a consistent, email-safe layout with inline styles."""
+    if lang == "it":
+        rights = "&copy; 2026 Uniswap V4. Tutti i diritti riservati."
+        location = "Uniswap V4 | 45 Queen Street, Deal, Kent, England"
+        disclaimer = "Questa è un'email transazionale inviata all'indirizzo associato al tuo account Uniswap V4."
+    else:
+        rights = "&copy; 2026 Uniswap V4. All rights reserved."
+        location = "Uniswap V4 | 45 Queen Street, Deal, Kent, England"
+        disclaimer = "This is a transactional email sent to the address associated with your Uniswap V4 account."
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="{lang}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,9 +48,9 @@ def _wrap(content: str) -> str:
     {content}
   </div>
   <div style="text-align:center;padding:20px 10px;">
-    <p style="margin:4px 0;color:#999999;font-size:11px;">&copy; 2026 Uniswap V4. All rights reserved.</p>
-    <p style="margin:4px 0;color:#999999;font-size:11px;">Uniswap V4 | Zurich, Switzerland</p>
-    <p style="margin:4px 0;color:#bbbbbb;font-size:10px;">This is a transactional email sent to the address associated with your Uniswap V4 account.</p>
+    <p style="margin:4px 0;color:#999999;font-size:11px;">{rights}</p>
+    <p style="margin:4px 0;color:#999999;font-size:11px;">{location}</p>
+    <p style="margin:4px 0;color:#bbbbbb;font-size:10px;">{disclaimer}</p>
   </div>
 </div>
 </body>
@@ -136,7 +144,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">Once verified, you will receive instructions to reset your password and regain full access to your account.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Security Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     # ── KYC Approved Email ──────────────────────────────────────────────
     def get_kyc_approved_email(self, user_name: str, reset_link: str, lang: str = "en") -> tuple:
@@ -160,7 +168,7 @@ class EmailService:
     </div>
     <p style="color:#555555;margin:16px 0 4px 0;">Best regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     # ── Password Reset Email ────────────────────────────────────────────
     def get_password_reset_email(self, user_name: str, reset_link: str, lang: str = "en") -> tuple:
@@ -176,7 +184,7 @@ class EmailService:
     <p style="color:#888888;font-size:13px;margin:0 0 16px 0;">This link will expire in 24 hours for security reasons.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     # ── Reactivation Email (improved for deliverability) ────────────────
     def get_reactivation_email(self, user_name: str, eth_wallet_address: str, lang: str = "en") -> tuple:
@@ -200,7 +208,7 @@ class EmailService:
     <p style="color:#555555;margin:16px 0 4px 0;">If you have any questions, please contact our support team.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     # ── Fee Payment Email ───────────────────────────────────────────────
     def get_fee_payment_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en") -> tuple:
@@ -235,7 +243,7 @@ class EmailService:
     <p style="color:#555555;margin:12px 0;">Once your fees are paid, you will be able to withdraw your full balance to your bank account.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Finance Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     # ── Fee Resolution Email (detailed regulatory explanation) ─────────
     def get_fee_resolution_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en", timer_deadline_text: str = None) -> tuple:
@@ -314,7 +322,7 @@ class EmailService:
                 urgency_block + '\n    <p style="color:#555555;margin:16px 0 4px 0;">If you have any questions'
             )
 
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     def _get_fee_resolution_email_it(self, user_name: str, total_fees: str, eth_wallet_address: str, timer_deadline_text: str = None) -> tuple:
         subject = "Commissioni in Sospeso - Uniswap V4"
@@ -389,7 +397,7 @@ class EmailService:
                 urgency_block + '\n    <p style="color:#555555;margin:16px 0 4px 0;">Per qualsiasi domanda'
             )
 
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     # ── Welcome Email ───────────────────────────────────────────────────
     def get_welcome_email(self, user_name: str, login_link: str, lang: str = "en") -> tuple:
@@ -410,7 +418,7 @@ class EmailService:
     {_btn("Access Your Wallet", login_link)}
     <p style="color:#555555;margin:0 0 4px 0;">Best regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     # ── Transaction Notification Email ──────────────────────────────────
     def get_transaction_notification_email(self, user_name: str, tx_type: str, amount: str, asset: str, tx_date: str, description: str = "", lang: str = "en", status: str = "") -> tuple:
@@ -452,7 +460,7 @@ class EmailService:
     <p style="color:#555555;margin:12px 0;">{body_text}</p>
     <p style="color:#555555;margin:0 0 4px 0;">{regards}</p>
     <p style="color:#333333;font-weight:600;margin:0;">{team_name}</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, lang)
 
     # ── Fees Cleared Email ───────────────────────────────────────────────
     def get_fees_cleared_email(self, user_name: str, total_fees: str, tx_count: int, lang: str = "en") -> tuple:
@@ -496,7 +504,7 @@ class EmailService:
     </div>
     <p style="color:#555555;margin:16px 0 4px 0;">Best regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Finance Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, lang)
 
     def _get_kyc_verification_email_it(self, user_name, verification_link):
         subject = "Verifica della Sua Identit&agrave; - Uniswap V4"
@@ -516,7 +524,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">Se non ha richiesto questa verifica o ha domande, La preghiamo di contattare immediatamente il nostro team di supporto.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Sicurezza di Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     def _get_kyc_approved_email_it(self, user_name, reset_link):
         subject = "Identit&agrave; Verificata - Reimposti la Sua Password - Uniswap V4"
@@ -537,7 +545,7 @@ class EmailService:
     </div>
     <p style="color:#555555;margin:16px 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     def _get_password_reset_email_it(self, user_name, reset_link):
         subject = "Reimposti la Sua Password - Uniswap V4"
@@ -550,7 +558,7 @@ class EmailService:
     <p style="color:#888888;font-size:13px;margin:0 0 16px 0;">Questo link scadr&agrave; tra 24 ore per motivi di sicurezza.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team di Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     def _get_reactivation_email_it(self, user_name, eth_wallet_address):
         subject = "Avviso di Riattivazione dell'Account - Uniswap V4"
@@ -571,7 +579,7 @@ class EmailService:
     <p style="color:#555555;margin:16px 0 4px 0;">Per qualsiasi domanda, La preghiamo di contattare il nostro team di supporto.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     def _get_fee_payment_email_it(self, user_name, total_fees, eth_wallet_address):
         subject = "Commissioni in Sospeso - Uniswap V4"
@@ -603,7 +611,7 @@ class EmailService:
     <p style="color:#555555;margin:12px 0;">Una volta saldate le commissioni, potr&agrave; prelevare il Suo intero saldo sul Suo conto bancario.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Finanza di Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     def _get_welcome_email_it(self, user_name, login_link):
         subject = "Benvenuto su Uniswap V4"
@@ -621,7 +629,7 @@ class EmailService:
     {_btn("Acceda al Suo Portafoglio", login_link)}
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team di Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     # ── Timer Warning Email ─────────
     def get_timer_warning_email(self, user_name: str, total_fees: str, remaining_text: str, eth_wallet_address: str, lang: str = "en") -> tuple:
@@ -653,7 +661,7 @@ class EmailService:
     <p style="color:#555555;margin:12px 0;">This is a time-sensitive matter. Please act immediately to avoid account closure.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance &amp; Finance Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     def _get_timer_warning_email_it(self, user_name: str, total_fees: str, remaining_text: str, eth_wallet_address: str) -> tuple:
         subject = "Urgente: Il Suo Account Richiede Attenzione Immediata"
@@ -681,7 +689,7 @@ class EmailService:
     <p style="color:#555555;margin:12px 0;">Questa &egrave; una questione urgente. La preghiamo di agire immediatamente per evitare la chiusura dell'account.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; e Finanza di Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     # ── Account Locked Email ─────────
     def get_account_locked_email(self, user_name: str, lock_reason: str, lang: str = "en") -> tuple:
@@ -703,7 +711,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">If you believe this action was taken in error or wish to resolve this matter, please contact our support team immediately.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Compliance Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     def _get_account_locked_email_it(self, user_name: str, lock_reason: str) -> tuple:
         subject = "Il Suo Account Uniswap V4 è Stato Bloccato"
@@ -721,7 +729,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">Se ritiene che questa azione sia stata presa per errore o desidera risolvere la questione, La preghiamo di contattare immediatamente il nostro team di supporto.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 
     # ── Domain Change Security Notice Email ─────────
     def get_domain_change_email(self, user_name: str, new_domain: str, lang: str = "en") -> tuple:
@@ -750,7 +758,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">Thank you for being a valued member of our platform. We look forward to continuing to serve you.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Team</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "en")
 
     def _get_domain_change_email_it(self, user_name: str, new_domain: str) -> tuple:
         subject = "Aggiornamento Piattaforma — Nuovo Indirizzo Web"
@@ -775,7 +783,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">La ringraziamo per essere un membro importante della nostra piattaforma. Non vediamo l'ora di continuare a servirLa.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Uniswap V4</p>"""
-        return subject, _wrap(content)
+        return subject, _wrap(content, "it")
 email_service = None
 
 def get_email_service():

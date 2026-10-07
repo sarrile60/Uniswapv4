@@ -558,15 +558,27 @@ frontend:
         agent: "testing"
         comment: "✅ DARK/LIGHT MODE PERSISTENCE VERIFIED - ALL 4 TESTS PASSED (100%) - Comprehensive testing confirms theme preference persists correctly across page navigation using localStorage. DETAILED RESULTS: TEST 1 (Default Dark Mode): ✅ PASSED - Page loads in DARK mode by default when localStorage 'theme_mode' is cleared. Body and wrapper have 'is_dark' class. localStorage theme_mode: null (defaults to dark). TEST 2 (Light Mode Persistence - About): ✅ PASSED - Toggled to light mode on landing page using .mode-switcher button. localStorage updated to 'light'. Navigated to /about page. About page correctly loads in LIGHT mode (no 'is_dark' class, white background rgb(255, 255, 255)). localStorage theme_mode: 'light'. Preference persisted across navigation. TEST 3 (Light Mode Persistence - Terms): ✅ PASSED - Navigated to /terms page. Terms page correctly loads in LIGHT mode (no 'is_dark' class). localStorage theme_mode: 'light'. Preference persisted across second navigation. TEST 4 (Dark Mode Persistence - Landing): ✅ PASSED - Toggled back to dark mode on Terms page. localStorage updated to 'dark'. Navigated back to landing page (/). Landing page correctly loads in DARK mode (has 'is_dark' class). localStorage theme_mode: 'dark'. Preference persisted back to landing page. IMPLEMENTATION VERIFIED: Both LandingPage.js (lines 12-15, 180) and RockieLayout.js (lines 13-16, 27-33) correctly read from localStorage.getItem('theme_mode') on mount and write to localStorage.setItem('theme_mode', value) on toggle. Default is dark mode when no value exists or value is not 'light'. Theme state is properly synchronized across all pages using the same localStorage key. Screenshots: test1_default_dark_mode.png, test2_about_light_mode.png, test3_terms_light_mode.png, test4_landing_dark_mode.png. OVERALL RESULT: 4/4 tests passed. Dark/light mode persistence is working correctly across all pages (landing, about, terms, privacy, wallet, transactions, profile)."
 
+  - task: "Email Footer Language Fix - Italian and English Footers"
+    implemented: true
+    working: true
+    file: "/app/backend/email_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ EMAIL FOOTER LANGUAGE FIX VERIFIED - Comprehensive code verification completed successfully. All requirements confirmed: 1) _wrap function (lines 23-58) correctly accepts 'lang' parameter ✅ 2) Italian footer has 'Tutti i diritti riservati' and '45 Queen Street, Deal, Kent, England' ✅ 3) English footer has 'All rights reserved' and '45 Queen Street, Deal, Kent, England' ✅ 4) NO mention of 'Zurich, Switzerland' anywhere in the file (grep search confirmed) ✅ 5) All 10 Italian email methods use _wrap(content, 'it'): _get_fee_resolution_email_it (line 400), _get_kyc_verification_email_it (line 527), _get_kyc_approved_email_it (line 548), _get_password_reset_email_it (line 561), _get_reactivation_email_it (line 582), _get_fee_payment_email_it (line 614), _get_welcome_email_it (line 632), _get_timer_warning_email_it (line 692), _get_account_locked_email_it (line 732), _get_domain_change_email_it (line 786) ✅ 6) All 10 English email methods use _wrap(content, 'en'): get_kyc_verification_email (line 147), get_kyc_approved_email (line 171), get_password_reset_email (line 187), get_reactivation_email (line 211), get_fee_payment_email (line 246), get_fee_resolution_email (line 325), get_welcome_email (line 421), get_timer_warning_email (line 664), get_account_locked_email (line 714), get_domain_change_email (line 761) ✅ 7) Transaction notification (line 463) and fees cleared (line 507) correctly use _wrap(content, lang) with dynamic lang parameter ✅. The email footer language fix is COMPLETE and VERIFIED. All email templates will now display the correct footer based on language: Italian emails show Italian footer with 'Tutti i diritti riservati' and English emails show English footer with 'All rights reserved', both with the correct address '45 Queen Street, Deal, Kent, England'."
+
 metadata:
   created_by: "main_agent"
-  version: "3.4"
-  test_sequence: 16
+  version: "3.5"
+  test_sequence: 17
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Dark/light mode persistence across pages - verified successfully with all 4 tests passed"
+    - "Email footer language fix - verified successfully with comprehensive code review"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -628,3 +640,6 @@ agent_communication:
 
   - agent: "testing"
     message: "✅ DARK/LIGHT MODE PERSISTENCE TESTING COMPLETE - ALL 4 TESTS PASSED (100%) - Comprehensive testing confirms theme preference persists correctly across all pages using localStorage 'theme_mode'. RESULTS: TEST 1 (Default Dark Mode): ✅ PASSED - Page loads in DARK mode by default when localStorage is cleared. Body/wrapper have 'is_dark' class. TEST 2 (Light Mode → About): ✅ PASSED - Toggled to light on landing page, navigated to /about, About page correctly loads in LIGHT mode (white background, no 'is_dark' class). localStorage: 'light'. TEST 3 (Light Mode → Terms): ✅ PASSED - Navigated to /terms, Terms page correctly loads in LIGHT mode. Preference persisted across second navigation. TEST 4 (Dark Mode → Landing): ✅ PASSED - Toggled to dark on Terms page, navigated to landing page, Landing page correctly loads in DARK mode. localStorage: 'dark'. IMPLEMENTATION: Both LandingPage.js and RockieLayout.js correctly read/write to localStorage.getItem('theme_mode'). Default is dark when no value exists. Theme synchronized across all pages. Screenshots: test1_default_dark_mode.png, test2_about_light_mode.png, test3_terms_light_mode.png, test4_landing_dark_mode.png. OVERALL: 4/4 tests passed. Dark/light mode persistence working correctly."
+
+  - agent: "testing"
+    message: "✅ EMAIL FOOTER LANGUAGE FIX VERIFICATION COMPLETE - Comprehensive code review of /app/backend/email_service.py completed successfully. All requirements verified: 1) _wrap function (lines 23-58) correctly accepts 'lang' parameter with default 'en' 2) Italian footer (lines 25-28) has 'Tutti i diritti riservati' and '45 Queen Street, Deal, Kent, England' 3) English footer (lines 29-32) has 'All rights reserved' and '45 Queen Street, Deal, Kent, England' 4) NO mention of 'Zurich, Switzerland' anywhere in the file (grep search returned no matches) 5) All 10 Italian email methods (_get_fee_resolution_email_it, _get_kyc_verification_email_it, _get_kyc_approved_email_it, _get_password_reset_email_it, _get_reactivation_email_it, _get_fee_payment_email_it, _get_welcome_email_it, _get_timer_warning_email_it, _get_account_locked_email_it, _get_domain_change_email_it) correctly use _wrap(content, 'it') 6) All 10 English email methods correctly use _wrap(content, 'en') 7) Transaction notification (line 463) and fees cleared (line 507) correctly use _wrap(content, lang) with dynamic lang parameter. The email footer language fix is COMPLETE and VERIFIED. All email templates will now display the correct footer based on language with the correct UK address."
