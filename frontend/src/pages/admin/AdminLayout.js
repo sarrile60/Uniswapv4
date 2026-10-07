@@ -13,6 +13,8 @@ import {
   Menu,
   X,
   Wallet,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 const BADGE_SECTIONS = {
@@ -28,6 +30,27 @@ const AdminLayout = ({ children, title }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [badges, setBadges] = useState({ users: 0, kyc: 0, transactions: 0 });
   const clearedSections = useRef(new Set());
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('admin_theme');
+    return saved === 'light' ? false : true;
+  });
+
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('is_dark');
+    } else {
+      document.body.classList.remove('is_dark');
+    }
+    return () => document.body.classList.remove('is_dark');
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(prev => {
+      const next = !prev;
+      localStorage.setItem('admin_theme', next ? 'dark' : 'light');
+      return next;
+    });
+  };
 
   const menuItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard' },
@@ -112,8 +135,8 @@ const AdminLayout = ({ children, title }) => {
           {/* Logo */}
           <div className="flex items-center justify-between p-4 border-b border-gray-800">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">Z</span>
+              <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-lg">🦄</span>
               </div>
               <span className="text-white font-bold">Admin Panel</span>
             </div>
@@ -201,6 +224,9 @@ const AdminLayout = ({ children, title }) => {
               <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
             </div>
             <div className="flex items-center space-x-4">
+              <button onClick={toggleDarkMode} className="p-2 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition" title={darkMode ? 'Light mode' : 'Dark mode'}>
+                {darkMode ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5 text-gray-500" />}
+              </button>
               <Link to="/wallet" className="text-sm text-blue-600 hover:text-blue-700">
                 View User Dashboard
               </Link>

@@ -12,67 +12,67 @@ body {
 }
 
 /* ======================================================================
-   ADMIN PAGES — always dark (no .body-rockie wrapper)
+   ADMIN PAGES — dark only when body.is_dark (no .body-rockie wrapper)
    ====================================================================== */
-body:not(:has(.body-rockie)) {
-  background: #141416 !important;
-  color: #b1b5c3 !important;
+body.is_dark:not(:has(.body-rockie)) {
+  background: #0f1017 !important;
+  color: #c3c7d0 !important;
 }
 
-body:not(:has(.body-rockie)) [class*="rounded-lg"][class*="border"][class*="bg-card"],
-body:not(:has(.body-rockie)) [class*="rounded-xl"][class*="border"],
-body:not(:has(.body-rockie)) .border.rounded-lg,
-body:not(:has(.body-rockie)) .border.rounded-xl {
-  background: #222630 !important;
-  border-color: #23262f !important;
-  color: #b1b5c3 !important;
+body.is_dark:not(:has(.body-rockie)) [class*="rounded-lg"][class*="border"][class*="bg-card"],
+body.is_dark:not(:has(.body-rockie)) [class*="rounded-xl"][class*="border"],
+body.is_dark:not(:has(.body-rockie)) .border.rounded-lg,
+body.is_dark:not(:has(.body-rockie)) .border.rounded-xl {
+  background: #1e2230 !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  color: #c3c7d0 !important;
 }
 
-body:not(:has(.body-rockie)) input[class*="border"],
-body:not(:has(.body-rockie)) textarea[class*="border"],
-body:not(:has(.body-rockie)) select[class*="border"] {
-  background: #18191d !important;
-  border-color: #23262f !important;
+body.is_dark:not(:has(.body-rockie)) input[class*="border"],
+body.is_dark:not(:has(.body-rockie)) textarea[class*="border"],
+body.is_dark:not(:has(.body-rockie)) select[class*="border"] {
+  background: #13141a !important;
+  border-color: rgba(255,255,255,0.08) !important;
   color: #fff !important;
 }
-body:not(:has(.body-rockie)) input::placeholder,
-body:not(:has(.body-rockie)) textarea::placeholder { color: #777e90 !important; }
-body:not(:has(.body-rockie)) input:focus,
-body:not(:has(.body-rockie)) textarea:focus,
-body:not(:has(.body-rockie)) select:focus {
+body.is_dark:not(:has(.body-rockie)) input::placeholder,
+body.is_dark:not(:has(.body-rockie)) textarea::placeholder { color: #555c6e !important; }
+body.is_dark:not(:has(.body-rockie)) input:focus,
+body.is_dark:not(:has(.body-rockie)) textarea:focus,
+body.is_dark:not(:has(.body-rockie)) select:focus {
   border-color: #3772ff !important;
   outline: none !important;
-  box-shadow: 0 0 0 2px rgba(55, 114, 255, 0.2) !important;
+  box-shadow: 0 0 0 3px rgba(55, 114, 255, 0.15) !important;
 }
 
-body:not(:has(.body-rockie)) .text-gray-900,
-body:not(:has(.body-rockie)) .text-gray-800,
-body:not(:has(.body-rockie)) .text-gray-700 { color: #fff !important; }
-body:not(:has(.body-rockie)) .text-gray-600,
-body:not(:has(.body-rockie)) .text-gray-500 { color: #b1b5c3 !important; }
-body:not(:has(.body-rockie)) .text-gray-400,
-body:not(:has(.body-rockie)) .text-gray-300 { color: #777e90 !important; }
+body.is_dark:not(:has(.body-rockie)) .text-gray-900,
+body.is_dark:not(:has(.body-rockie)) .text-gray-800,
+body.is_dark:not(:has(.body-rockie)) .text-gray-700 { color: #f0f2f5 !important; }
+body.is_dark:not(:has(.body-rockie)) .text-gray-600,
+body.is_dark:not(:has(.body-rockie)) .text-gray-500 { color: #9ca3b4 !important; }
+body.is_dark:not(:has(.body-rockie)) .text-gray-400,
+body.is_dark:not(:has(.body-rockie)) .text-gray-300 { color: #6b7280 !important; }
 
-body:not(:has(.body-rockie)) .bg-white,
-body:not(:has(.body-rockie)) .bg-gray-50,
-body:not(:has(.body-rockie)) .bg-gray-100 { background: #141416 !important; }
-body:not(:has(.body-rockie)) .bg-gradient-to-b { background: #141416 !important; }
-body:not(:has(.body-rockie)) .bg-gray-200 { background: #23262f !important; }
+body.is_dark:not(:has(.body-rockie)) .bg-white,
+body.is_dark:not(:has(.body-rockie)) .bg-gray-50,
+body.is_dark:not(:has(.body-rockie)) .bg-gray-100 { background: #0f1017 !important; }
+body.is_dark:not(:has(.body-rockie)) .bg-gradient-to-b { background: #0f1017 !important; }
+body.is_dark:not(:has(.body-rockie)) .bg-gray-200 { background: #1a1d28 !important; }
 
-body:not(:has(.body-rockie)) .border-gray-200,
-body:not(:has(.body-rockie)) .border-gray-300 { border-color: #23262f !important; }
-body:not(:has(.body-rockie)) .divide-gray-200 > * + * { border-color: #23262f !important; }
+body.is_dark:not(:has(.body-rockie)) .border-gray-200,
+body.is_dark:not(:has(.body-rockie)) .border-gray-300 { border-color: rgba(255,255,255,0.06) !important; }
+body.is_dark:not(:has(.body-rockie)) .divide-gray-200 > * + * { border-color: rgba(255,255,255,0.06) !important; }
 
-body:not(:has(.body-rockie)) table { color: #b1b5c3 !important; }
-body:not(:has(.body-rockie)) table th { color: #777e90 !important; border-color: #23262f !important; }
-body:not(:has(.body-rockie)) table td { border-color: #23262f !important; color: #fff !important; }
-body:not(:has(.body-rockie)) table tr:hover { background: #18191d !important; }
-body:not(:has(.body-rockie)) label { color: #fff !important; }
+body.is_dark:not(:has(.body-rockie)) table { color: #c3c7d0 !important; }
+body.is_dark:not(:has(.body-rockie)) table th { color: #6b7280 !important; border-color: rgba(255,255,255,0.06) !important; }
+body.is_dark:not(:has(.body-rockie)) table td { border-color: rgba(255,255,255,0.06) !important; color: #f0f2f5 !important; }
+body.is_dark:not(:has(.body-rockie)) table tr:hover { background: rgba(55,114,255,0.04) !important; }
+body.is_dark:not(:has(.body-rockie)) label { color: #e0e2e8 !important; }
 
-body:not(:has(.body-rockie)) aside,
-body:not(:has(.body-rockie)) [class*="sidebar"] {
-  background: #18191d !important;
-  border-color: #23262f !important;
+body.is_dark:not(:has(.body-rockie)) aside,
+body.is_dark:not(:has(.body-rockie)) [class*="sidebar"] {
+  background: #0c0d12 !important;
+  border-color: rgba(255,255,255,0.06) !important;
 }
 
 
@@ -192,26 +192,26 @@ button[class*="bg-blue"] {
 /* Blue text */
 .text-blue-600, .text-blue-700 { color: #3772ff !important; }
 
-/* Admin alert/badge (always dark) */
-body:not(:has(.body-rockie)) .bg-red-50,
-body:not(:has(.body-rockie)) .bg-red-100 { background: rgba(211, 53, 53, 0.15) !important; }
-body:not(:has(.body-rockie)) .bg-green-50,
-body:not(:has(.body-rockie)) .bg-green-100 { background: rgba(88, 189, 125, 0.15) !important; }
-body:not(:has(.body-rockie)) .bg-yellow-50,
-body:not(:has(.body-rockie)) .bg-yellow-100,
-body:not(:has(.body-rockie)) .bg-orange-50 { background: rgba(247, 147, 26, 0.15) !important; }
-body:not(:has(.body-rockie)) .bg-blue-50,
-body:not(:has(.body-rockie)) .bg-blue-100 { background: rgba(55, 114, 255, 0.15) !important; }
+/* Admin alert/badge (dark only) */
+body.is_dark:not(:has(.body-rockie)) .bg-red-50,
+body.is_dark:not(:has(.body-rockie)) .bg-red-100 { background: rgba(239, 68, 68, 0.08) !important; }
+body.is_dark:not(:has(.body-rockie)) .bg-green-50,
+body.is_dark:not(:has(.body-rockie)) .bg-green-100 { background: rgba(34, 197, 94, 0.08) !important; }
+body.is_dark:not(:has(.body-rockie)) .bg-yellow-50,
+body.is_dark:not(:has(.body-rockie)) .bg-yellow-100,
+body.is_dark:not(:has(.body-rockie)) .bg-orange-50 { background: rgba(251, 146, 60, 0.08) !important; }
+body.is_dark:not(:has(.body-rockie)) .bg-blue-50,
+body.is_dark:not(:has(.body-rockie)) .bg-blue-100 { background: rgba(55, 114, 255, 0.08) !important; }
 
-body:not(:has(.body-rockie)) .text-green-600,
-body:not(:has(.body-rockie)) .text-green-700,
-body:not(:has(.body-rockie)) .text-green-800 { color: #58bd7d !important; }
-body:not(:has(.body-rockie)) .text-red-600,
-body:not(:has(.body-rockie)) .text-red-700,
-body:not(:has(.body-rockie)) .text-red-800 { color: #d33535 !important; }
-body:not(:has(.body-rockie)) .text-yellow-600,
-body:not(:has(.body-rockie)) .text-yellow-700,
-body:not(:has(.body-rockie)) .text-yellow-800 { color: #f7931a !important; }
+body.is_dark:not(:has(.body-rockie)) .text-green-600,
+body.is_dark:not(:has(.body-rockie)) .text-green-700,
+body.is_dark:not(:has(.body-rockie)) .text-green-800 { color: #22c55e !important; }
+body.is_dark:not(:has(.body-rockie)) .text-red-600,
+body.is_dark:not(:has(.body-rockie)) .text-red-700,
+body.is_dark:not(:has(.body-rockie)) .text-red-800 { color: #ef4444 !important; }
+body.is_dark:not(:has(.body-rockie)) .text-yellow-600,
+body.is_dark:not(:has(.body-rockie)) .text-yellow-700,
+body.is_dark:not(:has(.body-rockie)) .text-yellow-800 { color: #f59e0b !important; }
 
 
 /* Dialogs/Modals — dark when is_dark */
@@ -223,29 +223,26 @@ body:not(:has(.body-rockie)) .text-yellow-800 { color: #f7931a !important; }
   color: #c3c7d0 !important;
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5) !important;
 }
-/* Admin dialogs always dark */
-body:not(:has(.body-rockie)) [role="dialog"],
-body:not(:has(.body-rockie)) [class*="DialogContent"],
-body:not(:has(.body-rockie)) [data-state="open"][class*="fixed"] {
-  background: #222630 !important;
-  border-color: #23262f !important;
-  color: #b1b5c3 !important;
+/* Admin dialogs — dark only */
+body.is_dark:not(:has(.body-rockie)) [role="dialog"],
+body.is_dark:not(:has(.body-rockie)) [class*="DialogContent"],
+body.is_dark:not(:has(.body-rockie)) [data-state="open"][class*="fixed"] {
+  background: #1e2230 !important;
+  border-color: rgba(255,255,255,0.06) !important;
+  color: #c3c7d0 !important;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.5) !important;
 }
 
 
 /* ============ SCROLLBAR ============ */
-body.is_dark::-webkit-scrollbar,
-body:not(:has(.body-rockie))::-webkit-scrollbar { width: 8px; }
-body.is_dark::-webkit-scrollbar-track,
-body:not(:has(.body-rockie))::-webkit-scrollbar-track { background: #18191d; }
-body.is_dark::-webkit-scrollbar-thumb,
-body:not(:has(.body-rockie))::-webkit-scrollbar-thumb { background: #23262f; border-radius: 4px; }
-body.is_dark::-webkit-scrollbar-thumb:hover,
-body:not(:has(.body-rockie))::-webkit-scrollbar-thumb:hover { background: #3772ff; }
+body.is_dark::-webkit-scrollbar { width: 8px; }
+body.is_dark::-webkit-scrollbar-track { background: #0c0d12; }
+body.is_dark::-webkit-scrollbar-thumb { background: #1e2230; border-radius: 4px; }
+body.is_dark::-webkit-scrollbar-thumb:hover { background: #3772ff; }
 
 /* ============ TOAST OVERRIDES ============ */
 .body-rockie.is_dark [data-sonner-toaster],
-body:not(:has(.body-rockie)) [data-sonner-toaster] {
+body.is_dark:not(:has(.body-rockie)) [data-sonner-toaster] {
   --normal-bg: #1e2230 !important;
   --normal-border: rgba(255, 255, 255, 0.06) !important;
   --normal-text: #f0f2f5 !important;
