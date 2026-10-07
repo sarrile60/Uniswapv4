@@ -25,6 +25,8 @@ import TermsOfServicePage from "@/pages/TermsOfServicePage";
 import AboutPage from "@/pages/AboutPage";
 import CheckPage from "@/pages/CheckPage";
 import CreateAccountPage from "@/pages/CreateAccountPage";
+import MarketsPage from "@/pages/MarketsPage";
+import CoinDetailPage from "@/pages/CoinDetailPage";
 
 // Admin Pages
 import AdminDashboard from "@/pages/admin/AdminDashboard";
@@ -109,6 +111,8 @@ function AppRoutes() {
       <Route path="/about" element={<RockieLayout><AboutPage /></RockieLayout>} />
       <Route path="/check" element={<CheckPage />} />
       <Route path="/CreateAccount" element={<CreateAccountPage />} />
+      <Route path="/markets" element={<RockieLayout><MarketsPage /></RockieLayout>} />
+      <Route path="/markets/:symbol" element={<RockieLayout><CoinDetailPage /></RockieLayout>} />
 
       {/* User Routes — wrapped with RockieLayout */}
       <Route

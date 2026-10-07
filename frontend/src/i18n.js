@@ -133,6 +133,12 @@ const translations = {
     nav_transactions: 'Transactions', nav_profile: 'Profile', nav_kycVerification: 'KYC Verification', nav_logout: 'Logout',
     nav_noNotifications: 'No notifications yet', nav_loginToSee: 'to see notifications', nav_viewAll: 'View All', nav_new: 'new',
     nav_createAccount: 'Create Account',
+    // Markets page
+    mkt_title: 'Markets', mkt_search: 'Search coins...', mkt_all: 'All', mkt_defi: 'DeFi', mkt_nft: 'NFT', mkt_layer1: 'Layer 1', mkt_stablecoins: 'Stablecoins',
+    mkt_rank: '#', mkt_name: 'Name', mkt_price: 'Price', mkt_24h: '24h %', mkt_7d: '7d', mkt_marketCap: 'Market Cap', mkt_volume: 'Volume (24h)', mkt_trade: 'Trade',
+    mkt_backToMarkets: 'Back to Markets', mkt_about: 'About', mkt_keyStats: 'Key Statistics',
+    mkt_high24h: '24h High', mkt_low24h: '24h Low', mkt_circSupply: 'Circulating Supply', mkt_totalSupply: 'Total Supply', mkt_ath: 'All-Time High', mkt_atl: 'All-Time Low',
+    mkt_1d: '1D', mkt_1w: '1W', mkt_1m: '1M', mkt_3m: '3M', mkt_1y: '1Y',
   },
   it: {
     wallet: d('UG9ydGFmb2dsaW8='), home: 'Home', swap: 'Scambia', profile: 'Profilo',
@@ -247,6 +253,12 @@ const translations = {
     nav_transactions: 'Transazioni', nav_profile: 'Profilo', nav_kycVerification: 'Verifica Identità', nav_logout: 'Esci',
     nav_noNotifications: 'Nessuna notifica ancora', nav_loginToSee: 'per vedere le notifiche', nav_viewAll: 'Vedi Tutto', nav_new: 'nuove',
     nav_createAccount: 'Crea un Conto',
+    // Markets page
+    mkt_title: 'Mercati', mkt_search: 'Cerca monete...', mkt_all: 'Tutti', mkt_defi: 'DeFi', mkt_nft: 'NFT', mkt_layer1: 'Layer 1', mkt_stablecoins: 'Stablecoin',
+    mkt_rank: '#', mkt_name: 'Nome', mkt_price: 'Prezzo', mkt_24h: '24h %', mkt_7d: '7g', mkt_marketCap: 'Capitalizzazione', mkt_volume: 'Volume (24h)', mkt_trade: 'Scambia',
+    mkt_backToMarkets: 'Torna ai Mercati', mkt_about: 'Informazioni', mkt_keyStats: 'Statistiche Chiave',
+    mkt_high24h: 'Massimo 24h', mkt_low24h: 'Minimo 24h', mkt_circSupply: 'Offerta Circolante', mkt_totalSupply: 'Offerta Totale', mkt_ath: 'Massimo Storico', mkt_atl: 'Minimo Storico',
+    mkt_1d: '1G', mkt_1w: '1S', mkt_1m: '1M', mkt_3m: '3M', mkt_1y: '1A',
   }
 };
 

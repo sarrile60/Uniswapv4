@@ -119,7 +119,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                         </ul>
                       </li>
                       <li className="menu-item">
-                        <Link to={isLoggedIn ? "/wallet" : "/#crypto-section"}>{t.nav_markets}</Link>
+                        <Link to="/markets">{t.nav_markets}</Link>
                       </li>
                       <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('sell'); }}>
                         <a href="#!">{t.nav_sellCrypto}</a>

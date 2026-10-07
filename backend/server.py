@@ -4888,6 +4888,63 @@ async def get_market_prices():
         return {"ok": True, "data": [], "error": "Unable to fetch live prices"}
 
 
+# Reverse lookup: symbol → coingecko id
+_SYMBOL_TO_CG = {v: k for k, v in COINGECKO_IDS.items()}
+
+# Coin detail cache (per-coin, 120s TTL)
+_coin_detail_cache = {}
+
+@api_router.get("/market/coin/{symbol}")
+async def get_coin_detail(symbol: str):
+    """Get detailed info for a single coin including price history."""
+    symbol = symbol.upper()
+    cg_id = _SYMBOL_TO_CG.get(symbol)
+    if not cg_id:
+        raise HTTPException(status_code=404, detail=f"Coin {symbol} not found")
+    
+    now = _time.time()
+    cached = _coin_detail_cache.get(symbol)
+    if cached and (now - cached["ts"]) < 120:
+        return {"ok": True, "data": cached["data"], "cached": True}
+    
+    try:
+        async with _httpx.AsyncClient(timeout=10.0) as client:
+            # Fetch coin detail + 7-day sparkline
+            detail_url = f"https://api.coingecko.com/api/v3/coins/{cg_id}?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=true"
+            resp = await client.get(detail_url, headers={"Accept": "application/json", "User-Agent": "UniswapV4-Platform/1.0"})
+            resp.raise_for_status()
+            coin = resp.json()
+        
+        md = coin.get("market_data", {})
+        result = {
+            "symbol": symbol,
+            "name": coin.get("name", ""),
+            "description": (coin.get("description", {}).get("en", "") or "")[:500],
+            "image": coin.get("image", {}).get("large", ""),
+            "price": md.get("current_price", {}).get("usd", 0),
+            "change_24h": round(md.get("price_change_percentage_24h", 0) or 0, 2),
+            "change_7d": round(md.get("price_change_percentage_7d", 0) or 0, 2),
+            "high_24h": md.get("high_24h", {}).get("usd", 0),
+            "low_24h": md.get("low_24h", {}).get("usd", 0),
+            "market_cap": md.get("market_cap", {}).get("usd", 0),
+            "volume_24h": md.get("total_volume", {}).get("usd", 0),
+            "circulating_supply": md.get("circulating_supply", 0),
+            "total_supply": md.get("total_supply", 0),
+            "ath": md.get("ath", {}).get("usd", 0),
+            "atl": md.get("atl", {}).get("usd", 0),
+            "sparkline_7d": md.get("sparkline_7d", {}).get("price", []),
+        }
+        
+        _coin_detail_cache[symbol] = {"data": result, "ts": now}
+        return {"ok": True, "data": result}
+    
+    except Exception as e:
+        logger.error(f"Failed to fetch coin detail for {symbol}: {e}")
+        if cached:
+            return {"ok": True, "data": cached["data"], "cached": True, "stale": True}
+        raise HTTPException(status_code=502, detail="Failed to fetch coin data")
+
+
 # ============== HEALTH CHECK (root level for K8s) ==============
 
 @app.get("/health")
