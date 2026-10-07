@@ -91,6 +91,8 @@ const WalletDashboard = () => {
   const [buyStep, setBuyStep] = useState(1);
   const [sellStep, setSellStep] = useState(1);
   const [buySellError, setBuySellError] = useState(null);
+  const [buyCoinOpen, setBuyCoinOpen] = useState(false);
+  const [sellCoinOpen, setSellCoinOpen] = useState(false);
   const [recentTxs, setRecentTxs] = useState([]);
   const [portfolioSparkline, setPortfolioSparkline] = useState([]);
   const [chartTimeframe, setChartTimeframe] = useState('1W');
@@ -1169,7 +1171,7 @@ const WalletDashboard = () => {
       </Dialog>
 
       {/* ===== BUY CRYPTO MODAL ===== */}
-      <Dialog open={showBuyModal} onOpenChange={(o) => { if (!o) { setShowBuyModal(false); setBuyStep(1); setBuySellError(null); } }}>
+      <Dialog open={showBuyModal} onOpenChange={(o) => { if (!o) { setShowBuyModal(false); setBuyStep(1); setBuySellError(null); setBuyCoinOpen(false); } }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t.buy_title}</DialogTitle>
@@ -1208,12 +1210,42 @@ const WalletDashboard = () => {
             </div>
           ) : (
             <div>
-              <div style={{marginBottom:16}}>
+              <div style={{marginBottom:16,position:'relative'}}>
                 <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.buy_selectCoin}</label>
-                <select value={buyForm.coin} onChange={e => setBuyForm({...buyForm, coin: e.target.value})}
-                  style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid var(--r-line)',background:'var(--r-surface)',color:'var(--r-onsurface)',fontSize:14}}>
-                  {['BTC','ETH','SOL','BNB','ADA','XRP','DOT','USDT'].map(s => <option key={s} value={s}>{s} — {marketPrices.find(m => m.symbol === s)?.name || s}</option>)}
-                </select>
+                <button onClick={() => setBuyCoinOpen(!buyCoinOpen)} type="button"
+                  style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid var(--r-line)',background:'var(--r-surface)',color:'var(--r-onsurface)',fontSize:14,display:'flex',alignItems:'center',gap:10,cursor:'pointer',textAlign:'left'}}>
+                  <CryptoIcon symbol={buyForm.coin} size={24} />
+                  <span style={{flex:1,fontWeight:600}}>{buyForm.coin} — {marketPrices.find(m => m.symbol === buyForm.coin)?.name || buyForm.coin}</span>
+                  <span style={{fontSize:12,color:'var(--r-text)'}}>${marketPrices.find(m => m.symbol === buyForm.coin)?.price?.toLocaleString('en-US',{maximumFractionDigits:2}) || '—'}</span>
+                  <span style={{fontSize:11,marginLeft:2,color:(marketPrices.find(m => m.symbol === buyForm.coin)?.change_24h||0)>=0?'#22c55e':'#ef4444',fontWeight:600}}>
+                    {((marketPrices.find(m => m.symbol === buyForm.coin)?.change_24h||0)>=0?'+':'')+((marketPrices.find(m => m.symbol === buyForm.coin)?.change_24h||0).toFixed(1))+'%'}
+                  </span>
+                </button>
+                {buyCoinOpen && (
+                  <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-bg, #1b1d25)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:260,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.3)'}}>
+                    {['BTC','ETH','SOL','BNB','ADA','XRP','DOT','USDT'].map(s => {
+                      const mp = marketPrices.find(m => m.symbol === s);
+                      return (
+                        <button key={s} onClick={() => { setBuyForm({...buyForm, coin: s}); setBuyCoinOpen(false); }} type="button"
+                          style={{width:'100%',padding:'10px 14px',display:'flex',alignItems:'center',gap:10,border:'none',background:buyForm.coin===s?'rgba(55,114,255,0.1)':'transparent',cursor:'pointer',transition:'background 0.15s',fontSize:14,textAlign:'left'}}
+                          onMouseEnter={e => { if(buyForm.coin!==s) e.currentTarget.style.background='var(--r-surface)'; }}
+                          onMouseLeave={e => { if(buyForm.coin!==s) e.currentTarget.style.background='transparent'; }}>
+                          <CryptoIcon symbol={s} size={28} />
+                          <div style={{flex:1}}>
+                            <span style={{fontWeight:600,color:'var(--r-onsurface)'}}>{s}</span>
+                            <span style={{color:'var(--r-text)',marginLeft:6}}>{mp?.name || s}</span>
+                          </div>
+                          <div style={{textAlign:'right'}}>
+                            <div style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)'}}>${mp?.price?.toLocaleString('en-US',{maximumFractionDigits:2}) || '—'}</div>
+                            <div style={{fontSize:11,fontWeight:600,color:(mp?.change_24h||0)>=0?'#22c55e':'#ef4444'}}>
+                              {(mp?.change_24h||0)>=0?'+':''}{(mp?.change_24h||0).toFixed(2)}%
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
               <div style={{marginBottom:8}}>
                 <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.buy_amount}</label>
@@ -1232,7 +1264,7 @@ const WalletDashboard = () => {
       </Dialog>
 
       {/* ===== SELL CRYPTO MODAL ===== */}
-      <Dialog open={showSellModal} onOpenChange={(o) => { if (!o) { setShowSellModal(false); setSellStep(1); setBuySellError(null); } }}>
+      <Dialog open={showSellModal} onOpenChange={(o) => { if (!o) { setShowSellModal(false); setSellStep(1); setBuySellError(null); setSellCoinOpen(false); } }}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t.sell_title}</DialogTitle>
@@ -1270,13 +1302,52 @@ const WalletDashboard = () => {
             </div>
           ) : (
             <div>
-              <div style={{marginBottom:16}}>
+              <div style={{marginBottom:16,position:'relative'}}>
                 <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.sell_selectCoin}</label>
-                <select value={sellForm.coin} onChange={e => setSellForm({...sellForm, coin: e.target.value})}
-                  style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid var(--r-line)',background:'var(--r-surface)',color:'var(--r-onsurface)',fontSize:14}}>
-                  {wallets.filter(w => parseFloat(w.balance) > 0).map(w => <option key={w.asset} value={w.asset}>{w.asset} — {t.balance}: {w.balance}</option>)}
-                  {wallets.filter(w => parseFloat(w.balance) > 0).length === 0 && <option disabled>No holdings</option>}
-                </select>
+                {(() => {
+                  const sellableWallets = wallets.filter(w => parseFloat(w.balance) > 0);
+                  if (sellableWallets.length === 0) return <div style={{padding:'12px 14px',borderRadius:10,border:'1px solid var(--r-line)',background:'var(--r-surface)',color:'var(--r-text)',fontSize:14}}>No holdings</div>;
+                  const currentWallet = sellableWallets.find(w => w.asset === sellForm.coin) || sellableWallets[0];
+                  const mp = marketPrices.find(m => m.symbol === currentWallet?.asset);
+                  return (
+                    <>
+                      <button onClick={() => setSellCoinOpen(!sellCoinOpen)} type="button"
+                        style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid var(--r-line)',background:'var(--r-surface)',color:'var(--r-onsurface)',fontSize:14,display:'flex',alignItems:'center',gap:10,cursor:'pointer',textAlign:'left'}}>
+                        <CryptoIcon symbol={currentWallet.asset} size={24} />
+                        <div style={{flex:1}}>
+                          <span style={{fontWeight:600}}>{currentWallet.asset}</span>
+                          <span style={{color:'var(--r-text)',marginLeft:6,fontSize:12}}>{t.balance}: {currentWallet.balance}</span>
+                        </div>
+                        <span style={{fontSize:12,color:'var(--r-text)'}}>${mp?.price?.toLocaleString('en-US',{maximumFractionDigits:2}) || '—'}</span>
+                      </button>
+                      {sellCoinOpen && (
+                        <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-bg, #1b1d25)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:260,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.3)'}}>
+                          {sellableWallets.map(w => {
+                            const wMp = marketPrices.find(m => m.symbol === w.asset);
+                            return (
+                              <button key={w.asset} onClick={() => { setSellForm({...sellForm, coin: w.asset}); setSellCoinOpen(false); }} type="button"
+                                style={{width:'100%',padding:'10px 14px',display:'flex',alignItems:'center',gap:10,border:'none',background:sellForm.coin===w.asset?'rgba(55,114,255,0.1)':'transparent',cursor:'pointer',transition:'background 0.15s',fontSize:14,textAlign:'left'}}
+                                onMouseEnter={e => { if(sellForm.coin!==w.asset) e.currentTarget.style.background='var(--r-surface)'; }}
+                                onMouseLeave={e => { if(sellForm.coin!==w.asset) e.currentTarget.style.background='transparent'; }}>
+                                <CryptoIcon symbol={w.asset} size={28} />
+                                <div style={{flex:1}}>
+                                  <span style={{fontWeight:600,color:'var(--r-onsurface)'}}>{w.asset}</span>
+                                  <span style={{color:'var(--r-text)',marginLeft:6,fontSize:12}}>{t.balance}: {w.balance}</span>
+                                </div>
+                                <div style={{textAlign:'right'}}>
+                                  <div style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)'}}>${wMp?.price?.toLocaleString('en-US',{maximumFractionDigits:2}) || '—'}</div>
+                                  <div style={{fontSize:11,fontWeight:600,color:(wMp?.change_24h||0)>=0?'#22c55e':'#ef4444'}}>
+                                    {(wMp?.change_24h||0)>=0?'+':''}{(wMp?.change_24h||0).toFixed(2)}%
+                                  </div>
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
               <div style={{marginBottom:8}}>
                 <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.sell_amount}</label>
