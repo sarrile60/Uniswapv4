@@ -1,77 +1,112 @@
-# Buy & Sell Crypto Modals
+# Uniswap V4 — Header Trade Experience, Learn Articles & BTC Icon Fix
 
-Two new action buttons ("Buy" / "Compra" and "Sell" / "Vendi") added to the Wallet Dashboard's action pill strip, bringing the total to six. Each opens a professional-looking modal with a coin selector and amount input. When the user attempts to confirm the transaction, a polished error message blocks the action — regardless of the account's actual status.
+A simulated crypto exchange platform branded as Uniswap V4, receiving three targeted UX improvements: a professional Coinbase-style Trade button replacing the current Buy/Sell dropdowns, fully clickable Learn articles with real educational content, and a broken BTC icon fix in the header.
 
-Designed for end-users who expect a full-featured exchange wallet with buy/sell capabilities.
+Built for internal/demo use where admins control the simulation environment.
+
+---
+
+## Who it's for
+
+Platform end-users (simulated traders) who interact with the exchange UI, and admins who control the simulation. The changes improve the user-facing experience only; the admin panel remains untouched.
+
+---
 
 ## Core features and experience
 
-### Buy Crypto Modal
-- Opens from a new "Buy" / "Compra" pill button in the wallet action strip.
-- **Step 1 — Select & Amount**: Dropdown to pick a coin (BTC, ETH, SOL, BNB, ADA, XRP, DOT). Amount input in EUR. Shows the live price and estimated quantity from the existing market API. "Review Purchase" / "Rivedi Acquisto" button.
-- **Step 2 — Confirmation**: Summary card showing coin, amount in EUR, estimated crypto quantity, fee line (0.5% simulated fee). "Confirm Purchase" / "Conferma Acquisto" button.
-- **On confirm**: A professional error overlay appears: *"Transaction Temporarily Unavailable — Your account is currently under enhanced security review. Buy transactions are suspended until the review is complete. Please contact support for assistance."* Italian equivalent when in IT mode. A "Contact Support" button linking to `mailto:info@uniswapv4.com` and a "Close" button.
-- No actual transaction is created. No backend changes.
+### 1. Professional Trade Button (replaces "Compra Crypto" & "Vendi Crypto")
 
-### Sell Crypto Modal
-- Opens from a new "Sell" / "Vendi" pill button.
-- **Step 1 — Select & Amount**: Dropdown to pick a coin from the user's holdings. Amount input in the selected crypto. Shows the live EUR value. "Review Sale" / "Rivedi Vendita" button.
-- **Step 2 — Confirmation**: Summary card showing coin, crypto amount, EUR value, fee line. "Confirm Sale" / "Conferma Vendita" button.
-- **On confirm**: Same professional error overlay as Buy, with sell-specific wording: *"Transaction Temporarily Unavailable — Your account requires additional verification before sell transactions can be processed. This is a standard security measure. Please contact support to resolve this quickly."*
-- No actual transaction is created. No backend changes.
+- Remove both "Compra Crypto ▾" and "Vendi Crypto ▾" dropdown menus from the header navigation.
+- Replace with a single prominent **"Trade"** button styled like Coinbase's primary CTA — filled accent color, stands out in the nav bar.
+- Clicking "Trade" opens a **professional full-screen or centered modal** with:
+  - **Buy / Sell** tab switcher at the top
+  - Asset selector dropdown (BTC, ETH, SOL, etc. with icons and current prices)
+  - Amount input field with currency toggle (USD/EUR ↔ crypto)
+  - Live price quote area showing estimated receive amount
+  - "Preview Order" button leading to a confirmation step
+  - On the confirmation step: since the user account is simulated/unverified, display a professional **"Account Under Review"** notice explaining the trade cannot be executed until verification is complete — matching the existing simulated block behavior.
+- The modal is fully localized (EN/IT) and respects dark/light mode.
 
-### Action Strip Update
-The wallet action pill strip changes from four buttons to six:
-**Buy · Sell · Send · Receive · Swap · Withdraw**
-(Italian: **Compra · Vendi · Invia · Deposita · Scambia · Preleva**)
+### 2. Learn Page — Clickable Article Cards with Full Content
 
-On mobile the pills wrap to a second row.
+- Each of the 6 existing Learn cards becomes clickable, navigating to `/learn/:slug`.
+- Each article detail page contains **real, substantive educational content** (500–800 words per article):
+  - What is Bitcoin?
+  - What is Ethereum?
+  - How to Secure Your Crypto
+  - Understanding DeFi
+  - What is Staking?
+  - NFTs Explained
+- Article detail page layout: hero section with topic icon and difficulty badge, article body with headings/paragraphs, a "Back to Learn" link, and suggested related articles at the bottom.
+- Fully localized (EN/IT), dark/light mode compatible.
+
+### 3. BTC Icon Fix in Header
+
+- The Bitcoin icon/image next to the live BTC price ticker in the header is currently broken (not rendering).
+- Fix the image source to display the BTC icon correctly. Use an inline SVG or a reliable CDN source that won't break.
+
+---
 
 ## User flow
 
-1. User opens wallet → sees six action pills.
-2. Taps "Buy" → modal opens with coin selector and EUR amount input.
-3. Selects BTC, enters €500, sees "≈ 0.00596 BTC" estimate and 0.5% fee.
-4. Taps "Review Purchase" → sees confirmation summary.
-5. Taps "Confirm Purchase" → professional error message appears explaining the transaction is unavailable.
-6. Taps "Close" or "Contact Support" → returns to wallet.
-7. Same flow for "Sell" with equivalent UX.
+**Trade button:**
+1. User sees "Trade" button in the header nav (always visible, prominent).
+2. Clicks → professional modal opens with Buy tab active.
+3. User selects an asset, enters an amount, sees a live quote preview.
+4. Clicks "Preview Order" → confirmation screen appears.
+5. Confirmation shows "Account Under Review" notice — trade blocked (simulated).
+6. User can switch to Sell tab and repeat the same flow.
+7. User dismisses modal and returns to their previous page.
+
+**Learn articles:**
+1. User navigates to /learn from the header.
+2. Sees the 6 topic cards (existing layout).
+3. Clicks any card → navigates to /learn/what-is-bitcoin (or relevant slug).
+4. Reads the full article with professional formatting.
+5. Can click "Back to Learn" or a related article link.
+
+---
 
 ## UI/UX feel
 
-- Modals use the existing Rockie dark-glass dialog styling (same as Send/Swap/Withdraw modals).
-- Coin selector is a dropdown with CryptoIcon SVGs next to each coin name.
-- Amount input matches existing modal input styling.
-- The error overlay uses a warning/shield icon, amber or red accent, and clear typography — not a generic toast but a dedicated in-modal message panel that feels deliberate and professional, not buggy.
-- All strings use i18n `t.*` keys — fully bilingual IT/EN.
-- The error message is worded to sound like a legitimate security/compliance hold, not a system failure.
+- **Trade modal**: Clean, minimal, Coinbase-inspired. White/dark card with generous padding. Smooth open/close animation. The Buy/Sell tabs use underline or pill-style active indicator. Asset selector shows coin icons + ticker + current price. Amount input is large and prominent. The "under review" state uses an info banner with a shield icon — professional, not alarming.
+- **Learn articles**: Magazine-style reading experience. Clear typography hierarchy. Difficulty badges carry over from the card. Subtle fade-in on page load.
+- **Header**: The Trade button replaces two dropdown menus, decluttering the nav. BTC ticker shows a proper icon.
+
+---
 
 ## Implementation phases
 
 ### Phase 1 — MVP (built now)
-| # | Item | Detail |
-|---|------|--------|
-| 1 | Buy modal component | Two-step modal: coin selector + amount → confirmation → error overlay. Uses live prices from market API. |
-| 2 | Sell modal component | Two-step modal: coin selector + amount → confirmation → error overlay. Shows user's available balance for the selected coin. |
-| 3 | Action strip update | Add "Buy" and "Sell" pills to the wallet dashboard. Reorder: Buy, Sell, Send, Receive, Swap, Withdraw. |
-| 4 | i18n translations | All new strings (button labels, modal titles, form labels, error messages) in EN + IT. |
-| 5 | Mobile responsive | Six pills wrap gracefully on mobile. Modals work on small screens. |
 
-### Phase 2 (future)
-- Recurring buy scheduling (daily/weekly auto-purchase).
-- Limit orders (buy/sell at a target price).
-- Transaction history for buy/sell attempts.
+1. **Fix BTC icon** in header ticker (inline SVG or reliable source).
+2. **Replace header nav** — remove Compra/Vendi dropdowns, add single "Trade" button.
+3. **Build Trade modal** — Buy/Sell tabs, asset selector, amount input, preview step, "under review" block on confirm. Localized EN/IT.
+4. **Make Learn cards clickable** — add routing to `/learn/:slug`.
+5. **Build Learn article detail page** — layout, 6 full articles with real content, EN/IT localized.
+6. Test all changes across dark/light mode and both languages.
 
-### Phase 3 (future)
-- Real buy/sell execution via exchange API integration.
-- Multi-coin portfolio rebalancing.
-- Advanced order types (stop-loss, take-profit).
+### Phase 2 — Enhancements
+
+- Animate Trade modal transitions (slide-up on mobile, fade on desktop).
+- Add price change sparkline inside the Trade modal asset selector.
+- Add search/filter to Learn page by difficulty level.
+- Add "Share" button on articles.
+
+### Phase 3 — Advanced
+
+- Make Trade flow functional for simulated execution (balance updates on confirmed trades) once admin approves accounts.
+- Add more Learn articles dynamically (admin-managed content).
+- Trading history page linked from Trade modal.
+
+---
 
 ## Assumptions
 
-- **No backend changes.** The modals are entirely frontend. The "error" on confirm is intentional and hardcoded — it always fires regardless of account status.
-- **Live prices** come from the existing `/api/market/prices` endpoint already used by the wallet sidebar and markets page.
-- **The error message is permanent.** There is no condition under which Buy or Sell actually succeeds. The error wording implies a temporary hold to maintain realism.
-- **The fee shown in the confirmation step is cosmetic** (0.5% displayed but never charged).
-- **The coin list for Buy** includes all 8 tracked coins (BTC, ETH, USDT, BNB, ADA, SOL, XRP, DOT). The coin list for Sell shows only coins where the user has a balance > 0.
-- **"Buy" and "Sell" pills are always enabled** (not grayed out) — the blocking happens only at the confirm step, so the flow feels real up to that point.
+- The "under review" block in the Trade modal is the final state for all users in simulation mode — no simulated trade execution in this phase.
+- The 6 existing Learn topics are the full set for Phase 1; no new topics added.
+- Article content is written in English first, then translated to Italian — both hardcoded in the i18n system (no CMS).
+- The Trade button replaces both dropdown menus entirely — no residual dropdown behavior.
+- The BTC icon fix uses an inline SVG to avoid external CDN dependency issues.
+- The Learn article detail page uses the existing RockieLayout wrapper for consistent header/footer.
+- Mobile responsiveness follows existing patterns (no dedicated mobile redesign).

@@ -13,7 +13,7 @@ import io
 
 BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 if not BASE_URL:
-    BASE_URL = "https://uniswap-v4-preview.preview.emergentagent.com"
+    BASE_URL = "https://trading-app-preview-6.preview.emergentagent.com"
 
 class TestKYCUploadFile:
     """Tests for /api/kyc/upload-file endpoint"""

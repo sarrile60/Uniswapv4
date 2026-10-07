@@ -82,6 +82,30 @@ A production-grade simulated crypto exchange platform branded as **Uniswap V4**,
 ## Credentials
 - Admin: `admin@uniswapv4.com` / `admin123`
 
+### Phase 3 — Trade Experience, Learn Articles & BTC Icon Fix
+
+#### Completed Items (All Verified ✅)
+1. **Professional Trade Button** — Replaced both "Buy Crypto" and "Sell Crypto" dropdown menus with a single prominent blue "Trade" button in the header nav. Opens a professional Coinbase-style full-screen trade modal.
+2. **Trade Modal** — Full-featured trade modal (rendered via React Portal for z-index safety) with:
+   - Buy/Sell tab switcher (green buy, red sell)
+   - Asset selector dropdown (BTC, ETH, SOL, BNB, ADA, XRP, DOT, USDT with icons and live prices from CoinGecko)
+   - Amount input with EUR prefix and currency label
+   - Live quote area showing estimated receive amount
+   - "Preview Order" step with order summary (price, 0.5% fee, estimated receive)
+   - Confirm step triggers "Account Under Review" notice (simulated security review block)
+   - Contact Support and Close buttons on the under-review screen
+   - Fully localized EN/IT, dark/light mode compatible
+3. **BTC Icon Fix** — Replaced broken `₿` text symbol in header BTC ticker with a proper inline SVG Bitcoin logo (orange circle with white ₿ path). No external CDN dependency.
+4. **Clickable Learn Cards** — All 6 Learn page cards now link to `/learn/:slug` with "Read article →" CTAs. Each card has a unique slug: what-is-bitcoin, what-is-ethereum, secure-your-crypto, understanding-defi, what-is-staking, nfts-explained.
+5. **Learn Article Detail Pages** — New `/learn/:slug` route with full educational content (500-800 words per article):
+   - Hero section with topic icon, difficulty badge, title
+   - Read time and "Uniswap V4 Academy" metadata
+   - Full article body with headings, paragraphs, and bullet lists
+   - Related Articles section at bottom with clickable cards
+   - "← Back to Learn" navigation link
+   - 404 handling for invalid slugs
+   - Fully localized EN/IT, dark/light mode compatible
+
 ## Upcoming Tasks
 - Task 5: Build full exchange/trading UI pages (spot trading, order book)
 - Task 6: Implement advanced charting integration

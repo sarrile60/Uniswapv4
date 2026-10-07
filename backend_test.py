@@ -9,7 +9,7 @@ import json
 import sys
 
 # Backend URL
-BASE_URL = "https://uniswap-v4-preview.preview.emergentagent.com/api"
+BASE_URL = "https://trading-app-preview-6.preview.emergentagent.com/api"
 
 # Admin credentials
 ADMIN_EMAIL = "admin@uniswapv4.com"

@@ -28,6 +28,7 @@ import CreateAccountPage from "@/pages/CreateAccountPage";
 import MarketsPage from "@/pages/MarketsPage";
 import CoinDetailPage from "@/pages/CoinDetailPage";
 import LearnPage from "@/pages/LearnPage";
+import LearnArticlePage from "@/pages/LearnArticlePage";
 import EarnPage from "@/pages/EarnPage";
 import SecurityPage from "@/pages/SecurityPage";
 
@@ -117,6 +118,7 @@ function AppRoutes() {
       <Route path="/markets" element={<RockieLayout><MarketsPage /></RockieLayout>} />
       <Route path="/markets/:symbol" element={<RockieLayout><CoinDetailPage /></RockieLayout>} />
       <Route path="/learn" element={<RockieLayout><LearnPage /></RockieLayout>} />
+      <Route path="/learn/:slug" element={<RockieLayout><LearnArticlePage /></RockieLayout>} />
       <Route path="/earn" element={<RockieLayout><EarnPage /></RockieLayout>} />
       <Route path="/security" element={<ProtectedRoute><RockieLayout><SecurityPage /></RockieLayout></ProtectedRoute>} />
 

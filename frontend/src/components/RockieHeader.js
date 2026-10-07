@@ -1,8 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useLang } from "@/i18n";
+import TradeModal from "@/components/TradeModal";
 
 const API = process.env.REACT_APP_BACKEND_URL;
+
+/* Inline Bitcoin SVG icon — reliable, no external dependency */
+const BtcIcon = ({ size = 16 }) => (
+  <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="16" cy="16" r="16" fill="#f7931a"/>
+    <path d="M22.5 14.2c.3-2-1.2-3.1-3.3-3.8l.7-2.7-1.6-.4-.7 2.7c-.4-.1-.9-.2-1.3-.3l.7-2.7-1.6-.4-.7 2.7c-.3-.1-.7-.2-1-.3l-2.2-.5-.4 1.7s1.2.3 1.2.3c.7.2.8.6.8 1l-.8 3.2c0 0 .1 0 .2.1h-.2l-1.1 4.5c-.1.2-.3.5-.8.4 0 0-1.2-.3-1.2-.3l-.8 1.8 2.1.5c.4.1.8.2 1.2.3l-.7 2.8 1.6.4.7-2.7c.4.1.9.2 1.3.3l-.7 2.7 1.6.4.7-2.8c2.9.5 5.1.3 6-2.3.7-2.1 0-3.3-1.5-4.1 1.1-.3 1.9-1 2.1-2.5zm-3.7 5.2c-.5 2.1-4 1-5.1.7l.9-3.7c1.1.3 4.7.8 4.2 3zm.5-5.3c-.5 1.9-3.4.9-4.3.7l.8-3.3c.9.2 4 .6 3.5 2.6z" fill="#fff"/>
+  </svg>
+);
 
 /**
  * RockieHeader — Shared header for landing page and all inside pages.
@@ -13,6 +22,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [btcPrice, setBtcPrice] = useState(null);
+  const [tradeModalOpen, setTradeModalOpen] = useState(false);
   const navigate = useNavigate();
   const { lang, t, toggleLang } = useLang();
 
@@ -72,7 +82,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
         const res = await fetch(`${API}/api/market/prices`);
         const json = await res.json();
         if (json.ok && json.data) { const btc = json.data.find(c => c.symbol === 'BTC'); if (btc) setBtcPrice(btc); }
-      } catch {}
+      } catch { /* silent */ }
     };
     fetchBtc();
     const iv = setInterval(fetchBtc, 60000);
@@ -105,204 +115,219 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
     : null;
 
   return (
-    <header id="header_main" className="header">
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-12">
-            <div className="header__body d-flex justify-content-between">
-              <div className="header__left">
-                <div className="logo">
-                  <Link className="light" to="/">
-                    <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#3772ff', letterSpacing: '-0.5px'}}>
-                      <span style={{color: '#3772ff'}}>🦄</span> Uniswap V4
-                    </span>
-                  </Link>
-                  <Link className="dark" to="/">
-                    <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px'}}>
-                      <span style={{color: '#3772ff'}}>🦄</span> Uniswap V4
-                    </span>
-                  </Link>
-                </div>
-                <div className="left__main">
-                  <nav id="main-nav" className={`main-nav ${mobileMenuOpen ? "active" : ""}`}>
-                    <ul id="menu-primary-menu" className="menu">
-                      <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('buy'); }}>
-                        <a href="#!">{t.nav_buyCrypto}</a>
-                        <ul className={`sub-menu ${activeDropdown === 'buy' ? 'show' : ''}`}>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_buyCryptoSelect}</Link></li>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_buyCryptoConfirm}</Link></li>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_buyCryptoDetails}</Link></li>
-                        </ul>
-                      </li>
-                      <li className="menu-item">
-                        <Link to="/markets">{t.nav_markets}</Link>
-                      </li>
-                      <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('sell'); }}>
-                        <a href="#!">{t.nav_sellCrypto}</a>
-                        <ul className={`sub-menu ${activeDropdown === 'sell' ? 'show' : ''}`}>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_sellCryptoSelect}</Link></li>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_sellCryptoConfirm}</Link></li>
-                          <li className="menu-item"><Link to={isLoggedIn ? "/wallet" : "/register"}>{t.nav_sellCryptoDetails}</Link></li>
-                        </ul>
-                      </li>
-                      <li className="menu-item">
-                        <Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link>
-                      </li>
-                      <li className="menu-item bitusdt-item">
-                        <Link to="/markets/BTC" style={{display:'inline-flex',alignItems:'center',gap:6}}>
-                          {btcPrice ? (
-                            <>
-                              <span style={{fontSize:13}}>₿</span>
-                              <span>${btcPrice.price?.toLocaleString('en-US',{maximumFractionDigits:0})}</span>
-                              <span style={{fontSize:12,fontWeight:700,color: btcPrice.change_24h >= 0 ? '#22c55e' : '#ef4444'}}>
-                                {btcPrice.change_24h >= 0 ? '↑' : '↓'}{Math.abs(btcPrice.change_24h)}%
-                              </span>
-                            </>
-                          ) : 'BTC'}
-                        </Link>
-                      </li>
-                      <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('pages'); }}>
-                        <a href="#!">{t.nav_pages}</a>
-                        <ul className={`sub-menu ${activeDropdown === 'pages' ? 'show' : ''}`}>
-                          <li className="menu-item"><Link to="/about">{t.nav_about}</Link></li>
-                          <li className="menu-item"><Link to="/earn">{lang === 'it' ? 'Guadagna' : 'Earn'}</Link></li>
-                          <li className="menu-item"><Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link></li>
-                          <li className="menu-item"><a href="mailto:info@uniswapv4.com">{t.nav_contact}</a></li>
-                          <li className="menu-item"><Link to="/terms">{t.nav_faq}</Link></li>
-                        </ul>
-                      </li>
-                    </ul>
-                  </nav>
-                </div>
-              </div>
-
-              <div className="header__right">
-                <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('assets'); }}>
-                  <button className="header-dropdown-btn">{t.nav_assets}</button>
-                  <div className={`header-dropdown-menu ${activeDropdown === 'assets' ? 'show' : ''}`}>
-                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_visaCard}</Link>
-                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_cryptoLoans}</Link>
-                    <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_pay}</Link>
-                  </div>
-                </div>
-                <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('orders'); }}>
-                  <button className="header-dropdown-btn">{t.nav_ordersTrades}</button>
-                  <div className={`header-dropdown-menu ${activeDropdown === 'orders' ? 'show' : ''}`}>
-                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_convert}</Link>
-                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_spot}</Link>
-                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_margin}</Link>
-                    <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">P2P</Link>
-                  </div>
-                </div>
-
-                {/* Language Toggle — wired to i18n */}
-                <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('lang'); }}>
-                  <button className="header-dropdown-btn" data-testid="lang-toggle-btn">{lang === 'en' ? 'EN/USD' : 'IT/EUR'}</button>
-                  <div className={`header-dropdown-menu ${activeDropdown === 'lang' ? 'show' : ''}`}>
-                    <span className={`dropdown-item ${lang === 'en' ? 'active-lang' : ''}`} style={{cursor:'pointer', fontWeight: lang === 'en' ? 700 : 400}} onClick={() => handleLangSelect('en')} data-testid="lang-en">English / USD</span>
-                    <span className={`dropdown-item ${lang === 'it' ? 'active-lang' : ''}`} style={{cursor:'pointer', fontWeight: lang === 'it' ? 700 : 400}} onClick={() => handleLangSelect('it')} data-testid="lang-it">Italiano / EUR</span>
-                  </div>
-                </div>
-
-                {/* Dark/Light Mode */}
-                <div className="mode-switcher" onClick={onToggleDarkMode}>
-                  {darkMode ? (
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 15C12.7614 15 15 12.7614 15 10C15 7.23858 12.7614 5 10 5C7.23858 5 5 7.23858 5 10C5 12.7614 7.23858 15 10 15Z" stroke="currentColor" strokeWidth="2"/><path d="M10 1V3M10 17V19M1 10H3M17 10H19M3.93 3.93L5.34 5.34M14.66 14.66L16.07 16.07M3.93 16.07L5.34 14.66M14.66 5.34L16.07 3.93" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
-                  ) : (
-                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                  )}
-                </div>
-
-                {/* Notification Bell with Dropdown */}
-                <div className="header-dropdown notification-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('notif'); }} style={{position: 'relative'}}>
-                  <div className="header-icon-btn" title="Notifications" style={{cursor: 'pointer', position: 'relative'}} data-testid="notification-bell">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                    </svg>
-                    {unreadCount > 0 && (
-                      <span data-testid="notification-badge" style={{ position: 'absolute', top: -4, right: -4, background: '#d33535', color: '#fff', fontSize: 10, fontWeight: 700, width: 18, height: 18, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--r-bg, #141416)' }}>
-                        {unreadCount > 9 ? '9+' : unreadCount}
+    <>
+      <header id="header_main" className="header">
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-12">
+              <div className="header__body d-flex justify-content-between">
+                <div className="header__left">
+                  <div className="logo">
+                    <Link className="light" to="/">
+                      <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#3772ff', letterSpacing: '-0.5px'}}>
+                        <span style={{color: '#3772ff'}}>🦄</span> Uniswap V4
                       </span>
+                    </Link>
+                    <Link className="dark" to="/">
+                      <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px'}}>
+                        <span style={{color: '#3772ff'}}>🦄</span> Uniswap V4
+                      </span>
+                    </Link>
+                  </div>
+                  <div className="left__main">
+                    <nav id="main-nav" className={`main-nav ${mobileMenuOpen ? "active" : ""}`}>
+                      <ul id="menu-primary-menu" className="menu">
+
+                        {/* === TRADE BUTTON (replaces Buy/Sell dropdowns) === */}
+                        <li className="menu-item">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setTradeModalOpen(true); }}
+                            data-testid="header-trade-btn"
+                            style={{
+                              background: '#3772ff',
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: 10,
+                              padding: '8px 22px',
+                              fontSize: 14,
+                              fontWeight: 700,
+                              cursor: 'pointer',
+                              letterSpacing: '0.3px',
+                              transition: 'all 0.2s',
+                              boxShadow: '0 2px 8px rgba(55,114,255,0.25)',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = '#2860e0'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(55,114,255,0.4)'; }}
+                            onMouseLeave={e => { e.currentTarget.style.background = '#3772ff'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(55,114,255,0.25)'; }}
+                          >
+                            Trade
+                          </button>
+                        </li>
+
+                        <li className="menu-item">
+                          <Link to="/markets">{t.nav_markets}</Link>
+                        </li>
+                        <li className="menu-item">
+                          <Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link>
+                        </li>
+                        <li className="menu-item bitusdt-item">
+                          <Link to="/markets/BTC" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+                            {btcPrice ? (
+                              <>
+                                <BtcIcon size={18} />
+                                <span>${btcPrice.price?.toLocaleString('en-US',{maximumFractionDigits:0})}</span>
+                                <span style={{fontSize:12,fontWeight:700,color: btcPrice.change_24h >= 0 ? '#22c55e' : '#ef4444'}}>
+                                  {btcPrice.change_24h >= 0 ? '↑' : '↓'}{Math.abs(btcPrice.change_24h).toFixed(1)}%
+                                </span>
+                              </>
+                            ) : 'BTC'}
+                          </Link>
+                        </li>
+                        <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('pages'); }}>
+                          <a href="#!">{t.nav_pages}</a>
+                          <ul className={`sub-menu ${activeDropdown === 'pages' ? 'show' : ''}`}>
+                            <li className="menu-item"><Link to="/about">{t.nav_about}</Link></li>
+                            <li className="menu-item"><Link to="/earn">{lang === 'it' ? 'Guadagna' : 'Earn'}</Link></li>
+                            <li className="menu-item"><Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link></li>
+                            <li className="menu-item"><a href="mailto:info@uniswapv4.com">{t.nav_contact}</a></li>
+                            <li className="menu-item"><Link to="/terms">{t.nav_faq}</Link></li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </nav>
+                  </div>
+                </div>
+
+                <div className="header__right">
+                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('assets'); }}>
+                    <button className="header-dropdown-btn">{t.nav_assets}</button>
+                    <div className={`header-dropdown-menu ${activeDropdown === 'assets' ? 'show' : ''}`}>
+                      <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_visaCard}</Link>
+                      <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_cryptoLoans}</Link>
+                      <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_pay}</Link>
+                    </div>
+                  </div>
+                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('orders'); }}>
+                    <button className="header-dropdown-btn">{t.nav_ordersTrades}</button>
+                    <div className={`header-dropdown-menu ${activeDropdown === 'orders' ? 'show' : ''}`}>
+                      <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_convert}</Link>
+                      <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_spot}</Link>
+                      <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_margin}</Link>
+                      <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">P2P</Link>
+                    </div>
+                  </div>
+
+                  {/* Language Toggle — wired to i18n */}
+                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('lang'); }}>
+                    <button className="header-dropdown-btn" data-testid="lang-toggle-btn">{lang === 'en' ? 'EN/USD' : 'IT/EUR'}</button>
+                    <div className={`header-dropdown-menu ${activeDropdown === 'lang' ? 'show' : ''}`}>
+                      <span className={`dropdown-item ${lang === 'en' ? 'active-lang' : ''}`} style={{cursor:'pointer', fontWeight: lang === 'en' ? 700 : 400}} onClick={() => handleLangSelect('en')} data-testid="lang-en">English / USD</span>
+                      <span className={`dropdown-item ${lang === 'it' ? 'active-lang' : ''}`} style={{cursor:'pointer', fontWeight: lang === 'it' ? 700 : 400}} onClick={() => handleLangSelect('it')} data-testid="lang-it">Italiano / EUR</span>
+                    </div>
+                  </div>
+
+                  {/* Dark/Light Mode */}
+                  <div className="mode-switcher" onClick={onToggleDarkMode}>
+                    {darkMode ? (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 15C12.7614 15 15 12.7614 15 10C15 7.23858 12.7614 5 10 5C7.23858 5 5 7.23858 5 10C5 12.7614 7.23858 15 10 15Z" stroke="currentColor" strokeWidth="2"/><path d="M10 1V3M10 17V19M1 10H3M17 10H19M3.93 3.93L5.34 5.34M14.66 14.66L16.07 16.07M3.93 16.07L5.34 14.66M14.66 5.34L16.07 3.93" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                     )}
                   </div>
-                  <div className={`header-dropdown-menu notification-menu ${activeDropdown === 'notif' ? 'show' : ''}`} style={{right: 0, minWidth: 320, maxHeight: 400, overflowY: 'auto', padding: 0}}>
-                    <div style={{padding: '14px 16px', borderBottom: '1px solid var(--r-line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                      <span style={{fontWeight: 700, fontSize: 15, color: 'var(--r-onsurface)'}}>{t.nav_notifications}</span>
-                      {unreadCount > 0 && <span style={{fontSize: 12, color: '#3772ff', fontWeight: 600}}>{unreadCount} {t.nav_new}</span>}
+
+                  {/* Notification Bell with Dropdown */}
+                  <div className="header-dropdown notification-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('notif'); }} style={{position: 'relative'}}>
+                    <div className="header-icon-btn" title="Notifications" style={{cursor: 'pointer', position: 'relative'}} data-testid="notification-bell">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                      </svg>
+                      {unreadCount > 0 && (
+                        <span data-testid="notification-badge" style={{ position: 'absolute', top: -4, right: -4, background: '#d33535', color: '#fff', fontSize: 10, fontWeight: 700, width: 18, height: 18, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--r-bg, #141416)' }}>
+                          {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                      )}
                     </div>
-                    {!isLoggedIn ? (
-                      <div style={{padding: '24px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
-                        <Link to="/login" style={{color: '#3772ff', fontWeight: 600}}>{t.nav_login}</Link> {t.nav_loginToSee}
+                    <div className={`header-dropdown-menu notification-menu ${activeDropdown === 'notif' ? 'show' : ''}`} style={{right: 0, minWidth: 320, maxHeight: 400, overflowY: 'auto', padding: 0}}>
+                      <div style={{padding: '14px 16px', borderBottom: '1px solid var(--r-line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <span style={{fontWeight: 700, fontSize: 15, color: 'var(--r-onsurface)'}}>{t.nav_notifications}</span>
+                        {unreadCount > 0 && <span style={{fontSize: 12, color: '#3772ff', fontWeight: 600}}>{unreadCount} {t.nav_new}</span>}
                       </div>
-                    ) : notifications.length === 0 ? (
-                      <div style={{padding: '32px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--r-text)" strokeWidth="1.5" style={{margin: '0 auto 8px', display: 'block', opacity: 0.5}}>
-                          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-                        </svg>
-                        {t.nav_noNotifications}
-                      </div>
-                    ) : (
-                      <>
-                        {notifications.map((notif) => (
-                          <div key={notif.id} onClick={() => !notif.read && markAsRead(notif.id)} style={{ padding: '12px 16px', borderBottom: '1px solid var(--r-line)', background: notif.read ? 'transparent' : 'rgba(55, 114, 255, 0.05)', cursor: 'pointer', transition: 'background 0.2s' }}>
-                            <div style={{display: 'flex', alignItems: 'flex-start', gap: 10}}>
-                              <div style={{ width: 8, height: 8, borderRadius: '50%', background: notif.read ? 'transparent' : '#3772ff', marginTop: 6, flexShrink: 0 }}/>
-                              <div style={{flex: 1, minWidth: 0}}>
-                                <div style={{fontSize: 13, fontWeight: 600, color: 'var(--r-onsurface)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                                  {notif.title || notif.message?.slice(0, 50) || 'Notification'}
-                                </div>
-                                <div style={{fontSize: 12, color: 'var(--r-text)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>
-                                  {notif.message}
-                                </div>
-                                <div style={{fontSize: 11, color: 'var(--r-text)', opacity: 0.7, marginTop: 4}}>
-                                  {timeAgo(notif.created_at)}
+                      {!isLoggedIn ? (
+                        <div style={{padding: '24px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
+                          <Link to="/login" style={{color: '#3772ff', fontWeight: 600}}>{t.nav_login}</Link> {t.nav_loginToSee}
+                        </div>
+                      ) : notifications.length === 0 ? (
+                        <div style={{padding: '32px 16px', textAlign: 'center', color: 'var(--r-text)', fontSize: 14}}>
+                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--r-text)" strokeWidth="1.5" style={{margin: '0 auto 8px', display: 'block', opacity: 0.5}}>
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                          </svg>
+                          {t.nav_noNotifications}
+                        </div>
+                      ) : (
+                        <>
+                          {notifications.map((notif) => (
+                            <div key={notif.id} onClick={() => !notif.read && markAsRead(notif.id)} style={{ padding: '12px 16px', borderBottom: '1px solid var(--r-line)', background: notif.read ? 'transparent' : 'rgba(55, 114, 255, 0.05)', cursor: 'pointer', transition: 'background 0.2s' }}>
+                              <div style={{display: 'flex', alignItems: 'flex-start', gap: 10}}>
+                                <div style={{ width: 8, height: 8, borderRadius: '50%', background: notif.read ? 'transparent' : '#3772ff', marginTop: 6, flexShrink: 0 }}/>
+                                <div style={{flex: 1, minWidth: 0}}>
+                                  <div style={{fontSize: 13, fontWeight: 600, color: 'var(--r-onsurface)', marginBottom: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
+                                    {notif.title || notif.message?.slice(0, 50) || 'Notification'}
+                                  </div>
+                                  <div style={{fontSize: 12, color: 'var(--r-text)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical'}}>
+                                    {notif.message}
+                                  </div>
+                                  <div style={{fontSize: 11, color: 'var(--r-text)', opacity: 0.7, marginTop: 4}}>
+                                    {timeAgo(notif.created_at)}
+                                  </div>
                                 </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
-                        <Link to="/wallet" style={{ display: 'block', padding: '12px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#3772ff' }}>{t.nav_viewAll}</Link>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Wallet Button */}
-                <Link to={isLoggedIn ? "/wallet" : "/login"} className="header-wallet-btn">{t.nav_wallet}</Link>
-
-                {/* User Avatar / Profile — initials when logged in, generic icon when not */}
-                {isLoggedIn ? (
-                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('user'); }}>
-                    <div className="header-avatar" data-testid="user-avatar" style={{cursor:'pointer', fontSize: 15, fontWeight: 700, letterSpacing: '0.5px'}}>
-                      {userInitials}
-                    </div>
-                    <div className={`header-dropdown-menu ${activeDropdown === 'user' ? 'show' : ''}`} style={{right:0, minWidth: '180px'}}>
-                      {user && <div className="dropdown-item" style={{fontWeight:700, color:'var(--r-onsurface)', cursor:'default', borderBottom:'1px solid var(--r-line)', paddingBottom:'12px', marginBottom:'4px'}}>{user.first_name} {user.last_name}</div>}
-                      <Link to="/wallet" className="dropdown-item">💰 {t.nav_wallet}</Link>
-                      <Link to="/transactions" className="dropdown-item">📋 {t.nav_transactions || 'Transactions'}</Link>
-                      <Link to="/profile" className="dropdown-item">👤 {t.nav_profile || 'Profile'}</Link>
-                      <Link to="/kyc" className="dropdown-item">🔒 {t.nav_kycVerification || 'KYC Verification'}</Link>
-                      <Link to="/security" className="dropdown-item">🛡️ {lang === 'it' ? 'Sicurezza' : 'Security'}</Link>
-                      <div className="dropdown-item" onClick={handleLogout} style={{color:'#d33535', cursor:'pointer', borderTop:'1px solid var(--r-line)', marginTop:'4px', paddingTop:'12px'}}>🚪 {t.nav_logout || 'Logout'}</div>
+                          ))}
+                          <Link to="/wallet" style={{ display: 'block', padding: '12px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: '#3772ff' }}>{t.nav_viewAll}</Link>
+                        </>
+                      )}
                     </div>
                   </div>
-                ) : (
-                  <Link to="/login" className="header-avatar" title="Profile">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                    </svg>
-                  </Link>
-                )}
 
-                <div className={`mobile-button ${mobileMenuOpen ? "active" : ""}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-                  <span></span>
+                  {/* Wallet Button */}
+                  <Link to={isLoggedIn ? "/wallet" : "/login"} className="header-wallet-btn">{t.nav_wallet}</Link>
+
+                  {/* User Avatar / Profile — initials when logged in, generic icon when not */}
+                  {isLoggedIn ? (
+                    <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('user'); }}>
+                      <div className="header-avatar" data-testid="user-avatar" style={{cursor:'pointer', fontSize: 15, fontWeight: 700, letterSpacing: '0.5px'}}>
+                        {userInitials}
+                      </div>
+                      <div className={`header-dropdown-menu ${activeDropdown === 'user' ? 'show' : ''}`} style={{right:0, minWidth: '180px'}}>
+                        {user && <div className="dropdown-item" style={{fontWeight:700, color:'var(--r-onsurface)', cursor:'default', borderBottom:'1px solid var(--r-line)', paddingBottom:'12px', marginBottom:'4px'}}>{user.first_name} {user.last_name}</div>}
+                        <Link to="/wallet" className="dropdown-item">💰 {t.nav_wallet}</Link>
+                        <Link to="/transactions" className="dropdown-item">📋 {t.nav_transactions || 'Transactions'}</Link>
+                        <Link to="/profile" className="dropdown-item">👤 {t.nav_profile || 'Profile'}</Link>
+                        <Link to="/kyc" className="dropdown-item">🔒 {t.nav_kycVerification || 'KYC Verification'}</Link>
+                        <Link to="/security" className="dropdown-item">🛡️ {lang === 'it' ? 'Sicurezza' : 'Security'}</Link>
+                        <div className="dropdown-item" onClick={handleLogout} style={{color:'#d33535', cursor:'pointer', borderTop:'1px solid var(--r-line)', marginTop:'4px', paddingTop:'12px'}}>🚪 {t.nav_logout || 'Logout'}</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <Link to="/login" className="header-avatar" title="Profile">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                      </svg>
+                    </Link>
+                  )}
+
+                  <div className={`mobile-button ${mobileMenuOpen ? "active" : ""}`} onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                    <span></span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Trade Modal */}
+      <TradeModal open={tradeModalOpen} onClose={() => setTradeModalOpen(false)} />
+    </>
   );
 };
 
