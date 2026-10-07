@@ -13,10 +13,20 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [rememberMe, setRememberMe] = useState(false);
   const [lockInfo, setLockInfo] = useState(null);
 
   useEffect(() => {
     document.body.classList.add('is_dark');
+    // Load saved credentials if "Remember Me" was checked
+    const saved = localStorage.getItem('remembered_login');
+    if (saved) {
+      try {
+        const { email, password } = JSON.parse(saved);
+        setFormData({ email: email || '', password: password || '' });
+        setRememberMe(true);
+      } catch {}
+    }
     const reason = sessionStorage.getItem('account_locked_reason');
     if (reason !== null) {
       sessionStorage.removeItem('account_locked_reason');
@@ -37,6 +47,12 @@ const LoginPage = () => {
     try {
       const result = await login(formData.email, formData.password);
       if (result.success) {
+        // Save or clear remembered credentials
+        if (rememberMe) {
+          localStorage.setItem('remembered_login', JSON.stringify({ email: formData.email, password: formData.password }));
+        } else {
+          localStorage.removeItem('remembered_login');
+        }
         if (result.user.role === 'admin' || result.user.role === 'superadmin') {
           navigate('/admin');
         } else {
@@ -114,7 +130,7 @@ const LoginPage = () => {
 
             <div className="auth-check-row">
               <div className="check-left">
-                <input type="checkbox" id="remember" />
+                <input type="checkbox" id="remember" checked={rememberMe} onChange={(e) => { setRememberMe(e.target.checked); if (!e.target.checked) localStorage.removeItem('remembered_login'); }} />
                 <label htmlFor="remember">{t.rememberMe || 'Remember Me'}</label>
               </div>
               <Link to="/forgot-password" className="forgot-link" data-testid="forgot-password-link">

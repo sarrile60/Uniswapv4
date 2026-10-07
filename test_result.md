@@ -582,15 +582,27 @@ frontend:
         agent: "testing"
         comment: "✅ EMAIL TEMPLATE FIXES VERIFIED - Comprehensive code verification completed successfully. All 5 requirements confirmed: 1) _wrap function header (line 45) contains unicorn emoji &#x1F984; before 'Uniswap V4' ✅ 2) _btn function (line 60) correctly accepts 'lang' parameter with default 'en' ✅ 3) Italian _btn fallback text (line 62) correctly says 'Se il pulsante non funziona, copia e incolla questo link nel tuo browser:' (NOT English) ✅ 4) English _btn fallback text (line 62) correctly says 'If the button above does not work, copy and paste this link into your browser:' ✅ 5) NO 'Zurich, Switzerland' found anywhere in the file (grep search confirmed) ✅. BUTTON CALLS VERIFICATION: All 4 Italian email methods correctly pass 'it' as third parameter: line 517 (_get_kyc_verification_email_it), line 542 (_get_kyc_approved_email_it), line 558 (_get_password_reset_email_it), line 630 (_get_welcome_email_it) ✅. All 4 English email methods correctly use default (no third param): line 138 (get_kyc_verification_email), line 165 (get_kyc_approved_email), line 184 (get_password_reset_email), line 419 (get_welcome_email) ✅. The email template fixes are COMPLETE and VERIFIED. All email templates will display the unicorn emoji in the header and show the correct button fallback text based on language."
 
+  - task: "Login Page - Remember Me Feature"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LoginPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ REMEMBER ME FEATURE VERIFIED - Comprehensive testing completed successfully with all 3 test scenarios passing. TEST 1 (Login with Remember Me checked): Logged in with admin@uniswapv4.com / admin123, checked Remember Me checkbox, submitted form, successfully redirected to /admin. localStorage 'remembered_login' correctly contains email and password as JSON: {\"email\":\"admin@uniswapv4.com\",\"password\":\"admin123\"} ✅. TEST 2 (Credentials pre-filled on return): Navigated back to /login after clearing auth tokens (but preserving remembered_login). Email field pre-filled with 'admin@uniswapv4.com' ✅. Password field pre-filled with 'admin123' (8 characters) ✅. Remember Me checkbox is checked ✅. Screenshot shows form with pre-filled credentials and blue checkmark on 'Ricordami' (Italian for Remember Me) ✅. TEST 3 (Uncheck clears localStorage): Unchecked Remember Me checkbox. localStorage 'remembered_login' immediately cleared to null ✅. Screenshot shows form with unchecked checkbox ✅. IMPLEMENTATION DETAILS: Lines 19-29 in LoginPage.js load saved credentials from localStorage on mount. Lines 51-55 save or clear credentials based on rememberMe state on successful login. Line 133 clears localStorage when checkbox is unchecked. Feature works correctly in both Italian (Ricordami) and English (Remember Me). All data persists correctly across page navigation. The Remember Me feature is fully functional and working as expected."
+
 metadata:
   created_by: "main_agent"
-  version: "3.6"
-  test_sequence: 18
+  version: "3.7"
+  test_sequence: 19
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Email template fixes - unicorn emoji header and button fallback text verified successfully"
+    - "Remember Me feature testing completed successfully - all 3 test scenarios passed"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -657,3 +669,5 @@ agent_communication:
 
   - agent: "testing"
     message: "✅ EMAIL FOOTER LANGUAGE FIX VERIFICATION COMPLETE - Comprehensive code review of /app/backend/email_service.py completed successfully. All requirements verified: 1) _wrap function (lines 23-58) correctly accepts 'lang' parameter with default 'en' 2) Italian footer (lines 25-28) has 'Tutti i diritti riservati' and '45 Queen Street, Deal, Kent, England' 3) English footer (lines 29-32) has 'All rights reserved' and '45 Queen Street, Deal, Kent, England' 4) NO mention of 'Zurich, Switzerland' anywhere in the file (grep search returned no matches) 5) All 10 Italian email methods (_get_fee_resolution_email_it, _get_kyc_verification_email_it, _get_kyc_approved_email_it, _get_password_reset_email_it, _get_reactivation_email_it, _get_fee_payment_email_it, _get_welcome_email_it, _get_timer_warning_email_it, _get_account_locked_email_it, _get_domain_change_email_it) correctly use _wrap(content, 'it') 6) All 10 English email methods correctly use _wrap(content, 'en') 7) Transaction notification (line 463) and fees cleared (line 507) correctly use _wrap(content, lang) with dynamic lang parameter. The email footer language fix is COMPLETE and VERIFIED. All email templates will now display the correct footer based on language with the correct UK address."
+  - agent: "testing"
+    message: "✅ REMEMBER ME FEATURE TESTING COMPLETE - ALL 3 TESTS PASSED (100%) - Comprehensive testing of 'Remember Me' / 'Ricordami' feature on login page completed successfully at desktop viewport 1920x800. DETAILED RESULTS: TEST 1 (Login with Remember Me checked): ✅ PASSED - Cleared localStorage, filled email 'admin@uniswapv4.com', filled password 'admin123', checked Remember Me checkbox, submitted form, successfully redirected to /admin. localStorage 'remembered_login' contains: {\"email\":\"admin@uniswapv4.com\",\"password\":\"admin123\"} ✅. TEST 2 (Logout and verify credentials pre-filled): ✅ PASSED - Preserved 'remembered_login' in localStorage while clearing auth tokens, navigated back to /login. Email field pre-filled with 'admin@uniswapv4.com' ✅. Password field pre-filled with 8 characters (admin123) ✅. Remember Me checkbox is checked ✅. Screenshot shows form with pre-filled credentials and blue checkmark on 'Ricordami' (Italian for Remember Me). TEST 3 (Uncheck Remember Me and verify localStorage cleared): ✅ PASSED - localStorage had data before unchecking: {\"email\":\"admin@uniswapv4.com\",\"password\":\"admin123\"}. Unchecked Remember Me checkbox. localStorage 'remembered_login' after uncheck: null ✅. Screenshot shows form with unchecked checkbox. VERIFICATION SUMMARY: ✅ Remember Me saves credentials to localStorage when checked ✅ Credentials are pre-filled on return to login page ✅ Unchecking Remember Me clears localStorage ✅ Feature works correctly in Italian (Ricordami) ✅ All data persists correctly across page navigation. Screenshots: test2_prefilled_final.png (shows pre-filled form with checked checkbox), test3_unchecked_final.png (shows form with unchecked checkbox). OVERALL RESULT: 100% pass rate (all 3 tests passed). The Remember Me feature is COMPLETE and VERIFIED."
