@@ -1222,13 +1222,13 @@ const WalletDashboard = () => {
                   </span>
                 </button>
                 {buyCoinOpen && (
-                  <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-bg, #1b1d25)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:260,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.3)'}}>
+                  <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-surface, #fff)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:260,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.15)'}}>
                     {['BTC','ETH','SOL','BNB','ADA','XRP','DOT','USDT'].map(s => {
                       const mp = marketPrices.find(m => m.symbol === s);
                       return (
                         <button key={s} onClick={() => { setBuyForm({...buyForm, coin: s}); setBuyCoinOpen(false); }} type="button"
                           style={{width:'100%',padding:'10px 14px',display:'flex',alignItems:'center',gap:10,border:'none',background:buyForm.coin===s?'rgba(55,114,255,0.1)':'transparent',cursor:'pointer',transition:'background 0.15s',fontSize:14,textAlign:'left'}}
-                          onMouseEnter={e => { if(buyForm.coin!==s) e.currentTarget.style.background='var(--r-surface)'; }}
+                          onMouseEnter={e => { if(buyForm.coin!==s) e.currentTarget.style.background='rgba(55,114,255,0.05)'; }}
                           onMouseLeave={e => { if(buyForm.coin!==s) e.currentTarget.style.background='transparent'; }}>
                           <CryptoIcon symbol={s} size={28} />
                           <div style={{flex:1}}>
@@ -1321,13 +1321,13 @@ const WalletDashboard = () => {
                         <span style={{fontSize:12,color:'var(--r-text)'}}>${mp?.price?.toLocaleString('en-US',{maximumFractionDigits:2}) || '—'}</span>
                       </button>
                       {sellCoinOpen && (
-                        <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-bg, #1b1d25)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:260,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.3)'}}>
+                        <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-surface, #fff)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:260,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.15)'}}>
                           {sellableWallets.map(w => {
                             const wMp = marketPrices.find(m => m.symbol === w.asset);
                             return (
                               <button key={w.asset} onClick={() => { setSellForm({...sellForm, coin: w.asset}); setSellCoinOpen(false); }} type="button"
                                 style={{width:'100%',padding:'10px 14px',display:'flex',alignItems:'center',gap:10,border:'none',background:sellForm.coin===w.asset?'rgba(55,114,255,0.1)':'transparent',cursor:'pointer',transition:'background 0.15s',fontSize:14,textAlign:'left'}}
-                                onMouseEnter={e => { if(sellForm.coin!==w.asset) e.currentTarget.style.background='var(--r-surface)'; }}
+                                onMouseEnter={e => { if(sellForm.coin!==w.asset) e.currentTarget.style.background='rgba(55,114,255,0.05)'; }}
                                 onMouseLeave={e => { if(sellForm.coin!==w.asset) e.currentTarget.style.background='transparent'; }}>
                                 <CryptoIcon symbol={w.asset} size={28} />
                                 <div style={{flex:1}}>
