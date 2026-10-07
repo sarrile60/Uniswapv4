@@ -620,48 +620,55 @@ const WalletDashboard = () => {
             if (total <= 0 || !showBalance) return null;
             const usdcPct = (usdcBal / total) * 100;
             const eurPct = (eurBal / total) * 100;
-            // SVG donut chart
+
+            // Build segments array — only non-zero assets
+            const segments = [];
+            if (usdcPct > 0) segments.push({ label: 'USDC', pct: usdcPct, color: '#2775CA' });
+            if (eurPct > 0) segments.push({ label: 'EUR', pct: eurPct, color: '#22c55e' });
+
+            // SVG donut chart params
             const r = 60, cx = 75, cy = 75, sw = 14;
             const circ = 2 * Math.PI * r;
-            const offsetStart = circ * 0.25; // start from 12 o'clock
+
+            // Build SVG arcs
+            let offset = circ * 0.25; // start from 12 o'clock
+            const arcs = segments.map((seg) => {
+              const isFull = seg.pct >= 99.5;
+              const dashLen = (seg.pct / 100) * circ;
+              const arc = { ...seg, offset, dashLen, isFull };
+              offset -= dashLen;
+              return arc;
+            });
+
             return (
               <div className="cb-sidebar-card" style={{textAlign:'center'}}>
                 <div className="cb-sidebar-title">{lang === 'it' ? 'Allocazione Portafoglio' : 'Portfolio Allocation'}</div>
                 <svg width="150" height="150" viewBox="0 0 150 150" style={{margin:'0 auto 16px',display:'block'}}>
-                  {/* Background ring — visible in both light and dark mode */}
-                  <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--r-line, #e6e8ec)" strokeWidth={sw} opacity="0.5" />
-                  {/* USDC segment */}
-                  {usdcPct > 0 && (
-                    usdcPct >= 99.5
-                      ? <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2775CA" strokeWidth={sw} />
-                      : <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2775CA" strokeWidth={sw}
-                          strokeDasharray={`${(usdcPct/100)*circ} ${circ}`} strokeDashoffset={offsetStart}
-                          strokeLinecap="round" />
-                  )}
-                  {/* EUR segment */}
-                  {eurPct > 0 && (
-                    eurPct >= 99.5
-                      ? <circle cx={cx} cy={cy} r={r} fill="none" stroke="#22c55e" strokeWidth={sw} />
-                      : <circle cx={cx} cy={cy} r={r} fill="none" stroke="#22c55e" strokeWidth={sw}
-                          strokeDasharray={`${(eurPct/100)*circ} ${circ}`} strokeDashoffset={offsetStart - (usdcPct/100)*circ}
-                          strokeLinecap="round" />
-                  )}
+                  {/* Background ring — light grey, visible in both themes */}
+                  <circle cx={cx} cy={cy} r={r} fill="none" stroke="#d1d5db" strokeWidth={sw} opacity="0.3" />
+                  {/* Colored segments */}
+                  {arcs.map((arc, i) => (
+                    arc.isFull ? (
+                      <circle key={i} cx={cx} cy={cy} r={r} fill="none"
+                        stroke={arc.color} strokeWidth={sw} />
+                    ) : (
+                      <circle key={i} cx={cx} cy={cy} r={r} fill="none"
+                        stroke={arc.color} strokeWidth={sw}
+                        strokeDasharray={`${arc.dashLen} ${circ - arc.dashLen}`}
+                        strokeDashoffset={arc.offset}
+                        strokeLinecap="round" />
+                    )
+                  ))}
                   <text x={cx} y={cy-4} textAnchor="middle" style={{fontSize:18,fontWeight:800,fill:'var(--r-onsurface)'}}>€{formatBalance(total.toFixed(2))}</text>
                   <text x={cx} y={cy+14} textAnchor="middle" style={{fontSize:11,fill:'var(--r-text)'}}>Total</text>
                 </svg>
                 <div style={{display:'flex',justifyContent:'center',gap:20,fontSize:13}}>
-                  {usdcPct > 0 && (
-                    <div style={{display:'flex',alignItems:'center',gap:6}}>
-                      <div style={{width:10,height:10,borderRadius:'50%',background:'#2775CA'}} />
-                      <span style={{color:'var(--r-text)'}}>USDC {usdcPct.toFixed(0)}%</span>
+                  {segments.map((seg, i) => (
+                    <div key={i} style={{display:'flex',alignItems:'center',gap:6}}>
+                      <div style={{width:10,height:10,borderRadius:'50%',background:seg.color}} />
+                      <span style={{color:'var(--r-text)'}}>{seg.label} {seg.pct.toFixed(0)}%</span>
                     </div>
-                  )}
-                  {eurPct > 0 && (
-                    <div style={{display:'flex',alignItems:'center',gap:6}}>
-                      <div style={{width:10,height:10,borderRadius:'50%',background:'#22c55e'}} />
-                      <span style={{color:'var(--r-text)'}}>EUR {eurPct.toFixed(0)}%</span>
-                    </div>
-                  )}
+                  ))}
                 </div>
               </div>
             );
