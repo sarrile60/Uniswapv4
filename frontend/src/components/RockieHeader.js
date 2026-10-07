@@ -192,23 +192,6 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                 </div>
 
                 <div className="header__right">
-                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('assets'); }}>
-                    <button className="header-dropdown-btn">{t.nav_assets}</button>
-                    <div className={`header-dropdown-menu ${activeDropdown === 'assets' ? 'show' : ''}`}>
-                      <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_visaCard}</Link>
-                      <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_cryptoLoans}</Link>
-                      <Link to={isLoggedIn ? "/wallet" : "/register"} className="dropdown-item">{t.nav_pay}</Link>
-                    </div>
-                  </div>
-                  <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('orders'); }}>
-                    <button className="header-dropdown-btn">{t.nav_ordersTrades}</button>
-                    <div className={`header-dropdown-menu ${activeDropdown === 'orders' ? 'show' : ''}`}>
-                      <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_convert}</Link>
-                      <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_spot}</Link>
-                      <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">{t.nav_margin}</Link>
-                      <Link to={isLoggedIn ? "/transactions" : "/register"} className="dropdown-item">P2P</Link>
-                    </div>
-                  </div>
 
                   {/* Language Toggle — wired to i18n */}
                   <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('lang'); }}>
