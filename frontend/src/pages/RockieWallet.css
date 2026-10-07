@@ -652,7 +652,7 @@
 }
 .cb-asset-row {
   display: grid;
-  grid-template-columns: 44px 1fr 100px 100px 140px;
+  grid-template-columns: 44px 1fr 100px 80px 80px 140px;
   align-items: center;
   gap: 12px;
   padding: 14px 20px;

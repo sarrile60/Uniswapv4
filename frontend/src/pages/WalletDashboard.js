@@ -91,6 +91,9 @@ const WalletDashboard = () => {
   const [buyStep, setBuyStep] = useState(1);
   const [sellStep, setSellStep] = useState(1);
   const [buySellError, setBuySellError] = useState(null);
+  const [recentTxs, setRecentTxs] = useState([]);
+  const [portfolioSparkline, setPortfolioSparkline] = useState([]);
+  const [chartTimeframe, setChartTimeframe] = useState('1W');
   const sseRef = useRef(null);
 
   // SSE real-time connection
@@ -200,6 +203,30 @@ const WalletDashboard = () => {
     const iv = setInterval(fetchMarket, 60000);
     return () => clearInterval(iv);
   }, []);
+
+  // Fetch recent transactions
+  useEffect(() => {
+    const loadRecentTxs = async () => {
+      try {
+        const res = await api.get('/transactions?page_size=5&page=1');
+        if (res.data.ok) setRecentTxs(res.data.data.transactions || []);
+      } catch {}
+    };
+    loadRecentTxs();
+  }, []);
+
+  // Fetch portfolio sparkline (BTC 7d as proxy for portfolio performance)
+  useEffect(() => {
+    const fetchSparkline = async () => {
+      try {
+        const res = await fetch(`${API}/api/market/coin/BTC`);
+        const json = await res.json();
+        if (json.ok && json.data?.sparkline_7d) setPortfolioSparkline(json.data.sparkline_7d);
+      } catch {}
+    };
+    fetchSparkline();
+  }, []);
+
 
 
   useEffect(() => {
@@ -403,6 +430,42 @@ const WalletDashboard = () => {
                 <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
               </button>
             </div>
+
+            {/* Portfolio Chart */}
+            {portfolioSparkline.length > 10 && (
+              <div style={{marginTop:20}}>
+                <div style={{display:'flex',gap:6,marginBottom:10}}>
+                  {['1D','1W','1M','3M'].map(tf => (
+                    <button key={tf} onClick={() => setChartTimeframe(tf)}
+                      style={{padding:'4px 12px',borderRadius:8,fontSize:11,fontWeight:600,border:'none',cursor:'pointer',
+                        background: chartTimeframe === tf ? '#3772ff' : 'rgba(255,255,255,0.06)',
+                        color: chartTimeframe === tf ? '#fff' : 'var(--r-text)',transition:'all 0.2s'}}>
+                      {tf}
+                    </button>
+                  ))}
+                </div>
+                {(() => {
+                  const len = portfolioSparkline.length;
+                  const sliced = chartTimeframe === '1D' ? portfolioSparkline.slice(-24) : chartTimeframe === '1W' ? portfolioSparkline : chartTimeframe === '1M' ? portfolioSparkline : portfolioSparkline;
+                  const min = Math.min(...sliced);
+                  const max = Math.max(...sliced);
+                  const range = max - min || 1;
+                  const w = 800, h = 120, pad = 4;
+                  const pts = sliced.map((v, i) => `${pad + (i / (sliced.length - 1)) * (w - pad * 2)},${pad + (1 - (v - min) / range) * (h - pad * 2)}`);
+                  const pathD = `M${pts.join(' L')}`;
+                  const areaD = `${pathD} L${w - pad},${h - pad} L${pad},${h - pad} Z`;
+                  const isUp = sliced[sliced.length - 1] >= sliced[0];
+                  const clr = isUp ? '#22c55e' : '#ef4444';
+                  return (
+                    <svg width="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{display:'block',borderRadius:8}}>
+                      <defs><linearGradient id="pfGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={clr} stopOpacity="0.12"/><stop offset="100%" stopColor={clr} stopOpacity="0"/></linearGradient></defs>
+                      <path d={areaD} fill="url(#pfGrad)" />
+                      <path d={pathD} fill="none" stroke={clr} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  );
+                })()}
+              </div>
+            )}
           </div>
 
           {/* Action Pills */}
@@ -476,6 +539,11 @@ const WalletDashboard = () => {
               <div className="hide-mobile" style={{fontSize:13,color: exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
                 {exchangeRate.change_24h_pct >= 0 ? '+' : ''}{exchangeRate.change_24h_pct?.toFixed(2)}%
               </div>
+              <div className="hide-mobile" style={{width:80}}>
+                <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
+                  <path d={exchangeRate.change_24h_pct >= 0 ? "M0 18 L10 16 L20 14 L30 15 L40 11 L50 13 L60 8 L70 6 L80 9" : "M0 6 L10 8 L20 11 L30 9 L40 13 L50 11 L60 16 L70 18 L80 15"} stroke={exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444'} strokeWidth="1.5" strokeLinecap="round" />
+                </svg>
+              </div>
               <div style={{textAlign:'right'}}>
                 <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
                 <div style={{fontSize:12,color:'var(--r-text)'}} data-testid="usdc-eur-value">≈ €{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
@@ -496,12 +564,50 @@ const WalletDashboard = () => {
               </div>
               <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>€1.00</div>
               <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>—</div>
+              <div className="hide-mobile" style={{width:80}}>
+                <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
+                  <path d="M0 12 L80 12" stroke="var(--r-text)" strokeWidth="1" strokeDasharray="4 4" opacity="0.3" />
+                </svg>
+              </div>
               <div style={{textAlign:'right'}}>
                 <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="eur-total">€{showBalance ? formatBalance(getEURWallet()?.balance) : '••••••'}</div>
                 <div style={{fontSize:12,color:'var(--r-text)'}}>{t.balance}</div>
               </div>
             </div>
           </div>
+
+          {/* Recent Transactions */}
+          {recentTxs.length > 0 && (
+            <div className="cb-asset-list" style={{marginTop:20}}>
+              <div className="cb-asset-list-header">
+                <span className="rk-section-title" style={{fontSize:16}}>{t.transactionHistory || 'Recent Transactions'}</span>
+                <Link to="/transactions" className="rk-section-link">{t.seeAll}</Link>
+              </div>
+              {recentTxs.slice(0, 5).map(tx => {
+                const isPositive = ['deposit', 'receive'].includes(tx.type);
+                const isSend = ['withdrawal', 'send'].includes(tx.type);
+                const txColors = { deposit: '#22c55e', receive: '#22c55e', withdrawal: '#ef4444', send: '#ef4444', swap: '#3772ff', fee: '#f59e0b', adjustment: '#9ca3b4' };
+                const txIcons = { deposit: '↓', receive: '↓', withdrawal: '↑', send: '↑', swap: '⇄', fee: '⚡', adjustment: '~' };
+                const typeLabel = t[`tx${tx.type?.charAt(0).toUpperCase()}${tx.type?.slice(1)}`] || tx.type;
+                return (
+                  <div key={tx.id} style={{display:'flex',alignItems:'center',gap:12,padding:'12px 20px',borderBottom:'1px solid var(--r-line)',cursor:'pointer'}} onClick={() => navigate('/transactions')}>
+                    <div style={{width:36,height:36,borderRadius:10,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16,background:`${txColors[tx.type] || '#9ca3b4'}15`,color:txColors[tx.type] || '#9ca3b4'}}>
+                      {txIcons[tx.type] || '•'}
+                    </div>
+                    <div style={{flex:1}}>
+                      <div style={{fontWeight:600,fontSize:13,color:'var(--r-onsurface)'}}>{typeLabel}</div>
+                      <div style={{fontSize:11,color:'var(--r-text)'}}>{new Date(tx.transaction_date || tx.created_at).toLocaleDateString(lang === 'it' ? 'it-IT' : 'en-US', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</div>
+                    </div>
+                    <div style={{textAlign:'right'}}>
+                      <div style={{fontWeight:700,fontSize:14,color: isPositive ? '#22c55e' : isSend ? '#ef4444' : 'var(--r-onsurface)'}}>
+                        {isPositive ? '+' : isSend ? '-' : ''}{tx.amount} {tx.asset}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* ===== RIGHT PANEL (SIDEBAR) ===== */}
