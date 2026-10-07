@@ -620,55 +620,56 @@ const WalletDashboard = () => {
             if (total <= 0 || !showBalance) return null;
             const usdcPct = (usdcBal / total) * 100;
             const eurPct = (eurBal / total) * 100;
-
-            // Build segments array — only non-zero assets
-            const segments = [];
-            if (usdcPct > 0) segments.push({ label: 'USDC', pct: usdcPct, color: '#2775CA' });
-            if (eurPct > 0) segments.push({ label: 'EUR', pct: eurPct, color: '#22c55e' });
-
-            // SVG donut chart params
-            const r = 60, cx = 75, cy = 75, sw = 14;
-            const circ = 2 * Math.PI * r;
-
-            // Build SVG arcs
-            let offset = circ * 0.25; // start from 12 o'clock
-            const arcs = segments.map((seg) => {
-              const isFull = seg.pct >= 99.5;
-              const dashLen = (seg.pct / 100) * circ;
-              const arc = { ...seg, offset, dashLen, isFull };
-              offset -= dashLen;
-              return arc;
-            });
-
+            // CSS conic-gradient donut — reliable across all browsers
+            const gradientStops = [];
+            let pos = 0;
+            if (usdcPct > 0) {
+              gradientStops.push(`#2775CA ${pos}%`);
+              pos += usdcPct;
+              gradientStops.push(`#2775CA ${pos}%`);
+            }
+            if (eurPct > 0) {
+              gradientStops.push(`#22c55e ${pos}%`);
+              pos += eurPct;
+              gradientStops.push(`#22c55e ${pos}%`);
+            }
+            const gradient = `conic-gradient(from 0deg, ${gradientStops.join(', ')})`;
             return (
               <div className="cb-sidebar-card" style={{textAlign:'center'}}>
                 <div className="cb-sidebar-title">{lang === 'it' ? 'Allocazione Portafoglio' : 'Portfolio Allocation'}</div>
-                <svg width="150" height="150" viewBox="0 0 150 150" style={{margin:'0 auto 16px',display:'block'}}>
-                  {/* Background ring — light grey, visible in both themes */}
-                  <circle cx={cx} cy={cy} r={r} fill="none" stroke="#d1d5db" strokeWidth={sw} opacity="0.3" />
-                  {/* Colored segments */}
-                  {arcs.map((arc, i) => (
-                    arc.isFull ? (
-                      <circle key={i} cx={cx} cy={cy} r={r} fill="none"
-                        stroke={arc.color} strokeWidth={sw} />
-                    ) : (
-                      <circle key={i} cx={cx} cy={cy} r={r} fill="none"
-                        stroke={arc.color} strokeWidth={sw}
-                        strokeDasharray={`${arc.dashLen} ${circ - arc.dashLen}`}
-                        strokeDashoffset={arc.offset}
-                        strokeLinecap="round" />
-                    )
-                  ))}
-                  <text x={cx} y={cy-4} textAnchor="middle" style={{fontSize:18,fontWeight:800,fill:'var(--r-onsurface)'}}>€{formatBalance(total.toFixed(2))}</text>
-                  <text x={cx} y={cy+14} textAnchor="middle" style={{fontSize:11,fill:'var(--r-text)'}}>Total</text>
-                </svg>
+                <div style={{
+                  width: 140, height: 140, borderRadius: '50%',
+                  background: gradient,
+                  margin: '0 auto 16px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  position: 'relative',
+                }}>
+                  {/* Inner cutout for donut effect */}
+                  <div style={{
+                    width: 100, height: 100, borderRadius: '50%',
+                    background: 'var(--r-bg, #fff)',
+                    display: 'flex', flexDirection: 'column',
+                    alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <span style={{fontSize: 16, fontWeight: 800, color: 'var(--r-onsurface)'}}>
+                      {'€' + formatBalance(total.toFixed(2))}
+                    </span>
+                    <span style={{fontSize: 11, color: 'var(--r-text)'}}>Total</span>
+                  </div>
+                </div>
                 <div style={{display:'flex',justifyContent:'center',gap:20,fontSize:13}}>
-                  {segments.map((seg, i) => (
-                    <div key={i} style={{display:'flex',alignItems:'center',gap:6}}>
-                      <div style={{width:10,height:10,borderRadius:'50%',background:seg.color}} />
-                      <span style={{color:'var(--r-text)'}}>{seg.label} {seg.pct.toFixed(0)}%</span>
+                  {usdcPct > 0.5 && (
+                    <div style={{display:'flex',alignItems:'center',gap:6}}>
+                      <div style={{width:10,height:10,borderRadius:'50%',background:'#2775CA'}} />
+                      <span style={{color:'var(--r-text)'}}>USDC {usdcPct.toFixed(0)}%</span>
                     </div>
-                  ))}
+                  )}
+                  {eurPct > 0.5 && (
+                    <div style={{display:'flex',alignItems:'center',gap:6}}>
+                      <div style={{width:10,height:10,borderRadius:'50%',background:'#22c55e'}} />
+                      <span style={{color:'var(--r-text)'}}>EUR {eurPct.toFixed(0)}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
