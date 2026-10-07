@@ -737,7 +737,8 @@ metadata:
   test_sequence: 2
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Portfolio Pie Chart in Wallet Sidebar - needs manual verification with non-zero balance"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -760,7 +761,70 @@ agent_communication:
     status_history:
       - working: true
         agent: "testing"
-        comment: "✅ COINBASE PRO FEATURES TESTING COMPLETE - ALL 3 TESTS PASSED (100%) - Comprehensive testing of 3 new Coinbase Pro features on wallet dashboard completed successfully at desktop viewport 1920x1080. Admin login: admin@uniswapv4.com / admin123. DETAILED RESULTS: TEST 1 (Portfolio Chart with SVG and Timeframe Buttons): ✅ PASSED - Portfolio card (.cb-portfolio-card) found with 'PORTAFOGLIO' label and €0,00 balance display ✅. SVG line chart visible with red color showing declining portfolio performance ✅. Chart displays gradient fill (area chart) with line stroke overlay ✅. All 4 timeframe buttons present and functional: 1D, 1W, 1M, 3M ✅. Timeframe buttons have pill-style design with borderRadius=8px ✅. Active button (1W by default) highlighted with blue background (#3772ff) ✅. Clicking '1D' button successfully updates chart and highlights button in blue ✅. Chart uses portfolioSparkline data (fetched from BTC 7d data as proxy for portfolio performance) ✅. Chart implementation: SVG with viewBox '0 0 800 120', 2 path elements (gradient fill + line stroke), linearGradient with id 'pfGrad', dynamic color based on performance (green for up, red for down) ✅. Screenshot: wallet_full_page.png shows portfolio chart with red declining line and 1W button active. Screenshot: final_wallet_view.png shows chart after clicking 1D button (1D now highlighted in blue). TEST 2 (Mini Sparklines in Asset Rows): ✅ PASSED - USDC asset row (.cb-asset-row[data-testid='usdc-asset-card']) found with 'USD Coin' label ✅. Mini sparkline SVG visible in USDC row showing price movement ✅. Sparkline displays as small red wavy line chart next to price ($1.1274) and -0.05% change ✅. Sparkline implementation: SVG with width=80, height=24, viewBox='0 0 80 24', single path element with stroke color (green for positive, red for negative) ✅. Sparkline dynamically updates based on exchangeRate.change_24h_pct ✅. EUR row shows flat dashed line (no sparkline) as expected since EUR is stable ✅. Both screenshots clearly show the USDC sparkline as a small red line chart in the asset row. TEST 3 (Recent Transactions Section): ✅ PASSED - Recent Transactions section correctly hidden when admin has 0 transactions ✅. This is expected behavior per code implementation: section only renders when recentTxs.length > 0 (line 580 in WalletDashboard.js) ✅. Code verification: Section would display with header 'Recent Transactions' or 'Cronologia Transazioni' (Italian), show up to 5 recent transactions, each transaction row includes: type icon (colored circle with emoji), transaction type label, amount with color coding (green for deposits/receives, red for withdrawals/sends), date in localized format, 'See All' link to /transactions page ✅. Conditional rendering is working correctly - section is properly hidden when no transactions exist ✅. IMPLEMENTATION VERIFICATION: Portfolio chart: Lines 434-468 in WalletDashboard.js, uses portfolioSparkline state (fetched from /api/market/coin/BTC endpoint), 4 timeframe buttons with onClick handlers, SVG chart with gradient fill and line stroke, dynamic color based on performance ✅. Mini sparklines: Lines 542-546 for USDC row, SVG with 80x24 size, path element with dynamic stroke color, updates based on exchangeRate.change_24h_pct ✅. Recent transactions: Lines 579-610, conditional rendering with recentTxs.length > 0 check, displays transaction type icon, description, amount, and date ✅. VERIFICATION SUMMARY: ✅ Portfolio chart displays SVG line chart with gradient fill ✅ All 4 timeframe buttons present (1D, 1W, 1M, 3M) ✅ Clicking timeframe buttons updates chart and highlights active button ✅ USDC asset row contains mini sparkline SVG chart ✅ Sparkline shows price movement with color coding ✅ Recent transactions section correctly hidden when no transactions ✅ All features implemented per Coinbase Pro specification ✅ No console errors or critical issues detected. Screenshots: wallet_full_page.png (shows portfolio chart with 1W active and USDC sparkline), final_wallet_view.png (shows portfolio chart with 1D active after clicking). OVERALL RESULT: 3/3 tests passed (100% pass rate). All 3 Coinbase Pro features are COMPLETE, FULLY FUNCTIONAL, and VERIFIED."
+        comment: "✅ COINBASE PRO FEATURES TESTING COMPLETE - ALL 3 TESTS PASSED (100%) - Comprehensive testing of 3 new Coinbase Pro features on wallet dashboard completed successfully at desktop viewport 1920x1080. Admin login: admin@uniswapv4.com / admin123. DETAILED RESULTS: TEST"
+
+  - task: "Live BTC Ticker in Header"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/components/RockieHeader.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+  - agent: "testing"
+    message: "✅ 5 NEW FEATURES TESTING COMPLETE - 4/5 TESTS PASSED SUCCESSFULLY. Comprehensive testing of 5 new features on Uniswap V4 completed at https://uniswap-v4-preview.preview.emergentagent.com. RESULTS: TEST 1 (Live BTC Ticker): ✅ PASSED - BTC ticker displays ₿$82,986↓3.82% with Bitcoin symbol, price, and percentage change. BITUSDT correctly removed. Positioned between 'Impara' and 'Pagine' in navigation. TEST 2 (Learn Page): ✅ PASSED - Page title 'Impara' (Italian), 6 education cards with titles 'Cos'è Bitcoin?', 'Cos'è Ethereum?', etc. Each card has icon, tag badge (Principiante/Avanzato/Sicurezza/Intermedio), and description. TEST 3 (Earn/Staking Page): ✅ PASSED - Page title 'Guadagna Ricompense Crypto', 6 staking cards (ETH 4.1%, SOL 6.8%, ADA 3.5%, DOT 12%, BNB 2.9%, XRP 4.5%) with APY, min stake, lock period, and 'Metti in Staking' button. TEST 4 (Security Page): ✅ PASSED - Logged in with admin@uniswapv4.com / admin123. Page title 'Centro Sicurezza', 2FA toggle, Password Security, Anti-Phishing sections, Login History with simulated entries (Chrome, Safari, MacOS). TEST 5 (Portfolio Pie Chart): ⚠️ TIMEOUT - Navigation to /wallet timed out after 30 seconds. Chart implementation exists but could not be verified. May not display if admin has 0 balance (expected). Screenshots: test1_btc_ticker.png, test2_learn_page.png, test3_earn_page.png, test4_security_page.png. All 4 tested features are COMPLETE and FULLY FUNCTIONAL."
+
+        agent: "testing"
+        comment: "✅ LIVE BTC TICKER TESTING COMPLETE - ALL CHECKS PASSED. Comprehensive testing of live BTC ticker in header completed successfully. RESULTS: 1) BITUSDT text correctly removed from navigation ✓ 2) BTC ticker displays with Bitcoin symbol (₿), live price ($82,986), and percentage change (↓3.82%) with color coding (red for negative) ✓ 3) Ticker positioned between 'Impara' (Learn) and 'Pagine' (Pages) in navigation as specified ✓ 4) Ticker fetches live data from /api/market/prices endpoint ✓ 5) Updates every 60 seconds ✓. Screenshot: test1_btc_ticker.png. The live BTC ticker feature is COMPLETE and FULLY FUNCTIONAL."
+
+  - task: "Learn Page - Education Cards"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LearnPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ LEARN PAGE TESTING COMPLETE - ALL 6 CARDS VERIFIED. Comprehensive testing of Learn page completed successfully. RESULTS: 1) Page title displays 'Impara' (Italian) ✓ 2) Found exactly 6 education cards as specified ✓ 3) All card titles verified: 'Cos'è Bitcoin?', 'Cos'è Ethereum?', 'Come Proteggere le Tue Crypto', 'Capire la DeFi', 'Cos'è lo Staking?', 'NFT Spiegati' ✓ 4) Each card has proper icon (BookOpen, Layers, Shield, TrendingUp, Wallet, Zap) ✓ 5) Each card has tag badge with correct level: PRINCIPIANTE (Beginner), AVANZATO (Advanced), SICUREZZA (Security), INTERMEDIO (Intermediate) ✓ 6) Each card has description text (125-141 characters) ✓. Screenshot: test2_learn_page.png. The Learn page is COMPLETE and FULLY FUNCTIONAL with all 6 education cards displaying correctly."
+
+  - task: "Earn/Staking Page - 6 Staking Cards"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/EarnPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ EARN/STAKING PAGE TESTING COMPLETE - ALL 6 CARDS VERIFIED. Comprehensive testing of Earn page completed successfully. RESULTS: 1) Page title displays 'Guadagna Ricompense Crypto' (Italian for 'Earn Crypto Rewards') ✓ 2) Found 6 staking cards as specified ✓ 3) All 6 coins verified from screenshot: ETH (4.1% APY), SOL (6.8% APY), ADA (3.5% APY), DOT (12% APY), BNB (2.9% APY), XRP (4.5% APY) ✓ 4) Each card displays: crypto icon, coin name, APY percentage in large green text, min stake amount, lock period (Flexible/days), 'Metti in Staking' button ✓ 5) 'How It Works' section present with 3 step cards ✓. Screenshot: test3_earn_page.png. The Earn/Staking page is COMPLETE and FULLY FUNCTIONAL with all 6 staking options displaying correctly."
+
+  - task: "Security Page - 2FA, Password, Anti-Phishing, Login History"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/SecurityPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ SECURITY PAGE TESTING COMPLETE - ALL SECTIONS VERIFIED. Comprehensive testing of Security page completed successfully after login with admin@uniswapv4.com / admin123. RESULTS: 1) Page title displays 'Centro Sicurezza' (Italian for 'Security Center') ✓ 2) Security Level card shows 'Medio' (Medium) with recommendation to enable 2FA ✓ 3) 2FA section found with toggle button showing 'Attiva' (Enable) - currently disabled ✓ 4) Password Security section found with 'Cambia Password' button and last changed info ✓ 5) Anti-Phishing Code section found showing 'Non impostato' (Not set) ✓ 6) Login History section found with 3 simulated entries: Chrome·Windows (Milano, Italia, 2 min ago - ATTUALE/Current), Safari·iPhone (Roma, Italia, 2 giorni fa), Chrome·MacOS (Londra, UK, 5 giorni fa) ✓. Screenshot: test4_security_page.png. The Security page is COMPLETE and FULLY FUNCTIONAL with all required sections displaying correctly."
+
+  - task: "Portfolio Pie Chart in Wallet Sidebar"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/WalletDashboard.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "⚠️ PORTFOLIO PIE CHART TEST INCOMPLETE - Navigation timeout occurred when accessing /wallet page after 30 seconds. This may be due to: 1) Wallet page taking longer to load with authentication 2) Redirect issues 3) SSE connection delays. NOTE: As mentioned in test requirements, the portfolio allocation chart may not display if admin has 0 balance (which is expected behavior). The chart implementation exists in WalletDashboard.js lines 616-651 and renders a donut chart with USDC/EUR allocation when total balance > 0. RECOMMENDATION: Test manually or with a user account that has non-zero balance to verify chart rendering. The feature is implemented but could not be fully tested due to timeout." 1 (Portfolio Chart with SVG and Timeframe Buttons): ✅ PASSED - Portfolio card (.cb-portfolio-card) found with 'PORTAFOGLIO' label and €0,00 balance display ✅. SVG line chart visible with red color showing declining portfolio performance ✅. Chart displays gradient fill (area chart) with line stroke overlay ✅. All 4 timeframe buttons present and functional: 1D, 1W, 1M, 3M ✅. Timeframe buttons have pill-style design with borderRadius=8px ✅. Active button (1W by default) highlighted with blue background (#3772ff) ✅. Clicking '1D' button successfully updates chart and highlights button in blue ✅. Chart uses portfolioSparkline data (fetched from BTC 7d data as proxy for portfolio performance) ✅. Chart implementation: SVG with viewBox '0 0 800 120', 2 path elements (gradient fill + line stroke), linearGradient with id 'pfGrad', dynamic color based on performance (green for up, red for down) ✅. Screenshot: wallet_full_page.png shows portfolio chart with red declining line and 1W button active. Screenshot: final_wallet_view.png shows chart after clicking 1D button (1D now highlighted in blue). TEST 2 (Mini Sparklines in Asset Rows): ✅ PASSED - USDC asset row (.cb-asset-row[data-testid='usdc-asset-card']) found with 'USD Coin' label ✅. Mini sparkline SVG visible in USDC row showing price movement ✅. Sparkline displays as small red wavy line chart next to price ($1.1274) and -0.05% change ✅. Sparkline implementation: SVG with width=80, height=24, viewBox='0 0 80 24', single path element with stroke color (green for positive, red for negative) ✅. Sparkline dynamically updates based on exchangeRate.change_24h_pct ✅. EUR row shows flat dashed line (no sparkline) as expected since EUR is stable ✅. Both screenshots clearly show the USDC sparkline as a small red line chart in the asset row. TEST 3 (Recent Transactions Section): ✅ PASSED - Recent Transactions section correctly hidden when admin has 0 transactions ✅. This is expected behavior per code implementation: section only renders when recentTxs.length > 0 (line 580 in WalletDashboard.js) ✅. Code verification: Section would display with header 'Recent Transactions' or 'Cronologia Transazioni' (Italian), show up to 5 recent transactions, each transaction row includes: type icon (colored circle with emoji), transaction type label, amount with color coding (green for deposits/receives, red for withdrawals/sends), date in localized format, 'See All' link to /transactions page ✅. Conditional rendering is working correctly - section is properly hidden when no transactions exist ✅. IMPLEMENTATION VERIFICATION: Portfolio chart: Lines 434-468 in WalletDashboard.js, uses portfolioSparkline state (fetched from /api/market/coin/BTC endpoint), 4 timeframe buttons with onClick handlers, SVG chart with gradient fill and line stroke, dynamic color based on performance ✅. Mini sparklines: Lines 542-546 for USDC row, SVG with 80x24 size, path element with dynamic stroke color, updates based on exchangeRate.change_24h_pct ✅. Recent transactions: Lines 579-610, conditional rendering with recentTxs.length > 0 check, displays transaction type icon, description, amount, and date ✅. VERIFICATION SUMMARY: ✅ Portfolio chart displays SVG line chart with gradient fill ✅ All 4 timeframe buttons present (1D, 1W, 1M, 3M) ✅ Clicking timeframe buttons updates chart and highlights active button ✅ USDC asset row contains mini sparkline SVG chart ✅ Sparkline shows price movement with color coding ✅ Recent transactions section correctly hidden when no transactions ✅ All features implemented per Coinbase Pro specification ✅ No console errors or critical issues detected. Screenshots: wallet_full_page.png (shows portfolio chart with 1W active and USDC sparkline), final_wallet_view.png (shows portfolio chart with 1D active after clicking). OVERALL RESULT: 3/3 tests passed (100% pass rate). All 3 Coinbase Pro features are COMPLETE, FULLY FUNCTIONAL, and VERIFIED."
 
 agent_communication:
   - agent: "main"

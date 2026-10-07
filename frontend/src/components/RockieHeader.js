@@ -12,6 +12,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [btcPrice, setBtcPrice] = useState(null);
   const navigate = useNavigate();
   const { lang, t, toggleLang } = useLang();
 
@@ -63,6 +64,21 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
     if (onLogout) onLogout();
     navigate('/login');
   };
+
+  // Fetch BTC price for header ticker
+  useEffect(() => {
+    const fetchBtc = async () => {
+      try {
+        const res = await fetch(`${API}/api/market/prices`);
+        const json = await res.json();
+        if (json.ok && json.data) { const btc = json.data.find(c => c.symbol === 'BTC'); if (btc) setBtcPrice(btc); }
+      } catch {}
+    };
+    fetchBtc();
+    const iv = setInterval(fetchBtc, 60000);
+    return () => clearInterval(iv);
+  }, []);
+
 
   const handleLangSelect = (selectedLang) => {
     if ((selectedLang === 'en' && lang !== 'en') || (selectedLang === 'it' && lang !== 'it')) {
@@ -130,22 +146,27 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                         </ul>
                       </li>
                       <li className="menu-item">
-                        <Link to={isLoggedIn ? "/wallet" : "/#about-section"}>{t.nav_blog}</Link>
+                        <Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link>
                       </li>
                       <li className="menu-item bitusdt-item">
-                        <Link to={isLoggedIn ? "/wallet" : "/register"}>
-                          BITUSDT
-                          <svg width="8" height="10" viewBox="0 0 8 10" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginLeft:'4px',verticalAlign:'middle'}}>
-                            <path d="M6.76 3.2C6.69 3.14 6.6 3.11 6.51 3.12C6.42 3.14 6.34 3.19 6.3 3.28C6.15 3.56 5.96 3.82 5.74 4.05C5.77 3.89 5.78 3.72 5.78 3.55C5.78 3.23 5.73 2.9 5.65 2.56C5.37 1.47 4.63 0.55 3.63 0.03C3.54-0.01 3.44-0.01 3.35 0.04C3.27 0.08 3.21 0.17 3.2 0.27C3.13 1.26 2.62 2.16 1.8 2.75L1.71 2.81C1.19 3.19 0.77 3.67 0.48 4.23C0.19 4.8 0.04 5.41 0.04 6.04C0.04 6.36 0.08 6.69 0.17 7.03C0.62 8.78 2.19 10 4 10C6.18 10 7.96 8.22 7.96 6.04C7.96 4.96 7.53 3.95 6.76 3.2Z" fill="#3772FF"/>
-                          </svg>
+                        <Link to="/markets/BTC" style={{display:'inline-flex',alignItems:'center',gap:6}}>
+                          {btcPrice ? (
+                            <>
+                              <span style={{fontSize:13}}>₿</span>
+                              <span>${btcPrice.price?.toLocaleString('en-US',{maximumFractionDigits:0})}</span>
+                              <span style={{fontSize:12,fontWeight:700,color: btcPrice.change_24h >= 0 ? '#22c55e' : '#ef4444'}}>
+                                {btcPrice.change_24h >= 0 ? '↑' : '↓'}{Math.abs(btcPrice.change_24h)}%
+                              </span>
+                            </>
+                          ) : 'BTC'}
                         </Link>
                       </li>
                       <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('pages'); }}>
                         <a href="#!">{t.nav_pages}</a>
                         <ul className={`sub-menu ${activeDropdown === 'pages' ? 'show' : ''}`}>
                           <li className="menu-item"><Link to="/about">{t.nav_about}</Link></li>
-                          <li className="menu-item"><Link to="/login">{t.nav_login}</Link></li>
-                          <li className="menu-item"><Link to="/register">{t.nav_register}</Link></li>
+                          <li className="menu-item"><Link to="/earn">{lang === 'it' ? 'Guadagna' : 'Earn'}</Link></li>
+                          <li className="menu-item"><Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link></li>
                           <li className="menu-item"><a href="mailto:info@uniswapv4.com">{t.nav_contact}</a></li>
                           <li className="menu-item"><Link to="/terms">{t.nav_faq}</Link></li>
                         </ul>
@@ -261,6 +282,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                       <Link to="/transactions" className="dropdown-item">📋 {t.nav_transactions || 'Transactions'}</Link>
                       <Link to="/profile" className="dropdown-item">👤 {t.nav_profile || 'Profile'}</Link>
                       <Link to="/kyc" className="dropdown-item">🔒 {t.nav_kycVerification || 'KYC Verification'}</Link>
+                      <Link to="/security" className="dropdown-item">🛡️ {lang === 'it' ? 'Sicurezza' : 'Security'}</Link>
                       <div className="dropdown-item" onClick={handleLogout} style={{color:'#d33535', cursor:'pointer', borderTop:'1px solid var(--r-line)', marginTop:'4px', paddingTop:'12px'}}>🚪 {t.nav_logout || 'Logout'}</div>
                     </div>
                   </div>
