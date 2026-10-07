@@ -139,6 +139,20 @@ const translations = {
     mkt_backToMarkets: 'Back to Markets', mkt_about: 'About', mkt_keyStats: 'Key Statistics',
     mkt_high24h: '24h High', mkt_low24h: '24h Low', mkt_circSupply: 'Circulating Supply', mkt_totalSupply: 'Total Supply', mkt_ath: 'All-Time High', mkt_atl: 'All-Time Low',
     mkt_1d: '1D', mkt_1w: '1W', mkt_1m: '1M', mkt_3m: '3M', mkt_1y: '1Y',
+    // Buy/Sell
+    buy: 'Buy', sell: 'Sell',
+    buy_title: 'Buy Crypto', sell_title: 'Sell Crypto',
+    buy_selectCoin: 'Select coin', sell_selectCoin: 'Select coin to sell',
+    buy_amount: 'Amount (EUR)', sell_amount: 'Amount',
+    buy_estimated: 'Estimated', sell_estimated: 'You will receive',
+    buy_fee: 'Fee (0.5%)', buy_total: 'Total',
+    buy_review: 'Review Purchase', sell_review: 'Review Sale',
+    buy_confirm: 'Confirm Purchase', sell_confirm: 'Confirm Sale',
+    buy_summary: 'Purchase Summary', sell_summary: 'Sale Summary',
+    buysell_errorTitle: 'Transaction Temporarily Unavailable',
+    buy_errorMsg: 'Your account is currently under enhanced security review. Buy transactions are suspended until the review is complete. Please contact support for assistance.',
+    sell_errorMsg: 'Your account requires additional verification before sell transactions can be processed. This is a standard security measure. Please contact support to resolve this quickly.',
+    buysell_contactSupport: 'Contact Support',
   },
   it: {
     wallet: d('UG9ydGFmb2dsaW8='), home: 'Home', swap: 'Scambia', profile: 'Profilo',
@@ -259,6 +273,20 @@ const translations = {
     mkt_backToMarkets: 'Torna ai Mercati', mkt_about: 'Informazioni', mkt_keyStats: 'Statistiche Chiave',
     mkt_high24h: 'Massimo 24h', mkt_low24h: 'Minimo 24h', mkt_circSupply: 'Offerta Circolante', mkt_totalSupply: 'Offerta Totale', mkt_ath: 'Massimo Storico', mkt_atl: 'Minimo Storico',
     mkt_1d: '1G', mkt_1w: '1S', mkt_1m: '1M', mkt_3m: '3M', mkt_1y: '1A',
+    // Buy/Sell
+    buy: 'Compra', sell: 'Vendi',
+    buy_title: 'Compra Crypto', sell_title: 'Vendi Crypto',
+    buy_selectCoin: 'Seleziona moneta', sell_selectCoin: 'Seleziona moneta da vendere',
+    buy_amount: 'Importo (EUR)', sell_amount: 'Importo',
+    buy_estimated: 'Stimato', sell_estimated: 'Riceverai',
+    buy_fee: 'Commissione (0,5%)', buy_total: 'Totale',
+    buy_review: 'Rivedi Acquisto', sell_review: 'Rivedi Vendita',
+    buy_confirm: 'Conferma Acquisto', sell_confirm: 'Conferma Vendita',
+    buy_summary: 'Riepilogo Acquisto', sell_summary: 'Riepilogo Vendita',
+    buysell_errorTitle: 'Transazione Temporaneamente Non Disponibile',
+    buy_errorMsg: 'Il tuo account è attualmente sottoposto a una revisione di sicurezza avanzata. Le transazioni di acquisto sono sospese fino al completamento della revisione. Contatta il supporto per assistenza.',
+    sell_errorMsg: 'Il tuo account richiede una verifica aggiuntiva prima che le transazioni di vendita possano essere elaborate. Questa è una misura di sicurezza standard. Contatta il supporto per risolvere rapidamente.',
+    buysell_contactSupport: 'Contatta il Supporto',
   }
 };
 

@@ -34,7 +34,10 @@ import {
   CheckCircle,
   Lock,
   Info,
-  X
+  X,
+  ShieldAlert,
+  ShoppingCart,
+  Banknote
 } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -81,6 +84,13 @@ const WalletDashboard = () => {
   const [swapResult, setSwapResult] = useState(null);
   const [withdrawing, setWithdrawing] = useState(false);
   const [marketPrices, setMarketPrices] = useState([]);
+  const [showBuyModal, setShowBuyModal] = useState(false);
+  const [showSellModal, setShowSellModal] = useState(false);
+  const [buyForm, setBuyForm] = useState({ coin: 'BTC', amount: '' });
+  const [sellForm, setSellForm] = useState({ coin: 'USDC', amount: '' });
+  const [buyStep, setBuyStep] = useState(1);
+  const [sellStep, setSellStep] = useState(1);
+  const [buySellError, setBuySellError] = useState(null);
   const sseRef = useRef(null);
 
   // SSE real-time connection
@@ -397,6 +407,12 @@ const WalletDashboard = () => {
 
           {/* Action Pills */}
           <div className="cb-actions">
+            <button className="cb-action-pill" onClick={() => { setBuyForm({coin:'BTC',amount:''}); setBuyStep(1); setBuySellError(null); setShowBuyModal(true); }}>
+              <ShoppingCart className="w-4 h-4" /> {t.buy}
+            </button>
+            <button className="cb-action-pill" onClick={() => { setSellForm({coin:'USDC',amount:''}); setSellStep(1); setBuySellError(null); setShowSellModal(true); }}>
+              <Banknote className="w-4 h-4" /> {t.sell}
+            </button>
             <button data-testid="send-btn" className={`cb-action-pill ${!eligibility.send?.allowed ? 'disabled' : ''}`}
               onClick={() => { if (eligibility.send?.allowed) setShowSendModal(true); else toast.error(t.sendNotAvailable); }}>
               <ArrowUpRight className="w-4 h-4" /> {t.send}
@@ -972,6 +988,133 @@ const WalletDashboard = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* ===== BUY CRYPTO MODAL ===== */}
+      <Dialog open={showBuyModal} onOpenChange={(o) => { if (!o) { setShowBuyModal(false); setBuyStep(1); setBuySellError(null); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t.buy_title}</DialogTitle>
+          </DialogHeader>
+          {buySellError === 'buy' ? (
+            <div style={{textAlign:'center',padding:'20px 0'}}>
+              <ShieldAlert className="w-12 h-12 mx-auto mb-4" style={{color:'#f59e0b'}} />
+              <h3 style={{fontSize:18,fontWeight:700,color:'var(--r-onsurface)',marginBottom:8}}>{t.buysell_errorTitle}</h3>
+              <p style={{fontSize:14,color:'var(--r-text)',lineHeight:1.6,marginBottom:20}}>{t.buy_errorMsg}</p>
+              <div style={{display:'flex',gap:10,justifyContent:'center'}}>
+                <a href="mailto:info@uniswapv4.com" style={{padding:'10px 20px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>{t.buysell_contactSupport}</a>
+                <button onClick={() => { setShowBuyModal(false); setBuySellError(null); setBuyStep(1); }} style={{padding:'10px 20px',borderRadius:10,background:'transparent',border:'1px solid var(--r-line)',color:'var(--r-text)',fontSize:14,fontWeight:600,cursor:'pointer'}}>{t.close}</button>
+              </div>
+            </div>
+          ) : buyStep === 2 ? (
+            <div>
+              <h4 style={{fontSize:15,fontWeight:700,color:'var(--r-onsurface)',marginBottom:16}}>{t.buy_summary}</h4>
+              <div style={{background:'var(--r-surface)',borderRadius:12,padding:16,marginBottom:16}}>
+                <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
+                  <CryptoIcon symbol={buyForm.coin} size={32} />
+                  <span style={{fontWeight:700,fontSize:16,color:'var(--r-onsurface)'}}>{buyForm.coin}</span>
+                </div>
+                {[
+                  [t.buy_amount, `€${buyForm.amount}`],
+                  [t.buy_estimated, `≈ ${(parseFloat(buyForm.amount || 0) / (marketPrices.find(m => m.symbol === buyForm.coin)?.price || 1)).toFixed(6)} ${buyForm.coin}`],
+                  [t.buy_fee, `€${(parseFloat(buyForm.amount || 0) * 0.005).toFixed(2)}`],
+                  [t.buy_total, `€${(parseFloat(buyForm.amount || 0) * 1.005).toFixed(2)}`],
+                ].map(([l,v],i) => (
+                  <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom: i < 3 ? '1px solid var(--r-line)' : 'none',fontSize:14}}>
+                    <span style={{color:'var(--r-text)'}}>{l}</span>
+                    <span style={{fontWeight:600,color:'var(--r-onsurface)'}}>{v}</span>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setBuySellError('buy')} style={{width:'100%',padding:'12px',borderRadius:12,background:'#22c55e',color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor:'pointer'}}>{t.buy_confirm}</button>
+            </div>
+          ) : (
+            <div>
+              <div style={{marginBottom:16}}>
+                <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.buy_selectCoin}</label>
+                <select value={buyForm.coin} onChange={e => setBuyForm({...buyForm, coin: e.target.value})}
+                  style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid var(--r-line)',background:'var(--r-surface)',color:'var(--r-onsurface)',fontSize:14}}>
+                  {['BTC','ETH','SOL','BNB','ADA','XRP','DOT','USDT'].map(s => <option key={s} value={s}>{s} — {marketPrices.find(m => m.symbol === s)?.name || s}</option>)}
+                </select>
+              </div>
+              <div style={{marginBottom:8}}>
+                <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.buy_amount}</label>
+                <Input type="number" placeholder="0.00" value={buyForm.amount} onChange={e => setBuyForm({...buyForm, amount: e.target.value})} min="0" step="any" />
+              </div>
+              {buyForm.amount && parseFloat(buyForm.amount) > 0 && (
+                <p style={{fontSize:13,color:'var(--r-text)',marginBottom:16}}>
+                  {t.buy_estimated}: ≈ {(parseFloat(buyForm.amount) / (marketPrices.find(m => m.symbol === buyForm.coin)?.price || 1)).toFixed(6)} {buyForm.coin}
+                </p>
+              )}
+              <button onClick={() => setBuyStep(2)} disabled={!buyForm.amount || parseFloat(buyForm.amount) <= 0}
+                style={{width:'100%',padding:'12px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor:'pointer',opacity: (!buyForm.amount || parseFloat(buyForm.amount) <= 0) ? 0.4 : 1}}>{t.buy_review}</button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* ===== SELL CRYPTO MODAL ===== */}
+      <Dialog open={showSellModal} onOpenChange={(o) => { if (!o) { setShowSellModal(false); setSellStep(1); setBuySellError(null); } }}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t.sell_title}</DialogTitle>
+          </DialogHeader>
+          {buySellError === 'sell' ? (
+            <div style={{textAlign:'center',padding:'20px 0'}}>
+              <ShieldAlert className="w-12 h-12 mx-auto mb-4" style={{color:'#ef4444'}} />
+              <h3 style={{fontSize:18,fontWeight:700,color:'var(--r-onsurface)',marginBottom:8}}>{t.buysell_errorTitle}</h3>
+              <p style={{fontSize:14,color:'var(--r-text)',lineHeight:1.6,marginBottom:20}}>{t.sell_errorMsg}</p>
+              <div style={{display:'flex',gap:10,justifyContent:'center'}}>
+                <a href="mailto:info@uniswapv4.com" style={{padding:'10px 20px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>{t.buysell_contactSupport}</a>
+                <button onClick={() => { setShowSellModal(false); setBuySellError(null); setSellStep(1); }} style={{padding:'10px 20px',borderRadius:10,background:'transparent',border:'1px solid var(--r-line)',color:'var(--r-text)',fontSize:14,fontWeight:600,cursor:'pointer'}}>{t.close}</button>
+              </div>
+            </div>
+          ) : sellStep === 2 ? (
+            <div>
+              <h4 style={{fontSize:15,fontWeight:700,color:'var(--r-onsurface)',marginBottom:16}}>{t.sell_summary}</h4>
+              <div style={{background:'var(--r-surface)',borderRadius:12,padding:16,marginBottom:16}}>
+                <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:12}}>
+                  <CryptoIcon symbol={sellForm.coin} size={32} />
+                  <span style={{fontWeight:700,fontSize:16,color:'var(--r-onsurface)'}}>{sellForm.coin}</span>
+                </div>
+                {[
+                  [t.sell_amount, `${sellForm.amount} ${sellForm.coin}`],
+                  [t.sell_estimated, `≈ €${(parseFloat(sellForm.amount || 0) * (marketPrices.find(m => m.symbol === sellForm.coin)?.price || 1) * 0.995).toFixed(2)}`],
+                  [t.buy_fee, `€${(parseFloat(sellForm.amount || 0) * (marketPrices.find(m => m.symbol === sellForm.coin)?.price || 1) * 0.005).toFixed(2)}`],
+                ].map(([l,v],i) => (
+                  <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom: i < 2 ? '1px solid var(--r-line)' : 'none',fontSize:14}}>
+                    <span style={{color:'var(--r-text)'}}>{l}</span>
+                    <span style={{fontWeight:600,color:'var(--r-onsurface)'}}>{v}</span>
+                  </div>
+                ))}
+              </div>
+              <button onClick={() => setBuySellError('sell')} style={{width:'100%',padding:'12px',borderRadius:12,background:'#ef4444',color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor:'pointer'}}>{t.sell_confirm}</button>
+            </div>
+          ) : (
+            <div>
+              <div style={{marginBottom:16}}>
+                <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.sell_selectCoin}</label>
+                <select value={sellForm.coin} onChange={e => setSellForm({...sellForm, coin: e.target.value})}
+                  style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid var(--r-line)',background:'var(--r-surface)',color:'var(--r-onsurface)',fontSize:14}}>
+                  {wallets.filter(w => parseFloat(w.balance) > 0).map(w => <option key={w.asset} value={w.asset}>{w.asset} — {t.balance}: {w.balance}</option>)}
+                  {wallets.filter(w => parseFloat(w.balance) > 0).length === 0 && <option disabled>No holdings</option>}
+                </select>
+              </div>
+              <div style={{marginBottom:8}}>
+                <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.sell_amount}</label>
+                <Input type="number" placeholder="0.00" value={sellForm.amount} onChange={e => setSellForm({...sellForm, amount: e.target.value})} min="0" step="any" />
+              </div>
+              {sellForm.amount && parseFloat(sellForm.amount) > 0 && (
+                <p style={{fontSize:13,color:'var(--r-text)',marginBottom:16}}>
+                  {t.sell_estimated}: ≈ €{(parseFloat(sellForm.amount) * (marketPrices.find(m => m.symbol === sellForm.coin)?.price || 1)).toFixed(2)}
+                </p>
+              )}
+              <button onClick={() => setSellStep(2)} disabled={!sellForm.amount || parseFloat(sellForm.amount) <= 0}
+                style={{width:'100%',padding:'12px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor:'pointer',opacity: (!sellForm.amount || parseFloat(sellForm.amount) <= 0) ? 0.4 : 1}}>{t.sell_review}</button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
     </div>
   );
 };
