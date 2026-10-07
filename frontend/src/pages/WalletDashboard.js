@@ -80,6 +80,7 @@ const WalletDashboard = () => {
   const [swapping, setSwapping] = useState(false);
   const [swapResult, setSwapResult] = useState(null);
   const [withdrawing, setWithdrawing] = useState(false);
+  const [marketPrices, setMarketPrices] = useState([]);
   const sseRef = useRef(null);
 
   // SSE real-time connection
@@ -175,6 +176,21 @@ const WalletDashboard = () => {
     loadNotifications();
     loadWithdrawalDefaults();
   }, []);
+
+  // Fetch market prices for sidebar
+  useEffect(() => {
+    const fetchMarket = async () => {
+      try {
+        const res = await fetch(`${API}/api/market/prices`);
+        const json = await res.json();
+        if (json.ok && json.data) setMarketPrices(json.data.slice(0, 4));
+      } catch {}
+    };
+    fetchMarket();
+    const iv = setInterval(fetchMarket, 60000);
+    return () => clearInterval(iv);
+  }, []);
+
 
   useEffect(() => {
     if (!showFreezeModal) setEmailSent(false);
@@ -338,367 +354,226 @@ const WalletDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div style={{minHeight:'100vh'}}>
       {/* Admin Preview Banner */}
       {isAdmin && (
-        <div className="bg-yellow-400 text-yellow-900 text-center py-2 px-4 text-sm font-medium flex items-center justify-center space-x-2" data-testid="admin-preview-banner">
+        <div style={{background:'#f59e0b',color:'#78350f',textAlign:'center',padding:'8px 16px',fontSize:13,fontWeight:600,display:'flex',alignItems:'center',justifyContent:'center',gap:8}} data-testid="admin-preview-banner">
           <AlertTriangle className="w-4 h-4" />
           <span>{t.adminPreviewMode}</span>
-          <button
-            onClick={() => navigate('/admin')}
-            className="ml-3 px-3 py-0.5 bg-yellow-900 text-yellow-100 rounded text-xs font-semibold hover:bg-yellow-800 transition"
-            data-testid="back-to-admin-btn"
-          >
-            {t.backToAdmin}
-          </button>
+          <button onClick={() => navigate('/admin')} className="ml-3 px-3 py-0.5 bg-yellow-900 text-yellow-100 rounded text-xs font-semibold" data-testid="back-to-admin-btn">{t.backToAdmin}</button>
         </div>
       )}
 
-      {/* Portfolio Section */}
-      <div className="rk-portfolio-header">
-        <div className="rk-portfolio-inner">
-
-          {/* Portfolio Section */}
-
-          {/* Notification Dropdown */}
-          {showNotifications && (
-            <div data-testid="notification-dropdown" className="absolute right-4 md:right-auto md:left-1/2 md:-translate-x-1/2 lg:right-8 lg:left-auto lg:translate-x-0 top-14 w-80 bg-white rounded-lg shadow-xl z-50 border max-h-96 overflow-auto">
-              <div className="flex items-center justify-between p-3 border-b">
-                <h3 className="font-semibold text-gray-900 text-sm">{t.notifications}</h3>
-                <div className="flex items-center space-x-2">
-                  {unreadCount > 0 && (
-                    <button
-                      className="text-xs text-blue-600 hover:text-blue-700"
-                      onClick={async () => { await api.put('/notifications/read-all'); loadNotifications(); }}
-                    >{t.markAllRead}</button>
-                  )}
-                  <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
-                    <X className="w-4 h-4" />
+      {/* Two-Panel Layout */}
+      <div className="cb-dashboard">
+        {/* ===== LEFT PANEL ===== */}
+        <div>
+          {/* Portfolio Card */}
+          <div className="cb-portfolio-card">
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+              <div>
+                <div className="cb-portfolio-label">
+                  <User className="w-4 h-4" />
+                  {t.portfolio}
+                </div>
+                <div className="cb-portfolio-value">
+                  &euro;{showBalance ? formatBalance(totalBalance()) : '••••••'}
+                  <button onClick={() => setShowBalance(!showBalance)} style={{background:'none',border:'none',cursor:'pointer',color:'var(--r-text)',padding:4}}>
+                    {showBalance ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                   </button>
                 </div>
-              </div>
-              {notifications.length === 0 ? (
-                <div className="p-6 text-center text-gray-400 text-sm">{t.noNotifications}</div>
-              ) : (
-                notifications.map(n => (
-                  <div
-                    key={n.id}
-                    className={`p-3 border-b last:border-b-0 cursor-pointer hover:bg-gray-50 ${
-                      !n.read ? 'bg-blue-50/50' : ''
-                    } ${n.data?.status === 'blocked' ? 'border-l-4 border-l-red-500' : ''}`}
-                    onClick={async () => {
-                      if (!n.read) { await api.put(`/notifications/${n.id}/read`); loadNotifications(); }
-                      // Navigate to transactions if notification has a link
-                      if (n.data?.link) { setShowNotifications(false); navigate(n.data.link); }
-                    }}
-                  >
-                    <div className="flex items-start space-x-2">
-                      <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                        n.data?.status === 'blocked' ? 'bg-red-500' : !n.read ? 'bg-blue-500' : 'bg-transparent'
-                      }`} />
-                      <div>
-                        <p className={`text-sm font-medium ${
-                          n.data?.status === 'blocked' ? 'text-red-700' : 'text-gray-900'
-                        }`}>{n.title}</p>
-                        <p className="text-xs text-gray-500 mt-0.5">{n.message}</p>
-                        {n.data?.status === 'blocked' && (
-                          <span className="inline-block mt-1 text-[10px] bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">
-                            {lang === 'it' ? 'Clicca per vedere i dettagli' : 'Tap to view details'}
-                          </span>
-                        )}
-                        <p className="text-[10px] text-gray-400 mt-1">{new Date(n.created_at).toLocaleString(dateFmt(lang))}</p>
-                      </div>
-                    </div>
+                {showBalance && (
+                  <div className={`cb-portfolio-change ${exchangeRate.change_24h_pct >= 0 ? 'up' : 'down'}`}>
+                    {exchangeRate.change_24h_pct >= 0 ? '↑' : '↓'} €{formatBalance(Math.abs(parseFloat(totalBalance()) * exchangeRate.change_24h_pct / 100).toFixed(2))} ({Math.abs(exchangeRate.change_24h_pct).toFixed(2)}%)
+                    <span style={{color:'var(--r-text)',fontWeight:400,marginLeft:6}}>{t.past24hr}</span>
                   </div>
-                ))
-              )}
+                )}
+              </div>
+              <button onClick={handleRefresh} disabled={loading} style={{background:'none',border:'none',cursor:'pointer',color:'var(--r-text)',padding:8}}>
+                <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+          </div>
+
+          {/* Action Pills */}
+          <div className="cb-actions">
+            <button data-testid="send-btn" className={`cb-action-pill ${!eligibility.send?.allowed ? 'disabled' : ''}`}
+              onClick={() => { if (eligibility.send?.allowed) setShowSendModal(true); else toast.error(t.sendNotAvailable); }}>
+              <ArrowUpRight className="w-4 h-4" /> {t.send}
+            </button>
+            <button data-testid="deposit-btn" className="cb-action-pill" onClick={() => setShowReceiveModal(true)}>
+              <ArrowDownLeft className="w-4 h-4" /> {t.deposit}
+            </button>
+            <button data-testid="swap-btn" className={`cb-action-pill ${!eligibility.swap?.allowed ? 'disabled' : ''}`}
+              onClick={() => { if (eligibility.swap?.allowed) setShowSwapModal(true); else toast.error(t.swapNotAvailable); }}>
+              <ArrowLeftRight className="w-4 h-4" /> {t.swap}
+            </button>
+            <button data-testid="withdraw-btn" className={`cb-action-pill ${parseFloat(getEURWallet()?.balance || '0') <= 0 ? 'disabled' : ''}`}
+              onClick={() => { const b = parseFloat(getEURWallet()?.balance || '0'); if (b > 0) { setWithdrawForm({amount:'',iban:withdrawalDefaults.iban,swift:withdrawalDefaults.swift,firstName:'',lastName:''}); setShowWithdrawModal(true); } else toast.error(t.noEurBalance); }}>
+              <ArrowUpRight className="w-4 h-4 rotate-45" /> {t.withdraw}
+            </button>
+          </div>
+
+          {/* Alerts */}
+          {alertState?.type === 'password_reset' && (
+            <div className="cb-alert info">
+              <CheckCircle className="w-5 h-5 flex-shrink-0" style={{color:'#3772ff',marginTop:2}} />
+              <div>
+                <h4>{alertState.title}</h4>
+                <p>{alertState.description}</p>
+                <button className="cb-alert-btn" onClick={handleResendPasswordReset} disabled={resendingEmail}>
+                  {resendingEmail ? t.sendingDots : alertState.buttonText}
+                </button>
+              </div>
+            </div>
+          )}
+          {alertState?.type !== 'password_reset' && alertState && (
+            <div className="cb-alert warning">
+              <AlertTriangle className="w-5 h-5 flex-shrink-0" style={{color:'#f59e0b',marginTop:2}} />
+              <div>
+                <h4>{alertState.title}</h4>
+                <p>{alertState.description}</p>
+                <button className="cb-alert-btn" onClick={handleFixAccount} disabled={sendingEmail}>
+                  {sendingEmail ? t.sendingDots : alertState.buttonText}
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Portfolio Section */}
-          <div className="flex items-start justify-between">
-            <div>
-              <div className="rk-portfolio-label">
-                <User className="w-4 h-4" />
-                <span>{t.portfolio}</span>
-              </div>
-              <div className="rk-portfolio-balance">
-                <span>&euro;{formatBalance(totalBalance())}</span>
-                <button 
-                  onClick={() => setShowBalance(!showBalance)}
-                  className="p-1 hover:bg-white/10 rounded"
-                >
-                  {showBalance ? <Eye className="w-4 h-4" style={{opacity:0.5}} /> : <EyeOff className="w-4 h-4" style={{opacity:0.5}} />}
-                </button>
-              </div>
-              {showBalance && (
-                <div className={`rk-portfolio-change ${exchangeRate.change_24h_pct >= 0 ? 'up' : 'down'}`}>
-                  <span>{exchangeRate.change_24h_pct >= 0 ? '\u2191' : '\u2193'} &euro;{formatBalance(Math.abs(parseFloat(totalBalance()) * exchangeRate.change_24h_pct / 100).toFixed(2))} ({Math.abs(exchangeRate.change_24h_pct).toFixed(2)}%)</span>
-                  <span className="muted">{t.past24hr}</span>
-                </div>
-              )}
+          {/* Asset List */}
+          <div className="cb-asset-list">
+            <div className="cb-asset-list-header">
+              <span className="rk-section-title" style={{fontSize:16}}>{t.assets}</span>
+              <Link to="/transactions" className="rk-section-link">{t.seeAll}</Link>
             </div>
-            <button 
-              onClick={handleRefresh}
-              disabled={loading}
-              className="p-2 hover:bg-white/10 rounded-full"
-            >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} style={{color:'rgba(255,255,255,0.5)'}} />
-            </button>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="rk-actions">
-            <button 
-              data-testid="swap-btn"
-              className={`rk-action-btn ${!eligibility.swap?.allowed ? 'disabled' : ''}`}
-              onClick={() => { if (eligibility.swap?.allowed) setShowSwapModal(true); else toast.error(t.swapNotAvailable); }}
-            >
-              <div className="icon-circle"><ArrowLeftRight className="w-5 h-5" /></div>
-              <span>{t.swap}</span>
-            </button>
-            <button 
-              data-testid="send-btn"
-              className={`rk-action-btn ${!eligibility.send?.allowed ? 'disabled' : ''}`}
-              onClick={() => { if (eligibility.send?.allowed) setShowSendModal(true); else toast.error(t.sendNotAvailable); }}
-            >
-              <div className="icon-circle"><ArrowUpRight className="w-5 h-5" /></div>
-              <span>{t.send}</span>
-            </button>
-            <button 
-              data-testid="deposit-btn"
-              className="rk-action-btn"
-              onClick={() => setShowReceiveModal(true)}
-            >
-              <div className="icon-circle"><ArrowDownLeft className="w-5 h-5" /></div>
-              <span>{t.deposit}</span>
-            </button>
-            <button 
-              data-testid="withdraw-btn"
-              className={`rk-action-btn ${parseFloat(getEURWallet()?.balance || '0') <= 0 ? 'disabled' : ''}`}
-              onClick={() => {
-                const eurBalance = parseFloat(getEURWallet()?.balance || '0');
-                if (eurBalance > 0) { setWithdrawForm({ amount: '', iban: withdrawalDefaults.iban, swift: withdrawalDefaults.swift, firstName: '', lastName: '' }); setShowWithdrawModal(true); }
-                else toast.error(t.noEurBalance);
-              }}
-            >
-              <div className="icon-circle"><ArrowUpRight className="w-5 h-5 rotate-45" /></div>
-              <span>{t.withdraw}</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <main className="rk-content">
-        {/* Password Reset Alert */}
-        {alertState?.type === 'password_reset' && (
-          <Card className="mb-4 border-blue-200 bg-blue-50">
-            <div className="p-4">
-              <div className="flex items-start space-x-3">
-                <CheckCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-blue-800">{alertState.title}</h3>
-                  <p className="text-sm text-blue-700 mt-1">{alertState.description}</p>
-                  <p className="text-sm text-blue-600 mt-2">{t.checkEmailForReset}</p>
-                  <Button 
-                    onClick={handleResendPasswordReset}
-                    disabled={resendingEmail}
-                    className="mt-3 bg-blue-500 hover:bg-blue-600 text-white"
-                    size="sm"
-                  >
-                    {resendingEmail ? t.sendingDots : alertState.buttonText}
-                  </Button>
-                </div>
+            {/* USDC Row */}
+            <div className="cb-asset-row" data-testid="usdc-asset-card" onClick={() => navigate('/transactions')}>
+              <CryptoIcon symbol="USDC" size={40} />
+              <div>
+                <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>USD Coin</div>
+                <div style={{fontSize:12,color:'var(--r-text)'}}>USDC</div>
               </div>
-            </div>
-          </Card>
-        )}
-
-        {/* KYC Pending Alert */}
-        {alertState?.type === 'kyc_pending' && user?.show_freeze_alert !== false && (
-          <Card className="mb-4 border-yellow-200 bg-yellow-50">
-            <div className="p-4">
-              <div className="flex items-start space-x-3">
-                <RefreshCw className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-yellow-800">{alertState.title}</h3>
-                  <p className="text-sm text-yellow-700 mt-1">{alertState.description}</p>
-                </div>
+              <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>
+                ${(1 / (exchangeRate.usdc_eur || 1)).toFixed(4)}
               </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Freeze Alert */}
-        {alertState?.type === 'freeze' && user?.show_freeze_alert !== false && (
-          <Card className="mb-4 border-orange-200 bg-orange-50">
-            <div className="p-4">
-              <div className="flex items-start space-x-3">
-                <AlertTriangle className="w-5 h-5 text-orange-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <h3 className="font-semibold text-orange-800">{alertState.title}</h3>
-                  <p className="text-sm text-orange-700 mt-1">{alertState.description}</p>
-                  <Button 
-                    onClick={handleFixAccount}
-                    disabled={sendingEmail}
-                    className="mt-3 bg-orange-500 hover:bg-orange-600 text-white"
-                    size="sm"
-                  >
-                    {sendingEmail ? t.sendingDots : alertState.buttonText}
-                  </Button>
-                </div>
+              <div className="hide-mobile" style={{fontSize:13,color: exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
+                {exchangeRate.change_24h_pct >= 0 ? '+' : ''}{exchangeRate.change_24h_pct?.toFixed(2)}%
               </div>
-            </div>
-          </Card>
-        )}
-
-        {/* Assets Section */}
-        <div className="rk-section-header">
-          <h2 className="rk-section-title">{t.assets}</h2>
-          <Link to="/transactions" className="rk-section-link">{t.seeAll}</Link>
-        </div>
-
-        <div className="rk-asset-grid">
-          {/* USDC Asset */}
-          <div className="rk-card rk-card-clickable" data-testid="usdc-asset-card" onClick={() => navigate('/transactions')}>
-            <div className="rk-asset-card">
-              <div className="rk-asset-left">
-                <CryptoIcon symbol="USDC" size={40} />
-                <div>
-                  <div className="rk-asset-name">USDC</div>
-                  <div className="rk-asset-sub">USD Coin (ERC-20)</div>
-                </div>
-              </div>
-              <div className="rk-asset-right">
-                <div className="rk-asset-balance" data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
-                <div className="rk-asset-fiat" data-testid="usdc-eur-value">&asymp; &euro;{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
+                <div style={{fontSize:12,color:'var(--r-text)'}} data-testid="usdc-eur-value">≈ €{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
                 {availableBalance.USDC && availableBalance.USDC.available !== availableBalance.USDC.total && (
-                  <div style={{fontSize:11,color:'#f59e0b',marginTop:3}} data-testid="usdc-available">
-                    <Lock className="w-3 h-3 inline mr-0.5" />
-                    {t.available}: {showBalance ? formatBalance(availableBalance.USDC.available) : '••••••'} USDC
+                  <div style={{fontSize:11,color:'#f59e0b',marginTop:2}} data-testid="usdc-available">
+                    <Lock className="w-3 h-3 inline mr-0.5" />{t.available}: {showBalance ? formatBalance(availableBalance.USDC.available) : '••••••'}
                   </div>
                 )}
               </div>
             </div>
-          </div>
 
-          {/* EUR Asset */}
-          <div className="rk-card rk-card-clickable" data-testid="eur-asset-card" onClick={() => navigate('/transactions')}>
-            <div className="rk-asset-card">
-              <div className="rk-asset-left">
-                <CryptoIcon symbol="EUR" size={40} />
-                <div>
-                  <div className="rk-asset-name">EUR</div>
-                  <div className="rk-asset-sub">{t.euroBalance}</div>
-                </div>
+            {/* EUR Row */}
+            <div className="cb-asset-row" data-testid="eur-asset-card" onClick={() => navigate('/transactions')}>
+              <CryptoIcon symbol="EUR" size={40} />
+              <div>
+                <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>Euro</div>
+                <div style={{fontSize:12,color:'var(--r-text)'}}>EUR</div>
               </div>
-              <div className="rk-asset-right">
-                <div className="rk-asset-balance" data-testid="eur-total">&euro;{formatBalance(getEURWallet()?.balance)}</div>
-                <div className="rk-asset-fiat">{t.balance}</div>
+              <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>€1.00</div>
+              <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>—</div>
+              <div style={{textAlign:'right'}}>
+                <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="eur-total">€{showBalance ? formatBalance(getEURWallet()?.balance) : '••••••'}</div>
+                <div style={{fontSize:12,color:'var(--r-text)'}}>{t.balance}</div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Desktop: Two-column layout for Connected Apps + Account */}
-        <div className="mt-8 md:grid md:grid-cols-2 md:gap-6">
-          {/* Connected Apps Section */}
-          {user?.connected_app_name && (
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">{t.connectedApps}</h2>
-              </div>
-              <Card className="p-4">
-                <div className="flex items-center space-x-3">
-                  {user.connected_app_logo ? (
-                    <img src={user.connected_app_logo} alt={user.connected_app_name} className="w-10 h-10 rounded-full object-cover" />
-                  ) : (
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                      <ExternalLink className="w-5 h-5 text-gray-500" />
-                    </div>
-                  )}
-                  <div>
-                    <div className="font-semibold text-gray-900">{user.connected_app_name}</div>
-                    <div className="text-sm text-gray-500">{t.connected}</div>
+        {/* ===== RIGHT PANEL (SIDEBAR) ===== */}
+        <div>
+          {/* Live Market Prices */}
+          <div className="cb-sidebar-card">
+            <div className="cb-sidebar-title">{lang === 'it' ? 'Prezzi di Mercato' : 'Market Prices'}</div>
+            {marketPrices.map(coin => (
+              <div key={coin.symbol} className="cb-market-row" onClick={() => navigate(`/markets/${coin.symbol}`)}>
+                <CryptoIcon symbol={coin.symbol} size={32} />
+                <div style={{flex:1}}>
+                  <div style={{fontWeight:600,fontSize:13,color:'var(--r-onsurface)'}}>{coin.name}</div>
+                  <div style={{fontSize:11,color:'var(--r-text)'}}>{coin.symbol}</div>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontWeight:600,fontSize:13,color:'var(--r-onsurface)'}}>${coin.price?.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}</div>
+                  <div style={{fontSize:11,fontWeight:600,color: coin.change_24h >= 0 ? '#22c55e' : '#ef4444'}}>
+                    {coin.change_24h >= 0 ? '+' : ''}{coin.change_24h}%
                   </div>
                 </div>
-              </Card>
+              </div>
+            ))}
+            <Link to="/markets" style={{display:'block',textAlign:'center',marginTop:12,fontSize:13,fontWeight:600,color:'#3772ff',textDecoration:'none'}}>
+              {lang === 'it' ? 'Vedi tutti i mercati →' : 'View all markets →'}
+            </Link>
+          </div>
+
+          {/* Account Info */}
+          <div className="cb-sidebar-card">
+            <div className="cb-sidebar-title">{t.account}</div>
+            <div className="rk-info-row">
+              <span className="rk-info-label">{t.email}</span>
+              <span className="rk-info-value" style={{fontSize:13}}>{user?.email}</span>
+            </div>
+            <div className="rk-info-row">
+              <span className="rk-info-label">{t.username}</span>
+              <span className="rk-info-value">@{user?.username}</span>
+            </div>
+            <div className="rk-info-row">
+              <span className="rk-info-label">{t.ethAddress}</span>
+              <button onClick={() => copyToClipboard(user?.eth_wallet_address)} style={{display:'flex',alignItems:'center',gap:4,background:'none',border:'none',cursor:'pointer',color:'#3772ff',fontSize:13,fontWeight:600}}>
+                {user?.eth_wallet_address?.slice(0,6)}...{user?.eth_wallet_address?.slice(-4)}
+                <Copy className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="rk-info-row">
+              <span className="rk-info-label">{t.kycStatus}</span>
+              <span className={`rk-badge ${user?.kyc_status === 'approved' ? 'rk-badge-success' : user?.kyc_status === 'pending' ? 'rk-badge-warning' : 'rk-badge-neutral'}`}>
+                {user?.kyc_status === 'approved' ? t.verified : user?.kyc_status === 'pending' ? t.pendingReview : user?.kyc_status === 'under_review' ? t.underReview : user?.kyc_status === 'rejected' ? t.rejected : t.notVerified}
+              </span>
+            </div>
+          </div>
+
+          {/* Connected App */}
+          {user?.connected_app_name && (
+            <div className="cb-sidebar-card">
+              <div className="cb-sidebar-title">{t.connectedApps}</div>
+              <div style={{display:'flex',alignItems:'center',gap:12}}>
+                {user.connected_app_logo ? (
+                  <img src={user.connected_app_logo} alt={user.connected_app_name} style={{width:40,height:40,borderRadius:'50%',objectFit:'cover'}} />
+                ) : (
+                  <div style={{width:40,height:40,borderRadius:'50%',background:'var(--r-surface)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    <ExternalLink className="w-5 h-5" style={{color:'var(--r-text)'}} />
+                  </div>
+                )}
+                <div>
+                  <div style={{fontWeight:600,fontSize:14,color:'var(--r-onsurface)'}}>{user.connected_app_name}</div>
+                  <div style={{fontSize:12,color:'var(--r-text)'}}>{t.connected}</div>
+                </div>
+              </div>
             </div>
           )}
 
-          {/* Account Info */}
-          <div className={!user?.connected_app_name ? 'md:col-span-2' : ''}>
-            <div className="flex items-center justify-between mb-4 mt-8 md:mt-0">
-              <h2 className="text-lg font-semibold text-gray-900">{t.account}</h2>
-            </div>
-            <Card className="p-4">
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">{t.email}</span>
-                  <span className="text-gray-900">{user?.email}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">{t.username}</span>
-                  <span className="text-gray-900">@{user?.username}</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-500">{t.ethAddress}</span>
-                  <button 
-                    onClick={() => copyToClipboard(user?.eth_wallet_address)}
-                    className="flex items-center space-x-1 text-blue-600 hover:text-blue-700"
-                  >
-                    <span className="font-mono text-xs">
-                      {user?.eth_wallet_address?.slice(0, 6)}...{user?.eth_wallet_address?.slice(-4)}
-                    </span>
-                    <Copy className="w-3 h-3" />
-                  </button>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">{t.kycStatus}</span>
-                  <span className={`font-medium ${
-                    user?.kyc_status === 'approved' ? 'text-green-600' :
-                    user?.kyc_status === 'pending' ? 'text-yellow-600' :
-                    'text-gray-600'
-                  }`}>
-                    {
-                      user?.kyc_status === 'approved' ? t.verified :
-                      user?.kyc_status === 'pending' ? t.pendingReview :
-                      user?.kyc_status === 'under_review' ? t.underReview :
-                      user?.kyc_status === 'rejected' ? t.rejected :
-                      user?.kyc_status === 'not_started' ? t.notVerified :
-                      user?.kyc_status
-                    }
-                  </span>
-                </div>
-              </div>
-              <div className="mt-4 pt-4 border-t">
-                <Button 
-                  variant="outline" 
-                  className="w-full text-red-600 hover:text-red-700 hover:bg-red-50"
-                  onClick={() => { logout(); navigate('/'); }}
-                  data-testid="dashboard-signout-btn"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  {t.signOut}
-                </Button>
-              </div>
-            </Card>
+          {/* Quick Actions */}
+          <div className="cb-sidebar-card" style={{textAlign:'center'}}>
+            <Button variant="outline" className="w-full" style={{color:'#ef4444',borderColor:'rgba(239,68,68,0.3)'}} onClick={() => { logout(); navigate('/'); }} data-testid="dashboard-signout-btn">
+              <LogOut className="w-4 h-4 mr-2" />{t.signOut}
+            </Button>
           </div>
         </div>
-      </main>
+      </div>
 
       {/* Bottom Navigation */}
       <div className="rk-bottom-nav">
-        <button className="rk-bottom-nav-item active" data-testid="nav-home">
-          <Home className="w-5 h-5" />
-          <span>{t.home}</span>
-        </button>
-        <button className="rk-bottom-nav-item" data-testid="nav-swap" onClick={() => setShowSwapModal(true)}>
-          <Repeat className="w-5 h-5" />
-          <span>{t.swap}</span>
-        </button>
+        <button className="rk-bottom-nav-item active" data-testid="nav-home"><Home className="w-5 h-5" /><span>{t.home}</span></button>
+        <button className="rk-bottom-nav-item" data-testid="nav-swap" onClick={() => setShowSwapModal(true)}><Repeat className="w-5 h-5" /><span>{t.swap}</span></button>
       </div>
+
 
       {/* Receive Modal */}
       <Dialog open={showReceiveModal} onOpenChange={setShowReceiveModal}>

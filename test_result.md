@@ -703,3 +703,35 @@ agent_communication:
 
   - agent: "testing"
     message: "✅ WALLET DASHBOARD REDESIGN TESTING COMPLETE - ALL 3 TESTS PASSED (100%) - Comprehensive testing of redesigned Wallet Dashboard with Rockie styling completed successfully at desktop viewport 1920x1080. Admin login: admin@uniswapv4.com / admin123. DETAILED RESULTS: TEST 1 (Portfolio Header Gradient Background): ✅ PASSED - Portfolio header element (.rk-portfolio-header) found with gradient background: linear-gradient(135deg, rgb(15, 18, 41) 0%, rgb(22, 27, 58) 50%, rgb(13, 16, 37) 100%) - NOT plain white or flat ✅. Balance displayed prominently: €0,00 with font-size: 40px, font-weight: 800, color: white ✅. All 4 action buttons found (Swap, Send, Deposit, Withdraw) ✅. All 4 icon circles found with circular design: width=52px, height=52px, borderRadius=50% ✅. TEST 2 (Asset Cards Rockie Styling): ✅ PASSED - Section header 'Asset' found ✅. 'Vedi tutto' (See all) link found ✅. 2 asset cards found with .rk-card class (glass/rounded card design) ✅. Card styling verified: background color rgb(30, 34, 48), border-radius 16px, border 1px solid rgba(255, 255, 255, 0.06) ✅. USDC card has CryptoIcon SVG with circle and path elements (real crypto icon, NOT just letter) ✅. EUR card has CryptoIcon SVG with circle and path elements (real crypto icon, NOT just letter) ✅. TEST 3 (Page Functions Correctly): ✅ PASSED - Balance amount shown: €0,00 ✅. Deposit button clickable - modal opened successfully ✅. Swap button clicked but no modal appeared (expected behavior - swap disabled due to zero balance, shows toast 'Scambio non disponibile') ✅. No JavaScript errors detected ✅. No critical console error messages ✅. VERIFICATION SUMMARY: ✅ Portfolio header has dark gradient background (not plain white or flat) ✅ Balance displayed prominently with large font size ✅ Action buttons visible as circular icon buttons (52px diameter, 50% border-radius) ✅ Asset cards use new Rockie styling with rk-card class ✅ USDC and EUR cards show CryptoIcon SVGs (real crypto icons with circle and path elements) ✅ 'Asset' section header and 'Vedi tutto' link visible ✅ Page functions correctly - balance shown, buttons clickable, no JS errors. Screenshots: test1_portfolio_header.png (shows gradient header with circular action buttons), test2_asset_cards.png (shows USDC and EUR cards with SVG icons), test3_page_functions.png (shows Deposit modal opening). OVERALL RESULT: 3/3 tests passed (100% pass rate). The Wallet Dashboard redesign with Rockie styling is COMPLETE and VERIFIED."
+
+  - task: "Wallet Dashboard - Coinbase Pro-style Redesign"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/WalletDashboard.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Redesigned wallet dashboard with Coinbase Pro-style two-panel layout. LEFT PANEL: Portfolio card with balance (€ amount), eye toggle, 'PORTAFOGLIO' label, 4 horizontal pill-style action buttons (Invia, Deposita, Scambia, Preleva), asset list with USDC and EUR rows. RIGHT PANEL: Market prices card ('Prezzi di Mercato') with live BTC/ETH prices and 'Vedi tutti i mercati →' link, Account info card with Email, Username, ETH Address, KYC Status ('VERIFICATO' badge), Sign out button. Grid layout: ~60% left, ~40% right. Responsive design with mobile breakpoints. Uses RockieWallet.css for styling."
+      - working: true
+        agent: "testing"
+        comment: "✅ COMPREHENSIVE TESTING COMPLETE - ALL 5 TESTS PASSED (100%). Tested Coinbase Pro-style wallet dashboard at https://uniswap-v4-preview.preview.emergentagent.com/wallet with admin@uniswapv4.com login. DETAILED RESULTS: TEST 1 (Two-panel layout): ✅ PASSED - Dashboard container found with grid: 828px 380px (correct ~60/40 split). Left panel has portfolio card, action buttons, and asset list. Right panel has sidebar cards. TEST 2 (Portfolio card): ✅ PASSED - Balance displays '€0,00' with Euro symbol. Label shows 'PORTAFOGLIO' (Italian). Eye toggle works perfectly: clicking hides balance (shows ••••••), clicking again shows balance. TEST 3 (Action buttons pill-style): ✅ PASSED - Found 4 action buttons with correct Italian labels: 'Invia', 'Deposita', 'Scambia', 'Preleva'. Buttons are pill-style with borderRadius=12px. Clicking 'Deposita' successfully opens deposit modal. TEST 4 (Market prices sidebar): ✅ PASSED - Market prices card found with title 'Prezzi di Mercato'. Shows 4 market rows including Bitcoin ($83,170.00, -3.6%) and Ethereum ($2,557.36, -5.83%) with real dollar prices. 'Vedi tutti i mercati →' link present. TEST 5 (Account info sidebar): ✅ PASSED - Account card found with all 4 required fields: Email (admin@uniswapv4.com), Username (@admin), ETH Address, KYC Status. KYC badge shows 'VERIFICATO' (verified status). NO ERRORS: No console errors or error messages found on page. The Coinbase Pro-style wallet dashboard redesign is COMPLETE and FULLY FUNCTIONAL. All UI elements render correctly, all interactions work as expected, and the layout matches the specification perfectly."
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: "Implemented Coinbase Pro-style wallet dashboard redesign with two-panel layout. Ready for comprehensive testing of all 5 test scenarios: 1) Two-panel layout verification 2) Portfolio card with eye toggle 3) Pill-style action buttons 4) Market prices sidebar 5) Account info sidebar. Please test at http://localhost:3000/wallet after logging in as admin@uniswapv4.com / admin123."
+  - agent: "testing"
+    message: "✅ TESTING COMPLETE - ALL 5 TESTS PASSED! The Coinbase Pro-style wallet dashboard is working perfectly. Two-panel layout verified (828px left, 380px right), portfolio card with working eye toggle and 'PORTAFOGLIO' label, 4 pill-style action buttons (Invia, Deposita, Scambia, Preleva) with deposit modal working, market prices sidebar showing live BTC/ETH prices with 'Vedi tutti i mercati →' link, and account info sidebar with all fields (Email, Username, ETH Address, KYC Status 'VERIFICATO'). No errors detected. Screenshots saved. Ready for main agent to summarize and finish."

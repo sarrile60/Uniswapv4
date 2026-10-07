@@ -1,81 +1,135 @@
-# Markets Page — Live Cryptocurrency Explorer
+# Wallet Dashboard — Coinbase Pro Redesign with Rockie Theme
 
-A dedicated Markets page where users browse all available cryptocurrencies with real-time prices, search/filter, and click into individual coin detail pages with price charts and key statistics.
+A complete visual overhaul of the Wallet Dashboard page to match the Coinbase Pro / Advanced Trade aesthetic, built on top of the existing Rockie dark theme. All existing functionality (balances, send, receive, swap, withdraw, alerts, modals, notifications, freeze logic, timer, fee system) is preserved exactly — only the presentation layer changes.
 
-Designed for all users (logged in or not) who want to explore the crypto market before trading.
+## Who it's for
+
+Logged-in users who manage their crypto portfolio. The redesign makes the wallet feel like a professional trading platform instead of a simple balance viewer.
 
 ## Core features and experience
 
-### Markets List Page (`/markets`)
-- **Header**: "Markets" title with a search bar to filter coins by name or symbol.
-- **Category tabs**: All, DeFi, NFT, Layer 1, Stablecoins — filters the displayed list.
-- **Coin table**: Each row shows rank, coin icon (CryptoIcon SVG), name, symbol, live price, 24h change %, 7d sparkline mini-chart, market cap, and 24h volume. Data pulled from the existing `/api/market/prices` endpoint (CoinGecko cached).
-- **Sorting**: Click column headers to sort by price, change, market cap, or volume.
-- **Favorites column**: Star icon to save favorites (same localStorage system already built for the landing page).
-- **Responsive**: On mobile, the table collapses to card-style rows showing coin, price, and change only.
+### Layout — Three-Panel Dashboard
 
-### Coin Detail Page (`/markets/:symbol`)
-- **Price header**: Large coin icon, name, current price, 24h change badge, 24h high/low.
-- **Price chart**: Interactive line chart showing price history. Uses a lightweight charting approach (SVG-based or a small library). Timeframe toggles: 1D, 1W, 1M, 3M, 1Y.
-- **Key stats grid**: Market cap, 24h volume, circulating supply, all-time high, all-time low.
-- **About section**: Short description of the cryptocurrency.
-- **Action button**: "Trade" button linking to the register page (or wallet if logged in).
-- **Back to markets link**.
+The single-column wallet is replaced with a Coinbase Pro–inspired multi-panel layout:
 
-### Data source
-- Extends the existing `/api/market/prices` backend endpoint to also return market cap, volume, and image URL (already returned by CoinGecko but not all fields are exposed).
-- Adds a new `/api/market/coin/:id` endpoint for individual coin detail (price history, description) — also from CoinGecko free API with server-side caching.
-- No new database tables needed.
+**Left Panel — Portfolio & Assets (main column, ~60% width)**
+- **Portfolio value header** — large balance in EUR with 24h change (amount + percentage), eye toggle to hide balances. Subtle gradient or solid dark card background.
+- **Action button strip** — four pill buttons in a row: Send, Receive, Swap, Withdraw. Compact, Coinbase-style rounded pills with icons, not the current large circles.
+- **Asset list** — each asset as a row: CryptoIcon SVG, name + symbol, sparkline mini-chart (7d from market API), current price, 24h change %, user's balance + fiat equivalent. Clickable rows navigate to Transactions. This replaces the two static USDC/EUR cards.
+- **Alert banners** — freeze/KYC/fee alerts appear above the asset list, same logic, restyled as compact notification bars.
+
+**Right Panel — Market Overview + Account (~40% width)**
+- **Live prices card** — real-time prices of top coins (BTC, ETH, SOL, BNB) from the existing market API, each showing icon, name, price, and 24h change. Updates every 60s. Clicking a row goes to `/markets/:symbol`.
+- **Account info card** — email, username, ETH address (truncated + copy), KYC status badge. Compact layout.
+- **Connected app card** — if the user has a connected app, shows it here.
+- **Quick actions** — "View Transactions" link, "Complete KYC" button (if unverified).
+
+**On mobile (< 768px)** — panels stack vertically: portfolio header → action buttons → asset list → market card → account card. The right panel content drops below the main content.
+
+### Portfolio Header Detail
+
+- Total portfolio value calculated from all wallet balances × current market prices (using the existing market API for exchange rates).
+- 24h change calculated from the USDC/EUR exchange rate change (already available).
+- Green up arrow or red down arrow with the change amount and percentage.
+- "Portfolio" / "Portafoglio" label above the balance.
+- Eye icon to toggle balance visibility (already implemented).
+- Refresh button with spin animation (already implemented).
+
+### Asset List Detail
+
+Each row in the asset list shows:
+- Rank number
+- CryptoIcon SVG (already available for USDC, EUR, BTC, ETH, etc.)
+- Asset name + symbol (e.g., "USD Coin" / "USDC")
+- Mini sparkline chart (inline SVG, same style as landing page table)
+- Current market price in USD
+- 24h price change percentage (green/red)
+- User's balance in the asset (e.g., "271,493.83 USDC")
+- Fiat equivalent (e.g., "≈ €242,071")
+- Locked balance indicator if applicable
+
+The list shows whatever wallets the user has (currently USDC + EUR, expandable by admin).
+
+### Action Buttons
+
+Four compact pill buttons replacing the large circle buttons:
+- **Send** — opens existing Send modal
+- **Receive** — opens existing Receive/Deposit modal
+- **Swap** — opens existing Swap modal
+- **Withdraw** — opens existing Withdraw modal
+
+Styled as horizontal pills with icon + text, Coinbase Pro style (dark bg, subtle border, hover glow).
+
+### Modals
+
+All five existing modals (Receive, Send, Swap, Withdraw, Freeze) keep their exact logic but get a visual refresh:
+- Darker glassmorphism background matching the Rockie card style.
+- Cleaner form layouts with better spacing.
+- More prominent CTA buttons.
+- Same fields, same validation, same API calls — just better-looking wrappers.
+
+### Bottom Navigation (Mobile)
+
+Same two-tab mobile nav (Home, Swap) restyled to match the new dashboard aesthetic.
 
 ## User flow
 
-1. User clicks "Markets" / "Mercati" in the header nav → lands on `/markets`.
-2. Sees a table of all tracked cryptocurrencies with live prices.
-3. Can search by name, filter by category, sort by any column.
-4. Clicks a coin row → navigates to `/markets/BTC` (or ETH, SOL, etc.).
-5. Sees the coin's price chart, stats, and description.
-6. Clicks "Trade" → goes to register (or wallet if logged in).
-7. Clicks back → returns to the markets list.
+1. User logs in → lands on the redesigned Wallet Dashboard.
+2. Sees their total portfolio value with 24h change at the top.
+3. Below that, four action pill buttons (Send, Receive, Swap, Withdraw).
+4. Scrolls through their asset list showing all holdings with live prices and sparklines.
+5. On the right (or below on mobile), sees live market prices for top coins and their account info.
+6. Taps any action button → same modals open with the same flows.
+7. Taps an asset row → navigates to Transactions.
+8. Everything looks and feels like Coinbase Pro but with Rockie's dark theme colors.
 
 ## UI/UX feel
 
-- Follows the established Rockie dark theme: #0f1017 background, #1e2230 cards, #3772ff primary.
-- The markets table uses the existing `rk-card` design system from `RockieWallet.css`.
-- Coin detail page has a full-width price chart area with the glassmorphism card style.
-- Category tabs use the `rk-tab` / `rk-tab.active` pill styling.
-- Search bar matches the Rockie input styling.
-- Sparkline mini-charts in the table use inline SVGs (same approach as the landing page).
-- All text uses i18n `t.*` keys — table headers, category names, stats labels, "Trade" button all translated IT/EN.
-- Fully responsive: table → card layout on mobile.
-- Page wrapped in `RockieLayout` (gets the header, dark/light toggle, footer automatically).
+- **Color palette**: #0f1017 page bg, #1e2230 card bg, rgba(255,255,255,0.06) borders, #3772ff primary, #22c55e success, #ef4444 danger — the established Rockie palette.
+- **Typography**: DM Sans, large bold balance (36–42px), medium section headers (18px), clean data text (14px).
+- **Cards**: 16px border-radius, subtle box-shadow, glassmorphism on hover.
+- **Layout**: CSS Grid — `grid-template-columns: 1fr 380px` on desktop, single column on mobile.
+- **Transitions**: 0.3s ease on hovers, cards have subtle lift on hover.
+- **Sparklines**: Inline SVG mini-charts in asset rows (same approach as landing page).
+- **i18n**: All text uses existing `t.*` keys — nothing is hardcoded. Italian and English both work.
+- **Dark/light toggle**: Fully supported. The existing RockieLayout wrapper handles this — the dashboard uses CSS variables that adapt.
+- **Responsive breakpoints**: Desktop (> 1024px) three-panel, tablet (768–1024px) two-panel, mobile (< 768px) single column stacked.
 
 ## Implementation phases
 
 ### Phase 1 — MVP (built now)
 | # | Item | Detail |
 |---|------|--------|
-| 1 | Markets list page | `/markets` route with coin table, search, category filters, sorting, favorites |
-| 2 | Coin detail page | `/markets/:symbol` route with price header, chart (SVG-based), stats grid, about text |
-| 3 | Backend endpoints | Extend `/api/market/prices` to expose all CoinGecko fields; add `/api/market/coin/:id` for detail + price history |
-| 4 | Navigation wiring | "Markets" / "Mercati" header link points to `/markets` instead of `/#crypto-section` or `/wallet` |
-| 5 | i18n translations | All new strings (table headers, stat labels, categories, "Trade", "Back to Markets") added in EN + IT |
-| 6 | Responsive | Mobile card layout for the table, chart scales down properly |
+| 1 | Layout restructure | Replace the single-column layout with a CSS Grid two-panel layout (main + sidebar). Add responsive breakpoints. |
+| 2 | Portfolio header redesign | Large balance, 24h change with arrow, eye toggle, refresh — all in a clean Coinbase Pro style header card. |
+| 3 | Action button strip | Replace large circle buttons with compact horizontal pill buttons (icon + text). Same onClick handlers. |
+| 4 | Asset list table | Replace the two static USDC/EUR cards with a dynamic asset list showing all user wallets as rows with sparklines, prices, balances. |
+| 5 | Market overview sidebar | Add a live prices card showing top coins (BTC, ETH, SOL, BNB) with prices and 24h change from the market API. |
+| 6 | Account info sidebar | Move account details (email, username, ETH address, KYC status) to a compact sidebar card. |
+| 7 | Alert banners restyle | Same freeze/KYC/fee alert logic, restyled as compact notification bars fitting the new layout. |
+| 8 | Modal visual refresh | Same modal logic, updated CSS to match the new card styling. |
+| 9 | Mobile responsive | Stack panels vertically on mobile, ensure bottom nav works. |
+| 10 | Testing | Full test pass: balances display, modals open, alerts show, dark/light mode works, mobile layout correct. |
 
 ### Phase 2 (future)
-- Advanced charting with candlestick view and technical indicators.
-- Coin comparison tool (overlay two coins on one chart).
-- Price alerts — set a target price and get notified.
+- Portfolio performance chart (line chart showing balance over time).
+- Asset allocation pie chart.
+- Price alerts (set target price, get notified).
+- Advanced order types in the sidebar.
 
 ### Phase 3 (future)
-- Full Buy/Sell flow pages (select coin → enter amount → confirm → receipt).
-- Order book and limit orders.
-- Recurring buy scheduling.
+- Full trading view with candlestick charts and order book.
+- Tabbed interface: Portfolio / Trade / Earn / NFTs.
+- Deposit/withdrawal history timeline.
 
 ## Assumptions
 
-- The markets page is public (accessible without login). Favorites require login.
-- CoinGecko free API is used for all data. The existing 60-second cache is extended to cover the new endpoints. Rate limiting is handled gracefully with stale-cache fallback (already implemented).
-- The price chart on the coin detail page uses SVG-based rendering (no heavy charting library like Chart.js or TradingView). This keeps the bundle small. A lightweight approach with animated SVG paths, similar to the existing sparklines but larger and interactive.
-- The initial coin list includes the 8 coins already tracked (BTC, ETH, USDT, BNB, ADA, SOL, XRP, DOT). The backend can be expanded later to track more.
-- "Trade" button on the coin detail page links to `/register` for non-logged-in users and `/wallet` for logged-in users. No actual buy/sell flow is built in Phase 1.
-- The Markets page replaces the current "Markets" nav link behavior (which currently goes to `/#crypto-section` on landing or `/wallet` when logged in).
+- **Only the Wallet Dashboard page is redesigned.** Transactions, Profile, KYC pages stay as-is.
+- **All existing JavaScript logic is preserved exactly.** State variables, useEffects, API calls, modal handlers, alert logic, timer system, fee calculations, SSE connection, heartbeat — none of this changes. Only the JSX rendering and CSS classes change.
+- **The asset list shows whatever wallets the user has in the database.** Currently most users have USDC + EUR. If admin assigns more assets (BTC, ETH, etc.), they appear automatically.
+- **Sparkline data for each asset** is fetched from the existing `/api/market/prices` endpoint. For assets without market data (like EUR), no sparkline is shown.
+- **The right sidebar market prices card** uses the same `/api/market/prices` data already fetched by the landing page — no new API calls needed, just a new display component.
+- **Modal HTML structure** may change (better wrappers, spacing) but all form fields, validation, submit handlers, and error handling remain identical.
+- **The admin preview banner** (shown when admin views the wallet) stays at the top, above the new layout.
+- **The existing RockieWallet.css** design system classes are reused and extended where needed.
+- **No backend changes required.** This is a pure frontend redesign.
