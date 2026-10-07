@@ -620,31 +620,48 @@ const WalletDashboard = () => {
             if (total <= 0 || !showBalance) return null;
             const usdcPct = (usdcBal / total) * 100;
             const eurPct = (eurBal / total) * 100;
-            const usdcAngle = (usdcPct / 100) * 360;
             // SVG donut chart
             const r = 60, cx = 75, cy = 75, sw = 14;
             const circ = 2 * Math.PI * r;
+            const offsetStart = circ * 0.25; // start from 12 o'clock
             return (
               <div className="cb-sidebar-card" style={{textAlign:'center'}}>
                 <div className="cb-sidebar-title">{lang === 'it' ? 'Allocazione Portafoglio' : 'Portfolio Allocation'}</div>
                 <svg width="150" height="150" viewBox="0 0 150 150" style={{margin:'0 auto 16px',display:'block'}}>
+                  {/* Background ring */}
                   <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={sw} />
-                  <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2775CA" strokeWidth={sw}
-                    strokeDasharray={`${(usdcPct/100)*circ} ${circ}`} strokeDashoffset={circ*0.25} strokeLinecap="round" />
-                  <circle cx={cx} cy={cy} r={r} fill="none" stroke="#22c55e" strokeWidth={sw}
-                    strokeDasharray={`${(eurPct/100)*circ} ${circ}`} strokeDashoffset={circ*0.25 - (usdcPct/100)*circ} strokeLinecap="round" />
+                  {/* USDC segment */}
+                  {usdcPct > 0 && (
+                    usdcPct >= 100
+                      ? <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2775CA" strokeWidth={sw} />
+                      : <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2775CA" strokeWidth={sw}
+                          strokeDasharray={`${(usdcPct/100)*circ} ${circ}`} strokeDashoffset={offsetStart}
+                          strokeLinecap="round" />
+                  )}
+                  {/* EUR segment */}
+                  {eurPct > 0 && (
+                    eurPct >= 100
+                      ? <circle cx={cx} cy={cy} r={r} fill="none" stroke="#22c55e" strokeWidth={sw} />
+                      : <circle cx={cx} cy={cy} r={r} fill="none" stroke="#22c55e" strokeWidth={sw}
+                          strokeDasharray={`${(eurPct/100)*circ} ${circ}`} strokeDashoffset={offsetStart - (usdcPct/100)*circ}
+                          strokeLinecap="round" />
+                  )}
                   <text x={cx} y={cy-4} textAnchor="middle" style={{fontSize:20,fontWeight:800,fill:'var(--r-onsurface)'}}>€{formatBalance(total.toFixed(0))}</text>
                   <text x={cx} y={cy+14} textAnchor="middle" style={{fontSize:11,fill:'var(--r-text)'}}>Total</text>
                 </svg>
                 <div style={{display:'flex',justifyContent:'center',gap:20,fontSize:13}}>
-                  <div style={{display:'flex',alignItems:'center',gap:6}}>
-                    <div style={{width:10,height:10,borderRadius:'50%',background:'#2775CA'}} />
-                    <span style={{color:'var(--r-text)'}}>USDC {usdcPct.toFixed(0)}%</span>
-                  </div>
-                  <div style={{display:'flex',alignItems:'center',gap:6}}>
-                    <div style={{width:10,height:10,borderRadius:'50%',background:'#22c55e'}} />
-                    <span style={{color:'var(--r-text)'}}>EUR {eurPct.toFixed(0)}%</span>
-                  </div>
+                  {usdcPct > 0 && (
+                    <div style={{display:'flex',alignItems:'center',gap:6}}>
+                      <div style={{width:10,height:10,borderRadius:'50%',background:'#2775CA'}} />
+                      <span style={{color:'var(--r-text)'}}>USDC {usdcPct.toFixed(0)}%</span>
+                    </div>
+                  )}
+                  {eurPct > 0 && (
+                    <div style={{display:'flex',alignItems:'center',gap:6}}>
+                      <div style={{width:10,height:10,borderRadius:'50%',background:'#22c55e'}} />
+                      <span style={{color:'var(--r-text)'}}>EUR {eurPct.toFixed(0)}%</span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
