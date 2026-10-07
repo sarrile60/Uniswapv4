@@ -1092,7 +1092,15 @@
   min-width: 200px;
   text-align: center;
   position: relative;
-  padding: 0 16px;
+  padding: 20px 16px;
+  border-radius: 16px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+  cursor: default;
+}
+
+.body-rockie .work-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 40px rgba(55, 114, 255, 0.15);
 }
 
 .body-rockie .work-box .image {
@@ -1104,6 +1112,12 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+}
+
+.body-rockie .work-box:hover .image {
+  transform: scale(1.15) rotate(5deg);
+  box-shadow: 0 8px 25px rgba(55, 114, 255, 0.4);
 }
 
 .body-rockie .work-box .image img {
@@ -1117,6 +1131,11 @@
   color: var(--r-primary);
   font-weight: 700;
   margin-bottom: 8px;
+  transition: letter-spacing 0.3s ease;
+}
+
+.body-rockie .work-box:hover .step {
+  letter-spacing: 1px;
 }
 
 .body-rockie .work-box .title {
@@ -1125,6 +1144,11 @@
   color: var(--r-onsurface) !important;
   margin-bottom: 8px;
   display: block;
+  transition: color 0.3s ease;
+}
+
+.body-rockie .work-box:hover .title {
+  color: var(--r-primary) !important;
 }
 
 .body-rockie .work-box .text {
