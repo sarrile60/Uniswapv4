@@ -1,63 +1,92 @@
-# Header Avatar Initials, Session Timeout & Dark-Mode Fixes
+# Wallet & Inner Pages — Full Rockie Theme Redesign
 
-Uniswap V4's header avatar currently shows a generic person icon for all users. When a client is logged in it should instead display a circle with their **first-name initial + last-name initial** (e.g. "JD" for John Doe). The session currently lasts 7 days; the user wants a **24-hour** expiry. Several pages also have dark-mode colour bugs that need fixing.
+A complete visual overhaul of the user-facing wallet, transactions, profile, and KYC pages to match the Rockie cryptocurrency exchange template aesthetic. All existing functionality is preserved; only the presentation layer changes.
 
-## Who it's for
-End-users who log in to the platform and navigate across Landing, Wallet, Transactions, Profile, FAQ/Terms, and Privacy pages.
+Designed for end-users who interact with the wallet dashboard, view transactions, manage their profile, and complete KYC verification.
 
 ## Core features and experience
 
-1. **Avatar with initials (desktop only for now)**
-   - When logged in the blue avatar circle in the header shows the user's first + last initial in white text (e.g. "JD"), replacing the generic person SVG.
-   - When not logged in, the avatar stays as the current generic person icon linking to `/login`.
-   - Mobile: no change — avatar remains hidden per user request.
+The redesign covers four pages. Each page adopts the Rockie dark-theme design language: rounded cards with subtle glass effects, the DM Sans typeface, the established color palette (#0f1017 background, #1e2230 cards, #3772ff primary, #58bd7d success, #ef4444 danger), and the same icon set (Lucide). No backend changes are required — the redesign is purely frontend.
 
-2. **24-hour session timeout**
-   - JWT token expiry changed from 168 hours (7 days) → **24 hours**.
-   - After 24 h the token expires, API calls return 401, and the frontend redirects to `/login`.
+### Wallet Dashboard
+- **Portfolio header** — Full-width gradient banner (dark blue → indigo) showing total balance, 24h change, eye toggle. Clean, large typography.
+- **Action bar** — Four circular action buttons (Swap, Send, Deposit, Withdraw) in a horizontal strip below the banner, with hover glow effects.
+- **Asset cards** — Two-column grid on desktop, stacked on mobile. Each card shows the real CryptoIcon SVG, asset name, balance, fiat equivalent, and a subtle sparkline or change badge. Cards have the glassmorphism look (semi-transparent bg, soft border, shadow).
+- **Account section** — Clean info rows (email, username, ETH address, KYC status) inside a Rockie-styled card.
+- **Connected app** — If present, a branded card showing the connected service.
+- **Alert banners** — Styled with Rockie alert components (left border accent, muted background, clear CTA button).
+- **Modals** (Receive, Send, Swap, Withdraw, Freeze) — Redesigned with Rockie modal styling: dark glass background, rounded corners, clear section dividers, prominent CTA button.
+- **Mobile bottom nav** — Two-tab (Home, Swap) bar at the bottom, matching Rockie's mobile nav style.
 
-3. **Dark-mode colour fixes across pages**
-   - **Terms of Service / FAQ page** — uses Tailwind light-mode classes (`text-gray-900`, `bg-gray-50`, etc.) that become invisible on the forced dark background. Will be rewritten with explicit dark-friendly styles (same approach already applied to About page).
-   - **Privacy Policy page** — same treatment.
-   - **Wallet Dashboard bottom nav bar** — `bg-white` mobile bottom nav renders as near-invisible dark bar; will get explicit dark styling.
-   - **Wallet modals and inner cards** — audit any remaining `bg-white`, `text-gray-900`, `bg-gray-100` usages that clash with the dark override and patch them.
-   - **EN/USD language toggle** — the "Italiano / EUR" option in the header dropdown is not clickable / does nothing. Wire it to the existing `toggleLang()` i18n function so clicking switches the UI language and closes the dropdown.
+### Transactions Page
+- **Filter tabs** — Horizontal pill tabs (All, Deposits, Withdrawals, Sends, Receives, Swaps) matching Rockie tab styling.
+- **Transaction list** — Each transaction as a Rockie-styled row/card: icon on left (colored circle with directional arrow), asset name + type, amount + fiat value on right, fee badge, status badge, expandable detail area.
+- **Pagination** — Rockie-styled prev/next buttons.
+- **Empty state** — Centered illustration placeholder with message.
+
+### Profile Page
+- **Profile header** — User avatar (initials circle), name, email, member-since date.
+- **Info sections** — Two-column card grid: Personal Info (email, phone, DOB, username) and Wallet & Security (ETH address, account status, KYC status).
+- **Change password** — Rockie-styled dialog/modal with form fields.
+- **KYC badge** — Prominent verification status with action button if unverified.
+
+### KYC Page
+- **Step progress** — Visual step indicator (1–2–3 dots or bar) showing document type → upload → selfie/video.
+- **Upload zones** — Rockie drag-and-drop style upload areas with dashed borders, icon, and helper text.
+- **Document preview** — Thumbnail display of uploaded documents.
+- **Status states** — Pending review, approved, rejected screens with appropriate Rockie styling.
+- The complex KYC logic (camera, video, in-app browser detection) remains untouched — only the visual wrapper changes.
 
 ## User flow
-1. User opens the site → sees landing page with dark theme, real-time prices.
-2. User logs in → header avatar switches from person icon to "JD" initials circle.
-3. User clicks EN/USD dropdown → can toggle between English / USD and Italiano / EUR.
-4. User visits Terms, Privacy, Wallet pages → all text clearly visible on dark background.
-5. After 24 hours of inactivity the token expires → user is returned to login.
+
+1. User logs in → lands on the redesigned Wallet Dashboard.
+2. Taps an action button (Send/Receive/Swap/Withdraw) → modal opens in new Rockie style.
+3. Navigates to Transactions → sees filtered, paginated list in new design.
+4. Navigates to Profile → views personal info, can change password.
+5. Navigates to KYC → completes verification through redesigned step flow.
+6. All dark/light mode toggle behavior is preserved from the RockieLayout wrapper.
 
 ## UI/UX feel
-- Avatar circle stays the same blue (#3772ff) background with white bold initials, same 40 px size.
-- Dark-mode fixes use the established palette: `#141416` body, `#222630` cards, `#fff` headings, `#b1b5c3` body text, `#23262f` borders.
-- No layout or structural changes — only colour corrections and the avatar text swap.
+
+- **Dark mode default**: #0f1017 body, #1e2230 cards, rgba(255,255,255,0.06) borders, #f0f2f5 headings, #9ca3b4 secondary text.
+- **Light mode**: #f3f4f6 body, #ffffff cards, standard Tailwind borders, dark text.
+- Cards use `border-radius: 16px`, `backdrop-filter: blur` where appropriate.
+- Buttons: primary blue (#3772ff) with rounded-full pill shape, hover lift with shadow.
+- All text uses the i18n `t.*` keys — zero hardcoded strings. Italian and English both work.
+- Responsive: mobile-first layout with stacked cards, collapsible sections, and proper bottom nav spacing.
+- Transitions: 0.3s ease on hovers, card entrances use the existing `reveal` scroll animation class.
 
 ## Implementation phases
 
 ### Phase 1 — MVP (built now)
 | # | Item | Detail |
 |---|------|--------|
-| 1 | Avatar initials | Replace generic SVG with first + last initial when `user` prop is present. Keep generic SVG for logged-out state. |
-| 2 | Session timeout | Change `ACCESS_TOKEN_EXPIRE_HOURS` from 168 → 24 in `auth.py`. |
-| 3 | Terms/FAQ dark fix | Rewrite `TermsOfServicePage.js` with inline dark styles (same pattern as the About page fix). |
-| 4 | Privacy dark fix | Same rewrite for `PrivacyPolicyPage.js`. |
-| 5 | Wallet dark audit | Fix bottom nav, modal backgrounds, and any remaining light-mode artefacts in `WalletDashboard.js` and `theme-override.css`. |
-| 6 | Language toggle | Wire "Italiano / EUR" click in RockieHeader to `toggleLang` from the i18n context; close dropdown on selection. |
-| 7 | Testing agent | Run full verification of all 6 items above. |
+| 1 | Wallet Dashboard redesign | Rewrite `WalletDashboard.js` UI with Rockie-styled components. Keep all state, API calls, and modal logic intact. New layout: gradient header, action bar, asset card grid, account card, alert banners. |
+| 2 | Wallet modals redesign | Restyle all five modals (Receive, Send, Swap, Withdraw, Freeze) with Rockie dark-glass look. |
+| 3 | Transactions page redesign | Rewrite `TransactionsPage.js` UI. New filter pill tabs, transaction row cards, pagination, empty state. |
+| 4 | Profile page redesign | Rewrite `ProfilePage.js` UI. New profile header, info card grid, change-password modal. |
+| 5 | KYC page visual refresh | Update `KYCPage.js` wrapper styling — step indicator, upload zones, status screens. Preserve all camera/video/upload logic. |
+| 6 | Mobile responsive polish | Ensure all four pages render perfectly on 390×844 (iPhone) and 768×1024 (iPad). Bottom nav, stacked cards, no horizontal overflow. |
+| 7 | Testing | Full test pass on all four pages in both dark and light mode, desktop and mobile. |
 
 ### Phase 2 (future)
-- Sliding session refresh (extend token on activity) so active users never get logged out mid-session.
-- Persist language preference in `localStorage`.
+- Dedicated Swap/Exchange page with two-panel layout (select pair, enter amount, confirm).
+- Portfolio analytics: pie chart of asset allocation, historical balance chart.
+- Price alerts and watchlist.
 
 ### Phase 3 (future)
-- Gravatar / uploaded profile picture in the avatar circle.
-- Push-notification support with browser Notification API.
+- Full spot trading page with order book, candlestick chart, and trade history.
+- Staking / DeFi yield page.
+- NFT gallery page.
 
 ## Assumptions
-- "24 hours" means a hard 24-hour token lifetime from login, not 24 hours of inactivity. There is no sliding session at present.
-- The Italiano / EUR toggle will use the existing `toggleLang` i18n machinery already in the codebase; no new translations are being added.
-- Mobile avatar remains hidden as explicitly requested — no changes to mobile header layout.
-- Admin panel pages are untouched (they use their own Tailwind dark styles and are not wrapped in RockieLayout).
+
+- Login, Register, Forgot Password, and Reset Password pages are NOT redesigned — they stay as-is.
+- Admin panel is NOT redesigned — it keeps its current layout and toggle.
+- The RockieHeader (site header with nav, notifications, avatar) is NOT changed — it already matches the Rockie theme.
+- The RockieLayout wrapper (which provides dark/light toggle and the header) is NOT changed.
+- All existing backend API contracts remain the same — no backend changes.
+- The KYC page's camera, video, and upload JavaScript logic is preserved exactly; only the surrounding CSS/HTML structure changes.
+- "Swap exchange" refers to the existing swap modal (USDC ↔ EUR), not a new trading page. A dedicated exchange page is deferred to Phase 2.
+- All existing i18n translations continue to work — the redesign uses the same `t.*` keys.
+- The existing theme-override.css dark/light scoping is preserved and extended as needed for new components.

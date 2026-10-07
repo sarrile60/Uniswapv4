@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang, dateFmt } from '@/i18n';
 import { Button } from '@/components/ui/button';
+import './RockieWallet.css';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { 
@@ -354,8 +355,8 @@ const WalletDashboard = () => {
       )}
 
       {/* Portfolio Section */}
-      <div className="bg-gradient-to-r from-[#1a1f3c] to-[#121530] text-white">
-        <div className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 pt-4 pb-6">
+      <div className="rk-portfolio-header">
+        <div className="rk-portfolio-inner">
 
           {/* Portfolio Section */}
 
@@ -417,23 +418,23 @@ const WalletDashboard = () => {
           {/* Portfolio Section */}
           <div className="flex items-start justify-between">
             <div>
-              <div className="flex items-center space-x-2 text-gray-400 text-sm mb-1">
+              <div className="rk-portfolio-label">
                 <User className="w-4 h-4" />
                 <span>{t.portfolio}</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-3xl lg:text-4xl font-bold">&euro;{formatBalance(totalBalance())}</span>
+              <div className="rk-portfolio-balance">
+                <span>&euro;{formatBalance(totalBalance())}</span>
                 <button 
                   onClick={() => setShowBalance(!showBalance)}
                   className="p-1 hover:bg-white/10 rounded"
                 >
-                  {showBalance ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                  {showBalance ? <Eye className="w-4 h-4" style={{opacity:0.5}} /> : <EyeOff className="w-4 h-4" style={{opacity:0.5}} />}
                 </button>
               </div>
               {showBalance && (
-                <div className={`flex items-center space-x-1 text-sm mt-1 ${exchangeRate.change_24h_pct >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                <div className={`rk-portfolio-change ${exchangeRate.change_24h_pct >= 0 ? 'up' : 'down'}`}>
                   <span>{exchangeRate.change_24h_pct >= 0 ? '\u2191' : '\u2193'} &euro;{formatBalance(Math.abs(parseFloat(totalBalance()) * exchangeRate.change_24h_pct / 100).toFixed(2))} ({Math.abs(exchangeRate.change_24h_pct).toFixed(2)}%)</span>
-                  <span className="text-gray-400">{t.past24hr}</span>
+                  <span className="muted">{t.past24hr}</span>
                 </div>
               )}
             </div>
@@ -442,71 +443,54 @@ const WalletDashboard = () => {
               disabled={loading}
               className="p-2 hover:bg-white/10 rounded-full"
             >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} style={{color:'rgba(255,255,255,0.5)'}} />
             </button>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between md:justify-start md:space-x-8 mt-6">
+          <div className="rk-actions">
             <button 
               data-testid="swap-btn"
-              className="flex flex-col items-center space-y-2"
-              onClick={() => {
-                if (eligibility.swap?.allowed) setShowSwapModal(true);
-                else toast.error(t.swapNotAvailable);
-              }}
+              className={`rk-action-btn ${!eligibility.swap?.allowed ? 'disabled' : ''}`}
+              onClick={() => { if (eligibility.swap?.allowed) setShowSwapModal(true); else toast.error(t.swapNotAvailable); }}
             >
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition ${eligibility.swap?.allowed ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 opacity-60'}`}>
-                <ArrowLeftRight className="w-5 h-5" />
-              </div>
-              <span className="text-xs">{t.swap}</span>
+              <div className="icon-circle"><ArrowLeftRight className="w-5 h-5" /></div>
+              <span>{t.swap}</span>
             </button>
             <button 
               data-testid="send-btn"
-              className="flex flex-col items-center space-y-2"
-              onClick={() => {
-                if (eligibility.send?.allowed) setShowSendModal(true);
-                else toast.error(t.sendNotAvailable);
-              }}
+              className={`rk-action-btn ${!eligibility.send?.allowed ? 'disabled' : ''}`}
+              onClick={() => { if (eligibility.send?.allowed) setShowSendModal(true); else toast.error(t.sendNotAvailable); }}
             >
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition ${eligibility.send?.allowed ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 opacity-60'}`}>
-                <ArrowUpRight className="w-5 h-5" />
-              </div>
-              <span className="text-xs">{t.send}</span>
+              <div className="icon-circle"><ArrowUpRight className="w-5 h-5" /></div>
+              <span>{t.send}</span>
             </button>
             <button 
               data-testid="deposit-btn"
-              className="flex flex-col items-center space-y-2"
+              className="rk-action-btn"
               onClick={() => setShowReceiveModal(true)}
             >
-              <div className="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 transition">
-                <ArrowDownLeft className="w-5 h-5" />
-              </div>
-              <span className="text-xs">{t.deposit}</span>
+              <div className="icon-circle"><ArrowDownLeft className="w-5 h-5" /></div>
+              <span>{t.deposit}</span>
             </button>
             <button 
               data-testid="withdraw-btn"
-              className="flex flex-col items-center space-y-2"
+              className={`rk-action-btn ${parseFloat(getEURWallet()?.balance || '0') <= 0 ? 'disabled' : ''}`}
               onClick={() => {
                 const eurBalance = parseFloat(getEURWallet()?.balance || '0');
-                if (eurBalance > 0) {
-                  setWithdrawForm({ amount: '', iban: withdrawalDefaults.iban, swift: withdrawalDefaults.swift, firstName: '', lastName: '' });
-                  setShowWithdrawModal(true);
-                }
+                if (eurBalance > 0) { setWithdrawForm({ amount: '', iban: withdrawalDefaults.iban, swift: withdrawalDefaults.swift, firstName: '', lastName: '' }); setShowWithdrawModal(true); }
                 else toast.error(t.noEurBalance);
               }}
             >
-              <div className={`w-12 h-12 rounded-full flex items-center justify-center transition ${parseFloat(getEURWallet()?.balance || '0') > 0 ? 'bg-white/10 hover:bg-white/20' : 'bg-white/5 opacity-60'}`}>
-                <ArrowUpRight className="w-5 h-5 rotate-45" />
-              </div>
-              <span className="text-xs">{t.withdraw}</span>
+              <div className="icon-circle"><ArrowUpRight className="w-5 h-5 rotate-45" /></div>
+              <span>{t.withdraw}</span>
             </button>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <main className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6 pb-24">
+      <main className="rk-content">
         {/* Password Reset Alert */}
         {alertState?.type === 'password_reset' && (
           <Card className="mb-4 border-blue-200 bg-blue-50">
@@ -570,57 +554,51 @@ const WalletDashboard = () => {
         )}
 
         {/* Assets Section */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">{t.assets}</h2>
-          <Link to="/transactions" className="text-blue-600 text-sm font-medium hover:text-blue-700">
-            {t.seeAll}
-          </Link>
+        <div className="rk-section-header">
+          <h2 className="rk-section-title">{t.assets}</h2>
+          <Link to="/transactions" className="rk-section-link">{t.seeAll}</Link>
         </div>
 
-        <div className="space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
+        <div className="rk-asset-grid">
           {/* USDC Asset */}
-          <Card data-testid="usdc-asset-card" className="p-4 hover:shadow-md transition cursor-pointer" onClick={() => navigate('/transactions')}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                  <CryptoIcon symbol="USDC" size={40} />
-                </div>
+          <div className="rk-card rk-card-clickable" data-testid="usdc-asset-card" onClick={() => navigate('/transactions')}>
+            <div className="rk-asset-card">
+              <div className="rk-asset-left">
+                <CryptoIcon symbol="USDC" size={40} />
                 <div>
-                  <div className="font-semibold text-gray-900">USDC</div>
-                  <div className="text-sm text-gray-500">USD Coin (ERC-20)</div>
+                  <div className="rk-asset-name">USDC</div>
+                  <div className="rk-asset-sub">USD Coin (ERC-20)</div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="font-semibold text-gray-900" data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
-                <div className="text-xs text-gray-400" data-testid="usdc-eur-value">&asymp; &euro;{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
+              <div className="rk-asset-right">
+                <div className="rk-asset-balance" data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
+                <div className="rk-asset-fiat" data-testid="usdc-eur-value">&asymp; &euro;{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
                 {availableBalance.USDC && availableBalance.USDC.available !== availableBalance.USDC.total && (
-                  <div className="text-xs text-orange-500 mt-0.5" data-testid="usdc-available">
+                  <div style={{fontSize:11,color:'#f59e0b',marginTop:3}} data-testid="usdc-available">
                     <Lock className="w-3 h-3 inline mr-0.5" />
                     {t.available}: {showBalance ? formatBalance(availableBalance.USDC.available) : '••••••'} USDC
                   </div>
                 )}
               </div>
             </div>
-          </Card>
+          </div>
 
           {/* EUR Asset */}
-          <Card data-testid="eur-asset-card" className="p-4 hover:shadow-md transition cursor-pointer" onClick={() => navigate('/transactions')}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center">
-                  <CryptoIcon symbol="EUR" size={40} />
-                </div>
+          <div className="rk-card rk-card-clickable" data-testid="eur-asset-card" onClick={() => navigate('/transactions')}>
+            <div className="rk-asset-card">
+              <div className="rk-asset-left">
+                <CryptoIcon symbol="EUR" size={40} />
                 <div>
-                  <div className="font-semibold text-gray-900">EUR</div>
-                  <div className="text-sm text-gray-500">{t.euroBalance}</div>
+                  <div className="rk-asset-name">EUR</div>
+                  <div className="rk-asset-sub">{t.euroBalance}</div>
                 </div>
               </div>
-              <div className="text-right">
-                <div className="font-semibold text-gray-900" data-testid="eur-total">&euro;{formatBalance(getEURWallet()?.balance)}</div>
-                <div className="text-sm text-gray-500">{t.balance}</div>
+              <div className="rk-asset-right">
+                <div className="rk-asset-balance" data-testid="eur-total">&euro;{formatBalance(getEURWallet()?.balance)}</div>
+                <div className="rk-asset-fiat">{t.balance}</div>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Desktop: Two-column layout for Connected Apps + Account */}
@@ -711,22 +689,16 @@ const WalletDashboard = () => {
       </main>
 
       {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden">
-        <div className="max-w-lg mx-auto flex items-center justify-around py-3">
-          <button className="flex flex-col items-center text-blue-600" data-testid="nav-home">
-            <Home className="w-5 h-5" />
-            <span className="text-xs mt-1">{t.home}</span>
-          </button>
-          <button
-            className="flex flex-col items-center text-gray-400 hover:text-blue-600 transition"
-            data-testid="nav-swap"
-            onClick={() => setShowSwapModal(true)}
-          >
-            <Repeat className="w-5 h-5" />
-            <span className="text-xs mt-1">{t.swap}</span>
-          </button>
-        </div>
-      </nav>
+      <div className="rk-bottom-nav">
+        <button className="rk-bottom-nav-item active" data-testid="nav-home">
+          <Home className="w-5 h-5" />
+          <span>{t.home}</span>
+        </button>
+        <button className="rk-bottom-nav-item" data-testid="nav-swap" onClick={() => setShowSwapModal(true)}>
+          <Repeat className="w-5 h-5" />
+          <span>{t.swap}</span>
+        </button>
+      </div>
 
       {/* Receive Modal */}
       <Dialog open={showReceiveModal} onOpenChange={setShowReceiveModal}>
