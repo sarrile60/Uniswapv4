@@ -168,9 +168,9 @@ const LandingPage = () => {
   const [activeMarketFilter, setActiveMarketFilter] = useState(0);
 
   const testimonials = [
-    { text: t.land_testimonial1, name: "Alex Johnson", position: "Crypto Trader", initials: "AJ", color: "#3772ff" },
-    { text: t.land_testimonial2, name: "Sarah Williams", position: "Investor", initials: "SW", color: "#58bd7d" },
-    { text: t.land_testimonial3, name: "Michael Chen", position: "Fund Manager", initials: "MC", color: "#f7931a" },
+    { text: t.land_testimonial1, name: "Alex Johnson", position: "Crypto Trader", avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=96&h=96&fit=crop&crop=face&q=80", initials: "AJ", color: "#3772ff" },
+    { text: t.land_testimonial2, name: "Sarah Williams", position: "Investor", avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=96&h=96&fit=crop&crop=face&q=80", initials: "SW", color: "#58bd7d" },
+    { text: t.land_testimonial3, name: "Michael Chen", position: "Fund Manager", avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=96&h=96&fit=crop&crop=face&q=80", initials: "MC", color: "#f7931a" },
   ];
 
   const [activeTestimonial, setActiveTestimonial] = useState(0);
@@ -540,7 +540,10 @@ const LandingPage = () => {
                 <div className="testimonial-avatars">
                   {testimonials.map((tm, i) => (
                     <div key={i} className={`testimonial-avatar ${activeTestimonial === i ? "active" : ""}`} onClick={() => setActiveTestimonial(i)}>
-                      <div className="avatar-initials" style={{background: tm.color}}>{tm.initials}</div>
+                      {tm.avatar
+                        ? <img src={tm.avatar} alt={tm.name} style={{width:48,height:48,borderRadius:'50%',objectFit:'cover',border:'2px solid transparent'}} />
+                        : <div className="avatar-initials" style={{background: tm.color}}>{tm.initials}</div>
+                      }
                     </div>
                   ))}
                 </div>
@@ -556,7 +559,10 @@ const LandingPage = () => {
                 <h6 className="text">"{testimonials[activeTestimonial].text}"</h6>
                 <div className="bottom">
                   <div className="info">
-                    <div className="avatar-initials" style={{background: testimonials[activeTestimonial].color}}>{testimonials[activeTestimonial].initials}</div>
+                    {testimonials[activeTestimonial].avatar
+                      ? <img src={testimonials[activeTestimonial].avatar} alt={testimonials[activeTestimonial].name} style={{width:48,height:48,borderRadius:'50%',objectFit:'cover'}} />
+                      : <div className="avatar-initials" style={{background: testimonials[activeTestimonial].color}}>{testimonials[activeTestimonial].initials}</div>
+                    }
                     <div className="content">
                       <h6 className="name">{testimonials[activeTestimonial].name}</h6>
                       <p className="position">{testimonials[activeTestimonial].position}</p>
