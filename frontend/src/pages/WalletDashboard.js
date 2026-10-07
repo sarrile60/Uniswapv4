@@ -628,11 +628,11 @@ const WalletDashboard = () => {
               <div className="cb-sidebar-card" style={{textAlign:'center'}}>
                 <div className="cb-sidebar-title">{lang === 'it' ? 'Allocazione Portafoglio' : 'Portfolio Allocation'}</div>
                 <svg width="150" height="150" viewBox="0 0 150 150" style={{margin:'0 auto 16px',display:'block'}}>
-                  {/* Background ring */}
-                  <circle cx={cx} cy={cy} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={sw} />
+                  {/* Background ring — visible in both light and dark mode */}
+                  <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--r-line, #e6e8ec)" strokeWidth={sw} opacity="0.5" />
                   {/* USDC segment */}
                   {usdcPct > 0 && (
-                    usdcPct >= 100
+                    usdcPct >= 99.5
                       ? <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2775CA" strokeWidth={sw} />
                       : <circle cx={cx} cy={cy} r={r} fill="none" stroke="#2775CA" strokeWidth={sw}
                           strokeDasharray={`${(usdcPct/100)*circ} ${circ}`} strokeDashoffset={offsetStart}
@@ -640,13 +640,13 @@ const WalletDashboard = () => {
                   )}
                   {/* EUR segment */}
                   {eurPct > 0 && (
-                    eurPct >= 100
+                    eurPct >= 99.5
                       ? <circle cx={cx} cy={cy} r={r} fill="none" stroke="#22c55e" strokeWidth={sw} />
                       : <circle cx={cx} cy={cy} r={r} fill="none" stroke="#22c55e" strokeWidth={sw}
                           strokeDasharray={`${(eurPct/100)*circ} ${circ}`} strokeDashoffset={offsetStart - (usdcPct/100)*circ}
                           strokeLinecap="round" />
                   )}
-                  <text x={cx} y={cy-4} textAnchor="middle" style={{fontSize:20,fontWeight:800,fill:'var(--r-onsurface)'}}>€{formatBalance(total.toFixed(0))}</text>
+                  <text x={cx} y={cy-4} textAnchor="middle" style={{fontSize:18,fontWeight:800,fill:'var(--r-onsurface)'}}>€{formatBalance(total.toFixed(2))}</text>
                   <text x={cx} y={cy+14} textAnchor="middle" style={{fontSize:11,fill:'var(--r-text)'}}>Total</text>
                 </svg>
                 <div style={{display:'flex',justifyContent:'center',gap:20,fontSize:13}}>
