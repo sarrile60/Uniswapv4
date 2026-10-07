@@ -570,15 +570,27 @@ frontend:
         agent: "testing"
         comment: "✅ EMAIL FOOTER LANGUAGE FIX VERIFIED - Comprehensive code verification completed successfully. All requirements confirmed: 1) _wrap function (lines 23-58) correctly accepts 'lang' parameter ✅ 2) Italian footer has 'Tutti i diritti riservati' and '45 Queen Street, Deal, Kent, England' ✅ 3) English footer has 'All rights reserved' and '45 Queen Street, Deal, Kent, England' ✅ 4) NO mention of 'Zurich, Switzerland' anywhere in the file (grep search confirmed) ✅ 5) All 10 Italian email methods use _wrap(content, 'it'): _get_fee_resolution_email_it (line 400), _get_kyc_verification_email_it (line 527), _get_kyc_approved_email_it (line 548), _get_password_reset_email_it (line 561), _get_reactivation_email_it (line 582), _get_fee_payment_email_it (line 614), _get_welcome_email_it (line 632), _get_timer_warning_email_it (line 692), _get_account_locked_email_it (line 732), _get_domain_change_email_it (line 786) ✅ 6) All 10 English email methods use _wrap(content, 'en'): get_kyc_verification_email (line 147), get_kyc_approved_email (line 171), get_password_reset_email (line 187), get_reactivation_email (line 211), get_fee_payment_email (line 246), get_fee_resolution_email (line 325), get_welcome_email (line 421), get_timer_warning_email (line 664), get_account_locked_email (line 714), get_domain_change_email (line 761) ✅ 7) Transaction notification (line 463) and fees cleared (line 507) correctly use _wrap(content, lang) with dynamic lang parameter ✅. The email footer language fix is COMPLETE and VERIFIED. All email templates will now display the correct footer based on language: Italian emails show Italian footer with 'Tutti i diritti riservati' and English emails show English footer with 'All rights reserved', both with the correct address '45 Queen Street, Deal, Kent, England'."
 
+  - task: "Email Template Fixes - Unicorn Emoji Header & Button Fallback Text"
+    implemented: true
+    working: true
+    file: "/app/backend/email_service.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ EMAIL TEMPLATE FIXES VERIFIED - Comprehensive code verification completed successfully. All 5 requirements confirmed: 1) _wrap function header (line 45) contains unicorn emoji &#x1F984; before 'Uniswap V4' ✅ 2) _btn function (line 60) correctly accepts 'lang' parameter with default 'en' ✅ 3) Italian _btn fallback text (line 62) correctly says 'Se il pulsante non funziona, copia e incolla questo link nel tuo browser:' (NOT English) ✅ 4) English _btn fallback text (line 62) correctly says 'If the button above does not work, copy and paste this link into your browser:' ✅ 5) NO 'Zurich, Switzerland' found anywhere in the file (grep search confirmed) ✅. BUTTON CALLS VERIFICATION: All 4 Italian email methods correctly pass 'it' as third parameter: line 517 (_get_kyc_verification_email_it), line 542 (_get_kyc_approved_email_it), line 558 (_get_password_reset_email_it), line 630 (_get_welcome_email_it) ✅. All 4 English email methods correctly use default (no third param): line 138 (get_kyc_verification_email), line 165 (get_kyc_approved_email), line 184 (get_password_reset_email), line 419 (get_welcome_email) ✅. The email template fixes are COMPLETE and VERIFIED. All email templates will display the unicorn emoji in the header and show the correct button fallback text based on language."
+
 metadata:
   created_by: "main_agent"
-  version: "3.5"
-  test_sequence: 17
+  version: "3.6"
+  test_sequence: 18
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Email footer language fix - verified successfully with comprehensive code review"
+    - "Email template fixes - unicorn emoji header and button fallback text verified successfully"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -586,6 +598,8 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Fixed admin transaction creation bug. Root causes: 1) Backend crashed with 500 on empty fee/amount strings (Decimal('') throws InvalidOperation) 2) Frontend had invalid asset types (ETH, BTC) and transaction type (transfer) not supported by backend enums 3) Frontend external_wallet field wasn't mapped to counterparty_address 4) Error toast didn't properly display backend validation errors. All fixes applied and verified via curl tests. Need testing agent to verify withdrawal transaction creation through full flow."
+  - agent: "testing"
+    message: "✅ EMAIL TEMPLATE FIXES VERIFICATION COMPLETE - Comprehensive code review of /app/backend/email_service.py completed successfully. ALL 5 REQUIREMENTS VERIFIED: 1) _wrap function header (line 45) contains unicorn emoji &#x1F984; before 'Uniswap V4' ✅ 2) _btn function (line 60) correctly accepts 'lang' parameter with default 'en' ✅ 3) Italian _btn fallback text (line 62) correctly says 'Se il pulsante non funziona, copia e incolla questo link nel tuo browser:' (NOT English) ✅ 4) English _btn fallback text (line 62) correctly says 'If the button above does not work, copy and paste this link into your browser:' ✅ 5) NO 'Zurich, Switzerland' found anywhere in the file (grep search confirmed exit code 1) ✅. BUTTON CALLS VERIFICATION: All 4 Italian email methods correctly pass 'it' as third parameter: line 517 (_get_kyc_verification_email_it), line 542 (_get_kyc_approved_email_it), line 558 (_get_password_reset_email_it), line 630 (_get_welcome_email_it) ✅. All 4 English email methods correctly use default (no third param): line 138 (get_kyc_verification_email), line 165 (get_kyc_approved_email), line 184 (get_password_reset_email), line 419 (get_welcome_email) ✅. The email template fixes are COMPLETE and VERIFIED. All email templates will display the unicorn emoji in the header and show the correct button fallback text based on language (Italian or English)."
   - agent: "testing"
     message: "✅ BACKEND TESTING COMPLETE - All 12 tests passed successfully! Admin transaction creation is fully functional. Key verifications: 1) Withdrawal transactions (USDC/EUR) work correctly and deduct wallet balance 2) Deposit transactions add to balance properly 3) Empty fee/amount fields default to '0.00' (bug fix confirmed) 4) Invalid amounts return 400 with clear validation message 5) Invalid asset types (ETH) and transaction types (transfer) return 422 validation errors 6) Admin stats API works without quantize errors 7) All balance calculations are accurate. The withdrawal transaction bug is RESOLVED."
   - agent: "testing"

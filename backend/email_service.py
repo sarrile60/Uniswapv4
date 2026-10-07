@@ -42,7 +42,7 @@ def _wrap(content: str, lang: str = "en") -> str:
 <body style="margin:0;padding:0;background-color:#f4f4f7;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#333333;line-height:1.6;">
 <div style="max-width:600px;margin:0 auto;padding:20px;">
   <div style="background-color:#121530;padding:28px 20px;text-align:center;border-radius:8px 8px 0 0;">
-    <h1 style="color:#ffffff;margin:0;font-size:22px;font-weight:600;letter-spacing:0.5px;">Uniswap V4</h1>
+    <h1 style="color:#ffffff;margin:0;font-size:22px;font-weight:600;letter-spacing:0.5px;">&#x1F984; Uniswap V4</h1>
   </div>
   <div style="background-color:#ffffff;padding:32px 28px;border-radius:0 0 8px 8px;">
     {content}
@@ -57,14 +57,15 @@ def _wrap(content: str, lang: str = "en") -> str:
 </html>"""
 
 
-def _btn(text: str, href: str) -> str:
+def _btn(text: str, href: str, lang: str = "en") -> str:
     """Generate an email-safe CTA button with fallback link for maximum compatibility."""
+    fallback = "Se il pulsante non funziona, copia e incolla questo link nel tuo browser:" if lang == "it" else "If the button above does not work, copy and paste this link into your browser:"
     return f'''<div style="text-align:center;margin:24px 0;">
 <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto;">
 <tr><td style="background-color:#0052ff;border-radius:6px;">
 <a href="{href}" style="display:inline-block;background-color:#0052ff;color:#ffffff;padding:14px 36px;text-decoration:none;border-radius:6px;font-weight:600;font-size:15px;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;mso-padding-alt:14px 36px;">{text}</a>
 </td></tr></table>
-<p style="margin:12px 0 0;font-size:12px;color:#888888;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;">If the button above does not work, copy and paste this link into your browser:<br/>
+<p style="margin:12px 0 0;font-size:12px;color:#888888;font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;">{fallback}<br/>
 <a href="{href}" style="color:#0052ff;word-break:break-all;">{href}</a></p>
 </div>'''
 
@@ -513,7 +514,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
     <p style="color:#555555;margin:0 0 12px 0;">Abbiamo rilevato alcune attivit&agrave; insolite sul Suo account. Per garantire la sicurezza dei Suoi fondi e ottemperare ai requisiti normativi, Le chiediamo di verificare la Sua identit&agrave;.</p>
     <p style="color:#555555;margin:0 0 8px 0;">La preghiamo di completare la procedura di verifica KYC (Know Your Customer) cliccando sul pulsante qui sotto:</p>
-    {_btn("Verifica la Mia Identit&agrave;", verification_link)}
+    {_btn("Verifica la Mia Identit&agrave;", verification_link, "it")}
     <p style="color:#555555;margin:0 0 8px 0;">Sar&agrave; necessario fornire i seguenti documenti:</p>
     <ul style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
       <li style="margin-bottom:4px;">Un documento d'identit&agrave; valido rilasciato dal governo (Passaporto o Carta d'Identit&agrave;)</li>
@@ -538,7 +539,7 @@ class EmailService:
     <div style="background-color:#f0f4ff;border:1px solid #0052ff;border-radius:8px;padding:20px;margin:16px 0;">
       <p style="color:#0052ff;font-weight:700;margin:0 0 8px 0;">Prossimo Passaggio Richiesto</p>
       <p style="color:#555555;margin:0 0 12px 0;">Per garantire la sicurezza del Suo account, &egrave; ora necessario <strong>reimpostare la Sua password</strong> prima di poter accedere al Suo portafoglio.</p>
-      {_btn("Reimposta la Mia Password", reset_link)}
+      {_btn("Reimposta la Mia Password", reset_link, "it")}
     </div>
     <div style="background-color:#fff8e1;border-left:4px solid #f9a825;padding:12px 16px;margin:16px 0;border-radius:0 4px 4px 0;">
       <p style="color:#555555;margin:0;font-size:13px;"><strong>Importante:</strong> Questo link per la reimpostazione della password scade tra <strong>24 ore</strong>. Dopo la reimpostazione, avr&agrave; pieno accesso al Suo account. La preghiamo di scegliere una password sicura e unica.</p>
@@ -554,7 +555,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
     <p style="color:#555555;margin:0 0 12px 0;">La Sua identit&agrave; &egrave; stata verificata con successo. Come parte del nostro protocollo di sicurezza, Le &egrave; richiesto di reimpostare la Sua password prima di poter accedere al Suo account.</p>
     <p style="color:#555555;margin:0 0 8px 0;">Clicchi sul pulsante qui sotto per creare una nuova password:</p>
-    {_btn("Reimposta la Password", reset_link)}
+    {_btn("Reimposta la Password", reset_link, "it")}
     <p style="color:#888888;font-size:13px;margin:0 0 16px 0;">Questo link scadr&agrave; tra 24 ore per motivi di sicurezza.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team di Uniswap V4</p>"""
@@ -626,7 +627,7 @@ class EmailService:
       <li style="margin-bottom:4px;">Monitorare il Suo portafoglio in tempo reale</li>
       <li style="margin-bottom:4px;">Accedere a un livello di sicurezza di grado istituzionale</li>
     </ul>
-    {_btn("Acceda al Suo Portafoglio", login_link)}
+    {_btn("Acceda al Suo Portafoglio", login_link, "it")}
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team di Uniswap V4</p>"""
         return subject, _wrap(content, "it")
