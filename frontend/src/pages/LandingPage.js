@@ -205,8 +205,57 @@ const LandingPage = () => {
               </div>
             </div>
             <div className="col-xl-6 col-md-12">
-              <div className="banner__image">
-                <img src="/assets/images/layout/banner-01.png" alt="Uniswap V4 Trading" />
+              <div className="hero-animated">
+                {/* Floating crypto coins */}
+                <div className="hero-coin hero-coin-1">
+                  <CryptoIcon symbol="BTC" size={56} />
+                </div>
+                <div className="hero-coin hero-coin-2">
+                  <CryptoIcon symbol="ETH" size={48} />
+                </div>
+                <div className="hero-coin hero-coin-3">
+                  <CryptoIcon symbol="SOL" size={40} />
+                </div>
+                <div className="hero-coin hero-coin-4">
+                  <CryptoIcon symbol="BNB" size={36} />
+                </div>
+                <div className="hero-coin hero-coin-5">
+                  <CryptoIcon symbol="ADA" size={32} />
+                </div>
+
+                {/* Glassmorphism trading card */}
+                <div className="hero-glass-card">
+                  <div className="hero-card-header">
+                    <span className="hero-card-dot green"></span>
+                    <span className="hero-card-title">BTC / USD</span>
+                    <span className="hero-card-badge">+2.4%</span>
+                  </div>
+                  <div className="hero-card-price">$86,263.00</div>
+                  <svg className="hero-card-chart" viewBox="0 0 200 60" fill="none">
+                    <path d="M0 45 L20 40 L40 42 L60 30 L80 35 L100 20 L120 25 L140 15 L160 18 L180 10 L200 12" stroke="url(#heroGrad)" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                      <animate attributeName="d" dur="4s" repeatCount="indefinite" values="M0 45 L20 40 L40 42 L60 30 L80 35 L100 20 L120 25 L140 15 L160 18 L180 10 L200 12;M0 42 L20 38 L40 45 L60 28 L80 32 L100 22 L120 28 L140 12 L160 20 L180 8 L200 15;M0 45 L20 40 L40 42 L60 30 L80 35 L100 20 L120 25 L140 15 L160 18 L180 10 L200 12" />
+                    </path>
+                    <path d="M0 45 L20 40 L40 42 L60 30 L80 35 L100 20 L120 25 L140 15 L160 18 L180 10 L200 12 L200 60 L0 60 Z" fill="url(#heroFill)" opacity="0.15">
+                      <animate attributeName="d" dur="4s" repeatCount="indefinite" values="M0 45 L20 40 L40 42 L60 30 L80 35 L100 20 L120 25 L140 15 L160 18 L180 10 L200 12 L200 60 L0 60 Z;M0 42 L20 38 L40 45 L60 28 L80 32 L100 22 L120 28 L140 12 L160 20 L180 8 L200 15 L200 60 L0 60 Z;M0 45 L20 40 L40 42 L60 30 L80 35 L100 20 L120 25 L140 15 L160 18 L180 10 L200 12 L200 60 L0 60 Z" />
+                    </path>
+                    <defs>
+                      <linearGradient id="heroGrad" x1="0" y1="0" x2="200" y2="0"><stop stopColor="#58bd7d"/><stop offset="1" stopColor="#3772ff"/></linearGradient>
+                      <linearGradient id="heroFill" x1="100" y1="0" x2="100" y2="60" gradientUnits="userSpaceOnUse"><stop stopColor="#58bd7d"/><stop offset="1" stopColor="transparent"/></linearGradient>
+                    </defs>
+                  </svg>
+                  <div className="hero-card-row">
+                    <span className="hero-card-label">24h Vol</span>
+                    <span className="hero-card-value">$27.4B</span>
+                  </div>
+                  <div className="hero-card-row">
+                    <span className="hero-card-label">Market Cap</span>
+                    <span className="hero-card-value">$1.73T</span>
+                  </div>
+                </div>
+
+                {/* Glow orbs */}
+                <div className="hero-glow hero-glow-1"></div>
+                <div className="hero-glow hero-glow-2"></div>
               </div>
             </div>
           </div>
