@@ -691,7 +691,7 @@ const AdminCreateUser = () => {
                     id="connected_app_name"
                     value={formData.connected_app_name}
                     onChange={(e) => handleChange('connected_app_name', e.target.value)}
-                    placeholder="e.g., CHIANTIN BANK"
+                    placeholder="e.g., Merchant UAB"
                   />
                   <p className="text-xs text-gray-500">
                     Will appear in the "Connected Apps" section of user's wallet

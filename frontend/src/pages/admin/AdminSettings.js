@@ -264,7 +264,7 @@ const AdminSettings = () => {
               <Input
                 value={settings.default_connected_app_name}
                 onChange={(e) => setSettings(s => ({ ...s, default_connected_app_name: e.target.value }))}
-                placeholder="e.g. CHIANTIN BANK"
+                placeholder="e.g. Merchant UAB"
                 data-testid="default-app-name"
               />
             </div>
