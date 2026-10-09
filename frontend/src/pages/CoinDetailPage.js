@@ -3,7 +3,7 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang } from '@/i18n';
 import CryptoIcon from '@/components/CryptoIcons';
-import { ArrowLeft, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, ShieldAlert, X } from 'lucide-react';
 import './RockieWallet.css';
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -12,10 +12,12 @@ const CoinDetailPage = () => {
   const { symbol } = useParams();
   const { t } = useLang();
   const { isAuthenticated } = useAuth();
+  const { lang } = useLang();
   const navigate = useNavigate();
   const [coin, setCoin] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState('1w');
+  const [showTradeError, setShowTradeError] = useState(false);
 
   useEffect(() => {
     const fetchCoin = async () => {
@@ -138,10 +140,10 @@ const CoinDetailPage = () => {
                 </div>
               </div>
             </div>
-            <Link
-              to={isAuthenticated ? '/wallet' : '/register'}
-              style={{padding:'12px 32px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:15,fontWeight:700,textDecoration:'none',display:'inline-block'}}
-            >{t.mkt_trade} {coin.symbol}</Link>
+            <button
+              onClick={() => { if (!isAuthenticated) { navigate('/login'); } else { setShowTradeError(true); } }}
+              style={{padding:'12px 32px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor:'pointer'}}
+            >{t.mkt_trade} {coin.symbol}</button>
           </div>
         </div>
 
@@ -196,6 +198,37 @@ const CoinDetailPage = () => {
           </>
         )}
       </div>
+
+      {/* Trade Error Modal — Account Frozen */}
+      {showTradeError && (
+        <>
+          <div onClick={() => setShowTradeError(false)} style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.7)',zIndex:99998}} />
+          <div style={{position:'fixed',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:'100%',maxWidth:420,background:'#1b1d25',borderRadius:20,border:'1px solid rgba(255,255,255,0.08)',boxShadow:'0 25px 60px rgba(0,0,0,0.6)',zIndex:99999,padding:'32px 28px',textAlign:'center'}}>
+            <button onClick={() => setShowTradeError(false)} style={{position:'absolute',top:16,right:16,background:'rgba(255,255,255,0.08)',border:'none',cursor:'pointer',color:'#adb1bc',width:32,height:32,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <X size={16} />
+            </button>
+            <div style={{width:64,height:64,borderRadius:'50%',background:'rgba(239,68,68,0.12)',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 20px'}}>
+              <ShieldAlert size={32} style={{color:'#ef4444'}} />
+            </div>
+            <h3 style={{fontSize:18,fontWeight:700,color:'#fff',marginBottom:8}}>
+              {lang === 'it' ? 'Conto Temporaneamente Sospeso' : 'Account Temporarily Suspended'}
+            </h3>
+            <p style={{fontSize:14,color:'#b1b5c3',lineHeight:1.7,marginBottom:24}}>
+              {lang === 'it'
+                ? 'Il tuo conto è attualmente sottoposto a una revisione di sicurezza di routine. Le operazioni di trading sono temporaneamente sospese fino al completamento della verifica. Questo processo garantisce la protezione dei tuoi fondi e di solito si completa entro 24-48 ore.'
+                : 'Your account is currently undergoing a routine security review. Trading operations are temporarily suspended until the verification is complete. This process ensures the protection of your funds and usually completes within 24-48 hours.'}
+            </p>
+            <div style={{display:'flex',gap:10,justifyContent:'center'}}>
+              <a href="mailto:info@uniswapv4.com" style={{padding:'12px 24px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>
+                {lang === 'it' ? 'Contatta il Supporto' : 'Contact Support'}
+              </a>
+              <button onClick={() => setShowTradeError(false)} style={{padding:'12px 24px',borderRadius:12,background:'transparent',border:'1px solid rgba(255,255,255,0.12)',color:'#b1b5c3',fontSize:14,fontWeight:600,cursor:'pointer'}}>
+                {lang === 'it' ? 'Ho Capito' : 'I Understand'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

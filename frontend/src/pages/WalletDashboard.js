@@ -552,12 +552,12 @@ const WalletDashboard = () => {
             <div className="cb-asset-list-header">
               <span className="rk-section-title" style={{fontSize:16}}>{t.assets}</span>
               <button onClick={() => setAssetPageSize(prev => prev >= 999 ? 10 : 999)} style={{color:'#3772ff',fontWeight:600,fontSize:13,background:'none',border:'none',cursor:'pointer'}}>
-                {assetPageSize >= 999 ? (lang === 'it' ? 'Mostra meno' : 'Show less') : t.seeAll}
+                {assetPageSize >= 999 ? (lang === 'it' ? 'Mostra meno' : 'Show less') : (lang === 'it' ? 'Vedi tutto' : 'See all')}
               </button>
             </div>
 
-            {/* Table Header Row — same grid as cb-asset-row */}
-            <div className="cb-asset-row hide-mobile" style={{cursor:'default',padding:'6px 20px',borderBottom:'1px solid var(--r-line)',background:'transparent'}}>
+            {/* Table Header Row */}
+            <div className="cb-asset-row hide-mobile" style={{cursor:'default',padding:'6px 16px',borderBottom:'1px solid var(--r-line)',background:'transparent'}}>
               <div></div>
               <div style={{fontSize:11,fontWeight:600,color:'var(--r-text)',textTransform:'uppercase',letterSpacing:'0.5px'}}>{lang === 'it' ? 'Nome' : 'Name'}</div>
               <div style={{fontSize:11,fontWeight:600,color:'var(--r-text)',textTransform:'uppercase',letterSpacing:'0.5px',textAlign:'right'}}>{lang === 'it' ? 'Prezzo' : 'Price'}</div>
@@ -579,7 +579,7 @@ const WalletDashboard = () => {
                 <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>$1.00</div>
                 <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>$1.00</div>
                 <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
-                <div className="hide-mobile" style={{textAlign:'center'}}><svg width="56" height="18" viewBox="0 0 56 18" fill="none"><path d="M0 9 L56 9" stroke="var(--r-text)" strokeWidth="1" strokeDasharray="3 3" opacity="0.3"/></svg></div>
+                <div className="hide-mobile" style={{textAlign:'center'}}><svg width="56" height="18" viewBox="0 0 56 18" fill="none"><path d={exchangeRate.change_24h_pct>=0?"M0 14 L7 13 L14 12 L21 12 L28 11 L35 11 L42 10 L49 10 L56 9":"M0 9 L7 10 L14 10 L21 11 L28 11 L35 12 L42 12 L49 13 L56 14"} stroke={exchangeRate.change_24h_pct>=0?'#22c55e':'#ef4444'} strokeWidth="1.5" strokeLinecap="round" fill="none"/></svg></div>
                 <div style={{textAlign:'right'}}><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>{showBalance?formatBalance(getUSDCWallet()?.balance):'••••••'} USDC</div><div style={{fontSize:11,color:'var(--r-text)'}}>≈ €{showBalance?formatBalance((parseFloat(getUSDCWallet()?.balance||0)*exchangeRate.usdc_eur).toFixed(2)):'••••••'}</div></div>
               </div>
             )}
