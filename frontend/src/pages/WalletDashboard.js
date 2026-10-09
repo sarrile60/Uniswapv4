@@ -544,105 +544,136 @@ const WalletDashboard = () => {
             </div>
           )}
 
-          {/* Asset List — All coins with live prices + user balances */}
+          {/* Asset List — Professional table with headers */}
           <div className="cb-asset-list">
-            <div className="cb-asset-list-header">
+            <div className="cb-asset-list-header" style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 20px'}}>
               <span className="rk-section-title" style={{fontSize:16}}>{t.assets}</span>
-              <Link to="/transactions" className="rk-section-link">{t.seeAll}</Link>
+              <div style={{display:'flex',alignItems:'center',gap:12}}>
+                <button onClick={() => setAssetPageSize(prev => prev >= 999 ? 10 : 999)} style={{color:'#3772ff',fontWeight:600,fontSize:13,background:'none',border:'none',cursor:'pointer'}}>
+                  {assetPageSize >= 999 ? (lang === 'it' ? 'Mostra meno' : 'Show less') : t.seeAll}
+                </button>
+                <Link to="/transactions" style={{color:'#3772ff',fontWeight:600,fontSize:13,textDecoration:'none',display:'flex',alignItems:'center',gap:4}}>
+                  📋 {t.transactions || 'Transactions'}
+                </Link>
+              </div>
+            </div>
+
+            {/* Table Header */}
+            <div className="hide-mobile" style={{display:'flex',alignItems:'center',gap:0,padding:'8px 20px',borderBottom:'1px solid var(--r-line)',fontSize:11,fontWeight:600,color:'var(--r-text)',textTransform:'uppercase',letterSpacing:'0.5px'}}>
+              <div style={{width:52}}></div>
+              <div style={{flex:1,minWidth:120}}>{lang === 'it' ? 'Nome' : 'Name'}</div>
+              <div style={{width:100,textAlign:'right'}}>{lang === 'it' ? 'Prezzo' : 'Price'}</div>
+              <div style={{width:80,textAlign:'right'}}>24h %</div>
+              <div style={{width:80,textAlign:'right'}}>{lang === 'it' ? 'Max 24h' : '24h High'}</div>
+              <div style={{width:80,textAlign:'right'}}>{lang === 'it' ? 'Min 24h' : '24h Low'}</div>
+              <div style={{width:90,textAlign:'right'}}>{lang === 'it' ? 'Volume' : 'Volume'}</div>
+              <div style={{width:80,textAlign:'center'}}>{lang === 'it' ? 'Grafico' : 'Chart'}</div>
+              <div style={{width:100,textAlign:'right'}}>{lang === 'it' ? 'Saldo' : 'Balance'}</div>
             </div>
 
             {/* USDC Row (always first if user has balance) */}
             {parseFloat(getUSDCWallet()?.balance || 0) > 0 && (
-              <div className="cb-asset-row" data-testid="usdc-asset-card" onClick={() => navigate('/markets/USDT')}>
-                <CryptoIcon symbol="USDC" size={40} />
-                <div>
+              <div className="cb-asset-row" data-testid="usdc-asset-card" onClick={() => navigate('/markets/USDT')} style={{cursor:'pointer'}}>
+                <CryptoIcon symbol="USDC" size={36} />
+                <div style={{flex:1,minWidth:120}}>
                   <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>USD Coin</div>
-                  <div style={{fontSize:12,color:'var(--r-text)'}}>USDC</div>
+                  <div style={{fontSize:11,color:'var(--r-text)'}}>USDC</div>
                 </div>
-                <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>
+                <div className="hide-mobile" style={{width:100,textAlign:'right',fontSize:13,color:'var(--r-onsurface)',fontWeight:600}}>
                   ${(1 / (exchangeRate.usdc_eur || 1)).toFixed(4)}
                 </div>
-                <div className="hide-mobile" style={{fontSize:13,color: exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
+                <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:13,color: exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
                   {exchangeRate.change_24h_pct >= 0 ? '+' : ''}{exchangeRate.change_24h_pct?.toFixed(2)}%
                 </div>
-                <div className="hide-mobile" style={{width:80}}>
-                  <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
-                    <path d={exchangeRate.change_24h_pct >= 0 ? "M0 18 L10 16 L20 14 L30 15 L40 11 L50 13 L60 8 L70 6 L80 9" : "M0 6 L10 8 L20 11 L30 9 L40 13 L50 11 L60 16 L70 18 L80 15"} stroke={exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444'} strokeWidth="1.5" strokeLinecap="round" />
+                <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>$1.00</div>
+                <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>$1.00</div>
+                <div className="hide-mobile" style={{width:90,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
+                <div className="hide-mobile" style={{width:80,display:'flex',justifyContent:'center'}}>
+                  <svg width="60" height="20" viewBox="0 0 60 20" fill="none">
+                    <path d="M0 10 L60 10" stroke="var(--r-text)" strokeWidth="1" strokeDasharray="3 3" opacity="0.3" />
                   </svg>
                 </div>
-                <div style={{textAlign:'right'}}>
-                  <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
-                  <div style={{fontSize:12,color:'var(--r-text)'}} data-testid="usdc-eur-value">≈ €{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
+                <div style={{width:100,textAlign:'right'}}>
+                  <div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}} data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
+                  <div style={{fontSize:11,color:'var(--r-text)'}} data-testid="usdc-eur-value">≈ €{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
                   {availableBalance.USDC && availableBalance.USDC.available !== availableBalance.USDC.total && (
-                    <div style={{fontSize:11,color:'#f59e0b',marginTop:2}} data-testid="usdc-available">
-                      <Lock className="w-3 h-3 inline mr-0.5" />{t.available}: {showBalance ? formatBalance(availableBalance.USDC.available) : '••••••'}
+                    <div style={{fontSize:10,color:'#f59e0b',marginTop:2}} data-testid="usdc-available">
+                      <Lock className="w-3 h-3 inline mr-0.5" />{showBalance ? formatBalance(availableBalance.USDC.available) : '••••••'}
                     </div>
                   )}
                 </div>
               </div>
             )}
 
-            {/* EUR Row (always show if user has balance) */}
+            {/* EUR Row — NOT clickable */}
             {parseFloat(getEURWallet()?.balance || 0) > 0 && (
-              <div className="cb-asset-row" data-testid="eur-asset-card" onClick={() => navigate('/transactions')}>
-                <CryptoIcon symbol="EUR" size={40} />
-                <div>
+              <div className="cb-asset-row" data-testid="eur-asset-card" style={{cursor:'default'}}>
+                <CryptoIcon symbol="EUR" size={36} />
+                <div style={{flex:1,minWidth:120}}>
                   <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>Euro</div>
-                  <div style={{fontSize:12,color:'var(--r-text)'}}>EUR</div>
+                  <div style={{fontSize:11,color:'var(--r-text)'}}>EUR</div>
                 </div>
-                <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>€1.00</div>
-                <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>—</div>
-                <div className="hide-mobile" style={{width:80}}>
-                  <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
-                    <path d="M0 12 L80 12" stroke="var(--r-text)" strokeWidth="1" strokeDasharray="4 4" opacity="0.3" />
+                <div className="hide-mobile" style={{width:100,textAlign:'right',fontSize:13,color:'var(--r-onsurface)',fontWeight:600}}>€1.00</div>
+                <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:13,color:'var(--r-text)'}}>—</div>
+                <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
+                <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
+                <div className="hide-mobile" style={{width:90,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
+                <div className="hide-mobile" style={{width:80,display:'flex',justifyContent:'center'}}>
+                  <svg width="60" height="20" viewBox="0 0 60 20" fill="none">
+                    <path d="M0 10 L60 10" stroke="var(--r-text)" strokeWidth="1" strokeDasharray="3 3" opacity="0.3" />
                   </svg>
                 </div>
-                <div style={{textAlign:'right'}}>
-                  <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="eur-total">€{showBalance ? formatBalance(getEURWallet()?.balance) : '••••••'}</div>
-                  <div style={{fontSize:12,color:'var(--r-text)'}}>{t.balance}</div>
+                <div style={{width:100,textAlign:'right'}}>
+                  <div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}} data-testid="eur-total">€{showBalance ? formatBalance(getEURWallet()?.balance) : '••••••'}</div>
+                  <div style={{fontSize:11,color:'var(--r-text)'}}>{t.balance}</div>
                 </div>
               </div>
             )}
 
-            {/* All market coins — sorted by market cap */}
-            {marketPrices.slice(0, assetPageSize).map(coin => (
-              <div key={coin.symbol} className="cb-asset-row" onClick={() => navigate(`/markets/${coin.symbol}`)}
-                style={{cursor:'pointer'}}>
-                <CryptoIcon symbol={coin.symbol} size={40} imageUrl={coin.image} />
-                <div>
-                  <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>{coin.name}</div>
-                  <div style={{fontSize:12,color:'var(--r-text)'}}>{coin.symbol}</div>
-                </div>
-                <div className="hide-mobile" style={{fontSize:13,color:'var(--r-onsurface)',fontWeight:600}}>
-                  ${coin.price?.toLocaleString('en-US', {maximumFractionDigits: coin.price < 1 ? 6 : 2})}
-                </div>
-                <div className="hide-mobile" style={{fontSize:13,color: (coin.change_24h || 0) >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
-                  {(coin.change_24h || 0) >= 0 ? '+' : ''}{(coin.change_24h || 0).toFixed(2)}%
-                </div>
-                <div className="hide-mobile" style={{width:80}}>
-                  <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
-                    <path d={(coin.change_24h || 0) >= 0
-                      ? "M0 18 L10 16 L20 14 L30 15 L40 11 L50 13 L60 8 L70 6 L80 9"
-                      : "M0 6 L10 8 L20 11 L30 9 L40 13 L50 11 L60 16 L70 18 L80 15"}
-                      stroke={(coin.change_24h || 0) >= 0 ? '#22c55e' : '#ef4444'} strokeWidth="1.5" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <div style={{textAlign:'right'}}>
-                  <div style={{fontWeight:600,fontSize:13,color:'var(--r-text)'}}>
-                    ${coin.market_cap ? (coin.market_cap / 1e9).toFixed(1) + 'B' : '—'}
+            {/* All market coins — clickable → coin detail */}
+            {marketPrices.slice(0, assetPageSize).map(coin => {
+              const fmtVol = (v) => { if (!v) return '—'; if (v >= 1e9) return `$${(v/1e9).toFixed(1)}B`; if (v >= 1e6) return `$${(v/1e6).toFixed(0)}M`; return `$${v.toLocaleString()}`; };
+              const fmtP = (p) => { if (!p) return '—'; return `$${p.toLocaleString('en-US', {maximumFractionDigits: p < 1 ? 4 : 2})}`; };
+              return (
+                <div key={coin.symbol} className="cb-asset-row" onClick={() => navigate(`/markets/${coin.symbol}`)}
+                  style={{cursor:'pointer'}}>
+                  <CryptoIcon symbol={coin.symbol} size={36} imageUrl={coin.image} />
+                  <div style={{flex:1,minWidth:120}}>
+                    <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>{coin.name}</div>
+                    <div style={{fontSize:11,color:'var(--r-text)'}}>{coin.symbol}</div>
                   </div>
-                  <div style={{fontSize:11,color:'var(--r-text)',opacity:0.7}}>
-                    {lang === 'it' ? 'Cap.' : 'MCap'}
+                  <div className="hide-mobile" style={{width:100,textAlign:'right',fontSize:13,color:'var(--r-onsurface)',fontWeight:600}}>
+                    {fmtP(coin.price)}
+                  </div>
+                  <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:13,color: (coin.change_24h || 0) >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
+                    {(coin.change_24h || 0) >= 0 ? '+' : ''}{(coin.change_24h || 0).toFixed(2)}%
+                  </div>
+                  <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>{fmtP(coin.high_24h)}</div>
+                  <div className="hide-mobile" style={{width:80,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>{fmtP(coin.low_24h)}</div>
+                  <div className="hide-mobile" style={{width:90,textAlign:'right',fontSize:12,color:'var(--r-text)'}}>{fmtVol(coin.volume_24h)}</div>
+                  <div className="hide-mobile" style={{width:80,display:'flex',justifyContent:'center'}}>
+                    <svg width="60" height="20" viewBox="0 0 60 20" fill="none">
+                      <path d={(coin.change_24h || 0) >= 0
+                        ? "M0 16 L8 14 L16 12 L24 13 L32 9 L40 11 L48 6 L56 4 L60 7"
+                        : "M0 4 L8 6 L16 9 L24 7 L32 11 L40 9 L48 14 L56 16 L60 13"}
+                        stroke={(coin.change_24h || 0) >= 0 ? '#22c55e' : '#ef4444'} strokeWidth="1.5" strokeLinecap="round" fill="none" />
+                    </svg>
+                  </div>
+                  <div style={{width:100,textAlign:'right'}}>
+                    <div style={{fontWeight:600,fontSize:12,color:'var(--r-text)'}}>
+                      ${coin.market_cap ? (coin.market_cap >= 1e9 ? (coin.market_cap / 1e9).toFixed(1) + 'B' : (coin.market_cap / 1e6).toFixed(0) + 'M') : '—'}
+                    </div>
+                    <div style={{fontSize:10,color:'var(--r-text)',opacity:0.6}}>MCap</div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
-            {/* Show more controls */}
-            {marketPrices.length > assetPageSize && (
-              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px',borderTop:'1px solid var(--r-line)'}}>
+            {/* Pagination footer */}
+            {marketPrices.length > 10 && (
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 20px',borderTop:'1px solid var(--r-line)'}}>
                 <span style={{fontSize:12,color:'var(--r-text)'}}>
-                  {Math.min(assetPageSize, marketPrices.length)}/{marketPrices.length}
+                  {Math.min(assetPageSize >= 999 ? marketPrices.length : assetPageSize, marketPrices.length)}/{marketPrices.length}
                 </span>
                 <div style={{display:'flex',gap:6}}>
                   {[10, 20, 50].map(sz => (
