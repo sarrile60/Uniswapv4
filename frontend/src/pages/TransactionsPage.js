@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang, txTypeLabel, dateFmt } from '@/i18n';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { RefreshCw } from 'lucide-react';
 import { 
   ArrowLeft, 
   ArrowUpRight, 
@@ -16,6 +17,8 @@ import {
   Ban
 } from 'lucide-react';
 
+const API = process.env.REACT_APP_BACKEND_URL;
+
 const TransactionsPage = () => {
   const { api } = useAuth();
   const { t, lang } = useLang();
@@ -25,6 +28,41 @@ const TransactionsPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [filter, setFilter] = useState('all');
   const [expandedTx, setExpandedTx] = useState(null);
+  const [chartData, setChartData] = useState([]);
+  const [chartTimeframe, setChartTimeframe] = useState('1W');
+  const [chartLoading, setChartLoading] = useState(false);
+  const [btcPrice, setBtcPrice] = useState(null);
+
+  // Fetch chart data per timeframe
+  useEffect(() => {
+    const daysMap = { '1D': 1, '1W': 7, '1M': 30, '3M': 90 };
+    const days = daysMap[chartTimeframe] || 7;
+    const fetchChart = async () => {
+      setChartLoading(true);
+      try {
+        const res = await fetch(`${API}/api/market/chart/BTC?days=${days}`);
+        const json = await res.json();
+        if (json.ok && json.data?.prices?.length > 0) setChartData(json.data.prices);
+      } catch { /* silent */ }
+      finally { setChartLoading(false); }
+    };
+    fetchChart();
+  }, [chartTimeframe]);
+
+  // Fetch BTC price
+  useEffect(() => {
+    const fetchPrice = async () => {
+      try {
+        const res = await fetch(`${API}/api/market/prices`);
+        const json = await res.json();
+        if (json.ok && json.data) {
+          const btc = json.data.find(c => c.symbol === 'BTC');
+          if (btc) setBtcPrice(btc);
+        }
+      } catch { /* silent */ }
+    };
+    fetchPrice();
+  }, []);
 
   useEffect(() => {
     loadTransactions();
@@ -105,6 +143,61 @@ const TransactionsPage = () => {
   return (
     <div className="min-h-screen">
       <main className="max-w-lg md:max-w-3xl lg:max-w-5xl xl:max-w-6xl mx-auto px-4 sm:px-6 py-6">
+
+        {/* Portfolio Chart Section */}
+        <div style={{background:'var(--r-surface, #f8f9fa)',borderRadius:16,padding:'24px 24px 20px',marginBottom:24,border:'1px solid var(--r-line, #e6e8ec)'}}>
+          {/* Live Price Header */}
+          <div style={{display:'flex',alignItems:'baseline',gap:12,marginBottom:4}}>
+            <span style={{fontSize:28,fontWeight:800,color:'var(--r-onsurface)'}}>
+              ${btcPrice?.price?.toLocaleString('en-US', {maximumFractionDigits: 2}) || '—'}
+            </span>
+            {btcPrice && (
+              <span style={{fontSize:14,fontWeight:600,color: (btcPrice.change_24h || 0) >= 0 ? '#22c55e' : '#ef4444'}}>
+                {(btcPrice.change_24h || 0) >= 0 ? '+' : ''}{(btcPrice.change_24h || 0).toFixed(2)}%
+              </span>
+            )}
+          </div>
+          <div style={{fontSize:12,color:'var(--r-text)',marginBottom:16}}>
+            Bitcoin · {lang === 'it' ? 'Ultime 24 ore' : 'Past 24hr'}
+          </div>
+
+          {/* Timeframe Buttons */}
+          <div style={{display:'flex',gap:6,marginBottom:12}}>
+            {['1D','1W','1M','3M'].map(tf => (
+              <button key={tf} onClick={() => setChartTimeframe(tf)}
+                style={{padding:'4px 14px',borderRadius:8,fontSize:12,fontWeight:600,border:'none',cursor:'pointer',
+                  background: chartTimeframe === tf ? '#3772ff' : 'rgba(55,114,255,0.08)',
+                  color: chartTimeframe === tf ? '#fff' : 'var(--r-text)',transition:'all 0.2s'}}>
+                {tf}
+              </button>
+            ))}
+          </div>
+
+          {/* Chart */}
+          {chartLoading ? (
+            <div style={{height:120,display:'flex',alignItems:'center',justifyContent:'center'}}>
+              <RefreshCw className="w-5 h-5 animate-spin" style={{color:'var(--r-text)',opacity:0.5}} />
+            </div>
+          ) : chartData.length > 10 ? (() => {
+            const min = Math.min(...chartData);
+            const max = Math.max(...chartData);
+            const range = max - min || 1;
+            const w = 800, h = 120, pad = 4;
+            const pts = chartData.map((v, i) => `${pad + (i / (chartData.length - 1)) * (w - pad * 2)},${pad + (1 - (v - min) / range) * (h - pad * 2)}`);
+            const pathD = `M${pts.join(' L')}`;
+            const areaD = `${pathD} L${w - pad},${h - pad} L${pad},${h - pad} Z`;
+            const isUp = chartData[chartData.length - 1] >= chartData[0];
+            const clr = isUp ? '#22c55e' : '#ef4444';
+            return (
+              <svg width="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" style={{display:'block',borderRadius:8}}>
+                <defs><linearGradient id="txChartGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor={clr} stopOpacity="0.12"/><stop offset="100%" stopColor={clr} stopOpacity="0"/></linearGradient></defs>
+                <path d={areaD} fill="url(#txChartGrad)" />
+                <path d={pathD} fill="none" stroke={clr} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            );
+          })() : null}
+        </div>
+
         {/* Filter */}
         <div className="flex items-center space-x-2 mb-4 overflow-x-auto pb-2">
           {['all', 'deposit', 'receive', 'send', 'swap'].map((f) => (

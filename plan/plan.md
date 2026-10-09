@@ -1,77 +1,75 @@
-# Uniswap V4 — Header Trade Experience, Learn Articles & BTC Icon Fix
+# Uniswap V4 — Professional Wallet Upgrade: Full Markets, Rich Asset View & Transactions Redesign
 
-A simulated crypto exchange platform branded as Uniswap V4, receiving three targeted UX improvements: a professional Coinbase-style Trade button replacing the current Buy/Sell dropdowns, fully clickable Learn articles with real educational content, and a broken BTC icon fix in the header.
-
-Built for internal/demo use where admins control the simulation environment.
+A simulated crypto exchange wallet upgraded to match Coinbase's professional feel — expanded market coverage with 50+ coins, a rich asset list inside the wallet showing live prices and trends, and a redesigned transactions experience with inline charts and live data.
 
 ---
 
 ## Who it's for
 
-Platform end-users (simulated traders) who interact with the exchange UI, and admins who control the simulation. The changes improve the user-facing experience only; the admin panel remains untouched.
+End-users of the simulated exchange who expect a polished, data-rich wallet experience comparable to Coinbase or Binance.
 
 ---
 
 ## Core features and experience
 
-### 1. Professional Trade Button (replaces "Compra Crypto" & "Vendi Crypto")
+### 1. Expanded Markets (50+ coins)
 
-- Remove both "Compra Crypto ▾" and "Vendi Crypto ▾" dropdown menus from the header navigation.
-- Replace with a single prominent **"Trade"** button styled like Coinbase's primary CTA — filled accent color, stands out in the nav bar.
-- Clicking "Trade" opens a **professional full-screen or centered modal** with:
-  - **Buy / Sell** tab switcher at the top
-  - Asset selector dropdown (BTC, ETH, SOL, etc. with icons and current prices)
-  - Amount input field with currency toggle (USD/EUR ↔ crypto)
-  - Live price quote area showing estimated receive amount
-  - "Preview Order" button leading to a confirmation step
-  - On the confirmation step: since the user account is simulated/unverified, display a professional **"Account Under Review"** notice explaining the trade cannot be executed until verification is complete — matching the existing simulated block behavior.
-- The modal is fully localized (EN/IT) and respects dark/light mode.
+- Backend fetches top 50 coins by market cap from CoinGecko instead of the current 8.
+- Includes all major cryptos (BTC, ETH, SOL, BNB, ADA, XRP, DOT, AVAX, MATIC, LINK, etc.) plus stablecoins (USDC, USDT, DAI, BUSD).
+- Markets page displays all 50 coins in a scrollable, searchable, filterable table — same layout as today but with full data.
+- Coin detail pages (`/markets/:symbol`) work for all 50 coins.
 
-### 2. Learn Page — Clickable Article Cards with Full Content
+### 2. Rich Asset List in Wallet Dashboard
 
-- Each of the 6 existing Learn cards becomes clickable, navigating to `/learn/:slug`.
-- Each article detail page contains **real, substantive educational content** (500–800 words per article):
-  - What is Bitcoin?
-  - What is Ethereum?
-  - How to Secure Your Crypto
-  - Understanding DeFi
-  - What is Staking?
-  - NFTs Explained
-- Article detail page layout: hero section with topic icon and difficulty badge, article body with headings/paragraphs, a "Back to Learn" link, and suggested related articles at the bottom.
-- Fully localized (EN/IT), dark/light mode compatible.
+- The "Assets" section in the wallet sidebar/main area shows all 50 coins (not just USDC and EUR).
+- Each row displays: coin icon, name/symbol, live USD price, 24h % change (green/red), and the user's balance for that coin (0 if none held).
+- Coins with held balances appear first, sorted by value; remaining coins follow sorted by market cap.
+- Clicking any asset row navigates to a coin detail view (reuses `/markets/:symbol` or an inline view).
 
-### 3. BTC Icon Fix in Header
+### 3. Transactions Page Redesign (Chart + Live Price + History)
 
-- The Bitcoin icon/image next to the live BTC price ticker in the header is currently broken (not rendering).
-- Fix the image source to display the BTC icon correctly. Use an inline SVG or a reliable CDN source that won't break.
+- The wallet dashboard gets a visible "Transactions" button/tab.
+- When clicked, the page shows:
+  - **Top section**: Interactive price chart (reuses the portfolio sparkline approach) with timeframe buttons (1D, 1W, 1M, 3M).
+  - **Middle**: Live price display for the user's primary asset or portfolio total.
+  - **Bottom section**: Full transaction history list (existing functionality).
+- This mirrors Coinbase's pattern: chart context above, transactions below — not just a bare transaction list.
+
+### 4. Header Navigation Renames
+
+- "Impara" / "Learn" → renamed to **"Sicurezza" / "Security"** (same link destination — still goes to `/learn`).
+- "Pagine" / "Pages" → renamed to **"Chi Siamo" / "About Us"** (same dropdown with same sub-links underneath).
 
 ---
 
 ## User flow
 
-**Trade button:**
-1. User sees "Trade" button in the header nav (always visible, prominent).
-2. Clicks → professional modal opens with Buy tab active.
-3. User selects an asset, enters an amount, sees a live quote preview.
-4. Clicks "Preview Order" → confirmation screen appears.
-5. Confirmation shows "Account Under Review" notice — trade blocked (simulated).
-6. User can switch to Sell tab and repeat the same flow.
-7. User dismisses modal and returns to their previous page.
+**Markets:**
+1. User clicks "Markets" / "Mercati" in header.
+2. Sees 50+ coins with live prices, 24h change, market cap, volume.
+3. Can search, filter by category (DeFi, Layer 1, Stablecoins, etc.).
+4. Clicks any coin → full detail page with chart and stats.
 
-**Learn articles:**
-1. User navigates to /learn from the header.
-2. Sees the 6 topic cards (existing layout).
-3. Clicks any card → navigates to /learn/what-is-bitcoin (or relevant slug).
-4. Reads the full article with professional formatting.
-5. Can click "Back to Learn" or a related article link.
+**Wallet Assets:**
+1. User logs in, lands on wallet dashboard.
+2. Scrolls to Assets section — sees all 50 coins with live prices and their personal balance.
+3. Held coins (non-zero balance) appear at the top.
+4. Clicks a coin → navigates to its market detail page.
+
+**Transactions:**
+1. User clicks the "Transactions" button in the wallet.
+2. Sees a portfolio chart at the top with timeframe toggles.
+3. Below the chart: live portfolio value.
+4. Below that: full transaction history with filters (deposits, withdrawals, sends, swaps, etc.).
 
 ---
 
 ## UI/UX feel
 
-- **Trade modal**: Clean, minimal, Coinbase-inspired. White/dark card with generous padding. Smooth open/close animation. The Buy/Sell tabs use underline or pill-style active indicator. Asset selector shows coin icons + ticker + current price. Amount input is large and prominent. The "under review" state uses an info banner with a shield icon — professional, not alarming.
-- **Learn articles**: Magazine-style reading experience. Clear typography hierarchy. Difficulty badges carry over from the card. Subtle fade-in on page load.
-- **Header**: The Trade button replaces two dropdown menus, decluttering the nav. BTC ticker shows a proper icon.
+- **Markets table**: Clean Coinbase-style table with alternating hover rows. Coin icons, sparkline mini-charts optional. Mobile-responsive with horizontal scroll.
+- **Wallet Assets**: Coinbase portfolio list — each coin row is a clickable card with icon, name, price, change badge, and personal balance right-aligned. Subtle separators. "See all" expands if list is long.
+- **Transactions page**: Chart-first layout. The chart is prominent (not tiny). Transaction list below uses the existing card/row style with type icons, amounts, and status badges.
+- **Header**: Clean text links. No visual change beyond the label renames.
 
 ---
 
@@ -79,34 +77,32 @@ Platform end-users (simulated traders) who interact with the exchange UI, and ad
 
 ### Phase 1 — MVP (built now)
 
-1. **Fix BTC icon** in header ticker (inline SVG or reliable source).
-2. **Replace header nav** — remove Compra/Vendi dropdowns, add single "Trade" button.
-3. **Build Trade modal** — Buy/Sell tabs, asset selector, amount input, preview step, "under review" block on confirm. Localized EN/IT.
-4. **Make Learn cards clickable** — add routing to `/learn/:slug`.
-5. **Build Learn article detail page** — layout, 6 full articles with real content, EN/IT localized.
-6. Test all changes across dark/light mode and both languages.
+1. **Backend**: Expand CoinGecko fetch to top 50 coins. Update `/api/market/prices` to return 50 coins. Update the coin ID mapping for all 50.
+2. **Markets page**: Update to display all 50 coins. Ensure search and category filters work with the larger dataset.
+3. **Wallet Assets**: Replace the current 2-coin (USDC/EUR) asset list with the full 50-coin list showing live prices and user balances.
+4. **Transactions redesign**: Add chart + live price section above the transaction list on the `/transactions` page (or within the wallet view when "Transactions" is clicked).
+5. **Header renames**: "Impara"→"Sicurezza", "Pagine"→"Chi Siamo" in both EN and IT.
 
 ### Phase 2 — Enhancements
 
-- Animate Trade modal transitions (slide-up on mobile, fade on desktop).
-- Add price change sparkline inside the Trade modal asset selector.
-- Add search/filter to Learn page by difficulty level.
-- Add "Share" button on articles.
+- Add mini sparkline charts to each coin row in Markets and Assets.
+- Add "Favorites" / watchlist functionality.
+- Portfolio breakdown by coin in the transactions chart header.
 
 ### Phase 3 — Advanced
 
-- Make Trade flow functional for simulated execution (balance updates on confirmed trades) once admin approves accounts.
-- Add more Learn articles dynamically (admin-managed content).
-- Trading history page linked from Trade modal.
+- Real-time price updates via WebSocket instead of polling.
+- Advanced filtering and sorting in Markets (gainers, losers, trending).
+- Export transaction history as CSV/PDF.
 
 ---
 
 ## Assumptions
 
-- The "under review" block in the Trade modal is the final state for all users in simulation mode — no simulated trade execution in this phase.
-- The 6 existing Learn topics are the full set for Phase 1; no new topics added.
-- Article content is written in English first, then translated to Italian — both hardcoded in the i18n system (no CMS).
-- The Trade button replaces both dropdown menus entirely — no residual dropdown behavior.
-- The BTC icon fix uses an inline SVG to avoid external CDN dependency issues.
-- The Learn article detail page uses the existing RockieLayout wrapper for consistent header/footer.
-- Mobile responsiveness follows existing patterns (no dedicated mobile redesign).
+- Top 50 coins by market cap provides sufficient coverage. The exact list comes from CoinGecko's ranking at fetch time.
+- CoinGecko free API rate limits are managed with the existing 60-second cache. 50 coins in one call is within limits.
+- The wallet asset list shows ALL 50 coins for discoverability (Coinbase style), even if the user holds 0 — held coins sort to the top.
+- "Sicurezza"/"Security" label still links to `/learn` (not `/security`) — it's purely a text rename as requested.
+- "Chi Siamo"/"About Us" replaces "Pagine"/"Pages" as the dropdown label — the sub-links inside remain the same.
+- The transactions chart uses BTC as a market proxy (same approach as the portfolio chart today).
+- The existing transaction list functionality (filters, pagination) is preserved — the chart is added above it, not replacing it.

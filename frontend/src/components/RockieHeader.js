@@ -161,7 +161,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                           <Link to="/markets">{t.nav_markets}</Link>
                         </li>
                         <li className="menu-item">
-                          <Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link>
+                          <Link to="/learn">{lang === 'it' ? 'Sicurezza' : 'Security'}</Link>
                         </li>
                         <li className="menu-item bitusdt-item">
                           <Link to="/markets/BTC" style={{display:'inline-flex',alignItems:'center',gap:6}}>
@@ -177,7 +177,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                           </Link>
                         </li>
                         <li className="menu-item menu-item-has-children" onClick={(e) => { e.stopPropagation(); toggleDropdown('pages'); }}>
-                          <a href="#!">{t.nav_pages}</a>
+                          <a href="#!">{lang === 'it' ? 'Chi Siamo' : 'About Us'}</a>
                           <ul className={`sub-menu ${activeDropdown === 'pages' ? 'show' : ''}`}>
                             <li className="menu-item"><Link to="/about">{t.nav_about}</Link></li>
                             <li className="menu-item"><Link to="/earn">{lang === 'it' ? 'Guadagna' : 'Earn'}</Link></li>

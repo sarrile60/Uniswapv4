@@ -543,61 +543,108 @@ const WalletDashboard = () => {
             </div>
           )}
 
-          {/* Asset List */}
+          {/* Asset List — All coins with live prices + user balances */}
           <div className="cb-asset-list">
             <div className="cb-asset-list-header">
               <span className="rk-section-title" style={{fontSize:16}}>{t.assets}</span>
               <Link to="/transactions" className="rk-section-link">{t.seeAll}</Link>
             </div>
 
-            {/* USDC Row */}
-            <div className="cb-asset-row" data-testid="usdc-asset-card" onClick={() => navigate('/transactions')}>
-              <CryptoIcon symbol="USDC" size={40} />
-              <div>
-                <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>USD Coin</div>
-                <div style={{fontSize:12,color:'var(--r-text)'}}>USDC</div>
+            {/* USDC Row (always first if user has balance) */}
+            {parseFloat(getUSDCWallet()?.balance || 0) > 0 && (
+              <div className="cb-asset-row" data-testid="usdc-asset-card" onClick={() => navigate('/markets/USDT')}>
+                <CryptoIcon symbol="USDC" size={40} />
+                <div>
+                  <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>USD Coin</div>
+                  <div style={{fontSize:12,color:'var(--r-text)'}}>USDC</div>
+                </div>
+                <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>
+                  ${(1 / (exchangeRate.usdc_eur || 1)).toFixed(4)}
+                </div>
+                <div className="hide-mobile" style={{fontSize:13,color: exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
+                  {exchangeRate.change_24h_pct >= 0 ? '+' : ''}{exchangeRate.change_24h_pct?.toFixed(2)}%
+                </div>
+                <div className="hide-mobile" style={{width:80}}>
+                  <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
+                    <path d={exchangeRate.change_24h_pct >= 0 ? "M0 18 L10 16 L20 14 L30 15 L40 11 L50 13 L60 8 L70 6 L80 9" : "M0 6 L10 8 L20 11 L30 9 L40 13 L50 11 L60 16 L70 18 L80 15"} stroke={exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444'} strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
+                  <div style={{fontSize:12,color:'var(--r-text)'}} data-testid="usdc-eur-value">≈ €{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
+                  {availableBalance.USDC && availableBalance.USDC.available !== availableBalance.USDC.total && (
+                    <div style={{fontSize:11,color:'#f59e0b',marginTop:2}} data-testid="usdc-available">
+                      <Lock className="w-3 h-3 inline mr-0.5" />{t.available}: {showBalance ? formatBalance(availableBalance.USDC.available) : '••••••'}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>
-                ${(1 / (exchangeRate.usdc_eur || 1)).toFixed(4)}
-              </div>
-              <div className="hide-mobile" style={{fontSize:13,color: exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
-                {exchangeRate.change_24h_pct >= 0 ? '+' : ''}{exchangeRate.change_24h_pct?.toFixed(2)}%
-              </div>
-              <div className="hide-mobile" style={{width:80}}>
-                <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
-                  <path d={exchangeRate.change_24h_pct >= 0 ? "M0 18 L10 16 L20 14 L30 15 L40 11 L50 13 L60 8 L70 6 L80 9" : "M0 6 L10 8 L20 11 L30 9 L40 13 L50 11 L60 16 L70 18 L80 15"} stroke={exchangeRate.change_24h_pct >= 0 ? '#22c55e' : '#ef4444'} strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
-              </div>
-              <div style={{textAlign:'right'}}>
-                <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="usdc-total">{showBalance ? formatBalance(getUSDCWallet()?.balance) : '••••••'} USDC</div>
-                <div style={{fontSize:12,color:'var(--r-text)'}} data-testid="usdc-eur-value">≈ €{showBalance ? formatBalance((parseFloat(getUSDCWallet()?.balance || 0) * exchangeRate.usdc_eur).toFixed(2)) : '••••••'}</div>
-                {availableBalance.USDC && availableBalance.USDC.available !== availableBalance.USDC.total && (
-                  <div style={{fontSize:11,color:'#f59e0b',marginTop:2}} data-testid="usdc-available">
-                    <Lock className="w-3 h-3 inline mr-0.5" />{t.available}: {showBalance ? formatBalance(availableBalance.USDC.available) : '••••••'}
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
 
-            {/* EUR Row */}
-            <div className="cb-asset-row" data-testid="eur-asset-card" onClick={() => navigate('/transactions')}>
-              <CryptoIcon symbol="EUR" size={40} />
-              <div>
-                <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>Euro</div>
-                <div style={{fontSize:12,color:'var(--r-text)'}}>EUR</div>
+            {/* EUR Row (always show if user has balance) */}
+            {parseFloat(getEURWallet()?.balance || 0) > 0 && (
+              <div className="cb-asset-row" data-testid="eur-asset-card" onClick={() => navigate('/transactions')}>
+                <CryptoIcon symbol="EUR" size={40} />
+                <div>
+                  <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>Euro</div>
+                  <div style={{fontSize:12,color:'var(--r-text)'}}>EUR</div>
+                </div>
+                <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>€1.00</div>
+                <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>—</div>
+                <div className="hide-mobile" style={{width:80}}>
+                  <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
+                    <path d="M0 12 L80 12" stroke="var(--r-text)" strokeWidth="1" strokeDasharray="4 4" opacity="0.3" />
+                  </svg>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="eur-total">€{showBalance ? formatBalance(getEURWallet()?.balance) : '••••••'}</div>
+                  <div style={{fontSize:12,color:'var(--r-text)'}}>{t.balance}</div>
+                </div>
               </div>
-              <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>€1.00</div>
-              <div className="hide-mobile" style={{fontSize:13,color:'var(--r-text)'}}>—</div>
-              <div className="hide-mobile" style={{width:80}}>
-                <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
-                  <path d="M0 12 L80 12" stroke="var(--r-text)" strokeWidth="1" strokeDasharray="4 4" opacity="0.3" />
-                </svg>
+            )}
+
+            {/* All market coins — sorted by market cap */}
+            {marketPrices.slice(0, 20).map(coin => (
+              <div key={coin.symbol} className="cb-asset-row" onClick={() => navigate(`/markets/${coin.symbol}`)}
+                style={{cursor:'pointer'}}>
+                <CryptoIcon symbol={coin.symbol} size={40} />
+                <div>
+                  <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>{coin.name}</div>
+                  <div style={{fontSize:12,color:'var(--r-text)'}}>{coin.symbol}</div>
+                </div>
+                <div className="hide-mobile" style={{fontSize:13,color:'var(--r-onsurface)',fontWeight:600}}>
+                  ${coin.price?.toLocaleString('en-US', {maximumFractionDigits: coin.price < 1 ? 6 : 2})}
+                </div>
+                <div className="hide-mobile" style={{fontSize:13,color: (coin.change_24h || 0) >= 0 ? '#22c55e' : '#ef4444',fontWeight:600}}>
+                  {(coin.change_24h || 0) >= 0 ? '+' : ''}{(coin.change_24h || 0).toFixed(2)}%
+                </div>
+                <div className="hide-mobile" style={{width:80}}>
+                  <svg width="80" height="24" viewBox="0 0 80 24" fill="none">
+                    <path d={(coin.change_24h || 0) >= 0
+                      ? "M0 18 L10 16 L20 14 L30 15 L40 11 L50 13 L60 8 L70 6 L80 9"
+                      : "M0 6 L10 8 L20 11 L30 9 L40 13 L50 11 L60 16 L70 18 L80 15"}
+                      stroke={(coin.change_24h || 0) >= 0 ? '#22c55e' : '#ef4444'} strokeWidth="1.5" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <div style={{textAlign:'right'}}>
+                  <div style={{fontWeight:600,fontSize:13,color:'var(--r-text)'}}>
+                    ${coin.market_cap ? (coin.market_cap / 1e9).toFixed(1) + 'B' : '—'}
+                  </div>
+                  <div style={{fontSize:11,color:'var(--r-text)',opacity:0.7}}>
+                    {lang === 'it' ? 'Cap.' : 'MCap'}
+                  </div>
+                </div>
               </div>
-              <div style={{textAlign:'right'}}>
-                <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}} data-testid="eur-total">€{showBalance ? formatBalance(getEURWallet()?.balance) : '••••••'}</div>
-                <div style={{fontSize:12,color:'var(--r-text)'}}>{t.balance}</div>
+            ))}
+
+            {/* View all markets link */}
+            {marketPrices.length > 20 && (
+              <div style={{textAlign:'center',padding:'12px 20px'}}>
+                <Link to="/markets" style={{color:'#3772ff',fontWeight:600,fontSize:13}}>
+                  {lang === 'it' ? 'Vedi tutti i mercati →' : 'View all markets →'}
+                </Link>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Recent Transactions */}

@@ -10,10 +10,10 @@ const API = process.env.REACT_APP_BACKEND_URL;
 
 const CATEGORIES = {
   all: null,
-  defi: ['ETH', 'ADA', 'SOL', 'DOT'],
-  nft: ['SOL', 'ETH', 'BNB'],
-  layer1: ['BTC', 'ETH', 'SOL', 'ADA', 'DOT', 'BNB'],
-  stablecoins: ['USDT'],
+  defi: ['ETH', 'UNI', 'AAVE', 'MKR', 'LDO', 'GRT', 'INJ', 'LINK', 'ALGO', 'FTM'],
+  nft: ['SOL', 'ETH', 'SAND', 'MANA', 'AXS', 'IMX', 'APT'],
+  layer1: ['BTC', 'ETH', 'SOL', 'ADA', 'DOT', 'BNB', 'AVAX', 'NEAR', 'APT', 'SUI', 'SEI', 'ATOM', 'FTM', 'TRX', 'EOS'],
+  stablecoins: ['USDT', 'DAI'],
 };
 
 const MarketsPage = () => {

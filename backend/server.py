@@ -4830,6 +4830,48 @@ COINGECKO_IDS = {
     "solana": "SOL",
     "ripple": "XRP",
     "polkadot": "DOT",
+    "avalanche-2": "AVAX",
+    "chainlink": "LINK",
+    "dogecoin": "DOGE",
+    "shiba-inu": "SHIB",
+    "matic-network": "MATIC",
+    "tron": "TRX",
+    "litecoin": "LTC",
+    "uniswap": "UNI",
+    "wrapped-bitcoin": "WBTC",
+    "bitcoin-cash": "BCH",
+    "stellar": "XLM",
+    "cosmos": "ATOM",
+    "monero": "XMR",
+    "ethereum-classic": "ETC",
+    "filecoin": "FIL",
+    "internet-computer": "ICP",
+    "hedera-hashgraph": "HBAR",
+    "lido-dao": "LDO",
+    "arbitrum": "ARB",
+    "optimism": "OP",
+    "near": "NEAR",
+    "vechain": "VET",
+    "aptos": "APT",
+    "algorand": "ALGO",
+    "fantom": "FTM",
+    "the-graph": "GRT",
+    "aave": "AAVE",
+    "the-sandbox": "SAND",
+    "decentraland": "MANA",
+    "axie-infinity": "AXS",
+    "maker": "MKR",
+    "eos": "EOS",
+    "theta-token": "THETA",
+    "render-token": "RNDR",
+    "injective-protocol": "INJ",
+    "sui": "SUI",
+    "sei-network": "SEI",
+    "celestia": "TIA",
+    "stacks": "STX",
+    "immutable-x": "IMX",
+    "pepe": "PEPE",
+    "dai": "DAI",
 }
 
 @api_router.get("/market/prices")
@@ -4843,7 +4885,7 @@ async def get_market_prices():
     
     try:
         coin_ids = ",".join(COINGECKO_IDS.keys())
-        url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h"
+        url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h"
         
         async with _httpx.AsyncClient(timeout=10.0) as client:
             resp = await client.get(url, headers={
@@ -4870,9 +4912,8 @@ async def get_market_prices():
                 "last_updated": coin.get("last_updated", ""),
             })
         
-        # Sort by market cap (same order as input)
-        symbol_order = list(COINGECKO_IDS.values())
-        prices.sort(key=lambda x: symbol_order.index(x["symbol"]) if x["symbol"] in symbol_order else 999)
+        # Sort by market cap descending (natural CoinGecko order)
+        prices.sort(key=lambda x: x.get("market_cap", 0), reverse=True)
         
         _market_cache["data"] = prices
         _market_cache["timestamp"] = now
