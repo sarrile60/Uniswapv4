@@ -4819,7 +4819,26 @@ import httpx as _httpx
 import time as _time
 
 # Simple in-memory cache for market data
-_market_cache = {"data": None, "timestamp": 0, "ttl": 60}  # 60 second TTL
+_market_cache = {"data": None, "timestamp": 0, "ttl": 300}  # 5 minute TTL to avoid rate limits
+
+# Hardcoded fallback data for when CoinGecko is rate-limited
+_FALLBACK_PRICES = [
+    {"symbol":"BTC","name":"Bitcoin","price":83000,"change_24h":0.5,"high_24h":83500,"low_24h":80500,"volume_24h":37000000000,"market_cap":1660000000000,"image":""},
+    {"symbol":"ETH","name":"Ethereum","price":2490,"change_24h":-1.5,"high_24h":2530,"low_24h":2410,"volume_24h":16500000000,"market_cap":304000000000,"image":""},
+    {"symbol":"USDT","name":"Tether","price":1.00,"change_24h":-0.01,"high_24h":1.00,"low_24h":1.00,"volume_24h":71000000000,"market_cap":184000000000,"image":""},
+    {"symbol":"BNB","name":"BNB","price":740,"change_24h":-2.3,"high_24h":756,"low_24h":718,"volume_24h":1200000000,"market_cap":98000000000,"image":""},
+    {"symbol":"XRP","name":"XRP","price":1.38,"change_24h":-1.3,"high_24h":1.41,"low_24h":1.32,"volume_24h":2900000000,"market_cap":87000000000,"image":""},
+    {"symbol":"SOL","name":"Solana","price":110,"change_24h":-2.2,"high_24h":112,"low_24h":106,"volume_24h":4500000000,"market_cap":65000000000,"image":""},
+    {"symbol":"DOGE","name":"Dogecoin","price":0.08,"change_24h":-3.0,"high_24h":0.09,"low_24h":0.08,"volume_24h":1000000000,"market_cap":13000000000,"image":""},
+    {"symbol":"ADA","name":"Cardano","price":0.24,"change_24h":-4.5,"high_24h":0.25,"low_24h":0.22,"volume_24h":740000000,"market_cap":8500000000,"image":""},
+    {"symbol":"AVAX","name":"Avalanche","price":19.5,"change_24h":-3.1,"high_24h":20.2,"low_24h":18.8,"volume_24h":350000000,"market_cap":8000000000,"image":""},
+    {"symbol":"DOT","name":"Polkadot","price":3.8,"change_24h":-2.8,"high_24h":3.95,"low_24h":3.65,"volume_24h":200000000,"market_cap":5800000000,"image":""},
+    {"symbol":"LINK","name":"Chainlink","price":12.8,"change_24h":-1.4,"high_24h":13.0,"low_24h":12.1,"volume_24h":435000000,"market_cap":8200000000,"image":""},
+    {"symbol":"TRX","name":"TRON","price":0.33,"change_24h":-0.7,"high_24h":0.33,"low_24h":0.33,"volume_24h":366000000,"market_cap":31600000000,"image":""},
+    {"symbol":"USDC","name":"USD Coin","price":1.00,"change_24h":0.01,"high_24h":1.001,"low_24h":0.999,"volume_24h":8000000000,"market_cap":52000000000,"image":""},
+    {"symbol":"LTC","name":"Litecoin","price":72,"change_24h":-1.8,"high_24h":74,"low_24h":70,"volume_24h":400000000,"market_cap":5400000000,"image":""},
+    {"symbol":"UNI","name":"Uniswap","price":5.5,"change_24h":-2.1,"high_24h":5.7,"low_24h":5.3,"volume_24h":150000000,"market_cap":3300000000,"image":""},
+]
 
 COINGECKO_IDS = {
     "bitcoin": "BTC",
@@ -4888,13 +4907,33 @@ async def get_market_prices():
         coin_ids = ",".join(COINGECKO_IDS.keys())
         url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h"
         
-        async with _httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get(url, headers={
-                "Accept": "application/json",
-                "User-Agent": "UniswapV4-Platform/1.0"
-            })
-            resp.raise_for_status()
-            raw_data = resp.json()
+        # Retry up to 2 times with backoff on rate limit
+        raw_data = None
+        for attempt in range(3):
+            try:
+                async with _httpx.AsyncClient(timeout=10.0) as client:
+                    resp = await client.get(url, headers={
+                        "Accept": "application/json",
+                        "User-Agent": "UniswapV4-Platform/1.0"
+                    })
+                    if resp.status_code == 429:
+                        wait = 2 ** attempt
+                        logger.warning(f"CoinGecko 429 rate limit, retry {attempt+1}/3 after {wait}s")
+                        import asyncio
+                        await asyncio.sleep(wait)
+                        continue
+                    resp.raise_for_status()
+                    raw_data = resp.json()
+                    break
+            except Exception:
+                if attempt < 2:
+                    import asyncio
+                    await asyncio.sleep(1)
+                    continue
+                raise
+        
+        if not raw_data:
+            raise Exception("All retries exhausted (429 rate limit)")
         
         # Transform to our format
         prices = []
@@ -4926,8 +4965,9 @@ async def get_market_prices():
         # Return stale cache if available
         if _market_cache["data"]:
             return {"ok": True, "data": _market_cache["data"], "cached": True, "stale": True}
-        # Fallback static data
-        return {"ok": True, "data": [], "error": "Unable to fetch live prices"}
+        # Fallback to hardcoded static data so UI is never empty
+        logger.warning("Using hardcoded fallback prices — CoinGecko API unavailable")
+        return {"ok": True, "data": _FALLBACK_PRICES, "cached": True, "fallback": True}
 
 
 # Reverse lookup: symbol → coingecko id

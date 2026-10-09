@@ -206,17 +206,17 @@ const WalletDashboard = () => {
     loadWithdrawalDefaults();
   }, []);
 
-  // Fetch market prices for sidebar
+  // Fetch market prices for sidebar + asset list
   useEffect(() => {
     const fetchMarket = async () => {
       try {
         const res = await fetch(`${API}/api/market/prices`);
         const json = await res.json();
-        if (json.ok && json.data) setMarketPrices(json.data.slice(0, 4));
-      } catch {}
+        if (json.ok && json.data) setMarketPrices(json.data);
+      } catch { /* silent */ }
     };
     fetchMarket();
-    const iv = setInterval(fetchMarket, 60000);
+    const iv = setInterval(fetchMarket, 120000); // every 2 min (less aggressive)
     return () => clearInterval(iv);
   }, []);
 
@@ -736,7 +736,7 @@ const WalletDashboard = () => {
           {/* Live Market Prices */}
           <div className="cb-sidebar-card">
             <div className="cb-sidebar-title">{lang === 'it' ? 'Prezzi di Mercato' : 'Market Prices'}</div>
-            {marketPrices.map(coin => (
+            {marketPrices.slice(0, 4).map(coin => (
               <div key={coin.symbol} className="cb-market-row" onClick={() => navigate(`/markets/${coin.symbol}`)}>
                 <CryptoIcon symbol={coin.symbol} size={32} />
                 <div style={{flex:1}}>
