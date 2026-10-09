@@ -27,6 +27,7 @@ const MarketsPage = () => {
   const [sortKey, setSortKey] = useState('market_cap');
   const [sortDir, setSortDir] = useState('desc');
   const [favorites, setFavorites] = useState([]);
+  const [pageSize, setPageSize] = useState(10);
 
   useEffect(() => {
     if (isAuthenticated && user?.email) {
@@ -167,7 +168,7 @@ const MarketsPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filtered.map((coin, idx) => (
+                  {filtered.slice(0, pageSize).map((coin, idx) => (
                     <tr key={coin.symbol}
                       style={{borderBottom:'1px solid var(--r-line)',cursor:'pointer',transition:'background 0.15s'}}
                       onMouseEnter={e => e.currentTarget.style.background='rgba(55,114,255,0.04)'}
@@ -180,7 +181,7 @@ const MarketsPage = () => {
                       <td style={{padding:'12px 8px',fontSize:13,color:'var(--r-text)'}}>{idx+1}</td>
                       <td style={{padding:'12px 16px'}}>
                         <div style={{display:'flex',alignItems:'center',gap:12}}>
-                          <CryptoIcon symbol={coin.symbol} size={32} />
+                          <CryptoIcon symbol={coin.symbol} size={32} imageUrl={coin.image} />
                           <div>
                             <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>{coin.name}</div>
                             <div style={{fontSize:12,color:'var(--r-text)'}}>{coin.symbol}</div>
@@ -204,6 +205,27 @@ const MarketsPage = () => {
                   ))}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Show more / page size controls */}
+          {!loading && filtered.length > 0 && (
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'16px 20px',borderTop:'1px solid var(--r-line)'}}>
+              <span style={{fontSize:13,color:'var(--r-text)'}}>
+                {lang === 'it' ? 'Mostrando' : 'Showing'} {Math.min(pageSize, filtered.length)} {lang === 'it' ? 'di' : 'of'} {filtered.length}
+              </span>
+              <div style={{display:'flex',gap:6}}>
+                {[10, 20, 50].map(sz => (
+                  <button key={sz} onClick={() => setPageSize(sz)}
+                    style={{
+                      padding:'6px 16px',borderRadius:8,fontSize:12,fontWeight:600,border:'none',cursor:'pointer',
+                      background: pageSize === sz ? '#3772ff' : 'var(--r-surface)',
+                      color: pageSize === sz ? '#fff' : 'var(--r-text)',transition:'all 0.2s',
+                    }}>
+                    {sz}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>

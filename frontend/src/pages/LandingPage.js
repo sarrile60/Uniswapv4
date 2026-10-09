@@ -137,6 +137,7 @@ const LandingPage = () => {
     symbol: coin.symbol,
     name: coin.name,
     pair: coin.symbol,
+    image: coin.image || '',
     lastTraded: formatPrice(coin.price),
     change: `${coin.change_24h >= 0 ? "+" : ""}${coin.change_24h}%`,
     up: coin.change_24h >= 0,
@@ -166,6 +167,7 @@ const LandingPage = () => {
   const [activeMarketMain, setActiveMarketMain] = useState(1); // Derivatives active
   const [activeMarketSub, setActiveMarketSub] = useState(0);
   const [activeMarketFilter, setActiveMarketFilter] = useState(0);
+  const [landingPageSize, setLandingPageSize] = useState(10);
 
   const testimonials = [
     { text: t.land_testimonial1, name: "Alex Johnson", position: "Crypto Trader", avatar: "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDk2IDk2Ij4KICA8Y2lyY2xlIGN4PSI0OCIgY3k9IjQ4IiByPSI0OCIgZmlsbD0iIzM3NzJmZiIvPgogIDx0ZXh0IHg9IjQ4IiB5PSI0OCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZG9taW5hbnQtYmFzZWxpbmU9ImNlbnRyYWwiIAogICAgICAgIGZvbnQtZmFtaWx5PSItYXBwbGUtc3lzdGVtLEJsaW5rTWFjU3lzdGVtRm9udCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjM2IiBmb250LXdlaWdodD0iNzAwIiBmaWxsPSIjZmZmIj5BSjwvdGV4dD4KPC9zdmc+", initials: "AJ", color: "#3772ff" },
@@ -409,7 +411,7 @@ const LandingPage = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {displayData.map((coin, idx) => (
+                        {displayData.slice(0, landingPageSize).map((coin, idx) => (
                           <tr key={coin.symbol}>
                             <td>
                               <span
@@ -423,7 +425,7 @@ const LandingPage = () => {
                             <td>{idx + 1}</td>
                             <td>
                               <div className="td-pair">
-                                <CryptoIcon symbol={coin.symbol} size={28} />
+                                <CryptoIcon symbol={coin.symbol} size={28} imageUrl={coin.image} />
                                 <span className="coin-name">{coin.name}</span>
                                 <span className="coin-symbol">{coin.pair}</span>
                               </div>
@@ -441,6 +443,19 @@ const LandingPage = () => {
                     </table>
                   );
                 })()}
+                {/* Show more controls */}
+                <div style={{display:'flex',alignItems:'center',justifyContent:'center',padding:'16px 0',gap:8}}>
+                  {[10, 20, 50].map(sz => (
+                    <button key={sz} onClick={() => setLandingPageSize(sz)}
+                      style={{
+                        padding:'6px 20px',borderRadius:8,fontSize:12,fontWeight:600,border:'none',cursor:'pointer',
+                        background: landingPageSize === sz ? '#3772ff' : 'rgba(55,114,255,0.08)',
+                        color: landingPageSize === sz ? '#fff' : 'var(--onsurface, #777)',transition:'all 0.2s',
+                      }}>
+                      {lang === 'it' ? `Mostra ${sz}` : `Show ${sz}`}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

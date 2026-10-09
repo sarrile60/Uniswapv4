@@ -91,7 +91,7 @@ const icons = {
   ),
 };
 
-const CryptoIcon = ({ symbol, size = 32, className = '' }) => {
+const CryptoIcon = ({ symbol, size = 32, className = '', imageUrl = '' }) => {
   const upperSymbol = (symbol || '').toUpperCase();
   const renderIcon = icons[upperSymbol];
   
@@ -103,12 +103,28 @@ const CryptoIcon = ({ symbol, size = 32, className = '' }) => {
     );
   }
   
-  // Fallback for unknown symbols
-  const colors = { 
-    DOGE: '#C3A634', LINK: '#2A5ADA', UNI: '#FF007A', AVAX: '#E84142', 
-    MATIC: '#8247E5', ATOM: '#2E3148', ALGO: '#000', FTM: '#1969FF' 
-  };
-  const bg = colors[upperSymbol] || '#3772ff';
+  // Use CoinGecko image URL if provided
+  if (imageUrl) {
+    return (
+      <span className={`crypto-icon-wrapper ${className}`} style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: size, height: size, flexShrink: 0 }}>
+        <img
+          src={imageUrl}
+          alt={upperSymbol}
+          width={size}
+          height={size}
+          style={{ borderRadius: '50%', objectFit: 'cover' }}
+          onError={(e) => {
+            // Fallback to colored circle on load failure
+            e.target.style.display = 'none';
+            e.target.parentElement.innerHTML = `<span style="width:${size}px;height:${size}px;background:${fallbackColors[upperSymbol] || '#3772ff'};display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-size:${size * 0.4}px;font-weight:800;flex-shrink:0">${upperSymbol.charAt(0)}</span>`;
+          }}
+        />
+      </span>
+    );
+  }
+  
+  // Fallback for unknown symbols with no image
+  const bg = fallbackColors[upperSymbol] || '#3772ff';
   
   return (
     <span 
@@ -130,6 +146,21 @@ const CryptoIcon = ({ symbol, size = 32, className = '' }) => {
       {upperSymbol.charAt(0)}
     </span>
   );
+};
+
+// Color fallbacks for coins without built-in SVG icons
+const fallbackColors = { 
+  DOGE: '#C3A634', LINK: '#2A5ADA', UNI: '#FF007A', AVAX: '#E84142', 
+  MATIC: '#8247E5', ATOM: '#2E3148', ALGO: '#000', FTM: '#1969FF',
+  LTC: '#345D9D', TRX: '#EF0027', LDO: '#00A3FF', ARB: '#213147',
+  OP: '#FF0420', NEAR: '#000', VET: '#15BDFF', GRT: '#6747ED',
+  AAVE: '#B6509E', MKR: '#1AAB9B', SAND: '#00ADEF', MANA: '#FF2D55',
+  AXS: '#0055D5', EOS: '#000', THETA: '#2AB8E6', RNDR: '#000',
+  INJ: '#00F2FE', SUI: '#6FBCF0', SEI: '#9B1B30', TIA: '#7B2FBE',
+  STX: '#5546FF', IMX: '#17B5CB', PEPE: '#479F53', DAI: '#F5AC37',
+  BCH: '#0AC18E', XLM: '#000', XMR: '#FF6600', ETC: '#328332',
+  FIL: '#0090FF', ICP: '#29ABE2', HBAR: '#000', WBTC: '#F09242',
+  APT: '#000', SHIB: '#FFA409', DOGE: '#C3A634',
 };
 
 export default CryptoIcon;

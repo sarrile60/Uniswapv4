@@ -97,6 +97,7 @@ const WalletDashboard = () => {
   const [portfolioSparkline, setPortfolioSparkline] = useState([]);
   const [chartTimeframe, setChartTimeframe] = useState('1W');
   const [chartLoading, setChartLoading] = useState(false);
+  const [assetPageSize, setAssetPageSize] = useState(10);
   const sseRef = useRef(null);
 
   // Helper: get price info for any asset (with fallbacks for stablecoins/fiat)
@@ -604,10 +605,10 @@ const WalletDashboard = () => {
             )}
 
             {/* All market coins — sorted by market cap */}
-            {marketPrices.slice(0, 20).map(coin => (
+            {marketPrices.slice(0, assetPageSize).map(coin => (
               <div key={coin.symbol} className="cb-asset-row" onClick={() => navigate(`/markets/${coin.symbol}`)}
                 style={{cursor:'pointer'}}>
-                <CryptoIcon symbol={coin.symbol} size={40} />
+                <CryptoIcon symbol={coin.symbol} size={40} imageUrl={coin.image} />
                 <div>
                   <div style={{fontWeight:700,fontSize:14,color:'var(--r-onsurface)'}}>{coin.name}</div>
                   <div style={{fontSize:12,color:'var(--r-text)'}}>{coin.symbol}</div>
@@ -637,12 +638,24 @@ const WalletDashboard = () => {
               </div>
             ))}
 
-            {/* View all markets link */}
-            {marketPrices.length > 20 && (
-              <div style={{textAlign:'center',padding:'12px 20px'}}>
-                <Link to="/markets" style={{color:'#3772ff',fontWeight:600,fontSize:13}}>
-                  {lang === 'it' ? 'Vedi tutti i mercati →' : 'View all markets →'}
-                </Link>
+            {/* Show more controls */}
+            {marketPrices.length > assetPageSize && (
+              <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 20px',borderTop:'1px solid var(--r-line)'}}>
+                <span style={{fontSize:12,color:'var(--r-text)'}}>
+                  {Math.min(assetPageSize, marketPrices.length)}/{marketPrices.length}
+                </span>
+                <div style={{display:'flex',gap:6}}>
+                  {[10, 20, 50].map(sz => (
+                    <button key={sz} onClick={() => setAssetPageSize(sz)}
+                      style={{
+                        padding:'5px 14px',borderRadius:8,fontSize:11,fontWeight:600,border:'none',cursor:'pointer',
+                        background: assetPageSize === sz ? '#3772ff' : 'var(--r-surface)',
+                        color: assetPageSize === sz ? '#fff' : 'var(--r-text)',transition:'all 0.2s',
+                      }}>
+                      {sz}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
