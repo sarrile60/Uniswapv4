@@ -551,8 +551,8 @@ const WalletDashboard = () => {
           <div className="cb-asset-list">
             <div className="cb-asset-list-header">
               <span className="rk-section-title" style={{fontSize:16}}>{t.assets}</span>
-              <button onClick={() => setAssetPageSize(prev => prev >= 999 ? 10 : 999)} style={{color:'#3772ff',fontWeight:600,fontSize:13,background:'none',border:'none',cursor:'pointer'}}>
-                {assetPageSize >= 999 ? (lang === 'it' ? 'Mostra meno' : 'Show less') : (lang === 'it' ? 'Vedi tutto' : 'See all')}
+              <button onClick={() => setAssetPageSize(assetPageSize >= 900 ? 10 : 9999)} style={{color:'#3772ff',fontWeight:600,fontSize:13,background:'none',border:'none',cursor:'pointer'}}>
+                {assetPageSize >= 900 ? (lang === 'it' ? 'Mostra meno' : 'Show less') : (lang === 'it' ? 'Vedi tutto' : 'See all')}
               </button>
             </div>
 
@@ -569,22 +569,25 @@ const WalletDashboard = () => {
               <div style={{fontSize:11,fontWeight:600,color:'var(--r-text)',textTransform:'uppercase',letterSpacing:'0.5px',textAlign:'right'}}>{lang === 'it' ? 'Saldo' : 'Balance'}</div>
             </div>
 
-            {/* USDC Row */}
-            {parseFloat(getUSDCWallet()?.balance || 0) > 0 && (
-              <div className="cb-asset-row" data-testid="usdc-asset-card" onClick={() => navigate('/markets/USDT')}>
-                <CryptoIcon symbol="USDC" size={36} />
-                <div><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>USD Coin</div><div style={{fontSize:11,color:'var(--r-text)'}}>USDC</div></div>
-                <div className="hide-mobile" style={{textAlign:'right',fontSize:13,fontWeight:600,color:'var(--r-onsurface)'}}>${(1/(exchangeRate.usdc_eur||1)).toFixed(4)}</div>
-                <div className="hide-mobile" style={{textAlign:'right',fontSize:13,fontWeight:600,color:exchangeRate.change_24h_pct>=0?'#22c55e':'#ef4444'}}>{exchangeRate.change_24h_pct>=0?'+':''}{exchangeRate.change_24h_pct?.toFixed(2)}%</div>
-                <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>$1.00</div>
-                <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>$1.00</div>
-                <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
-                <div className="hide-mobile" style={{textAlign:'center'}}><svg width="56" height="18" viewBox="0 0 56 18" fill="none"><path d={exchangeRate.change_24h_pct>=0?"M0 14 L7 13 L14 12 L21 12 L28 11 L35 11 L42 10 L49 10 L56 9":"M0 9 L7 10 L14 10 L21 11 L28 11 L35 12 L42 12 L49 13 L56 14"} stroke={exchangeRate.change_24h_pct>=0?'#22c55e':'#ef4444'} strokeWidth="1.5" strokeLinecap="round" fill="none"/></svg></div>
-                <div style={{textAlign:'right'}}><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>{showBalance?formatBalance(getUSDCWallet()?.balance):'••••••'} USDC</div><div style={{fontSize:11,color:'var(--r-text)'}}>≈ €{showBalance?formatBalance((parseFloat(getUSDCWallet()?.balance||0)*exchangeRate.usdc_eur).toFixed(2)):'••••••'}</div></div>
-              </div>
-            )}
-
-            {/* EUR Row — NOT clickable */}
+            {/* User's held assets first (USDC/EUR with balance) */}
+            {parseFloat(getUSDCWallet()?.balance || 0) > 0 && (() => {
+              const usdcMarket = marketPrices.find(m => m.symbol === 'USDC') || marketPrices.find(m => m.symbol === 'USDT');
+              const fmtP = (p) => { if(!p) return '—'; return '$'+p.toLocaleString('en-US',{maximumFractionDigits:p<1?6:2}); };
+              const fmtV = (v) => { if(!v) return '—'; if(v>=1e9) return '$'+(v/1e9).toFixed(1)+'B'; if(v>=1e6) return '$'+(v/1e6).toFixed(0)+'M'; return '$'+v.toLocaleString(); };
+              return (
+                <div className="cb-asset-row" data-testid="usdc-asset-card" onClick={() => navigate('/markets/USDC')}>
+                  <CryptoIcon symbol="USDC" size={36} imageUrl={usdcMarket?.image} />
+                  <div><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>USD Coin</div><div style={{fontSize:11,color:'var(--r-text)'}}>USDC</div></div>
+                  <div className="hide-mobile" style={{textAlign:'right',fontSize:13,fontWeight:600,color:'var(--r-onsurface)'}}>{fmtP(usdcMarket?.price)}</div>
+                  <div className="hide-mobile" style={{textAlign:'right',fontSize:13,fontWeight:600,color:(usdcMarket?.change_24h||0)>=0?'#22c55e':'#ef4444'}}>{(usdcMarket?.change_24h||0)>=0?'+':''}{(usdcMarket?.change_24h||0).toFixed(2)}%</div>
+                  <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>{fmtP(usdcMarket?.high_24h)}</div>
+                  <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>{fmtP(usdcMarket?.low_24h)}</div>
+                  <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>{fmtV(usdcMarket?.volume_24h)}</div>
+                  <div className="hide-mobile" style={{textAlign:'center'}}><svg width="56" height="18" viewBox="0 0 56 18" fill="none"><path d={(usdcMarket?.change_24h||0)>=0?"M0 14 L7 13 L14 12 L21 12 L28 11 L35 11 L42 10 L49 10 L56 9":"M0 9 L7 10 L14 10 L21 11 L28 11 L35 12 L42 12 L49 13 L56 14"} stroke={(usdcMarket?.change_24h||0)>=0?'#22c55e':'#ef4444'} strokeWidth="1.5" strokeLinecap="round" fill="none"/></svg></div>
+                  <div style={{textAlign:'right'}}><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>{showBalance?formatBalance(getUSDCWallet()?.balance):'••••••'} USDC</div><div style={{fontSize:11,color:'var(--r-text)'}}>≈ €{showBalance?formatBalance((parseFloat(getUSDCWallet()?.balance||0)*exchangeRate.usdc_eur).toFixed(2)):'••••••'}</div></div>
+                </div>
+              );
+            })()}
             {parseFloat(getEURWallet()?.balance || 0) > 0 && (
               <div className="cb-asset-row" data-testid="eur-asset-card" style={{cursor:'default'}}>
                 <CryptoIcon symbol="EUR" size={36} />
@@ -599,10 +602,10 @@ const WalletDashboard = () => {
               </div>
             )}
 
-            {/* Market coins */}
-            {marketPrices.slice(0, assetPageSize >= 999 ? marketPrices.length : assetPageSize).map(coin => {
+            {/* All market coins */}
+            {marketPrices.slice(0, assetPageSize).map(coin => {
               const fmtV = (v) => { if(!v) return '—'; if(v>=1e9) return '$'+(v/1e9).toFixed(1)+'B'; if(v>=1e6) return '$'+(v/1e6).toFixed(0)+'M'; return '$'+v.toLocaleString(); };
-              const fmtP = (p) => { if(!p) return '—'; return '$'+p.toLocaleString('en-US',{maximumFractionDigits:p<1?4:2}); };
+              const fmtP = (p) => { if(!p) return '—'; return '$'+p.toLocaleString('en-US',{maximumFractionDigits:p<1?6:2}); };
               return (
                 <div key={coin.symbol} className="cb-asset-row" onClick={() => navigate(`/markets/${coin.symbol}`)}>
                   <CryptoIcon symbol={coin.symbol} size={36} imageUrl={coin.image} />
@@ -619,9 +622,9 @@ const WalletDashboard = () => {
             })}
 
             {/* Pagination */}
-            {marketPrices.length > 10 && (
+            {marketPrices.length > 10 && assetPageSize < 900 && (
               <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 20px',borderTop:'1px solid var(--r-line)'}}>
-                <span style={{fontSize:12,color:'var(--r-text)'}}>{Math.min(assetPageSize>=999?marketPrices.length:assetPageSize, marketPrices.length)}/{marketPrices.length}</span>
+                <span style={{fontSize:12,color:'var(--r-text)'}}>{Math.min(assetPageSize, marketPrices.length)}/{marketPrices.length}</span>
                 <div style={{display:'flex',gap:6}}>
                   {[10,20,50].map(sz => (
                     <button key={sz} onClick={() => setAssetPageSize(sz)} style={{padding:'5px 14px',borderRadius:8,fontSize:11,fontWeight:600,border:'none',cursor:'pointer',background:assetPageSize===sz?'#3772ff':'var(--r-surface)',color:assetPageSize===sz?'#fff':'var(--r-text)',transition:'all 0.2s'}}>{sz}</button>

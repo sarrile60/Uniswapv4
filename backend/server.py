@@ -4872,6 +4872,7 @@ COINGECKO_IDS = {
     "immutable-x": "IMX",
     "pepe": "PEPE",
     "dai": "DAI",
+    "usd-coin": "USDC",
 }
 
 @api_router.get("/market/prices")
