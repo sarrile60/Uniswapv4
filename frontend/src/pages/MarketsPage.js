@@ -65,21 +65,36 @@ const MarketsPage = () => {
     else { setSortKey(key); setSortDir('desc'); }
   };
 
-  const filtered = coins
-    .filter(c => {
-      if (search) {
-        const q = search.toLowerCase();
-        if (!c.name.toLowerCase().includes(q) && !c.symbol.toLowerCase().includes(q)) return false;
-      }
-      if (category !== 'all' && CATEGORIES[category]) {
-        if (!CATEGORIES[category].includes(c.symbol)) return false;
-      }
-      return true;
-    })
-    .sort((a, b) => {
+  // Pin GOLD and SILVER at positions 4-5 (after BTC, ETH, USDT)
+  const PINNED = ['GOLD', 'SILVER'];
+  const filtered = (() => {
+    let list = coins
+      .filter(c => {
+        if (search) {
+          const q = search.toLowerCase();
+          if (!c.name.toLowerCase().includes(q) && !c.symbol.toLowerCase().includes(q)) return false;
+        }
+        if (category !== 'all' && CATEGORIES[category]) {
+          if (!CATEGORIES[category].includes(c.symbol)) return false;
+        }
+        return true;
+      });
+    
+    const pinned = list.filter(c => PINNED.includes(c.symbol));
+    const rest = list.filter(c => !PINNED.includes(c.symbol));
+    rest.sort((a, b) => {
       const mul = sortDir === 'asc' ? 1 : -1;
       return ((a[sortKey] || 0) - (b[sortKey] || 0)) * mul;
     });
+    
+    if (pinned.length > 0 && category === 'all' && !search) {
+      // Insert after position 3 (after BTC, ETH, USDT)
+      const pos = Math.min(3, rest.length);
+      pinned.sort((a, b) => (a.symbol === 'GOLD' ? -1 : 1));
+      return [...rest.slice(0, pos), ...pinned, ...rest.slice(pos)];
+    }
+    return [...rest, ...pinned].length > 0 ? [...pinned, ...rest] : rest;
+  })();
 
   const fmt = (n) => {
     if (n >= 1e12) return `$${(n/1e12).toFixed(2)}T`;

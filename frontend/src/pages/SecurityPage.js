@@ -68,8 +68,8 @@ const SecurityPage = () => {
           </div>
         </div>
 
-        {/* 2FA */}
-        <div className="rk-card" style={{padding:20,marginBottom:16}}>
+        {/* 2FA — Currently Unavailable */}
+        <div className="rk-card" style={{padding:20,marginBottom:16,opacity:0.7}}>
           <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
             <div style={{display:'flex',alignItems:'center',gap:14}}>
               <div style={{width:40,height:40,borderRadius:10,background:'rgba(55,114,255,0.1)',display:'flex',alignItems:'center',justifyContent:'center'}}>
@@ -81,15 +81,13 @@ const SecurityPage = () => {
               </div>
             </div>
             <div style={{textAlign:'right'}}>
-              <span className={`rk-badge ${twoFA ? 'rk-badge-success' : 'rk-badge-warning'}`} style={{marginBottom:6,display:'inline-block'}}>
-                {twoFA ? t.enabled : t.disabled}
+              <span className="rk-badge rk-badge-neutral" style={{marginBottom:6,display:'inline-block'}}>
+                {lang === 'it' ? 'Non Disponibile' : 'Unavailable'}
               </span>
               <br/>
-              <button onClick={() => setTwoFA(!twoFA)}
-                style={{padding:'6px 16px',borderRadius:8,fontSize:12,fontWeight:600,border:'none',cursor:'pointer',marginTop:4,
-                  background: twoFA ? 'rgba(239,68,68,0.1)' : '#3772ff', color: twoFA ? '#ef4444' : '#fff'}}>
-                {twoFA ? t.disable : t.enable}
-              </button>
+              <span style={{fontSize:11,color:'var(--r-text)'}}>
+                {lang === 'it' ? 'Prossimamente' : 'Coming Soon'}
+              </span>
             </div>
           </div>
         </div>
@@ -127,25 +125,6 @@ const SecurityPage = () => {
           </div>
         </div>
 
-        {/* Login History */}
-        <h2 className="rk-section-title" style={{fontSize:18,marginTop:28,marginBottom:16}}>{t.loginHistory}</h2>
-        <div className="rk-card" style={{padding:0,overflow:'hidden'}}>
-          {loginHistory.map((entry, i) => (
-            <div key={i} style={{display:'flex',alignItems:'center',gap:14,padding:'14px 20px',borderBottom: i < loginHistory.length - 1 ? '1px solid var(--r-line)' : 'none'}}>
-              <div style={{width:36,height:36,borderRadius:10,background: entry.current ? 'rgba(34,197,94,0.1)' : 'rgba(156,163,180,0.1)',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                {entry.current ? <CheckCircle style={{width:18,height:18,color:'#22c55e'}} /> : <Globe style={{width:18,height:18,color:'var(--r-text)'}} />}
-              </div>
-              <div style={{flex:1}}>
-                <div style={{fontWeight:600,fontSize:14,color:'var(--r-onsurface)'}}>{entry.device}</div>
-                <div style={{fontSize:12,color:'var(--r-text)'}}>{entry.ip} · {entry.location}</div>
-              </div>
-              <div style={{textAlign:'right'}}>
-                <div style={{fontSize:12,color:'var(--r-text)'}}>{entry.time}</div>
-                {entry.current && <span className="rk-badge rk-badge-success" style={{marginTop:4}}>{lang === 'it' ? 'Attuale' : 'Current'}</span>}
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
     </div>
   );

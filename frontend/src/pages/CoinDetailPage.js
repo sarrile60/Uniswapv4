@@ -25,8 +25,26 @@ const CoinDetailPage = () => {
       try {
         const res = await fetch(`${API}/api/market/coin/${symbol}`);
         const json = await res.json();
-        if (json.ok && json.data) setCoin(json.data);
+        if (json.ok && json.data) { setCoin(json.data); return; }
       } catch (e) { console.error(e); }
+      // Fallback: build from market prices endpoint
+      try {
+        const res2 = await fetch(`${API}/api/market/prices`);
+        const json2 = await res2.json();
+        if (json2.ok && json2.data) {
+          const mp = json2.data.find(c => c.symbol === symbol?.toUpperCase());
+          if (mp) {
+            setCoin({
+              symbol: mp.symbol, name: mp.name, description: '', image: mp.image || '',
+              price: mp.price, change_24h: mp.change_24h, change_7d: 0,
+              high_24h: mp.high_24h, low_24h: mp.low_24h,
+              market_cap: mp.market_cap, volume_24h: mp.volume_24h,
+              circulating_supply: 0, total_supply: 0, ath: 0, atl: 0, sparkline_7d: [],
+            });
+            return;
+          }
+        }
+      } catch { /* silent */ }
       finally { setLoading(false); }
     };
     fetchCoin();

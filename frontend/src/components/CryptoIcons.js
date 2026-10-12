@@ -107,6 +107,98 @@ const icons = {
       <text x="16" y="25" textAnchor="middle" style={{fontSize:5,fontWeight:700,fill:'#fff'}}>Ag</text>
     </svg>
   ),
+  DOGE: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#C3A634"/>
+    <text x="16" y="20" textAnchor="middle" style={{fontSize:13,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>Ð</text></svg>
+  ),
+  LINK: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#2A5ADA"/>
+    <path d="M16 6l-2 1.2-6 3.4-2 1.2v8.4l2 1.2 6 3.4 2 1.2 2-1.2 6-3.4 2-1.2v-8.4l-2-1.2-6-3.4-2-1.2zm-6 13.4v-6.8l6-3.4 6 3.4v6.8l-6 3.4-6-3.4z" fill="white"/></svg>
+  ),
+  AVAX: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#E84142"/>
+    <path d="M21.5 21h3L16 9 7.5 21h3l5.5-9 5.5 9z" fill="white"/></svg>
+  ),
+  LTC: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#345D9D"/>
+    <path d="M16.5 7l-1 9.5-4 2 .5-1.5 3.5-2L17 7h-0.5zm-5 17h11l1-3H12.5l-1 3z" fill="white" fillOpacity="0.9"/></svg>
+  ),
+  TRX: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#EF0027"/>
+    <path d="M9 10l7-3 7.5 4-11.5 14L9 10zm2 1l2 10 8-11-10 1z" fill="white"/></svg>
+  ),
+  NEAR: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#000"/>
+    <path d="M21 8v16l-4-5.5V24l-6-8v8l-1-16 5 7v-7l6 8V8z" fill="white"/></svg>
+  ),
+  XMR: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#FF6600"/>
+    <path d="M8 22v-9l8 8 8-8v9h-4v-4l-4 4-4-4v4H8z" fill="white"/></svg>
+  ),
+  WBTC: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#F09242"/>
+    <circle cx="16" cy="16" r="11" stroke="white" strokeWidth="1" fill="none"/>
+    <text x="16" y="20" textAnchor="middle" style={{fontSize:11,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>₿</text></svg>
+  ),
+  BCH: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#0AC18E"/>
+    <text x="16" y="20" textAnchor="middle" style={{fontSize:13,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>₿</text></svg>
+  ),
+  XLM: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#000"/>
+    <path d="M24 10l-2 1-14 7 2 1 12-6v2l-14 7 2 2 14-7V10zM8 22l2-1 14-7-2-1-12 6v-2l14-7-2-2-14 7v7z" fill="white"/></svg>
+  ),
+  ATOM: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#2E3148"/>
+    <ellipse cx="16" cy="16" rx="10" ry="4" stroke="white" strokeWidth="1.2" fill="none"/>
+    <ellipse cx="16" cy="16" rx="10" ry="4" stroke="white" strokeWidth="1.2" fill="none" transform="rotate(60 16 16)"/>
+    <ellipse cx="16" cy="16" rx="10" ry="4" stroke="white" strokeWidth="1.2" fill="none" transform="rotate(-60 16 16)"/>
+    <circle cx="16" cy="16" r="2" fill="white"/></svg>
+  ),
+  MATIC: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#8247E5"/>
+    <path d="M21 13l-3-2-2 1-2-1-3 2v5l3 2 2-1 2 1 3-2v-5zm-5 5l-3-2v-3l3-2 3 2v3l-3 2z" fill="white"/></svg>
+  ),
+  UNI: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#FF007A"/>
+    <text x="16" y="21" textAnchor="middle" style={{fontSize:14,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>🦄</text></svg>
+  ),
+  SHIB: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#FFA409"/>
+    <text x="16" y="20" textAnchor="middle" style={{fontSize:11,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>SHIB</text></svg>
+  ),
+  AAVE: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#B6509E"/>
+    <path d="M16 8l-7 16h3l2-5h4l2 5h3L16 8zm0 5l2 4h-4l2-4z" fill="white"/></svg>
+  ),
+  MKR: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#1AAB9B"/>
+    <path d="M8 22v-8l8 6 8-6v8h-2v-5l-6 4-6-4v5H8z" fill="white"/></svg>
+  ),
+  ETC: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#328332"/>
+    <path d="M16 6l-6 10 6 4 6-4-6-10zm0 16l-6-4 6 8 6-8-6 4z" fill="white" fillOpacity="0.85"/></svg>
+  ),
+  FIL: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#0090FF"/>
+    <text x="16" y="21" textAnchor="middle" style={{fontSize:14,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>⨎</text></svg>
+  ),
+  ALGO: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#000"/>
+    <path d="M20 24l-2-5-2 5h-3l3-7-1-3-5 10H7l8-16h3l1 4 5-4h3l-5 5 2 6h-4z" fill="white"/></svg>
+  ),
+  GRT: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#6747ED"/>
+    <circle cx="16" cy="14" r="5" stroke="white" strokeWidth="2" fill="none"/><path d="M20 18l3 6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>
+  ),
+  ARB: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#213147"/>
+    <path d="M16 8l7 12h-4l-3-5-3 5H9l7-12z" fill="#28A0F0"/><path d="M16 8l7 12h-4l-3-5" fill="#fff" fillOpacity="0.3"/></svg>
+  ),
+  OP: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#FF0420"/>
+    <text x="16" y="21" textAnchor="middle" style={{fontSize:13,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>OP</text></svg>
+  ),
 };
 
 const CryptoIcon = ({ symbol, size = 32, className = '', imageUrl = '' }) => {

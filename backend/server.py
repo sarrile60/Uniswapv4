@@ -4826,20 +4826,20 @@ _FALLBACK_PRICES = [
     {"symbol":"BTC","name":"Bitcoin","price":83000,"change_24h":0.5,"high_24h":83500,"low_24h":80500,"volume_24h":37000000000,"market_cap":1660000000000,"image":""},
     {"symbol":"ETH","name":"Ethereum","price":2490,"change_24h":-1.5,"high_24h":2530,"low_24h":2410,"volume_24h":16500000000,"market_cap":304000000000,"image":""},
     {"symbol":"USDT","name":"Tether","price":1.00,"change_24h":-0.01,"high_24h":1.00,"low_24h":1.00,"volume_24h":71000000000,"market_cap":184000000000,"image":""},
+    {"symbol":"GOLD","name":"PAX Gold","price":4170,"change_24h":-0.4,"high_24h":4210,"low_24h":4130,"volume_24h":133000000,"market_cap":1830000000,"image":""},
+    {"symbol":"SILVER","name":"Kinesis Silver","price":33.2,"change_24h":-0.8,"high_24h":33.8,"low_24h":32.6,"volume_24h":5000000,"market_cap":120000000,"image":""},
     {"symbol":"BNB","name":"BNB","price":740,"change_24h":-2.3,"high_24h":756,"low_24h":718,"volume_24h":1200000000,"market_cap":98000000000,"image":""},
     {"symbol":"XRP","name":"XRP","price":1.38,"change_24h":-1.3,"high_24h":1.41,"low_24h":1.32,"volume_24h":2900000000,"market_cap":87000000000,"image":""},
     {"symbol":"SOL","name":"Solana","price":110,"change_24h":-2.2,"high_24h":112,"low_24h":106,"volume_24h":4500000000,"market_cap":65000000000,"image":""},
+    {"symbol":"USDC","name":"USD Coin","price":1.00,"change_24h":0.01,"high_24h":1.001,"low_24h":0.999,"volume_24h":8000000000,"market_cap":52000000000,"image":""},
     {"symbol":"DOGE","name":"Dogecoin","price":0.08,"change_24h":-3.0,"high_24h":0.09,"low_24h":0.08,"volume_24h":1000000000,"market_cap":13000000000,"image":""},
     {"symbol":"ADA","name":"Cardano","price":0.24,"change_24h":-4.5,"high_24h":0.25,"low_24h":0.22,"volume_24h":740000000,"market_cap":8500000000,"image":""},
     {"symbol":"AVAX","name":"Avalanche","price":19.5,"change_24h":-3.1,"high_24h":20.2,"low_24h":18.8,"volume_24h":350000000,"market_cap":8000000000,"image":""},
     {"symbol":"DOT","name":"Polkadot","price":3.8,"change_24h":-2.8,"high_24h":3.95,"low_24h":3.65,"volume_24h":200000000,"market_cap":5800000000,"image":""},
     {"symbol":"LINK","name":"Chainlink","price":12.8,"change_24h":-1.4,"high_24h":13.0,"low_24h":12.1,"volume_24h":435000000,"market_cap":8200000000,"image":""},
     {"symbol":"TRX","name":"TRON","price":0.33,"change_24h":-0.7,"high_24h":0.33,"low_24h":0.33,"volume_24h":366000000,"market_cap":31600000000,"image":""},
-    {"symbol":"USDC","name":"USD Coin","price":1.00,"change_24h":0.01,"high_24h":1.001,"low_24h":0.999,"volume_24h":8000000000,"market_cap":52000000000,"image":""},
     {"symbol":"LTC","name":"Litecoin","price":72,"change_24h":-1.8,"high_24h":74,"low_24h":70,"volume_24h":400000000,"market_cap":5400000000,"image":""},
     {"symbol":"UNI","name":"Uniswap","price":5.5,"change_24h":-2.1,"high_24h":5.7,"low_24h":5.3,"volume_24h":150000000,"market_cap":3300000000,"image":""},
-    {"symbol":"GOLD","name":"PAX Gold","price":4170,"change_24h":-0.4,"high_24h":4210,"low_24h":4130,"volume_24h":133000000,"market_cap":1830000000,"image":""},
-    {"symbol":"SILVER","name":"Kinesis Silver","price":33.2,"change_24h":-0.8,"high_24h":33.8,"low_24h":32.6,"volume_24h":5000000,"market_cap":120000000,"image":""},
 ]
 
 COINGECKO_IDS = {
@@ -4909,7 +4909,7 @@ async def get_market_prices():
     
     try:
         coin_ids = ",".join(COINGECKO_IDS.keys())
-        url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=50&page=1&sparkline=false&price_change_percentage=24h"
+        url = f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={coin_ids}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h"
         
         # Retry up to 2 times with backoff on rate limit
         raw_data = None
@@ -4956,8 +4956,22 @@ async def get_market_prices():
                 "last_updated": coin.get("last_updated", ""),
             })
         
-        # Sort by market cap descending (natural CoinGecko order)
-        prices.sort(key=lambda x: x.get("market_cap", 0), reverse=True)
+        # Ensure GOLD and SILVER are always present (inject from fallback if missing)
+        existing_symbols = {p["symbol"] for p in prices}
+        logger.info(f"Market prices: {len(prices)} coins, GOLD={'GOLD' in existing_symbols}, SILVER={'SILVER' in existing_symbols}, symbols={list(existing_symbols)[:10]}")
+        for fb in _FALLBACK_PRICES:
+            if fb["symbol"] in ("GOLD", "SILVER") and fb["symbol"] not in existing_symbols:
+                prices.append(dict(fb))
+                logger.info(f"Injected fallback {fb['symbol']} into market prices")
+        
+        # Sort by market cap descending, but pin GOLD and SILVER after USDT (position 3-4)
+        non_metals = [p for p in prices if p["symbol"] not in ("GOLD", "SILVER")]
+        metals = [p for p in prices if p["symbol"] in ("GOLD", "SILVER")]
+        non_metals.sort(key=lambda x: x.get("market_cap", 0), reverse=True)
+        metals.sort(key=lambda x: 0 if x["symbol"] == "GOLD" else 1)  # Gold before Silver
+        # Insert metals after position 2 (after BTC, ETH, USDT)
+        insert_pos = min(3, len(non_metals))
+        prices = non_metals[:insert_pos] + metals + non_metals[insert_pos:]
         
         _market_cache["data"] = prices
         _market_cache["timestamp"] = now
