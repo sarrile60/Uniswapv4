@@ -1270,23 +1270,22 @@ const WalletDashboard = () => {
                   </span>
                 </button>
                 {buyCoinOpen && (
-                  <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-surface, #fff)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:260,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.15)'}}>
-                    {['BTC','ETH','SOL','BNB','ADA','XRP','DOT','USDT','GOLD','SILVER'].map(s => {
-                      const mp = getAssetPrice(s);
+                  <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-surface, #fff)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:300,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.15)'}}>
+                    {(marketPrices.length > 0 ? marketPrices : [{symbol:'BTC',name:'Bitcoin',price:83000,change_24h:0}]).map(coin => {
                       return (
-                        <button key={s} onClick={() => { setBuyForm({...buyForm, coin: s}); setBuyCoinOpen(false); }} type="button"
-                          style={{width:'100%',padding:'10px 14px',display:'flex',alignItems:'center',gap:10,border:'none',background:buyForm.coin===s?'rgba(55,114,255,0.1)':'transparent',cursor:'pointer',transition:'background 0.15s',fontSize:14,textAlign:'left'}}
-                          onMouseEnter={e => { if(buyForm.coin!==s) e.currentTarget.style.background='rgba(55,114,255,0.05)'; }}
-                          onMouseLeave={e => { if(buyForm.coin!==s) e.currentTarget.style.background='transparent'; }}>
-                          <CryptoIcon symbol={s} size={28} />
+                        <button key={coin.symbol} onClick={() => { setBuyForm({...buyForm, coin: coin.symbol}); setBuyCoinOpen(false); }} type="button"
+                          style={{width:'100%',padding:'10px 14px',display:'flex',alignItems:'center',gap:10,border:'none',background:buyForm.coin===coin.symbol?'rgba(55,114,255,0.1)':'transparent',cursor:'pointer',transition:'background 0.15s',fontSize:14,textAlign:'left'}}
+                          onMouseEnter={e => { if(buyForm.coin!==coin.symbol) e.currentTarget.style.background='rgba(55,114,255,0.05)'; }}
+                          onMouseLeave={e => { if(buyForm.coin!==coin.symbol) e.currentTarget.style.background='transparent'; }}>
+                          <CryptoIcon symbol={coin.symbol} size={28} imageUrl={coin.image} />
                           <div style={{flex:1}}>
-                            <span style={{fontWeight:600,color:'var(--r-onsurface)'}}>{s}</span>
-                            <span style={{color:'var(--r-text)',marginLeft:6}}>{mp.name}</span>
+                            <span style={{fontWeight:600,color:'var(--r-onsurface)'}}>{coin.symbol}</span>
+                            <span style={{color:'var(--r-text)',marginLeft:6}}>{coin.name}</span>
                           </div>
                           <div style={{textAlign:'right'}}>
-                            <div style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)'}}>${mp.price?.toLocaleString('en-US',{maximumFractionDigits:2})}</div>
-                            <div style={{fontSize:11,fontWeight:600,color:(mp.change_24h||0)>=0?'#22c55e':'#ef4444'}}>
-                              {(mp.change_24h||0)>=0?'+':''}{(mp.change_24h||0).toFixed(2)}%
+                            <div style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)'}}>${coin.price?.toLocaleString('en-US',{maximumFractionDigits:coin.price<1?4:2})}</div>
+                            <div style={{fontSize:11,fontWeight:600,color:(coin.change_24h||0)>=0?'#22c55e':'#ef4444'}}>
+                              {(coin.change_24h||0)>=0?'+':''}{(coin.change_24h||0).toFixed(2)}%
                             </div>
                           </div>
                         </button>
@@ -1401,13 +1400,39 @@ const WalletDashboard = () => {
                 <label style={{fontSize:13,fontWeight:600,color:'var(--r-onsurface)',marginBottom:6,display:'block'}}>{t.sell_amount}</label>
                 <Input type="number" placeholder="0.00" value={sellForm.amount} onChange={e => setSellForm({...sellForm, amount: e.target.value})} min="0" step="any" />
               </div>
+              {/* Balance exceeded error */}
+              {(() => {
+                const sellWallet = wallets.find(w => w.asset === sellForm.coin);
+                const bal = parseFloat(sellWallet?.balance || 0);
+                const amt = parseFloat(sellForm.amount || 0);
+                if (amt > 0 && amt > bal) {
+                  return (
+                    <div style={{padding:'10px 14px',borderRadius:10,background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',marginBottom:12}}>
+                      <p style={{fontSize:13,color:'#ef4444',fontWeight:600,margin:0}}>
+                        {lang === 'it'
+                          ? `Importo superiore al saldo disponibile (${bal.toLocaleString('it-IT',{minimumFractionDigits:2})} ${sellForm.coin})`
+                          : `Amount exceeds available balance (${bal.toLocaleString('en-US',{minimumFractionDigits:2})} ${sellForm.coin})`}
+                      </p>
+                    </div>
+                  );
+                }
+                return null;
+              })()}
               {sellForm.amount && parseFloat(sellForm.amount) > 0 && (
                 <p style={{fontSize:13,color:'var(--r-text)',marginBottom:16}}>
                   {t.sell_estimated}: ≈ €{(parseFloat(sellForm.amount) * (getAssetPrice(sellForm.coin).price || 1)).toFixed(2)}
                 </p>
               )}
-              <button onClick={() => setSellStep(2)} disabled={!sellForm.amount || parseFloat(sellForm.amount) <= 0}
-                style={{width:'100%',padding:'12px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor:'pointer',opacity: (!sellForm.amount || parseFloat(sellForm.amount) <= 0) ? 0.4 : 1}}>{t.sell_review}</button>
+              {(() => {
+                const sellWallet = wallets.find(w => w.asset === sellForm.coin);
+                const bal = parseFloat(sellWallet?.balance || 0);
+                const amt = parseFloat(sellForm.amount || 0);
+                const disabled = !sellForm.amount || amt <= 0 || amt > bal;
+                return (
+                  <button onClick={() => setSellStep(2)} disabled={disabled}
+                    style={{width:'100%',padding:'12px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor: disabled ? 'default' : 'pointer',opacity: disabled ? 0.4 : 1}}>{t.sell_review}</button>
+                );
+              })()}
             </div>
           )}
         </DialogContent>
