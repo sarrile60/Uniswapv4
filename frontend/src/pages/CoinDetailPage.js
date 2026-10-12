@@ -22,10 +22,11 @@ const CoinDetailPage = () => {
   useEffect(() => {
     const fetchCoin = async () => {
       setLoading(true);
+      // Try primary endpoint
       try {
         const res = await fetch(`${API}/api/market/coin/${symbol}`);
         const json = await res.json();
-        if (json.ok && json.data) { setCoin(json.data); return; }
+        if (json.ok && json.data) { setCoin(json.data); setLoading(false); return; }
       } catch (e) { console.error(e); }
       // Fallback: build from market prices endpoint
       try {
@@ -41,11 +42,10 @@ const CoinDetailPage = () => {
               market_cap: mp.market_cap, volume_24h: mp.volume_24h,
               circulating_supply: 0, total_supply: 0, ath: 0, atl: 0, sparkline_7d: [],
             });
-            return;
           }
         }
       } catch { /* silent */ }
-      finally { setLoading(false); }
+      setLoading(false);
     };
     fetchCoin();
   }, [symbol]);
