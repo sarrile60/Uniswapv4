@@ -13,7 +13,8 @@ const CATEGORIES = {
   defi: ['ETH', 'UNI', 'AAVE', 'MKR', 'LDO', 'GRT', 'INJ', 'LINK', 'ALGO', 'FTM'],
   nft: ['SOL', 'ETH', 'SAND', 'MANA', 'AXS', 'IMX', 'APT'],
   layer1: ['BTC', 'ETH', 'SOL', 'ADA', 'DOT', 'BNB', 'AVAX', 'NEAR', 'APT', 'SUI', 'SEI', 'ATOM', 'FTM', 'TRX', 'EOS'],
-  stablecoins: ['USDT', 'DAI'],
+  stablecoins: ['USDT', 'DAI', 'USDC'],
+  commodities: ['GOLD', 'SILVER'],
 };
 
 const MarketsPage = () => {
@@ -107,6 +108,7 @@ const MarketsPage = () => {
     { key: 'nft', label: t.mkt_nft },
     { key: 'layer1', label: t.mkt_layer1 },
     { key: 'stablecoins', label: t.mkt_stablecoins },
+    { key: 'commodities', label: lang === 'it' ? 'Materie Prime' : 'Commodities' },
   ];
 
   const SortHeader = ({ k, children }) => (

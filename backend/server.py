@@ -4838,6 +4838,8 @@ _FALLBACK_PRICES = [
     {"symbol":"USDC","name":"USD Coin","price":1.00,"change_24h":0.01,"high_24h":1.001,"low_24h":0.999,"volume_24h":8000000000,"market_cap":52000000000,"image":""},
     {"symbol":"LTC","name":"Litecoin","price":72,"change_24h":-1.8,"high_24h":74,"low_24h":70,"volume_24h":400000000,"market_cap":5400000000,"image":""},
     {"symbol":"UNI","name":"Uniswap","price":5.5,"change_24h":-2.1,"high_24h":5.7,"low_24h":5.3,"volume_24h":150000000,"market_cap":3300000000,"image":""},
+    {"symbol":"GOLD","name":"PAX Gold","price":4170,"change_24h":-0.4,"high_24h":4210,"low_24h":4130,"volume_24h":133000000,"market_cap":1830000000,"image":""},
+    {"symbol":"SILVER","name":"Kinesis Silver","price":33.2,"change_24h":-0.8,"high_24h":33.8,"low_24h":32.6,"volume_24h":5000000,"market_cap":120000000,"image":""},
 ]
 
 COINGECKO_IDS = {
@@ -4892,6 +4894,8 @@ COINGECKO_IDS = {
     "pepe": "PEPE",
     "dai": "DAI",
     "usd-coin": "USDC",
+    "pax-gold": "GOLD",
+    "kinesis-silver": "SILVER",
 }
 
 @api_router.get("/market/prices")
@@ -4986,7 +4990,7 @@ async def get_coin_detail(symbol: str):
     
     now = _time.time()
     cached = _coin_detail_cache.get(symbol)
-    if cached and (now - cached["ts"]) < 120:
+    if cached and (now - cached["ts"]) < 600:  # 10 min cache for coin detail
         return {"ok": True, "data": cached["data"], "cached": True}
     
     try:
@@ -5024,6 +5028,40 @@ async def get_coin_detail(symbol: str):
         logger.error(f"Failed to fetch coin detail for {symbol}: {e}")
         if cached:
             return {"ok": True, "data": cached["data"], "cached": True, "stale": True}
+        # Fallback: build basic detail from market prices cache
+        if _market_cache["data"]:
+            mp = next((c for c in _market_cache["data"] if c["symbol"] == symbol), None)
+            if mp:
+                fallback_result = {
+                    "symbol": symbol,
+                    "name": mp.get("name", ""),
+                    "description": "",
+                    "image": mp.get("image", ""),
+                    "price": mp.get("price", 0),
+                    "change_24h": mp.get("change_24h", 0),
+                    "change_7d": 0,
+                    "high_24h": mp.get("high_24h", 0),
+                    "low_24h": mp.get("low_24h", 0),
+                    "market_cap": mp.get("market_cap", 0),
+                    "volume_24h": mp.get("volume_24h", 0),
+                    "circulating_supply": 0,
+                    "total_supply": 0,
+                    "ath": 0,
+                    "atl": 0,
+                    "sparkline_7d": [],
+                }
+                return {"ok": True, "data": fallback_result, "fallback": True}
+        # Also check hardcoded fallback
+        fb = next((c for c in _FALLBACK_PRICES if c["symbol"] == symbol), None)
+        if fb:
+            fallback_result = {
+                "symbol": symbol, "name": fb.get("name", ""), "description": "",
+                "image": "", "price": fb["price"], "change_24h": fb["change_24h"],
+                "change_7d": 0, "high_24h": fb.get("high_24h", 0), "low_24h": fb.get("low_24h", 0),
+                "market_cap": fb.get("market_cap", 0), "volume_24h": fb.get("volume_24h", 0),
+                "circulating_supply": 0, "total_supply": 0, "ath": 0, "atl": 0, "sparkline_7d": [],
+            }
+            return {"ok": True, "data": fallback_result, "fallback": True}
         raise HTTPException(status_code=502, detail="Failed to fetch coin data")
 
 

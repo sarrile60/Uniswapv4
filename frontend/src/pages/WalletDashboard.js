@@ -108,6 +108,8 @@ const WalletDashboard = () => {
     if (symbol === 'USDC') return { symbol: 'USDC', name: 'USD Coin', price: 1.00, change_24h: 0.01 };
     if (symbol === 'USDT') return { symbol: 'USDT', name: 'Tether', price: 1.00, change_24h: 0.00 };
     if (symbol === 'EUR') return { symbol: 'EUR', name: 'Euro', price: 1.08, change_24h: 0.02 };
+    if (symbol === 'GOLD') return { symbol: 'GOLD', name: 'PAX Gold', price: 4170, change_24h: -0.4 };
+    if (symbol === 'SILVER') return { symbol: 'SILVER', name: 'Kinesis Silver', price: 33.2, change_24h: -0.8 };
     return { symbol, name: symbol, price: 0, change_24h: 0 };
   }, [marketPrices]);
 
@@ -1269,7 +1271,7 @@ const WalletDashboard = () => {
                 </button>
                 {buyCoinOpen && (
                   <div style={{position:'absolute',top:'100%',left:0,right:0,zIndex:50,background:'var(--r-surface, #fff)',border:'1px solid var(--r-line)',borderRadius:10,marginTop:4,maxHeight:260,overflowY:'auto',boxShadow:'0 8px 24px rgba(0,0,0,0.15)'}}>
-                    {['BTC','ETH','SOL','BNB','ADA','XRP','DOT','USDT'].map(s => {
+                    {['BTC','ETH','SOL','BNB','ADA','XRP','DOT','USDT','GOLD','SILVER'].map(s => {
                       const mp = getAssetPrice(s);
                       return (
                         <button key={s} onClick={() => { setBuyForm({...buyForm, coin: s}); setBuyCoinOpen(false); }} type="button"

@@ -6,11 +6,12 @@ import { ShieldAlert, ArrowRight, X, ChevronDown, RefreshCw } from 'lucide-react
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
-const SUPPORTED_COINS = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'XRP', 'DOT', 'USDT'];
+const SUPPORTED_COINS = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'XRP', 'DOT', 'USDT', 'GOLD', 'SILVER'];
 
 const COIN_NAMES = {
   BTC: 'Bitcoin', ETH: 'Ethereum', SOL: 'Solana', BNB: 'BNB',
-  ADA: 'Cardano', XRP: 'Ripple', DOT: 'Polkadot', USDT: 'Tether'
+  ADA: 'Cardano', XRP: 'Ripple', DOT: 'Polkadot', USDT: 'Tether',
+  GOLD: 'Gold (PAX Gold)', SILVER: 'Silver (Kinesis)',
 };
 
 /* CoinPicker — extracted to avoid nested component renders */

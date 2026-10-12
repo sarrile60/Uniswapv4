@@ -89,6 +89,24 @@ const icons = {
       <path d="M16 7v1.5M16 23.5V25M20 12.5c0-1.4-1.8-2.5-4-2.5s-4 1.1-4 2.5 1.8 2.5 4 2.5 4 1.1 4 2.5-1.8 2.5-4 2.5-4-1.1-4-2.5" stroke="white" strokeWidth="2" strokeLinecap="round" fill="none"/>
     </svg>
   ),
+  GOLD: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="16" fill="#D4A017"/>
+      <path d="M10 21h12l-2-5h-8l-2 5z" fill="#FFF8DC"/>
+      <path d="M12 16h8l-1.5-4h-5l-1.5 4z" fill="#FFF8DC"/>
+      <path d="M13.5 12h5l-1-3h-3l-1 3z" fill="#FFF8DC"/>
+      <text x="16" y="25" textAnchor="middle" style={{fontSize:5,fontWeight:700,fill:'#fff'}}>Au</text>
+    </svg>
+  ),
+  SILVER: (size) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="16" cy="16" r="16" fill="#A8A9AD"/>
+      <path d="M10 21h12l-2-5h-8l-2 5z" fill="#E8E8E8"/>
+      <path d="M12 16h8l-1.5-4h-5l-1.5 4z" fill="#E8E8E8"/>
+      <path d="M13.5 12h5l-1-3h-3l-1 3z" fill="#E8E8E8"/>
+      <text x="16" y="25" textAnchor="middle" style={{fontSize:5,fontWeight:700,fill:'#fff'}}>Ag</text>
+    </svg>
+  ),
 };
 
 const CryptoIcon = ({ symbol, size = 32, className = '', imageUrl = '' }) => {
@@ -161,6 +179,7 @@ const fallbackColors = {
   BCH: '#0AC18E', XLM: '#000', XMR: '#FF6600', ETC: '#328332',
   FIL: '#0090FF', ICP: '#29ABE2', HBAR: '#000', WBTC: '#F09242',
   APT: '#000', SHIB: '#FFA409', DOGE: '#C3A634',
+  GOLD: '#D4A017', SILVER: '#A8A9AD',
 };
 
 export default CryptoIcon;
