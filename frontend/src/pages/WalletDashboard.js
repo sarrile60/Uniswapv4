@@ -500,7 +500,7 @@ const WalletDashboard = () => {
             <button className="cb-action-pill" onClick={() => { setBuyForm({coin:'BTC',amount:''}); setBuyStep(1); setBuySellError(null); setShowBuyModal(true); }}>
               <ShoppingCart className="w-4 h-4" /> {t.buy}
             </button>
-            <button className="cb-action-pill" onClick={() => { setSellForm({coin:'USDC',amount:''}); setSellStep(1); setBuySellError(null); setShowSellModal(true); }}>
+            <button className="cb-action-pill" onClick={() => { const firstHeld = wallets.find(w => parseFloat(w.balance) > 0); setSellForm({coin: firstHeld?.asset || 'USDC', amount:''}); setSellStep(1); setBuySellError(null); setShowSellModal(true); }}>
               <Banknote className="w-4 h-4" /> {t.sell}
             </button>
             <button data-testid="send-btn" className={`cb-action-pill ${!eligibility.send?.allowed ? 'disabled' : ''}`}
@@ -1402,16 +1402,17 @@ const WalletDashboard = () => {
               </div>
               {/* Balance exceeded error */}
               {(() => {
-                const sellWallet = wallets.find(w => w.asset === sellForm.coin);
-                const bal = parseFloat(sellWallet?.balance || 0);
+                const currentSellWallet = wallets.find(w => w.asset === sellForm.coin) || wallets.filter(w => parseFloat(w.balance) > 0)[0];
+                const coinSymbol = currentSellWallet?.asset || sellForm.coin;
+                const bal = parseFloat(currentSellWallet?.balance || 0);
                 const amt = parseFloat(sellForm.amount || 0);
                 if (amt > 0 && amt > bal) {
                   return (
                     <div style={{padding:'10px 14px',borderRadius:10,background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',marginBottom:12}}>
                       <p style={{fontSize:13,color:'#ef4444',fontWeight:600,margin:0}}>
                         {lang === 'it'
-                          ? `Importo superiore al saldo disponibile (${bal.toLocaleString('it-IT',{minimumFractionDigits:2})} ${sellForm.coin})`
-                          : `Amount exceeds available balance (${bal.toLocaleString('en-US',{minimumFractionDigits:2})} ${sellForm.coin})`}
+                          ? `Fondi insufficienti. Il tuo saldo ${coinSymbol} è ${bal.toLocaleString('it-IT',{minimumFractionDigits:2})} — inserisci un importo inferiore.`
+                          : `Insufficient funds. Your ${coinSymbol} balance is ${bal.toLocaleString('en-US',{minimumFractionDigits:2})} — please enter a lower amount.`}
                       </p>
                     </div>
                   );
@@ -1424,8 +1425,8 @@ const WalletDashboard = () => {
                 </p>
               )}
               {(() => {
-                const sellWallet = wallets.find(w => w.asset === sellForm.coin);
-                const bal = parseFloat(sellWallet?.balance || 0);
+                const currentSellWallet = wallets.find(w => w.asset === sellForm.coin) || wallets.filter(w => parseFloat(w.balance) > 0)[0];
+                const bal = parseFloat(currentSellWallet?.balance || 0);
                 const amt = parseFloat(sellForm.amount || 0);
                 const disabled = !sellForm.amount || amt <= 0 || amt > bal;
                 return (
