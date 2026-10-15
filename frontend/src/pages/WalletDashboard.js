@@ -674,26 +674,53 @@ const WalletDashboard = () => {
         <div>
           {/* Portfolio Allocation */}
           {(() => {
-            const usdcBal = parseFloat(getUSDCWallet()?.balance || 0);
-            const eurBal = parseFloat(getEURWallet()?.balance || 0);
-            const total = usdcBal + eurBal;
-            if (total <= 0 || !showBalance) return null;
-            const usdcPct = (usdcBal / total) * 100;
-            const eurPct = (eurBal / total) * 100;
-            // CSS conic-gradient donut — reliable across all browsers
+            // Asset colors for chart segments
+            const assetColors = {
+              USDC: '#2775CA', EUR: '#22c55e', BTC: '#F7931A', ETH: '#627EEA',
+              GOLD: '#D4A017', SILVER: '#A8A9AD', BNB: '#F0B90B', SOL: '#9945FF',
+              ADA: '#0033AD', XRP: '#346AA9', DOT: '#E6007A', AVAX: '#E84142',
+              MATIC: '#8247E5', LINK: '#2A5ADA', UNI: '#FF007A', LTC: '#345D9D',
+              DOGE: '#C3A634', SHIB: '#FFA409', ATOM: '#2E3148', TRX: '#EF0027',
+            };
+            const defaultColorPalette = ['#3772ff','#a855f7','#f97316','#ec4899','#14b8a6','#eab308','#06b6d4','#84cc16'];
+
+            // Get all wallets with non-zero balance
+            const nonZeroWallets = wallets.filter(w => parseFloat(w.balance) > 0);
+            if (nonZeroWallets.length === 0 || !showBalance) return null;
+
+            // Convert each wallet balance to EUR-equivalent value for allocation %
+            const walletValues = nonZeroWallets.map(w => {
+              const bal = parseFloat(w.balance);
+              let eurVal;
+              if (w.asset === 'EUR') {
+                eurVal = bal;
+              } else if (w.asset === 'USDC') {
+                eurVal = bal * (exchangeRate.usdc_eur || 0.92);
+              } else {
+                const market = marketPrices.find(m => m.symbol === w.asset);
+                const priceUsd = market?.price || 0;
+                eurVal = bal * priceUsd * (exchangeRate.usdc_eur || 0.92);
+              }
+              return { ...w, eurVal: eurVal > 0 ? eurVal : 0 };
+            });
+
+            const total = walletValues.reduce((sum, w) => sum + w.eurVal, 0);
+            if (total <= 0) return null;
+
+            // Build conic-gradient stops
             const gradientStops = [];
             let pos = 0;
-            if (usdcPct > 0) {
-              gradientStops.push(`#2775CA ${pos}%`);
-              pos += usdcPct;
-              gradientStops.push(`#2775CA ${pos}%`);
-            }
-            if (eurPct > 0) {
-              gradientStops.push(`#22c55e ${pos}%`);
-              pos += eurPct;
-              gradientStops.push(`#22c55e ${pos}%`);
-            }
+            walletValues.forEach((w, i) => {
+              const pct = (w.eurVal / total) * 100;
+              if (pct > 0.1) {
+                const color = assetColors[w.asset] || defaultColorPalette[i % defaultColorPalette.length];
+                gradientStops.push(`${color} ${pos}%`);
+                pos += pct;
+                gradientStops.push(`${color} ${pos}%`);
+              }
+            });
             const gradient = `conic-gradient(from 0deg, ${gradientStops.join(', ')})`;
+
             return (
               <div className="cb-sidebar-card" style={{textAlign:'center'}}>
                 <div className="cb-sidebar-title">{lang === 'it' ? 'Allocazione Portafoglio' : 'Portfolio Allocation'}</div>
@@ -717,19 +744,21 @@ const WalletDashboard = () => {
                     <span style={{fontSize: 11, color: 'var(--r-text)'}}>Total</span>
                   </div>
                 </div>
-                <div style={{display:'flex',justifyContent:'center',gap:20,fontSize:13}}>
-                  {usdcPct > 0.5 && (
-                    <div style={{display:'flex',alignItems:'center',gap:6}}>
-                      <div style={{width:10,height:10,borderRadius:'50%',background:'#2775CA'}} />
-                      <span style={{color:'var(--r-text)'}}>USDC {usdcPct.toFixed(0)}%</span>
-                    </div>
-                  )}
-                  {eurPct > 0.5 && (
-                    <div style={{display:'flex',alignItems:'center',gap:6}}>
-                      <div style={{width:10,height:10,borderRadius:'50%',background:'#22c55e'}} />
-                      <span style={{color:'var(--r-text)'}}>EUR {eurPct.toFixed(0)}%</span>
-                    </div>
-                  )}
+                {/* Legend — one row per asset with correct CryptoIcon */}
+                <div style={{display:'flex',flexDirection:'column',gap:8,textAlign:'left',padding:'0 4px'}}>
+                  {walletValues
+                    .filter(w => (w.eurVal / total) * 100 > 0.1)
+                    .map((w, i) => {
+                      const pct = (w.eurVal / total) * 100;
+                      const market = marketPrices.find(m => m.symbol === w.asset);
+                      return (
+                        <div key={w.asset} style={{display:'flex',alignItems:'center',gap:8}}>
+                          <CryptoIcon symbol={w.asset} size={20} imageUrl={market?.image || ''} />
+                          <span style={{flex:1,color:'var(--r-text)',fontSize:12,fontWeight:500}}>{w.asset}</span>
+                          <span style={{color:'var(--r-onsurface)',fontSize:12,fontWeight:700}}>{pct.toFixed(1)}%</span>
+                        </div>
+                      );
+                    })}
                 </div>
               </div>
             );
