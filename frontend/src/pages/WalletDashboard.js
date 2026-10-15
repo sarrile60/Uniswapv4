@@ -739,9 +739,9 @@ const WalletDashboard = () => {
                     alignItems: 'center', justifyContent: 'center',
                   }}>
                     <span style={{fontSize: 16, fontWeight: 800, color: 'var(--r-onsurface)'}}>
-                      {'€' + formatBalance(total.toFixed(2))}
+                      {formatBalance(total.toFixed(2))}
                     </span>
-                    <span style={{fontSize: 11, color: 'var(--r-text)'}}>Total</span>
+                    <span style={{fontSize: 11, color: 'var(--r-text)'}}>≈ EUR</span>
                   </div>
                 </div>
                 {/* Legend — one row per asset with correct CryptoIcon */}
