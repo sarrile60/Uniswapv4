@@ -1,47 +1,46 @@
-# Fix: Portfolio Allocation Donut — Correct Value Display
+# Fix: Transaction Amount Currency Symbol
 
-The "Allocazione Portafoglio" donut chart center converts all assets to a EUR-equivalent total and displays it with a € symbol (e.g. €166,645.77). But that number is the USDC balance converted at the exchange rate — it is not the user's actual EUR balance. Showing € on a USDC-denominated figure is misleading. The left-side portfolio card already shows the correct EUR total; the donut should reflect the real asset values without implying they are all in Euro.
+Every transaction in the Transactions page displays its amount with a `€` prefix regardless of the asset involved. A USDC→EUR swap therefore shows `−€166,645.77` on the USDC debit row even though no Euros left the account — only USDC did.
 
-**Who it's for:** All logged-in users viewing the Wallet Dashboard.
+**Who it's for:** All logged-in users viewing their transaction history.
 
 ## Core Features and Experience
 
-- **Center label fix:** The donut center currently shows `total` (sum of all wallets converted to EUR) with a `€` prefix. Since the bulk of the balance may be USDC (not EUR), this is replaced with the raw total and the currency symbol is made accurate:
-  - If the portfolio is 100% EUR → show `€` prefix.
-  - If the portfolio contains USDC or other non-EUR assets → show the total in USDC terms with a `$` prefix (or no symbol), making clear it is not a Euro amount.
-  - Simplest correct approach: **remove the `€` prefix entirely** and replace it with the dominant asset's symbol label (e.g. "USDC" sub-label instead of "Total"), OR just show a plain number with "Totale" below.
-
-- **Cleaner option (recommended):** Show the raw total value with no currency prefix, and change the sub-label from "Total" to "≈ EUR" or "Equiv. EUR" so the user understands it is an approximation — not a real EUR balance.
+- The amount column on each transaction card shows the correct currency symbol for that transaction's asset:
+  - `tx.asset === 'EUR'` → `€` prefix (current behavior, keep as-is)
+  - `tx.asset === 'USDC'` → `$` prefix (USDC is USD-pegged; no Euro sign)
+  - Any other crypto asset (BTC, ETH, SOL, etc.) → no prefix; append the asset symbol as a suffix (e.g. `−0.15 BTC`)
+- Positive/negative sign logic is unchanged.
+- No other layout, color, or badge change.
 
 ## User Flow
 
-1. User opens Wallet Dashboard.
-2. Portfolio card (left) correctly shows `€148.894,33` — the real EUR balance.
-3. Donut chart (right) shows the combined portfolio value without a misleading `€` prefix.
-4. Center reads: `166.645,77` with sub-label `≈ EUR` (approximation label).
-5. Legend below lists each asset (USDC 100%, or BTC/ETH/USDC split) with correct coin logos and percentages.
+1. User opens the Transactions page (`/transactions`).
+2. The USDC swap debit row shows `−$166,645.77` (or `−166,645.77 USDC`), not `−€166,645.77`.
+3. The EUR credit row from the same swap continues to show `+€148,553.97` — correct, unchanged.
+4. EUR withdrawals, deposits, and fees keep the `€` symbol.
+5. Any BTC/ETH send shows the amount with the coin's symbol suffix.
 
 ## UI/UX Feel
 
-- Honest and clear: the `€` symbol only appears where the value is truly in Euro.
-- The `≈ EUR` sub-label communicates "approximate Euro equivalent" without claiming it is real EUR.
-- No layout change — only the center label text is updated.
+- Honest denomination per asset — users immediately see which asset moved and in what unit.
+- No layout shift; the fix is text-only inside the existing amount `<div>`.
 
 ## Implementation Phases
 
 ### Phase 1 (MVP — Build Now)
-- In `WalletDashboard.js` line ~742: change `{'€' + formatBalance(total.toFixed(2))}` → `{formatBalance(total.toFixed(2))}`.
-- On line ~744: change sub-label from `"Total"` → `"≈ EUR"` (or `"Equiv. EUR"`).
+- In `TransactionsPage.js` line ~264, replace the hardcoded `&euro;` with a helper that returns the right prefix/suffix based on `tx.asset`.
+- Helper logic: `EUR` → `€{amount}`, `USDC` → `${amount}`, everything else → `{amount} {asset}`.
 
 ### Phase 2 (Future)
-- Optionally: if the wallet has only EUR balance, restore the `€` prefix dynamically.
+- Apply the same asset-aware symbol logic to the mini transaction list on the Wallet Dashboard (`WalletDashboard.js` lines ~662–664), which currently shows `{tx.amount} {tx.asset}` (already correct there, but worth a consistency review).
 
 ### Phase 3 (Future)
 - N/A
 
 ## Assumptions
 
-- The recommended fix is: remove `€` prefix, change sub-label to `≈ EUR`.
-- The left portfolio card (`€148.894,33`) is correct and untouched.
-- No backend changes needed.
-- The donut chart's EUR-equivalent conversion logic itself (USDC × exchange rate) stays — only the display label changes.
+- USDC displays with a `$` prefix (not `USDC` suffix) because it is USD-pegged and `$` reads more naturally to users.
+- Other non-EUR, non-USDC assets use `{amount} {symbol}` suffix format (e.g. `0.15 BTC`).
+- No backend changes; the `tx.asset` field is already present in the API response.
+- The fee amount (line ~298, also hardcoded `&euro;`) is always stored and denominated in EUR, so it is left unchanged.

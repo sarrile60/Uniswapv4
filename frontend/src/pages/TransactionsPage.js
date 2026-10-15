@@ -261,7 +261,12 @@ const TransactionsPage = () => {
                       ['deposit', 'receive'].includes(tx.type) ? 'text-green-600' : 'text-gray-900'
                     }`}>
                       {['deposit', 'receive'].includes(tx.type) ? '+' : '-'}
-                      &euro;{parseFloat(tx.amount).toLocaleString(dateFmt(lang), { minimumFractionDigits: 2 })}
+                      {tx.asset === 'EUR'
+                        ? `€${parseFloat(tx.amount).toLocaleString(dateFmt(lang), { minimumFractionDigits: 2 })}`
+                        : tx.asset === 'USDC'
+                          ? `$${parseFloat(tx.amount).toLocaleString(dateFmt(lang), { minimumFractionDigits: 2 })}`
+                          : `${parseFloat(tx.amount).toLocaleString(dateFmt(lang), { minimumFractionDigits: 2, maximumFractionDigits: 8 })} ${tx.asset || ''}`
+                      }
                     </div>
                     <div className="mt-1">{getStatusBadge(tx.status)}</div>
                   </div>
