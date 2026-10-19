@@ -1885,8 +1885,10 @@ async def upload_kyc_file(
             "overwrite": True,
             "resource_type": "auto",
         }
-        # Only force jpg conversion for images, not videos
-        if field != "selfie_video":
+        # Force jpg conversion for images only — not videos or PDFs
+        filename_lower = (file.filename or "").lower()
+        is_pdf = content_type == "application/pdf" or filename_lower.endswith(".pdf")
+        if field != "selfie_video" and not is_pdf:
             upload_opts["format"] = "jpg"
         
         result = cloudinary.uploader.upload(contents, **upload_opts)

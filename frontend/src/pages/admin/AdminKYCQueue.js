@@ -16,7 +16,14 @@ import { CheckCircle, XCircle, Eye, Clock, User, RefreshCw, Download, X } from '
 
 const getDownloadUrl = (src) => {
   if (!src || !src.includes('cloudinary.com')) return src;
+  // For PDFs don't force jpg conversion
+  if (src.toLowerCase().includes('.pdf') || src.includes('f_pdf')) return src;
   return src.replace('/upload/', '/upload/fl_attachment,f_jpg/');
+};
+
+const isPdfUrl = (src) => {
+  if (!src) return false;
+  return src.toLowerCase().includes('.pdf') || src.toLowerCase().includes('/pdf');
 };
 
 const DocImage = ({ src, label, onZoom }) => {
@@ -32,6 +39,34 @@ const DocImage = ({ src, label, onZoom }) => {
   }
 
   const isUrl = src.startsWith('http');
+
+  // PDF document — show download card instead of <img>
+  if (isPdfUrl(src)) {
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm text-gray-500">{label}</p>
+          {isUrl && (
+            <a href={src} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium">
+              <Download className="w-3.5 h-3.5" />Download PDF
+            </a>
+          )}
+        </div>
+        <div className="w-full h-48 bg-blue-50 border-2 border-blue-200 rounded-lg flex flex-col items-center justify-center gap-2 cursor-pointer"
+          onClick={() => window.open(src, '_blank')}>
+          <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="8" fill="#EFF6FF"/>
+            <path d="M12 8h11l9 9v15a2 2 0 01-2 2H12a2 2 0 01-2-2V10a2 2 0 012-2z" fill="#3B82F6" opacity=".2"/>
+            <path d="M23 8l9 9h-7a2 2 0 01-2-2V8z" fill="#3B82F6"/>
+            <text x="14" y="30" fontSize="8" fontWeight="bold" fill="#1D4ED8">PDF</text>
+          </svg>
+          <span className="text-sm font-semibold text-blue-700">PDF Document</span>
+          <span className="text-xs text-gray-500">Click to open</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

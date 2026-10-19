@@ -355,6 +355,8 @@ const KYCPage = () => {
 
   // Previews for display (use uploaded URLs as fallback when no object URL)
   const [previews, setPreviews] = useState({ id_front: null, id_back: null, selfie: null, address_proof: null });
+  // Track which fields have a PDF uploaded (so we show a PDF card instead of <img>)
+  const [pdfFields, setPdfFields] = useState({});
 
   // Cloudinary URLs
   const [uploadedUrls, setUploadedUrls] = useState(() => {
@@ -381,14 +383,22 @@ const KYCPage = () => {
   const uploadFileToCloudinary = useCallback(async (file, field) => {
     setUploadingField(field);
     try {
+      const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
       let blob;
-      try {
-        blob = await compressImageToBlob(file);
-      } catch {
+      if (isPdf) {
+        // PDFs must not be compressed — upload as-is
         blob = file;
+      } else {
+        try {
+          blob = await compressImageToBlob(file);
+        } catch {
+          blob = file;
+        }
       }
       const formData = new FormData();
-      const fileName = blob === file ? (file.name || `${field}.jpg`) : `${field}.jpg`;
+      const fileName = isPdf
+        ? (file.name || `${field}.pdf`)
+        : (blob === file ? (file.name || `${field}.jpg`) : `${field}.jpg`);
       formData.append('file', blob, fileName);
       formData.append('field', field);
 
@@ -525,19 +535,27 @@ const KYCPage = () => {
     if (!file) return;
     // Xiaomi HyperOS and some Android browsers return empty MIME types
     // Accept any file from camera capture, only validate gallery uploads
-    const hasValidType = file.type?.startsWith('image/') || file.name?.match(/\.(jpg|jpeg|png|gif|webp|heic|heif|bmp)$/i);
+    const isPdf = file.type === 'application/pdf' || file.name?.toLowerCase().endsWith('.pdf');
+    const hasValidType = file.type?.startsWith('image/') || isPdf || file.name?.match(/\.(jpg|jpeg|png|gif|webp|heic|heif|bmp|pdf)$/i);
     const isFromCamera = e.target.hasAttribute('capture');
     if (!hasValidType && !isFromCamera) {
       toast.error(t.fileTypeError);
       return;
     }
-    try {
-      // Use object URL for preview (much faster & less memory than data URL)
-      const objectUrl = URL.createObjectURL(file);
-      setPreviews(prev => ({ ...prev, [field]: objectUrl }));
-    } catch (err) {
-      console.warn('Preview creation failed:', err);
-      // Continue with upload even if preview fails
+    // Track PDF fields for preview rendering
+    setPdfFields(prev => ({ ...prev, [field]: isPdf }));
+    if (!isPdf) {
+      try {
+        // Use object URL for preview (much faster & less memory than data URL)
+        const objectUrl = URL.createObjectURL(file);
+        setPreviews(prev => ({ ...prev, [field]: objectUrl }));
+      } catch (err) {
+        console.warn('Preview creation failed:', err);
+        // Continue with upload even if preview fails
+      }
+    } else {
+      // For PDFs: clear any old image preview so PDF card is shown
+      setPreviews(prev => ({ ...prev, [field]: null }));
     }
     try {
       await uploadFileToCloudinary(file, field);
@@ -572,11 +590,26 @@ const KYCPage = () => {
     <div>
       <Label className="mb-2 block">{label}</Label>
       {/* Use <label htmlFor> instead of programmatic .click() for iOS 12+ compatibility */}
-      <input type="file" id={galleryId} ref={fileInputRefs[field]} onChange={handleFileChange(field)} accept="image/*" style={srOnlyStyle} />
+      {/* Gallery input: accept images AND PDFs */}
+      <input type="file" id={galleryId} ref={fileInputRefs[field]} onChange={handleFileChange(field)} accept="image/*,application/pdf,.pdf" style={srOnlyStyle} />
       {canUseCamera && <input type="file" id={cameraId} ref={cameraInputRefs[field]} onChange={handleFileChange(field)} accept="image/*" capture={captureMode} style={srOnlyStyle} />}
-      {previewSrc ? (
+      {(previewSrc || pdfFields[field]) ? (
         <div className="relative">
-          <img src={previewSrc} alt={field} className="w-full h-48 object-cover rounded-lg" onError={(e) => { e.target.style.display = 'none'; }} />
+          {pdfFields[field] && uploadedUrls[field] ? (
+            /* PDF uploaded — show a clean PDF confirmation card */
+            <div className="w-full h-48 border-2 border-blue-200 rounded-lg bg-blue-50/60 flex flex-col items-center justify-center gap-2">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="40" height="40" rx="8" fill="#EFF6FF"/>
+                <path d="M12 8h11l9 9v15a2 2 0 01-2 2H12a2 2 0 01-2-2V10a2 2 0 012-2z" fill="#3B82F6" opacity=".2"/>
+                <path d="M23 8l9 9h-7a2 2 0 01-2-2V8z" fill="#3B82F6"/>
+                <text x="14" y="30" fontSize="8" fontWeight="bold" fill="#1D4ED8">PDF</text>
+              </svg>
+              <span style={{fontSize:13,fontWeight:600,color:'#1D4ED8'}}>PDF caricato</span>
+              <span style={{fontSize:11,color:'#6B7280'}}>Documento ricevuto ✓</span>
+            </div>
+          ) : (
+            <img src={previewSrc} alt={field} className="w-full h-48 object-cover rounded-lg" onError={(e) => { e.target.style.display = 'none'; }} />
+          )}
           {isFieldUploading && (
             <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center">
               <div className="flex items-center space-x-2 bg-white/90 px-3 py-2 rounded-full">
@@ -591,7 +624,7 @@ const KYCPage = () => {
             </div>
           )}
           <div className="absolute bottom-2 right-2 flex space-x-2">
-            {canUseCamera && (
+            {canUseCamera && !pdfFields[field] && (
               <Button variant="outline" size="sm" className={`bg-white/90 ${isFieldUploading ? 'opacity-50 pointer-events-none' : ''}`} asChild>
                 <label htmlFor={isFieldUploading ? undefined : cameraId} className="cursor-pointer">
                   <Camera className="w-3.5 h-3.5 mr-1" />{t.takePhoto}
