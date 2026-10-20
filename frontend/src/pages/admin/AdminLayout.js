@@ -41,7 +41,6 @@ const AdminLayout = ({ children, title }) => {
     } else {
       document.body.classList.remove('is_dark');
     }
-    return () => document.body.classList.remove('is_dark');
   }, [darkMode]);
 
   const toggleDarkMode = () => {
