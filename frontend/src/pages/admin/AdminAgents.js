@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -53,7 +52,7 @@ const AdminAgents = () => {
   };
 
   return (
-    <AdminLayout title="Agents">
+    <>
       {/* Create Agent */}
       <Card className="mb-6">
         <CardHeader>
@@ -143,7 +142,7 @@ const AdminAgents = () => {
           )}
         </CardContent>
       </Card>
-    </AdminLayout>
+    </>
   );
 };
 

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import AdminLayout from './AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Users,
@@ -139,7 +138,7 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <AdminLayout title="Dashboard">
+    <>
       {loading ? (
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -223,7 +222,7 @@ const AdminDashboard = () => {
           </Card>
         </>
       )}
-    </AdminLayout>
+    </>
   );
 };
 

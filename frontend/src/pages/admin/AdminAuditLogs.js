@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -100,7 +99,7 @@ const AdminAuditLogs = () => {
   };
 
   return (
-    <AdminLayout title="Audit Logs">
+    <>
       {/* Filters */}
       <div className="flex gap-3 mb-6">
         <Select value={actionFilter} onValueChange={(v) => { setActionFilter(v); setPage(1); }}>
@@ -267,7 +266,7 @@ const AdminAuditLogs = () => {
           )}
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </>
   );
 };
 

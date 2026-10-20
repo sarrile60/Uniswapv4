@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +23,19 @@ const BADGE_SECTIONS = {
   '/admin/transactions': 'transactions',
 };
 
-const AdminLayout = ({ children, title }) => {
+const TITLE_MAP = {
+  '/admin': 'Dashboard',
+  '/admin/users': 'Users',
+  '/admin/users/create': 'Create User',
+  '/admin/kyc': 'KYC Queue',
+  '/admin/transactions': 'Transactions',
+  '/admin/audit-logs': 'Audit Logs',
+  '/admin/settings': 'Settings',
+  '/admin/wallet-pool': 'Wallet Pool',
+  '/admin/agents': 'Agents',
+};
+
+const AdminLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout, api } = useAuth();
@@ -34,6 +46,10 @@ const AdminLayout = ({ children, title }) => {
     const saved = localStorage.getItem('admin_theme');
     return saved === 'light' ? false : true;
   });
+
+  // Derive page title from current path
+  const title = TITLE_MAP[location.pathname]
+    || (location.pathname.startsWith('/admin/users/') ? 'Edit User' : 'Admin');
 
   useEffect(() => {
     if (darkMode) {
@@ -67,7 +83,6 @@ const AdminLayout = ({ children, title }) => {
       const res = await api.get('/admin/badges');
       if (res.data.ok) {
         const data = res.data.data;
-        // Respect locally cleared sections until backend catches up
         for (const section of clearedSections.current) {
           if (data[section] === 0) {
             clearedSections.current.delete(section);
@@ -106,7 +121,7 @@ const AdminLayout = ({ children, title }) => {
     navigate('/');
   };
 
-  const handleNavClick = async (path) => {
+  const handleNavClick = (path) => {
     setSidebarOpen(false);
     const section = BADGE_SECTIONS[path];
     if (section) {
@@ -120,13 +135,13 @@ const AdminLayout = ({ children, title }) => {
     <div className="min-h-screen bg-gray-100">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
+      {/* Sidebar — persistent, never remounts on navigation */}
       <aside className={`fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 transform transition-transform duration-300 lg:translate-x-0 ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
@@ -139,7 +154,7 @@ const AdminLayout = ({ children, title }) => {
               </div>
               <span className="text-white font-bold">Admin Panel</span>
             </div>
-            <button 
+            <button
               className="lg:hidden text-gray-400 hover:text-white"
               onClick={() => setSidebarOpen(false)}
             >
@@ -150,7 +165,8 @@ const AdminLayout = ({ children, title }) => {
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-1">
             {menuItems.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path
+                || (item.path !== '/admin' && location.pathname.startsWith(item.path));
               const badgeCount = item.badgeKey ? badges[item.badgeKey] || 0 : 0;
               return (
                 <Link
@@ -158,8 +174,8 @@ const AdminLayout = ({ children, title }) => {
                   to={item.path}
                   data-testid={`admin-nav-${item.badgeKey || item.label.toLowerCase().replace(/\s/g, '-')}`}
                   className={`flex items-center justify-between px-3 py-2 rounded-lg transition ${
-                    isActive 
-                      ? 'bg-blue-600 text-white' 
+                    isActive
+                      ? 'bg-blue-600 text-white'
                       : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                   }`}
                   onClick={() => handleNavClick(item.path)}
@@ -196,8 +212,8 @@ const AdminLayout = ({ children, title }) => {
                 <p className="text-gray-400 text-xs truncate">{user?.email}</p>
               </div>
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               className="w-full text-gray-300 border-gray-700 hover:bg-gray-800"
               onClick={handleLogout}
             >
@@ -214,7 +230,7 @@ const AdminLayout = ({ children, title }) => {
         <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center space-x-4">
-              <button 
+              <button
                 className="lg:hidden text-gray-600 hover:text-gray-900"
                 onClick={() => setSidebarOpen(true)}
               >
@@ -233,9 +249,9 @@ const AdminLayout = ({ children, title }) => {
           </div>
         </header>
 
-        {/* Page Content */}
+        {/* Page Content — only this area changes on navigation */}
         <main className="p-4 lg:p-6">
-          {children}
+          <Outlet />
         </main>
       </div>
     </div>

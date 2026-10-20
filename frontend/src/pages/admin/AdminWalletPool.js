@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -72,7 +71,7 @@ const AdminWalletPool = () => {
   const assignedCount = wallets.filter(w => w.status === 'assigned').length;
 
   return (
-    <AdminLayout title="Wallet Pool">
+    <>
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <Card><CardContent className="pt-5 pb-4 text-center">
@@ -173,7 +172,7 @@ const AdminWalletPool = () => {
           )}
         </CardContent>
       </Card>
-    </AdminLayout>
+    </>
   );
 };
 

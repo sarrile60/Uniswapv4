@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -104,16 +103,16 @@ const AdminSettings = () => {
 
   if (loading) {
     return (
-      <AdminLayout title="Settings">
+      <>
         <div className="flex justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
-      </AdminLayout>
+      </>
     );
   }
 
   return (
-    <AdminLayout title="Settings">
+    <>
       <div className="max-w-2xl space-y-6">
         {/* System Status */}
         <Card>
@@ -362,7 +361,7 @@ const AdminSettings = () => {
           </p>
         )}
       </div>
-    </AdminLayout>
+    </>
   );
 };
 

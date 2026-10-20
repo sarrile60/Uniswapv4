@@ -43,6 +43,7 @@ import AdminAuditLogs from "@/pages/admin/AdminAuditLogs";
 import AdminSettings from "@/pages/admin/AdminSettings";
 import AdminWalletPool from "@/pages/admin/AdminWalletPool";
 import AdminAgents from "@/pages/admin/AdminAgents";
+import AdminLayout from "@/pages/admin/AdminLayout";
 
 // Protected Route Component
 const ProtectedRoute = ({ children, adminOnly = false }) => {
@@ -149,87 +150,26 @@ function AppRoutes() {
         }
       />
 
-      {/* Admin Routes */}
+      {/* Admin Routes — AdminLayout is the persistent shell, only content changes */}
       <Route
         path="/admin"
         element={
           <ProtectedRoute adminOnly>
-            <AdminDashboard />
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/admin/users"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminUsers />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/users/create"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminCreateUser />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/users/:userId"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminEditUser />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/kyc"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminKYCQueue />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/transactions"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminTransactions />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/audit-logs"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminAuditLogs />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/settings"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminSettings />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/wallet-pool"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminWalletPool />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/agents"
-        element={
-          <ProtectedRoute adminOnly>
-            <AdminAgents />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="users" element={<AdminUsers />} />
+        <Route path="users/create" element={<AdminCreateUser />} />
+        <Route path="users/:userId" element={<AdminEditUser />} />
+        <Route path="kyc" element={<AdminKYCQueue />} />
+        <Route path="transactions" element={<AdminTransactions />} />
+        <Route path="audit-logs" element={<AdminAuditLogs />} />
+        <Route path="settings" element={<AdminSettings />} />
+        <Route path="wallet-pool" element={<AdminWalletPool />} />
+        <Route path="agents" element={<AdminAgents />} />
+      </Route>
 
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/" replace />} />

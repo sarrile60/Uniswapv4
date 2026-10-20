@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -68,7 +67,7 @@ const AdminTransactions = () => {
   };
 
   return (
-    <AdminLayout title="Transactions">
+    <>
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6">
         <Input
@@ -226,7 +225,7 @@ const AdminTransactions = () => {
           </div>
         )}
       </Card>
-    </AdminLayout>
+    </>
   );
 };
 

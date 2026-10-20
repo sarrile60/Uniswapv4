@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import AdminLayout from './AdminLayout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -194,7 +193,7 @@ const AdminCreateUser = () => {
   };
 
   return (
-    <AdminLayout title="Create User">
+    <>
       <div className="max-w-3xl mx-auto">
         <Link to="/admin/users" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -793,7 +792,7 @@ const AdminCreateUser = () => {
           )}
         </form>
       </div>
-    </AdminLayout>
+    </>
   );
 };
 
