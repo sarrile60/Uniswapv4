@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 /**
@@ -38,22 +38,19 @@ if (typeof document !== 'undefined' && !document.getElementById('page-transition
 
 const PageTransition = ({ children }) => {
   const location = useLocation();
-  const [displayKey, setDisplayKey] = useState(location.key || location.pathname);
   const containerRef = useRef(null);
 
   useEffect(() => {
-    setDisplayKey(location.key || location.pathname);
-    // Restart animation by removing and re-adding the animation property
+    // Restart animation on route change by removing and re-adding the animation property
     if (containerRef.current) {
       containerRef.current.style.animation = 'none';
-      // Trigger reflow
-      void containerRef.current.offsetHeight;
+      void containerRef.current.offsetHeight; // Trigger reflow
       containerRef.current.style.animation = 'pageEnter 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards';
     }
   }, [location.pathname]);
 
   return (
-    <div ref={containerRef} style={styles.container} key={displayKey}>
+    <div ref={containerRef} style={styles.container}>
       {children}
     </div>
   );
