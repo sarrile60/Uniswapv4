@@ -161,7 +161,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                           <Link to="/markets">{t.nav_markets}</Link>
                         </li>
                         <li className="menu-item">
-                          <Link to="/learn">{lang === 'it' ? 'Sicurezza' : 'Security'}</Link>
+                          <Link to="/security">{lang === 'it' ? 'Sicurezza' : 'Security'}</Link>
                         </li>
                         <li className="menu-item bitusdt-item">
                           <Link to="/markets/BTC" style={{display:'inline-flex',alignItems:'center',gap:6}}>
