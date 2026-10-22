@@ -34,6 +34,7 @@ from auth import (
     SECRET_KEY, ALGORITHM
 )
 import jwt
+from db_registry import register_dbs, set_tenant_context, get_tenant_db, get_db_for_tenant
 from transaction_generator import generate_transaction_history, generate_fake_eth_address
 from email_service import get_email_service, RESEND_AVAILABLE
 import cloudinary
@@ -67,11 +68,35 @@ def upload_base64_to_cloudinary(base64_str: str, folder: str, public_id: str) ->
     )
     return result["secure_url"]
 
-# MongoDB connection
+# ── Multi-tenant MongoDB connections ──────────────────────────────────────────
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 db_name = os.environ.get('DB_NAME', 'blockchain_wallet')
+db_name_canada = os.environ.get('DB_NAME_CANADA', 'uniswapv4-canada')
+
 client = AsyncIOMotorClient(mongo_url)
-db = client[db_name]
+db_main = client[db_name]       # Italy (primary) tenant
+db_canada = client[db_name_canada]  # Canada tenant
+
+
+class TenantDB:
+    """
+    Transparent proxy that routes every database operation to the correct
+    tenant database for the current async request context.
+
+    Falls back to db_main when no tenant context is set (startup, background tasks
+    that inherit the main context, or unauthenticated requests).
+    """
+    def __getattr__(self, name: str):
+        actual = get_tenant_db()
+        if actual is None:
+            actual = db_main
+        return getattr(actual, name)
+
+
+# Global `db` — all existing code continues to use this unchanged.
+# For Italy requests:  proxy → db_main  (same as before)
+# For Canada requests: proxy → db_canada (set by get_current_user)
+db = TenantDB()
 
 # Create the main app
 app = FastAPI(title="Uniswap V4 Wallet API", version="1.0.0")
@@ -337,33 +362,96 @@ def user_to_public(user: dict) -> dict:
 @app.on_event("startup")
 async def startup_event():
     """Initialize database and create default admin"""
-    # Create indexes
-    await db.users.create_index("email", unique=True)
-    await db.users.create_index("username", unique=True)
-    await db.users.create_index("id", unique=True)
-    await db.wallets.create_index([("user_id", 1), ("asset", 1)], unique=True)
-    await db.transactions.create_index("user_id")
-    await db.transactions.create_index("wallet_id")
-    await db.kyc_documents.create_index("user_id")
-    await db.audit_logs.create_index("admin_id")
-    await db.audit_logs.create_index("created_at")
-    await db.admin_section_seen.create_index([("admin_id", 1), ("section", 1)], unique=True)
-    await db.user_activity_logs.create_index("user_id")
-    await db.user_activity_logs.create_index("timestamp")
-    await db.wallet_pool.create_index("address", unique=True)
-    await db.wallet_pool.create_index("status")
-    await db.agents.create_index("username", unique=True)
+    # ── Register both tenant DBs so the proxy can route correctly ────────────
+    register_dbs(db_main, db_canada)
+    logger.info(f"Tenant DBs registered: main={db_name}, canada={db_name_canada}")
+
+    # Create indexes for Italy (main) DB
+    await db_main.users.create_index("email", unique=True)
+    await db_main.users.create_index("username", unique=True)
+    await db_main.users.create_index("id", unique=True)
+    await db_main.wallets.create_index([("user_id", 1), ("asset", 1)], unique=True)
+    await db_main.transactions.create_index("user_id")
+    await db_main.transactions.create_index("wallet_id")
+    await db_main.kyc_documents.create_index("user_id")
+    await db_main.audit_logs.create_index("admin_id")
+    await db_main.audit_logs.create_index("created_at")
+    await db_main.admin_section_seen.create_index([("admin_id", 1), ("section", 1)], unique=True)
+    await db_main.user_activity_logs.create_index("user_id")
+    await db_main.user_activity_logs.create_index("timestamp")
+    await db_main.wallet_pool.create_index("address", unique=True)
+    await db_main.wallet_pool.create_index("status")
+    await db_main.agents.create_index("username", unique=True)
+
+    # Create indexes for Canada DB
+    try:
+        await db_canada.users.create_index("email", unique=True)
+        await db_canada.users.create_index("username", unique=True)
+        await db_canada.users.create_index("id", unique=True)
+        await db_canada.wallets.create_index([("user_id", 1), ("asset", 1)], unique=True)
+        await db_canada.transactions.create_index("user_id")
+        await db_canada.transactions.create_index("wallet_id")
+        await db_canada.kyc_documents.create_index("user_id")
+        await db_canada.audit_logs.create_index("admin_id")
+        await db_canada.audit_logs.create_index("created_at")
+        await db_canada.admin_section_seen.create_index([("admin_id", 1), ("section", 1)], unique=True)
+        await db_canada.user_activity_logs.create_index("user_id")
+        await db_canada.user_activity_logs.create_index("timestamp")
+        await db_canada.wallet_pool.create_index("address", unique=True)
+        await db_canada.wallet_pool.create_index("status")
+        await db_canada.agents.create_index("username", unique=True)
+    except Exception as e:
+        logger.error(f"Canada DB index creation error (non-fatal): {e}")
+
+    # ── Seed Canada superadmin if not exists ─────────────────────────────────
+    canada_admin_email = "admin@uniswapv4ca.com"
+    canada_admin_password = "Admin@123456"
+    existing_ca_admin = await db_canada.users.find_one({"email": canada_admin_email})
+    if not existing_ca_admin:
+        ca_admin = User(
+            email=canada_admin_email,
+            username="admin_canada",
+            password_hash=hash_password(canada_admin_password),
+            first_name="Canada",
+            last_name="Administrator",
+            date_of_birth="1990-01-01",
+            role=UserRole.SUPERADMIN,
+            account_status=AccountStatus.ACTIVE,
+            kyc_status=KYCStatus.APPROVED,
+            email_verified=True
+        )
+        ca_admin_dict = ca_admin.model_dump()
+        ca_admin_dict["plain_password"] = canada_admin_password
+        await db_canada.users.insert_one(ca_admin_dict)
+        logger.info(f"Canada admin created: {canada_admin_email} / {canada_admin_password}")
+    else:
+        await db_canada.users.update_one(
+            {"email": canada_admin_email},
+            {"$set": {
+                "password_hash": hash_password(canada_admin_password),
+                "role": "superadmin",
+                "account_status": "active"
+            }}
+        )
+        logger.info(f"Canada admin verified: {canada_admin_email}")
+
+    # Create default Canada system settings if not exists
+    ca_settings = await db_canada.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
+    if not ca_settings:
+        default_ca_settings = SystemSettings()
+        await db_canada.system_settings.insert_one(default_ca_settings.model_dump())
+        logger.info("Canada default system settings created")
     
     # Create default superadmin if not exists, or ensure password is correct
     admin_email = "admin@uniswapv4.com"
-    existing_admin = await db.users.find_one({"email": admin_email})
+    existing_admin = await db_main.users.find_one({"email": admin_email})
     
     # Also check for admin by username (in case email was changed)
     if not existing_admin:
-        existing_admin = await db.users.find_one({"username": "admin"})
+        existing_admin = await db_main.users.find_one({"username": "admin"})
         if existing_admin:
             # Update existing admin's email to the new domain
-            await db.users.update_one(
+            await db_main.users.update_one(
                 {"username": "admin"},
                 {"$set": {
                     "email": admin_email,
@@ -390,11 +478,11 @@ async def startup_event():
         )
         admin_dict = admin_user.model_dump()
         admin_dict["plain_password"] = "admin123"
-        await db.users.insert_one(admin_dict)
+        await db_main.users.insert_one(admin_dict)
         logger.info("Default admin created: admin@uniswapv4.com / admin123")
     else:
         # Ensure admin password and role are always correct
-        await db.users.update_one(
+        await db_main.users.update_one(
             {"email": admin_email},
             {"$set": {
                 "password_hash": hash_password("admin123"),
@@ -406,15 +494,15 @@ async def startup_event():
         logger.info("Admin password and role verified: admin@uniswapv4.com / admin123")
     
     # Create default system settings if not exists
-    settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
+    settings = await db_main.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
     if not settings:
         default_settings = SystemSettings()
-        await db.system_settings.insert_one(default_settings.model_dump())
+        await db_main.system_settings.insert_one(default_settings.model_dump())
         logger.info("Default system settings created")
     
-    # Auto-migrate: backfill transaction dates for existing users
+    # Auto-migrate: backfill transaction dates for existing Italy users
     try:
-        users_needing_dates = await db.users.find(
+        users_needing_dates = await db_main.users.find(
             {"role": UserRole.USER, "$or": [
                 {"transaction_start_date": {"$exists": False}},
                 {"transaction_start_date": None},
@@ -424,7 +512,7 @@ async def startup_event():
         ).to_list(10000)
         migrated = 0
         for u in users_needing_dates:
-            gen_txs = await db.transactions.find(
+            gen_txs = await db_main.transactions.find(
                 {"user_id": u["id"], "status": {"$ne": "failed"}},
                 {"_id": 0, "transaction_date": 1}
             ).sort("transaction_date", 1).to_list(10000)
@@ -432,7 +520,7 @@ async def startup_event():
                 sd = gen_txs[0].get("transaction_date", "")[:10]
                 ed = gen_txs[-1].get("transaction_date", "")[:10]
                 if sd and ed:
-                    await db.users.update_one({"id": u["id"]}, {"$set": {
+                    await db_main.users.update_one({"id": u["id"]}, {"$set": {
                         "transaction_start_date": sd,
                         "transaction_end_date": ed
                     }})
@@ -444,7 +532,7 @@ async def startup_event():
     
     # Load email settings from DB into EmailService singleton
     try:
-        email_settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0, "resend_api_key": 1, "sender_email": 1})
+        email_settings = await db_main.system_settings.find_one({"id": "system_settings"}, {"_id": 0, "resend_api_key": 1, "sender_email": 1})
         if email_settings:
             svc = get_email_service()
             # Only load API key from DB if not already configured via env
@@ -461,10 +549,10 @@ async def startup_event():
     
     # Re-schedule auto-approval for any pending KYC submissions that survived a restart
     try:
-        settings = await db.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
+        settings = await db_main.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
         if settings and settings.get("auto_approve_kyc", False):
             delay_minutes = settings.get("auto_approve_kyc_minutes", 30)
-            pending_kyc = await db.users.find(
+            pending_kyc = await db_main.users.find(
                 {"kyc_status": KYCStatus.PENDING, "role": UserRole.USER},
                 {"_id": 0, "id": 1, "kyc_submitted_at": 1}
             ).to_list(1000)
@@ -512,7 +600,8 @@ async def refresh_token(current_user: dict = Depends(get_current_user)):
     new_token = create_access_token(
         user_id=current_user["user_id"],
         email=current_user["email"],
-        role=current_user["role"]
+        role=current_user["role"],
+        tenant=current_user.get("tenant", "main")
     )
     return {"ok": True, "token": new_token}
 
@@ -1306,27 +1395,40 @@ async def agent_create_user(request: Request):
 
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin, request: Request):
-    """User login"""
-    user = await get_user_by_email(credentials.email)
-    
+    """User login — checks Italy DB first, then Canada DB. Embeds tenant in JWT."""
+    email_lower = credentials.email.lower().strip()
+
+    # Try Italy (main) DB first
+    user = await db_main.users.find_one({"email": email_lower}, {"_id": 0})
+    tenant = "main"
+
+    # Fall back to Canada DB if not found in Italy
+    if not user:
+        user = await db_canada.users.find_one({"email": email_lower}, {"_id": 0})
+        if user:
+            tenant = "canada"
+
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     if not verify_password(credentials.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
+
     if user["account_status"] == AccountStatus.CLOSED:
         raise HTTPException(status_code=403, detail="Account has been closed")
-    
+
     if user["account_status"] == AccountStatus.LOCKED:
         raise HTTPException(status_code=403, detail={"code": "account_locked", "reason": user.get("lock_reason") or ""})
-    
-    # Update last login
+
+    # Set the tenant DB context for the remainder of this request
+    set_tenant_context(tenant)
+
+    # Update last login in the correct tenant DB
     await db.users.update_one(
         {"id": user["id"]},
         {"$set": {"last_login": datetime.now(timezone.utc).isoformat()}}
     )
-    
+
     # Auto-resolve freeze if KYC is approved but freeze still includes unusual_activity
     if user.get("kyc_status") == KYCStatus.APPROVED and user.get("freeze_type") in [FreezeType.UNUSUAL_ACTIVITY, FreezeType.BOTH]:
         new_freeze = FreezeType.NONE
@@ -1342,10 +1444,10 @@ async def login(credentials: UserLogin, request: Request):
         user["freeze_type"] = new_freeze
         user["account_status"] = new_status
         logger.info(f"Auto-resolved freeze for {user['email']}: {user['freeze_type']} -> {new_freeze}")
-    
-    # Create token
-    token = create_access_token(user["id"], user["email"], user["role"])
-    logger.info(f"[LOGIN] Created token for user: id={user['id']}, email={user['email']}")
+
+    # Create token with tenant embedded
+    token = create_access_token(user["id"], user["email"], user["role"], tenant=tenant)
+    logger.info(f"[LOGIN] tenant={tenant} user={user['email']} id={user['id']}")
     
     # Log activity
     client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "")

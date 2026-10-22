@@ -14,6 +14,7 @@ from pathlib import Path
 
 import os
 from dotenv import load_dotenv
+from db_registry import set_tenant_context
 
 # Load .env BEFORE reading any env vars
 load_dotenv(Path(__file__).parent / '.env')
@@ -41,7 +42,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     )
 
 
-def create_access_token(user_id: str, email: str, role: str, expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(user_id: str, email: str, role: str, tenant: str = "main", expires_delta: Optional[timedelta] = None) -> str:
     """Create a JWT access token"""
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -52,6 +53,7 @@ def create_access_token(user_id: str, email: str, role: str, expires_delta: Opti
         "sub": user_id,
         "email": email,
         "role": role,
+        "tenant": tenant,
         "exp": expire,
         "iat": datetime.now(timezone.utc)
     }
@@ -84,10 +86,16 @@ async def get_current_user(request: Request, credentials: HTTPAuthorizationCrede
         raise HTTPException(status_code=403, detail="Not authenticated")
     
     payload = decode_token(token)
+    tenant = payload.get("tenant", "main")
+
+    # Set the correct database for the entire duration of this request
+    set_tenant_context(tenant)
+
     return {
         "user_id": payload.get("sub"),
         "email": payload.get("email"),
         "role": payload.get("role"),
+        "tenant": tenant,
     }
 
 
