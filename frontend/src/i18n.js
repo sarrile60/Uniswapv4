@@ -293,7 +293,9 @@ const translations = {
 function detectLanguage() {
   const saved = localStorage.getItem('app_language');
   if (saved === 'it' || saved === 'en') return saved;
-  return 'it';
+  // No saved preference — auto-detect from browser language
+  const browser = (navigator.language || navigator.userLanguage || '').toLowerCase();
+  return browser.startsWith('it') ? 'it' : 'en';
 }
 
 const LangContext = createContext({ lang: 'en', t: translations.en, toggleLang: () => {} });
