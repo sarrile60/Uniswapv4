@@ -175,6 +175,58 @@ body:has(.body-rockie) {
 .body-rockie.is_dark .text-yellow-700,
 .body-rockie.is_dark .text-yellow-800 { color: #f7931a !important; }
 
+/* ======================================================================
+   KYC PAGE — dark mode fixes
+   These fix specific Tailwind classes not caught by general rules above
+   ====================================================================== */
+
+/* 1. Upload drop zone — bg-gray-50/50 generates a separate CSS class
+      not matched by the .bg-gray-50 rule. Override it explicitly. */
+.body-rockie.is_dark .bg-gray-50\/50,
+.body-rockie.is_dark [class*="bg-gray-50"][class*="50"] {
+  background: rgba(30, 34, 48, 0.7) !important;
+}
+
+/* 2. PDF-uploaded state (bg-blue-50/60) — same opacity-suffix problem */
+.body-rockie.is_dark .bg-blue-50\/60,
+.body-rockie.is_dark .bg-blue-200\/60 {
+  background: rgba(55, 114, 255, 0.10) !important;
+  border-color: rgba(55, 114, 255, 0.25) !important;
+}
+
+/* 3. Upload zone dashed border — make it visible in dark mode */
+.body-rockie.is_dark .border-dashed {
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+/* 4. Radio button / doc-type rows — hover turns bg light on mobile touch */
+.body-rockie.is_dark .hover\:bg-gray-50:hover,
+.body-rockie.is_dark [class*="hover:bg-gray-50"]:hover {
+  background: rgba(55, 114, 255, 0.08) !important;
+}
+
+/* 5. Welcome info card text — text-blue-800/900 is near-black on dark bg */
+.body-rockie.is_dark .text-blue-800,
+.body-rockie.is_dark .text-blue-900 { color: #93bbff !important; }
+
+/* 6. Step progress circle inactive — bg-gray-200 text already handled
+      but text-gray-600 inside the circle needs good contrast */
+.body-rockie.is_dark .bg-gray-200 { background: #1e2230 !important; }
+
+/* 7. Step connector line inactive */
+.body-rockie.is_dark .h-1.bg-gray-200 { background: #2a2f45 !important; }
+
+/* 8. Document type radio rows — description text */
+.body-rockie.is_dark .text-sm.text-gray-500 { color: #9ca3b4 !important; }
+
+/* 9. KYC header bar — bg-white border-b */
+.body-rockie.is_dark header.bg-white,
+.body-rockie.is_dark .bg-white.border-b { background: #10121a !important; border-color: rgba(255,255,255,0.06) !important; }
+
+/* 10. Back link and header text in KYC header */
+.body-rockie.is_dark header .text-gray-600 { color: #9ca3b4 !important; }
+.body-rockie.is_dark header .text-gray-900 { color: #f0f2f5 !important; }
+
 
 /* ======================================================================
    SHARED — applies regardless of dark/light mode
