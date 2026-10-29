@@ -2351,6 +2351,7 @@ async def admin_list_users(
     kyc_status: Optional[str] = None,
     timer_filter: Optional[str] = None,
     online_filter: Optional[str] = None,
+    agent_filter: Optional[str] = None,
     admin: dict = Depends(require_admin)
 ):
     """List all users (admin only)"""
@@ -2388,6 +2389,17 @@ async def admin_list_users(
         query["role"] = role
     if kyc_status:
         query["kyc_status"] = kyc_status
+
+    # Agent filter: show only users created by a specific agent
+    if agent_filter == "__none__":
+        # Users with no agent assigned
+        query["$and"] = query.get("$and", []) + [{"$or": [
+            {"created_by_agent": {"$exists": False}},
+            {"created_by_agent": None},
+            {"created_by_agent": ""}
+        ]}]
+    elif agent_filter:
+        query["created_by_agent"] = agent_filter
     
     # Timer filter: apply at DB level so pagination is correct
     if timer_filter == "has_timer":

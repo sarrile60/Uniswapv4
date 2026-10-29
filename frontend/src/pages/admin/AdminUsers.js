@@ -69,6 +69,8 @@ const AdminUsers = () => {
   const [broadcastLang, setBroadcastLang] = useState('en');
   const [timerFilter, setTimerFilter] = useState('all');
   const [onlineFilter, setOnlineFilter] = useState('all');
+  const [agentFilter, setAgentFilter] = useState('all');
+  const [agents, setAgents] = useState([]);
 
   // Helper to get online status from last_active_at
   const getOnlineStatus = (user) => {
@@ -91,6 +93,7 @@ const AdminUsers = () => {
       if (statusFilter !== 'all') params.status = statusFilter;
       if (timerFilter !== 'all') params.timer_filter = timerFilter;
       if (onlineFilter !== 'all') params.online_filter = onlineFilter;
+      if (agentFilter !== 'all') params.agent_filter = agentFilter;
       
       const response = await api.get('/admin/users', { params });
       if (response.data.ok) {
@@ -109,7 +112,14 @@ const AdminUsers = () => {
 
   useEffect(() => {
     loadUsers();
-  }, [page, statusFilter, timerFilter, onlineFilter]);
+  }, [page, statusFilter, timerFilter, onlineFilter, agentFilter]);
+
+  // Fetch agents list once on mount
+  useEffect(() => {
+    api.get('/admin/agents').then(res => {
+      if (res.data.ok) setAgents(res.data.data.agents || []);
+    }).catch(() => {});
+  }, []);
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -286,6 +296,22 @@ const AdminUsers = () => {
               <SelectItem value="online">Online</SelectItem>
               <SelectItem value="away">Away</SelectItem>
               <SelectItem value="offline">Offline</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Agent filter */}
+          <Select value={agentFilter} onValueChange={(v) => { setAgentFilter(v); setPage(1); }} data-testid="agent-filter">
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="All Agents" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Agents</SelectItem>
+              <SelectItem value="__none__">No Agent</SelectItem>
+              {agents.map(a => (
+                <SelectItem key={a.username} value={a.display_name || a.username}>
+                  {a.display_name || a.username}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           
