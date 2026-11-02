@@ -152,8 +152,19 @@ def generate_transaction_history(
     # Distribute the balance across transactions
     amounts = distribute_amount(balance, num_transactions)
     
-    # Distribute fees — EVERY transaction gets an unpaid fee (no zero-fee transactions)
-    fee_amounts = distribute_amount(fees, num_transactions, min_amount=Decimal("0.50"))
+    # Distribute fees — only if there are fees to distribute
+    # If total_fees is 0 or very small, set all fees to 0 (avoid fake 0.50 minimums)
+    min_viable_fees = Decimal("0.50") * num_transactions
+    if fees > Decimal("0") and fees >= min_viable_fees:
+        # Enough fees to properly distribute with min_amount constraint
+        fee_amounts = distribute_amount(fees, num_transactions, min_amount=Decimal("0.50"))
+    elif fees > Decimal("0"):
+        # Some fees but less than min_amount per transaction — just give one transaction the full fee
+        fee_amounts = [Decimal("0.00")] * num_transactions
+        fee_amounts[0] = fees
+    else:
+        # No fees — all transactions have 0 fee
+        fee_amounts = [Decimal("0.00")] * num_transactions
     
     # Shuffle fee distribution across transactions
     random.shuffle(fee_amounts)
