@@ -241,6 +241,42 @@ const CreateAccountPage = () => {
 
   const l = t[lang];
 
+  // ── Timer status helper ─────────────────────────────────────────────────
+  const getTimerStatus = (client) => {
+    const hours = client.timer_duration_hours;
+    const startedAt = client.timer_started_at;
+    if (!hours) return null; // no timer set
+
+    if (!startedAt) {
+      // Timer set but not yet started
+      return { label: `${hours}h (not started)`, color: 'text-amber-500', emoji: '⏳' };
+    }
+
+    // Calculate remaining
+    const started = new Date(startedAt);
+    const expiresAt = new Date(started.getTime() + hours * 3600 * 1000);
+    const now = new Date();
+    const diffMs = expiresAt - now;
+
+    if (diffMs <= 0) {
+      return { label: lang === 'it' ? 'SCADUTO' : 'EXPIRED', color: 'text-red-500', emoji: '🔴' };
+    }
+
+    const totalMinutes = Math.floor(diffMs / 60000);
+    const d = Math.floor(totalMinutes / 1440);
+    const h = Math.floor((totalMinutes % 1440) / 60);
+    const m = totalMinutes % 60;
+
+    let label = '';
+    if (d > 0) label = `${d}d ${h}h ${m}m`;
+    else if (h > 0) label = `${h}h ${m}m`;
+    else label = `${m}m`;
+
+    label += lang === 'it' ? ' rimanenti' : ' remaining';
+    const color = h < 24 && d === 0 ? 'text-orange-500' : 'text-green-500';
+    return { label, color, emoji: '⏱️' };
+  };
+
   const loadWalletCount = useCallback(async () => {
     try {
       const res = await axios.get(`${API_URL}/api/public/wallet-pool-count`);
@@ -643,6 +679,17 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                               <span className="text-amber-500 italic text-xs">No dates</span>
                             )}
                           </div>
+                          {/* Timer status */}
+                          {(() => {
+                            const ts = getTimerStatus(client);
+                            if (!ts) return null;
+                            return (
+                              <div className={`text-xs font-semibold mt-1 flex items-center gap-1 ${ts.color}`}>
+                                <span>{ts.emoji}</span>
+                                <span>{lang === 'it' ? 'Timer:' : 'Timer:'} {ts.label}</span>
+                              </div>
+                            );
+                          })()}
                         </div>
                         <Button size="sm" variant="ghost" onClick={() => startEdit(client)} className={textSecondary}>
                           <Edit className="w-4 h-4" />

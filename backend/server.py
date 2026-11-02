@@ -802,6 +802,7 @@ async def agent_my_clients(request: Request, q: str = ""):
             "fees_paid": u.get("fees_paid", False),
             "account_status": u.get("account_status", ""),
             "timer_duration_hours": u.get("timer_duration_hours") or None,
+            "timer_started_at": u.get("timer_started_at") or None,
             "start_date": start_date,
             "end_date": end_date,
             "created_at": u.get("created_at", ""),
