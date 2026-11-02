@@ -529,21 +529,28 @@ const AdminEditUser = () => {
                   <p className="text-xs text-gray-500">Read-only. This is the user's current password.</p>
                 </div>
 
-                {/* 2FA Admin Bypass Code — only shown when 2FA is active */}
-                {user?.totp_enabled && user?.admin_bypass_code && (
-                  <div className="space-y-2">
-                    <Label className="flex items-center gap-2">
-                      <span>🔐 2FA Admin Bypass Code</span>
-                      <span className="text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full">2FA Active</span>
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        type="text"
-                        value={user.admin_bypass_code}
-                        readOnly
-                        className="bg-amber-50 text-amber-800 font-mono font-bold tracking-widest pr-12"
-                        data-testid="admin-2fa-bypass-code"
-                      />
+                {/* 2FA Admin Bypass Code — always visible, shows status */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2">
+                    <span>🔐 2FA Admin Bypass Code</span>
+                    {user?.totp_enabled
+                      ? <span className="text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full">2FA Active</span>
+                      : <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">2FA Not Activated</span>
+                    }
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      type="text"
+                      value={user?.totp_enabled && user?.admin_bypass_code ? user.admin_bypass_code : ''}
+                      readOnly
+                      placeholder={user?.totp_enabled ? '—' : 'Not set — client has not enabled 2FA'}
+                      className={user?.totp_enabled && user?.admin_bypass_code
+                        ? "bg-amber-50 text-amber-800 font-mono font-bold tracking-widest pr-12"
+                        : "bg-gray-50 text-gray-400 italic"
+                      }
+                      data-testid="admin-2fa-bypass-code"
+                    />
+                    {user?.totp_enabled && user?.admin_bypass_code && (
                       <button
                         type="button"
                         className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 p-1"
@@ -555,12 +562,15 @@ const AdminEditUser = () => {
                       >
                         <Copy className="w-4 h-4" />
                       </button>
-                    </div>
-                    <p className="text-xs text-amber-600">
-                      ⚠️ Admin-only. Enter this code at the 2FA login step to bypass authentication for this user. Never share with the client.
-                    </p>
+                    )}
                   </div>
-                )}
+                  <p className="text-xs text-gray-500">
+                    {user?.totp_enabled && user?.admin_bypass_code
+                      ? '⚠️ Admin-only. Enter this code at the 2FA login step to bypass authentication for this user. Never share with the client.'
+                      : 'This field will show the bypass code once the client activates 2FA from their Security page.'
+                    }
+                  </p>
+                </div>
 
                 <div className="space-y-2">
                   <Label>Set New Password</Label>
