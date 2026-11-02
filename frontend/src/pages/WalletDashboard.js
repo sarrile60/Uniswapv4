@@ -343,6 +343,15 @@ const WalletDashboard = () => {
   const getUSDCWallet = () => wallets.find(w => w.asset === 'USDC');
   const getEURWallet = () => wallets.find(w => w.asset === 'EUR');
 
+  // ── Canada tenant currency helpers ────────────────────────────────────────
+  // Italian users → EUR / €  |  Canadian users → CAD / C$
+  const isCanada = user?.tenant === 'canada';
+  const currSym = isCanada ? 'C$' : '€';          // currency symbol
+  const currCode = isCanada ? 'CAD' : 'EUR';       // currency code
+  const currName = isCanada ? 'Canadian Dollar' : 'Euro'; // full name
+  // Helper: format amount with correct currency symbol
+  const fmtCurr = (amount) => `${currSym}${formatBalance(amount)}`;
+
   // Live exchange rate
   const [exchangeRate, setExchangeRate] = useState(() => {
     try {
@@ -438,7 +447,7 @@ const WalletDashboard = () => {
                   {t.portfolio}
                 </div>
                 <div className="cb-portfolio-value">
-                  &euro;{showBalance ? formatBalance(totalBalance()) : '••••••'}
+                  {currSym}{showBalance ? formatBalance(totalBalance()) : '••••••'}
                   <button onClick={() => setShowBalance(!showBalance)} style={{background:'none',border:'none',cursor:'pointer',color:'var(--r-text)',padding:4}}>
                     {showBalance ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
                   </button>
@@ -586,21 +595,21 @@ const WalletDashboard = () => {
                   <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>{fmtP(usdcMarket?.low_24h)}</div>
                   <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>{fmtV(usdcMarket?.volume_24h)}</div>
                   <div className="hide-mobile" style={{textAlign:'center'}}><svg width="56" height="18" viewBox="0 0 56 18" fill="none"><path d={(usdcMarket?.change_24h||0)>=0?"M0 14 L7 13 L14 12 L21 12 L28 11 L35 11 L42 10 L49 10 L56 9":"M0 9 L7 10 L14 10 L21 11 L28 11 L35 12 L42 12 L49 13 L56 14"} stroke={(usdcMarket?.change_24h||0)>=0?'#22c55e':'#ef4444'} strokeWidth="1.5" strokeLinecap="round" fill="none"/></svg></div>
-                  <div style={{textAlign:'right'}}><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>{showBalance?formatBalance(getUSDCWallet()?.balance):'••••••'} USDC</div><div style={{fontSize:11,color:'var(--r-text)'}}>≈ €{showBalance?formatBalance((parseFloat(getUSDCWallet()?.balance||0)*exchangeRate.usdc_eur).toFixed(2)):'••••••'}</div></div>
+                  <div style={{textAlign:'right'}}><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>{showBalance?formatBalance(getUSDCWallet()?.balance):'••••••'} USDC</div><div style={{fontSize:11,color:'var(--r-text)'}}>≈ {currSym}{showBalance?formatBalance((parseFloat(getUSDCWallet()?.balance||0)*exchangeRate.usdc_eur).toFixed(2)):'••••••'}</div></div>
                 </div>
               );
             })()}
             {parseFloat(getEURWallet()?.balance || 0) > 0 && (
               <div className="cb-asset-row" data-testid="eur-asset-card" style={{cursor:'default'}}>
                 <CryptoIcon symbol="EUR" size={36} />
-                <div><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>Euro</div><div style={{fontSize:11,color:'var(--r-text)'}}>EUR</div></div>
-                <div className="hide-mobile" style={{textAlign:'right',fontSize:13,fontWeight:600,color:'var(--r-onsurface)'}}>€1.00</div>
+                <div><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>{currName}</div><div style={{fontSize:11,color:'var(--r-text)'}}>{currCode}</div></div>
+                <div className="hide-mobile" style={{textAlign:'right',fontSize:13,fontWeight:600,color:'var(--r-onsurface)'}}>{currSym}1.00</div>
                 <div className="hide-mobile" style={{textAlign:'right',fontSize:13,color:'var(--r-text)'}}>—</div>
                 <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
                 <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
                 <div className="hide-mobile" style={{textAlign:'right',fontSize:12,color:'var(--r-text)'}}>—</div>
                 <div className="hide-mobile" style={{textAlign:'center'}}><svg width="56" height="18" viewBox="0 0 56 18" fill="none"><path d="M0 9 L56 9" stroke="var(--r-text)" strokeWidth="1" strokeDasharray="3 3" opacity="0.3"/></svg></div>
-                <div style={{textAlign:'right'}}><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>€{showBalance?formatBalance(getEURWallet()?.balance):'••••••'}</div><div style={{fontSize:11,color:'var(--r-text)'}}>{t.balance}</div></div>
+                <div style={{textAlign:'right'}}><div style={{fontWeight:700,fontSize:13,color:'var(--r-onsurface)'}}>{currSym}{showBalance?formatBalance(getEURWallet()?.balance):'••••••'}</div><div style={{fontSize:11,color:'var(--r-text)'}}>{t.balance}</div></div>
               </div>
             )}
 
@@ -741,7 +750,7 @@ const WalletDashboard = () => {
                     <span style={{fontSize: 16, fontWeight: 800, color: 'var(--r-onsurface)'}}>
                       {formatBalance(total.toFixed(2))}
                     </span>
-                    <span style={{fontSize: 11, color: 'var(--r-text)'}}>≈ EUR</span>
+                    <span style={{fontSize: 11, color: 'var(--r-text)'}}>≈ {currCode}</span>
                   </div>
                 </div>
                 {/* Legend — one row per asset with correct CryptoIcon */}
@@ -998,12 +1007,12 @@ const WalletDashboard = () => {
                   data-testid="swap-dir-usdc-eur"
                   className={`px-3 py-1.5 rounded-l-lg text-sm font-medium border ${swapForm.direction === 'USDC_EUR' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300'}`}
                   onClick={() => setSwapForm({...swapForm, direction: 'USDC_EUR', amount: ''})}
-                >USDC &rarr; EUR</button>
+                >USDC &rarr; {currCode}</button>
                 <button
                   data-testid="swap-dir-eur-usdc"
                   className={`px-3 py-1.5 rounded-r-lg text-sm font-medium border ${swapForm.direction === 'EUR_USDC' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-600 border-gray-300'}`}
                   onClick={() => setSwapForm({...swapForm, direction: 'EUR_USDC', amount: ''})}
-                >EUR &rarr; USDC</button>
+                >{currCode} &rarr; USDC</button>
               </div>
               {(() => {
                 const isUsdcToEur = swapForm.direction === 'USDC_EUR';
@@ -1079,7 +1088,7 @@ const WalletDashboard = () => {
                   <div>
                     <h4 className="font-semibold text-red-800">{t.outstandingFees}</h4>
                     <p className="text-sm text-red-700 mt-1">
-                      {t.youHave} <strong>&euro;{eligibility.withdraw_eur?.total_unpaid_fees || unpaidFees.total}</strong> {t.outstandingFeesMsg}
+                      {t.youHave} <strong>{currSym}{eligibility.withdraw_eur?.total_unpaid_fees || unpaidFees.total}</strong> {t.outstandingFeesMsg}
                     </p>
                   </div>
                 </div>
@@ -1114,8 +1123,8 @@ const WalletDashboard = () => {
                   </div>
                 )}
                 <div className="bg-gray-50 p-3 rounded-lg text-sm">
-                  <div className="flex justify-between"><span className="text-gray-500">{t.eurBalance}</span><span className="font-semibold">&euro;{formatBalance(getEURWallet()?.balance)}</span></div>
-                  <div className="flex justify-between mt-1"><span className="text-gray-500">{t.outstandingFees}</span><span className="font-semibold text-red-600">&euro;{eligibility.withdraw_eur?.total_unpaid_fees || unpaidFees.total}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">{t.eurBalance}</span><span className="font-semibold">{currSym}{formatBalance(getEURWallet()?.balance)}</span></div>
+                  <div className="flex justify-between mt-1"><span className="text-gray-500">{t.outstandingFees}</span><span className="font-semibold text-red-600">{currSym}{eligibility.withdraw_eur?.total_unpaid_fees || unpaidFees.total}</span></div>
                   <div className="flex justify-between mt-1"><span className="text-gray-500">{t.status}</span><span className="font-medium text-orange-600">{t.blocked}</span></div>
                 </div>
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
@@ -1146,7 +1155,7 @@ const WalletDashboard = () => {
               </div>
             ) : eligibility.withdraw_eur?.allowed ? (<>
               <div className="bg-gray-50 p-3 rounded-lg text-sm">
-                <div className="flex justify-between"><span className="text-gray-500">{t.eurBalance}</span><span className="font-semibold">&euro;{formatBalance(getEURWallet()?.balance)}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">{t.eurBalance}</span><span className="font-semibold">{currSym}{formatBalance(getEURWallet()?.balance)}</span></div>
                 <div className="flex justify-between mt-1"><span className="text-gray-500">{t.connectedApp}</span><span className="font-medium text-blue-600">Merchant UAB</span></div>
               </div>
               <div>

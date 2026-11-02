@@ -1524,7 +1524,8 @@ async def login(credentials: UserLogin, request: Request):
             "requires_2fa": False,
             "token": token,
             "user": user_to_public(user),
-            "wallets": wallets
+            "wallets": wallets,
+            "tenant": tenant
         }
     }
 
@@ -1615,12 +1616,10 @@ async def complete_2fa_login(request: Request):
         "data": {
             "token": token,
             "user": user_to_public(user),
-            "wallets": wallets
+            "wallets": wallets,
+            "tenant": tenant
         }
     }
-
-
-@api_router.post("/2fa/setup")
 async def setup_2fa(current_user: dict = Depends(get_current_user)):
     """Generate a new TOTP secret and QR code for the user to scan."""
     user = await db.users.find_one({"id": current_user["user_id"]}, {"_id": 0})
@@ -1869,12 +1868,10 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         "ok": True,
         "data": {
             "user": user_to_public(user),
-            "wallets": wallets
+            "wallets": wallets,
+            "tenant": current_user.get("tenant", "main")
         }
     }
-
-
-@api_router.put("/auth/language")
 async def update_language(current_user: dict = Depends(get_current_user), lang: str = "en"):
     """Update user's preferred language"""
     if lang not in ("en", "it"):

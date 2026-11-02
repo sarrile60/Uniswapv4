@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }) => {
           return;
         }
         
-        setUser(serverUser);
+        setUser({ ...serverUser, tenant: response.data.data.tenant || payload.tenant || 'main' });
         setWallets(response.data.data.wallets || []);
         setIsAuthenticated(true);
       } else {
@@ -198,7 +198,7 @@ export const AuthProvider = ({ children }) => {
       const { token, user, wallets } = data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
+      setUser({ ...user, tenant: data.tenant || 'main' });
       setWallets(wallets || []);
       setIsAuthenticated(true);
       // Sync current app language to backend
