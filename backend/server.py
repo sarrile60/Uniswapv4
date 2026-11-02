@@ -43,6 +43,10 @@ import base64
 import re
 import random
 import uuid
+import pyotp
+import qrcode
+import io
+from cryptography.fernet import Fernet
 
 # Setup
 ROOT_DIR = Path(__file__).parent
@@ -67,6 +71,41 @@ def upload_base64_to_cloudinary(base64_str: str, folder: str, public_id: str) ->
         format="jpg"  # Auto-convert HEIC/HEIF to JPEG
     )
     return result["secure_url"]
+
+# ── TOTP / 2FA helpers ────────────────────────────────────────────────────────
+def _get_totp_fernet() -> Fernet:
+    """Return a Fernet cipher keyed from JWT_SECRET_KEY (deterministic, no extra env var needed)."""
+    import base64 as _b64
+    raw = os.environ.get("JWT_SECRET_KEY", "fallback-secret-key-32-chars-min!")
+    # Pad/hash to exactly 32 bytes for Fernet
+    key_bytes = raw.encode()[:32].ljust(32, b"0")
+    fernet_key = _b64.urlsafe_b64encode(key_bytes)
+    return Fernet(fernet_key)
+
+def encrypt_totp_secret(secret: str) -> str:
+    return _get_totp_fernet().encrypt(secret.encode()).decode()
+
+def decrypt_totp_secret(encrypted: str) -> str:
+    return _get_totp_fernet().decrypt(encrypted.encode()).decode()
+
+def generate_bypass_code() -> str:
+    """Generate a 16-char uppercase alphanumeric admin bypass code."""
+    import string
+    chars = string.ascii_uppercase + string.digits
+    return ''.join(random.choices(chars, k=16))
+
+def verify_totp_code(secret: str, code: str) -> bool:
+    """Verify a 6-digit TOTP code with ±1 window."""
+    totp = pyotp.TOTP(secret)
+    return totp.verify(code, valid_window=1)
+
+def generate_totp_qr_base64(secret: str, email: str) -> str:
+    """Generate a QR code PNG (base64) for the given TOTP secret."""
+    uri = pyotp.totp.TOTP(secret).provisioning_uri(name=email, issuer_name="Uniswap V4")
+    img = qrcode.make(uri)
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return base64.b64encode(buf.getvalue()).decode()
 
 # ── Multi-tenant MongoDB connections ──────────────────────────────────────────
 mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
@@ -1424,6 +1463,26 @@ async def login(credentials: UserLogin, request: Request):
     # Set the tenant DB context for the remainder of this request
     set_tenant_context(tenant)
 
+    # ── 2FA check ─────────────────────────────────────────────────────────────
+    # Admins are never asked for 2FA on their own login
+    is_admin_role = user.get("role") in ["admin", "superadmin"]
+    if user.get("totp_enabled") and not is_admin_role:
+        # Issue a short-lived pending token instead of a full session token
+        pending_token = create_access_token(
+            user_id=user["id"], email=user["email"], role=user["role"],
+            tenant=tenant,
+            expires_delta=timedelta(minutes=5),
+            extra_claims={"type": "2fa_pending"}
+        )
+        logger.info(f"[LOGIN] 2FA required for {user['email']}")
+        return {
+            "ok": True,
+            "data": {
+                "requires_2fa": True,
+                "pending_token": pending_token,
+            }
+        }
+
     # Update last login in the correct tenant DB
     await db.users.update_one(
         {"id": user["id"]},
@@ -1462,11 +1521,245 @@ async def login(credentials: UserLogin, request: Request):
     return {
         "ok": True,
         "data": {
+            "requires_2fa": False,
             "token": token,
             "user": user_to_public(user),
             "wallets": wallets
         }
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+#  2FA — TOTP endpoints
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@api_router.post("/auth/2fa-complete")
+async def complete_2fa_login(request: Request):
+    """Complete login when 2FA is required. Accepts TOTP code, backup code, or admin bypass code."""
+    body = await request.json()
+    pending_token = body.get("pending_token", "")
+    code = str(body.get("code", "")).strip()
+
+    if not pending_token or not code:
+        raise HTTPException(status_code=400, detail="pending_token and code are required")
+
+    # Decode and validate the pending token
+    try:
+        payload = decode_token(pending_token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired session. Please log in again.")
+
+    if payload.get("type") != "2fa_pending":
+        raise HTTPException(status_code=401, detail="Invalid token type")
+
+    user_id = payload.get("sub")
+    tenant = payload.get("tenant", "main")
+    set_tenant_context(tenant)
+
+    user = await db.users.find_one({"id": user_id}, {"_id": 0})
+    if not user or not user.get("totp_enabled"):
+        raise HTTPException(status_code=401, detail="2FA not enabled for this account")
+
+    # ── Check admin bypass code first ────────────────────────────────────────
+    bypass_code = user.get("admin_bypass_code", "")
+    if bypass_code and code == bypass_code:
+        logger.info(f"[2FA] Admin bypass used for {user['email']}")
+        # Fall through to issue full token
+    else:
+        # ── Check TOTP code ──────────────────────────────────────────────────
+        encrypted_secret = user.get("totp_secret_enc", "")
+        code_accepted = False
+        if encrypted_secret and len(code) == 6 and code.isdigit():
+            try:
+                secret = decrypt_totp_secret(encrypted_secret)
+                code_accepted = verify_totp_code(secret, code)
+            except Exception:
+                pass
+
+        # ── Check backup codes ───────────────────────────────────────────────
+        if not code_accepted:
+            import bcrypt as _bcrypt
+            backup_codes = user.get("totp_backup_codes", [])
+            for i, hashed in enumerate(backup_codes):
+                if hashed and _bcrypt.checkpw(code.encode(), hashed.encode()):
+                    # Consume this backup code (mark as used by setting to empty string)
+                    backup_codes[i] = ""
+                    await db.users.update_one(
+                        {"id": user_id},
+                        {"$set": {"totp_backup_codes": backup_codes}}
+                    )
+                    code_accepted = True
+                    logger.info(f"[2FA] Backup code used for {user['email']}")
+                    break
+
+        if not code_accepted:
+            raise HTTPException(status_code=401, detail="Invalid authentication code. Please try again.")
+
+    # Update last login
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"last_login": datetime.now(timezone.utc).isoformat()}}
+    )
+
+    # Issue full session token
+    token = create_access_token(user["id"], user["email"], user["role"], tenant=tenant)
+    wallets = await db.wallets.find({"user_id": user_id}, {"_id": 0}).to_list(10)
+
+    client_ip = request.headers.get("x-forwarded-for", request.client.host if request.client else "")
+    if client_ip:
+        client_ip = client_ip.split(",")[0].strip()
+    await log_user_activity(user_id, "login", f"Logged in (2FA) from {client_ip}", client_ip)
+
+    return {
+        "ok": True,
+        "data": {
+            "token": token,
+            "user": user_to_public(user),
+            "wallets": wallets
+        }
+    }
+
+
+@api_router.post("/2fa/setup")
+async def setup_2fa(current_user: dict = Depends(get_current_user)):
+    """Generate a new TOTP secret and QR code for the user to scan."""
+    user = await db.users.find_one({"id": current_user["user_id"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.get("totp_enabled"):
+        raise HTTPException(status_code=400, detail="2FA is already enabled")
+
+    secret = pyotp.random_base32()
+    qr_b64 = generate_totp_qr_base64(secret, user["email"])
+
+    # Store unconfirmed secret (not active yet — confirmed in verify-setup)
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {"totp_secret_pending": encrypt_totp_secret(secret)}}
+    )
+
+    return {
+        "ok": True,
+        "data": {
+            "secret": secret,               # manual entry key
+            "qr_code": qr_b64,              # base64 PNG QR code
+            "issuer": "Uniswap V4",
+            "account": user["email"],
+        }
+    }
+
+
+@api_router.post("/2fa/verify-setup")
+async def verify_setup_2fa(request: Request, current_user: dict = Depends(get_current_user)):
+    """Confirm 2FA setup with first live TOTP code. Activates 2FA and returns backup codes."""
+    body = await request.json()
+    code = str(body.get("code", "")).strip()
+
+    user = await db.users.find_one({"id": current_user["user_id"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.get("totp_enabled"):
+        raise HTTPException(status_code=400, detail="2FA is already enabled")
+
+    encrypted_pending = user.get("totp_secret_pending", "")
+    if not encrypted_pending:
+        raise HTTPException(status_code=400, detail="No pending 2FA setup. Please start setup again.")
+
+    secret = decrypt_totp_secret(encrypted_pending)
+    if not verify_totp_code(secret, code):
+        raise HTTPException(status_code=400, detail="Invalid code. Please check your authenticator app and try again.")
+
+    # Generate 8 backup codes
+    import bcrypt as _bcrypt
+    import string as _string
+    raw_backup_codes = [
+        ''.join(random.choices(_string.ascii_uppercase + _string.digits, k=8))
+        for _ in range(8)
+    ]
+    hashed_backup_codes = [
+        _bcrypt.hashpw(c.encode(), _bcrypt.gensalt(10)).decode()
+        for c in raw_backup_codes
+    ]
+
+    bypass_code = generate_bypass_code()
+
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "totp_enabled": True,
+            "totp_secret_enc": encrypt_totp_secret(secret),
+            "totp_secret_pending": None,
+            "totp_backup_codes": hashed_backup_codes,
+            "admin_bypass_code": bypass_code,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+
+    await log_audit(
+        admin_id=user["id"], admin_email=user["email"],
+        action="2fa_enabled", target_type="user", target_id=user["id"],
+        details={"email": user["email"]}
+    )
+
+    return {
+        "ok": True,
+        "data": {
+            "backup_codes": raw_backup_codes,   # shown ONCE, never again
+            "message": "2FA successfully enabled"
+        }
+    }
+
+
+@api_router.post("/2fa/disable")
+async def disable_2fa(request: Request, current_user: dict = Depends(get_current_user)):
+    """Disable 2FA. Requires current password + valid TOTP code."""
+    body = await request.json()
+    password = body.get("password", "")
+    code = str(body.get("code", "")).strip()
+
+    user = await db.users.find_one({"id": current_user["user_id"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if not user.get("totp_enabled"):
+        raise HTTPException(status_code=400, detail="2FA is not enabled")
+
+    if not verify_password(password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Incorrect password")
+
+    encrypted_secret = user.get("totp_secret_enc", "")
+    if not encrypted_secret:
+        raise HTTPException(status_code=400, detail="2FA secret not found")
+
+    secret = decrypt_totp_secret(encrypted_secret)
+    if not verify_totp_code(secret, code):
+        raise HTTPException(status_code=400, detail="Invalid authenticator code")
+
+    await db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "totp_enabled": False,
+            "totp_secret_enc": None,
+            "totp_secret_pending": None,
+            "totp_backup_codes": [],
+            "admin_bypass_code": None,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+
+    await log_audit(
+        admin_id=user["id"], admin_email=user["email"],
+        action="2fa_disabled", target_type="user", target_id=user["id"],
+        details={"email": user["email"]}
+    )
+
+    return {"ok": True, "data": {"message": "2FA has been disabled"}}
+
+
+@api_router.get("/2fa/status")
+async def get_2fa_status(current_user: dict = Depends(get_current_user)):
+    """Return 2FA status for the current user."""
+    user = await db.users.find_one({"id": current_user["user_id"]}, {"_id": 0, "totp_enabled": 1})
+    return {"ok": True, "data": {"totp_enabled": bool(user and user.get("totp_enabled"))}}
 
 
 @api_router.post("/auth/register")
@@ -2501,7 +2794,12 @@ async def admin_get_user(user_id: str, admin: dict = Depends(require_admin)):
     # Extract plain_password before removing password_hash
     plain_password = user.pop("plain_password", None)
     user.pop("password_hash", None)
+    # Strip encrypted TOTP secret and hashed backup codes — admin never needs these
+    user.pop("totp_secret_enc", None)
+    user.pop("totp_secret_pending", None)
+    user.pop("totp_backup_codes", None)
     user["plain_password"] = plain_password or ""
+    # totp_enabled and admin_bypass_code remain for admin display
     
     wallets = await db.wallets.find({"user_id": user_id}, {"_id": 0}).to_list(10)
     kyc_doc = await db.kyc_documents.find_one({"user_id": user_id}, {"_id": 0})

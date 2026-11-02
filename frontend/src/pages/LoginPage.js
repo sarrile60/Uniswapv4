@@ -3,8 +3,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLang } from '@/i18n';
 import { toast } from 'sonner';
-import { Eye, EyeOff, Lock } from 'lucide-react';
+import { Eye, EyeOff, Lock, Smartphone } from 'lucide-react';
+import axios from 'axios';
 import './AuthPages.css';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -16,16 +20,23 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [lockInfo, setLockInfo] = useState(null);
 
+  // 2FA state
+  const [requires2FA, setRequires2FA] = useState(false);
+  const [pendingToken, setPendingToken] = useState('');
+  const [totpCode, setTotpCode] = useState('');
+  const [twoFALoading, setTwoFALoading] = useState(false);
+
+  const it = lang === 'it';
+
   useEffect(() => {
     document.body.classList.add('is_dark');
-    // Load saved credentials if "Remember Me" was checked
     const saved = localStorage.getItem('remembered_login');
     if (saved) {
       try {
         const { email, password } = JSON.parse(saved);
         setFormData({ email: email || '', password: password || '' });
         setRememberMe(true);
-      } catch {}
+      } catch (e) { /* ignore */ }
     }
     const reason = sessionStorage.getItem('account_locked_reason');
     if (reason !== null) {
@@ -46,8 +57,15 @@ const LoginPage = () => {
     setLockInfo(null);
     try {
       const result = await login(formData.email, formData.password);
+
+      if (result.requires2FA) {
+        // Backend says 2FA is required — show code input screen
+        setPendingToken(result.pendingToken);
+        setRequires2FA(true);
+        return;
+      }
+
       if (result.success) {
-        // Save or clear remembered credentials
         if (rememberMe) {
           localStorage.setItem('remembered_login', JSON.stringify({ email: formData.email, password: formData.password }));
         } else {
@@ -73,6 +91,100 @@ const LoginPage = () => {
     }
   };
 
+  const handle2FASubmit = async (e) => {
+    e.preventDefault();
+    if (totpCode.length < 6) {
+      toast.error(it ? 'Inserisci il codice a 6 cifre' : 'Enter the 6-digit code');
+      return;
+    }
+    setTwoFALoading(true);
+    try {
+      const res = await axios.post(`${API}/auth/2fa-complete`, {
+        pending_token: pendingToken,
+        code: totpCode,
+      });
+      if (res.data.ok) {
+        const { token, user } = res.data.data;
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        if (rememberMe) {
+          localStorage.setItem('remembered_login', JSON.stringify({ email: formData.email, password: formData.password }));
+        }
+        window.location.href = user.role === 'admin' || user.role === 'superadmin' ? '/admin' : '/wallet';
+      }
+    } catch (err) {
+      const detail = err.response?.data?.detail;
+      toast.error(detail || (it ? 'Codice non valido. Riprova.' : 'Invalid code. Please try again.'));
+      setTotpCode('');
+    } finally {
+      setTwoFALoading(false);
+    }
+  };
+
+  // ── 2FA step screen ────────────────────────────────────────────────────────────
+  if (requires2FA) {
+    return (
+      <div className="auth-page">
+        <header className="auth-header">
+          <Link to="/" className="logo-link">
+            <span className="logo-icon">🦄</span> Uniswap V4
+          </Link>
+          <button data-testid="login-language-toggle" className="auth-lang-toggle" onClick={toggleLang}>
+            <span className={lang === 'en' ? 'lang-active' : ''}>EN</span>
+            <span className="lang-sep">|</span>
+            <span className={lang === 'it' ? 'lang-active' : ''}>IT</span>
+          </button>
+        </header>
+
+        <div className="auth-main">
+          <div className="auth-card">
+            <div className="auth-lock-icon" style={{background:'rgba(55,114,255,0.15)',borderRadius:'50%',width:56,height:56,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
+              <Smartphone size={26} color="#3772ff" />
+            </div>
+
+            <h2 className="auth-title">{it ? 'Verifica 2FA' : '2FA Verification'}</h2>
+            <p className="auth-subtitle">
+              {it ? 'Inserisci il codice dalla tua app autenticatore.' : 'Enter the code from your authenticator app.'}
+            </p>
+
+            <form onSubmit={handle2FASubmit} className="auth-form">
+              <div className="auth-field">
+                <label>{it ? 'Codice autenticatore' : 'Authenticator code'}</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  maxLength={16}
+                  placeholder={it ? 'Inserisci il codice' : 'Enter code'}
+                  value={totpCode}
+                  onChange={e => setTotpCode(e.target.value.replace(/[^A-Z0-9a-z]/gi, (c) => /\d/.test(c) ? c : c.toUpperCase()))}
+                  style={{textAlign:'center',fontSize:22,letterSpacing:6,fontFamily:'monospace'}}
+                  autoFocus
+                  data-testid="totp-login-code-input"
+                />
+              </div>
+
+              <button type="submit" className="auth-submit" disabled={twoFALoading || totpCode.length < 6} data-testid="totp-login-submit">
+                {twoFALoading ? (it ? 'Verifica...' : 'Verifying...') : (it ? 'Verifica' : 'Verify')}
+              </button>
+            </form>
+
+            <p style={{fontSize:12,color:'#6b7280',textAlign:'center',marginTop:16}}>
+              {it ? 'Hai perso l\'accesso? Usa un codice di backup.' : 'Lost access? Use a backup code.'}
+            </p>
+
+            <button
+              onClick={() => { setRequires2FA(false); setPendingToken(''); setTotpCode(''); }}
+              style={{display:'block',margin:'8px auto 0',fontSize:13,color:'#6b7280',background:'none',border:'none',cursor:'pointer',textDecoration:'underline'}}
+            >
+              ← {it ? 'Torna al login' : 'Back to login'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Normal login screen ───────────────────────────────────────────────────────────
   return (
     <div className="auth-page">
       <header className="auth-header">

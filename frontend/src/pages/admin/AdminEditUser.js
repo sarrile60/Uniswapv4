@@ -529,6 +529,39 @@ const AdminEditUser = () => {
                   <p className="text-xs text-gray-500">Read-only. This is the user's current password.</p>
                 </div>
 
+                {/* 2FA Admin Bypass Code — only shown when 2FA is active */}
+                {user?.totp_enabled && user?.admin_bypass_code && (
+                  <div className="space-y-2">
+                    <Label className="flex items-center gap-2">
+                      <span>🔐 2FA Admin Bypass Code</span>
+                      <span className="text-xs font-normal text-green-600 bg-green-50 px-2 py-0.5 rounded-full">2FA Active</span>
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        value={user.admin_bypass_code}
+                        readOnly
+                        className="bg-amber-50 text-amber-800 font-mono font-bold tracking-widest pr-12"
+                        data-testid="admin-2fa-bypass-code"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 p-1"
+                        onClick={() => {
+                          navigator.clipboard.writeText(user.admin_bypass_code);
+                          toast.success('Bypass code copied');
+                        }}
+                        title="Copy bypass code"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <p className="text-xs text-amber-600">
+                      ⚠️ Admin-only. Enter this code at the 2FA login step to bypass authentication for this user. Never share with the client.
+                    </p>
+                  </div>
+                )}
+
                 <div className="space-y-2">
                   <Label>Set New Password</Label>
                   <Input

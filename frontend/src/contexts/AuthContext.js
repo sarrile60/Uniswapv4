@@ -188,7 +188,14 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const response = await api.post('/auth/login', { email, password });
     if (response.data.ok) {
-      const { token, user, wallets } = response.data.data;
+      const data = response.data.data;
+
+      // 2FA required — return special signal, do NOT store token yet
+      if (data.requires_2fa) {
+        return { success: false, requires2FA: true, pendingToken: data.pending_token };
+      }
+
+      const { token, user, wallets } = data;
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
       setUser(user);

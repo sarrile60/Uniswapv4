@@ -42,7 +42,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     )
 
 
-def create_access_token(user_id: str, email: str, role: str, tenant: str = "main", expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(user_id: str, email: str, role: str, tenant: str = "main", expires_delta: Optional[timedelta] = None, extra_claims: dict = None) -> str:
     """Create a JWT access token"""
     if expires_delta:
         expire = datetime.now(timezone.utc) + expires_delta
@@ -57,6 +57,8 @@ def create_access_token(user_id: str, email: str, role: str, tenant: str = "main
         "exp": expire,
         "iat": datetime.now(timezone.utc)
     }
+    if extra_claims:
+        to_encode.update(extra_claims)
     
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
