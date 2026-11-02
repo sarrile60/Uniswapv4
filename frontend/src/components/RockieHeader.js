@@ -195,7 +195,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
 
                   {/* Language Toggle — wired to i18n */}
                   <div className="header-dropdown" onClick={(e) => { e.stopPropagation(); toggleDropdown('lang'); }}>
-                    <button className="header-dropdown-btn" data-testid="lang-toggle-btn">{lang === 'en' ? (user?.tenant === 'canada' ? 'EN/CAD' : 'EN/USD') : 'IT/EUR'}</button>
+                    <button className="header-dropdown-btn" data-testid="lang-toggle-btn">{lang === 'en' ? 'EN/USD' : 'IT/EUR'}</button>
                     <div className={`header-dropdown-menu ${activeDropdown === 'lang' ? 'show' : ''}`}>
                       <span className={`dropdown-item ${lang === 'en' ? 'active-lang' : ''}`} style={{cursor:'pointer', fontWeight: lang === 'en' ? 700 : 400}} onClick={() => handleLangSelect('en')} data-testid="lang-en">English / USD</span>
                       <span className={`dropdown-item ${lang === 'it' ? 'active-lang' : ''}`} style={{cursor:'pointer', fontWeight: lang === 'it' ? 700 : 400}} onClick={() => handleLangSelect('it')} data-testid="lang-it">Italiano / EUR</span>

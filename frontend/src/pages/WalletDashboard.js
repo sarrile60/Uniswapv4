@@ -346,7 +346,7 @@ const WalletDashboard = () => {
   // ── Canada tenant currency helpers ────────────────────────────────────────
   // Italian users → EUR / €  |  Canadian users → CAD / C$
   const isCanada = user?.tenant === 'canada';
-  const currSym = isCanada ? 'C$' : '€';          // currency symbol
+  const currSym = isCanada ? '$' : '€';          // currency symbol
   const currCode = isCanada ? 'CAD' : 'EUR';       // currency code
   const currName = isCanada ? 'Canadian Dollar' : 'Euro'; // full name
   // Helper: format amount with correct currency symbol
