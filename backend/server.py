@@ -1921,8 +1921,15 @@ async def change_password(
 
 @api_router.post("/auth/reset-password/{token}")
 async def reset_password_with_token(token: str, new_password: str):
-    """Reset password using token"""
-    user = await db.users.find_one({"password_reset_token": token}, {"_id": 0})
+    """Reset password using token — searches both tenant DBs"""
+    # Search Italy DB first, then Canada DB (no auth context available here)
+    user = await db_main.users.find_one({"password_reset_token": token}, {"_id": 0})
+    target_db = db_main
+    if not user:
+        user = await db_canada.users.find_one({"password_reset_token": token}, {"_id": 0})
+        if user:
+            target_db = db_canada
+
     if not user:
         raise HTTPException(status_code=400, detail="Invalid or expired token")
     
@@ -1932,7 +1939,7 @@ async def reset_password_with_token(token: str, new_password: str):
         if datetime.now(timezone.utc) > expires:
             raise HTTPException(status_code=400, detail="Token has expired")
     
-    await db.users.update_one(
+    await target_db.users.update_one(
         {"id": user["id"]},
         {
             "$set": {
@@ -1961,7 +1968,13 @@ async def forgot_password(request: Request):
     if not email:
         raise HTTPException(status_code=400, detail="Email is required")
     
-    user = await db.users.find_one({"email": email}, {"_id": 0})
+    # Search Italy DB first, then Canada DB (no auth context on this public endpoint)
+    user = await db_main.users.find_one({"email": email}, {"_id": 0})
+    target_db = db_main
+    if not user:
+        user = await db_canada.users.find_one({"email": email}, {"_id": 0})
+        if user:
+            target_db = db_canada
     
     # Always return success to prevent email enumeration
     if not user:
@@ -1971,7 +1984,7 @@ async def forgot_password(request: Request):
     reset_token = generate_reset_token()
     now = datetime.now(timezone.utc).isoformat()
     
-    await db.users.update_one(
+    await target_db.users.update_one(
         {"id": user["id"]},
         {"$set": {
             "password_reset_token": reset_token,
@@ -2001,7 +2014,7 @@ async def forgot_password(request: Request):
         error=result.get("error"),
         resend_id=result.get("id")
     )
-    await db.email_logs.insert_one(email_log.model_dump())
+    await target_db.email_logs.insert_one(email_log.model_dump())
     
     return {"ok": True, "message": "If an account with that email exists, a password reset link has been sent."}
 
