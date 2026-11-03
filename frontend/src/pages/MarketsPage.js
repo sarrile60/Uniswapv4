@@ -215,7 +215,7 @@ const MarketsPage = () => {
                       <td style={{padding:'12px 16px'}}>
                         {isAuthenticated
                           ? <Link to="/wallet" onClick={e => e.stopPropagation()} style={{padding:'6px 16px',borderRadius:8,background:'#3772ff',color:'#fff',fontSize:12,fontWeight:600,textDecoration:'none',display:'inline-block'}}>{t.mkt_trade}</Link>
-                          : <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{padding:'6px 16px',borderRadius:8,background:'#3772ff',color:'#fff',fontSize:12,fontWeight:600,textDecoration:'none',display:'inline-block'}}>{t.mkt_trade}</a>
+                          : <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" onClick={e => e.stopPropagation()} style={{padding:'6px 16px',borderRadius:8,background:'#3772ff',color:'#fff',fontSize:12,fontWeight:600,textDecoration:'none',display:'inline-block'}}>{t.mkt_trade}</a>
                         }
                       </td>
                     </tr>

@@ -189,7 +189,7 @@ const LandingPage = () => {
               <div className="banner__content">
                 <h2 className="title">{t.land_bannerTitle}</h2>
                 <p className="fs-20 desc">{t.land_bannerDesc}</p>
-                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer" className="btn-action"><span>{t.land_getStarted}</span></a>
+                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" className="btn-action"><span>{t.land_getStarted}</span></a>
                 <div className="stats-row">
                   <div className="stat-item">
                     <h4 className="stat-number">{t.land_stat1}</h4>
@@ -436,7 +436,7 @@ const LandingPage = () => {
                             <td>{coin.low}</td>
                             <td>{coin.turnover}</td>
                             <td><Sparkline up={coin.up} /></td>
-                            <td><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer" className="btn-trade">{t.land_trade}</a></td>
+                            <td><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" className="btn-trade">{t.land_trade}</a></td>
                           </tr>
                         ))}
                       </tbody>
@@ -536,7 +536,7 @@ const LandingPage = () => {
                     <p className="text">{t.land_feature2Desc}</p>
                   </li>
                 </ul>
-                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer" className="btn-action">{t.land_exploreMore}</a>
+                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" className="btn-action">{t.land_exploreMore}</a>
               </div>
             </div>
           </div>
@@ -602,7 +602,7 @@ const LandingPage = () => {
             </div>
             <div className="col-md-5">
               <div className="sale-button">
-                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer">{t.land_createAccount}</a>
+                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy">{t.land_createAccount}</a>
               </div>
             </div>
           </div>
@@ -640,9 +640,9 @@ const LandingPage = () => {
                 <div className="widget-link s2">
                   <h6 className="title">{t.land_services}</h6>
                   <ul>
-                    <li><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer">{t.land_buyCrypto}</a></li>
+                    <li><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy">{t.land_buyCrypto}</a></li>
                     <li><a href="#crypto-section">{t.land_markets}</a></li>
-                    <li><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer">{t.land_trading}</a></li>
+                    <li><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy">{t.land_trading}</a></li>
                   </ul>
                 </div>
               </div>
