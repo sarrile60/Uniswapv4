@@ -64,6 +64,7 @@ class TransactionStatus(str, Enum):
 class AssetType(str, Enum):
     USDC = "USDC"
     EUR = "EUR"
+    GOLD = "GOLD"
 
 
 # ============== USER MODELS ==============

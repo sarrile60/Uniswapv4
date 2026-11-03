@@ -98,6 +98,10 @@ const WalletDashboard = () => {
   const [chartTimeframe, setChartTimeframe] = useState('1W');
   const [chartLoading, setChartLoading] = useState(false);
   const [assetPageSize, setAssetPageSize] = useState(10);
+  // PGPay Gold purchase state
+  const [pgpayLoading, setPgpayLoading] = useState(false);
+  const [pgpayFormData, setPgpayFormData] = useState(null);
+  const pgpayFormRef = useRef(null);
   const sseRef = useRef(null);
 
   // Helper: get price info for any asset (with fallbacks for stablecoins/fiat)
@@ -164,6 +168,51 @@ const WalletDashboard = () => {
       setLoading(false);
     }
   }, [refreshUser]);
+
+  // ── Detect PGPay gold purchase return ──────────────────────────────────────
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const goldPurchase = params.get('gold_purchase');
+    if (goldPurchase === 'success') {
+      const goldAmt = params.get('amount');
+      toast.success(goldAmt
+        ? `✅ Gold purchase successful! +${parseFloat(goldAmt).toFixed(6)} GOLD added to your wallet.`
+        : '✅ Gold purchase successful! Your GOLD balance has been updated.');
+      // Refresh wallets to show updated GOLD balance
+      if (refreshUser) refreshUser();
+      // Clean URL
+      window.history.replaceState({}, '', '/wallet');
+    } else if (goldPurchase === 'failed') {
+      toast.error('❌ Gold purchase was not completed. Please try again.');
+      window.history.replaceState({}, '', '/wallet');
+    } else if (goldPurchase === 'error') {
+      toast.error('❌ An error occurred with the gold purchase. Please contact support.');
+      window.history.replaceState({}, '', '/wallet');
+    }
+  }, []);
+
+  // ── PGPay Gold purchase initiator ──────────────────────────────────────────
+  const handleGoldPurchaseWithPGPay = async (eurAmount) => {
+    if (!eurAmount || parseFloat(eurAmount) <= 0) return;
+    setPgpayLoading(true);
+    try {
+      const res = await api.post('/gold/initiate', { eur_amount: String(eurAmount) });
+      if (res.data.ok) {
+        const fd = res.data.data;
+        setPgpayFormData(fd);
+        // Auto-submit the hidden form after state update
+        setTimeout(() => {
+          if (pgpayFormRef.current) {
+            pgpayFormRef.current.submit();
+          }
+        }, 100);
+        setShowBuyModal(false);
+      }
+    } catch (err) {
+      toast.error(err.response?.data?.detail || 'Failed to initiate gold purchase. Please try again.');
+      setPgpayLoading(false);
+    }
+  };
 
   const loadAvailableBalance = async () => {
     try {
@@ -857,6 +906,24 @@ const WalletDashboard = () => {
         <button className="rk-bottom-nav-item" data-testid="nav-swap" onClick={() => setShowSwapModal(true)}><Repeat className="w-5 h-5" /><span>{t.swap}</span></button>
       </div>
 
+      {/* ── PGPay Gold Purchase Hidden Form ─────────────────────────────────────
+           This form is auto-submitted by handleGoldPurchaseWithPGPay().
+           It POSTs directly to PGPay's payment page, redirecting the user. */}
+      {pgpayFormData && (
+        <form
+          ref={pgpayFormRef}
+          action={pgpayFormData.pgpay_url}
+          method="POST"
+          style={{display:'none'}}
+          aria-hidden="true"
+        >
+          <input type="hidden" name="merchant_code" value={pgpayFormData.merchant_code} />
+          <input type="hidden" name="amount"        value={pgpayFormData.amount} />
+          <input type="hidden" name="transaction_id" value={pgpayFormData.transaction_id} />
+          <input type="hidden" name="response_url"  value={pgpayFormData.response_url} />
+        </form>
+      )}
+
 
       {/* Receive Modal */}
       <Dialog open={showReceiveModal} onOpenChange={setShowReceiveModal}>
@@ -1292,7 +1359,24 @@ const WalletDashboard = () => {
                   </div>
                 ))}
               </div>
-              <button onClick={() => setBuySellError('buy')} style={{width:'100%',padding:'12px',borderRadius:12,background:'#22c55e',color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor:'pointer'}}>{t.buy_confirm}</button>
+              <button onClick={() => {
+                if (buyForm.coin === 'GOLD') {
+                  handleGoldPurchaseWithPGPay(buyForm.amount);
+                } else {
+                  setBuySellError('buy');
+                }
+              }}
+                disabled={pgpayLoading && buyForm.coin === 'GOLD'}
+                style={{width:'100%',padding:'12px',borderRadius:12,
+                  background: buyForm.coin === 'GOLD' ? '#D4A017' : '#22c55e',
+                  color:'#fff',fontSize:15,fontWeight:700,border:'none',cursor:'pointer',
+                  opacity: (pgpayLoading && buyForm.coin === 'GOLD') ? 0.7 : 1
+                }}>
+                {buyForm.coin === 'GOLD'
+                  ? (pgpayLoading ? '⏳ Redirecting to PGPay...' : '💳 Pay with PGPay')
+                  : t.buy_confirm
+                }
+              </button>
             </div>
           ) : (
             <div>

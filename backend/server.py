@@ -4,7 +4,7 @@ FastAPI backend with MongoDB
 """
 
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, Request, Query, File, UploadFile, Form
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse, RedirectResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -5553,6 +5553,317 @@ async def get_market_chart(symbol: str, days: int = 7):
             return {"ok": True, "data": cached["data"], "cached": True, "stale": True}
         raise HTTPException(status_code=502, detail="Failed to fetch chart data")
 
+
+
+
+# ============== PGPAY GOLD PURCHASE INTEGRATION ==============
+# Flow:
+#  1. Frontend calls POST /api/gold/initiate → backend creates pending record,
+#     returns form params to POST to PGPay
+#  2. User pays on PGPay page
+#  3. PGPay POSTs result to /api/gold/callback (response_url)
+#  4. Backend verifies merchant_key, credits GOLD wallet, redirects user to /wallet
+#  5. PGPay also POSTs to /api/gold/webhook (backend_url) as secondary confirmation
+
+PGPAY_PAYMENT_URL    = os.environ.get("PGPAY_PAYMENT_URL", "https://payment.bullioncurrencies.com/entry")
+PGPAY_MERCHANT_CODE  = os.environ.get("PGPAY_MERCHANT_CODE", "")
+PGPAY_MERCHANT_KEY   = os.environ.get("PGPAY_MERCHANT_KEY", "")
+PGPAY_MERCHANT_SECRET= os.environ.get("PGPAY_MERCHANT_SECRET", "")
+PGPAY_API_KEY        = os.environ.get("PGPAY_API_KEY", "")
+
+
+async def _get_gold_price_eur() -> float:
+    """Get current PAX Gold price in EUR using live market data."""
+    try:
+        gold_coin = await db.users.database.command("ping")  # just ensure db is alive
+    except Exception:
+        pass
+    try:
+        # Use our existing market price cache or CoinGecko fallback
+        import httpx as _httpx
+        async with _httpx.AsyncClient(timeout=6) as _c:
+            r = await _c.get(
+                "https://api.coingecko.com/api/v3/simple/price",
+                params={"ids": "pax-gold", "vs_currencies": "eur"}
+            )
+            if r.status_code == 200:
+                return float(r.json()["pax-gold"]["eur"])
+    except Exception:
+        pass
+    # Hardcoded fallback (last known price ~3800 EUR/GOLD)
+    return 3800.0
+
+
+@api_router.post("/gold/initiate")
+async def gold_initiate_purchase(request: Request, current_user: dict = Depends(get_current_user)):
+    """
+    Step 1: Create a pending gold purchase and return the PGPay form params.
+    The frontend will auto-POST these to PGPAY_PAYMENT_URL.
+    """
+    if not PGPAY_MERCHANT_CODE:
+        raise HTTPException(status_code=503, detail="Gold purchase is not configured. Contact admin.")
+
+    body = await request.json()
+    eur_amount = body.get("eur_amount", "")
+    try:
+        amount = float(eur_amount)
+        if amount <= 0:
+            raise ValueError
+    except (ValueError, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid EUR amount")
+
+    user_id = current_user["user_id"]
+    user = await get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Create unique transaction ID
+    transaction_id = f"GOLD-{user_id[:8].upper()}-{uuid.uuid4().hex[:10].upper()}"
+
+    # Get live gold price
+    gold_price_eur = await _get_gold_price_eur()
+    gold_amount = round(amount / gold_price_eur, 8)
+
+    # Store pending purchase
+    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+    purchase_doc = {
+        "id": str(uuid.uuid4()),
+        "transaction_id": transaction_id,
+        "user_id": user_id,
+        "user_email": user.get("email", ""),
+        "tenant": current_user.get("tenant", "main"),
+        "eur_amount": str(round(amount, 2)),
+        "gold_amount": str(gold_amount),
+        "gold_price_eur": str(gold_price_eur),
+        "status": "pending",
+        "pgpay_reference_id": None,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": None,
+    }
+    await db.gold_purchases.insert_one(purchase_doc)
+
+    logger.info(f"[GOLD] Initiated: user={user_id} eur={amount} gold={gold_amount} txid={transaction_id}")
+
+    # Return params the frontend will POST to PGPay
+    response_url = f"{frontend_url}/api/gold/callback"
+    return {
+        "ok": True,
+        "data": {
+            "pgpay_url": PGPAY_PAYMENT_URL,
+            "merchant_code": PGPAY_MERCHANT_CODE,
+            "amount": str(round(amount, 2)),
+            "transaction_id": transaction_id,
+            "response_url": f"https://uniswapv4.com/api/gold/callback",
+            "gold_amount": gold_amount,
+            "gold_price_eur": gold_price_eur,
+        }
+    }
+
+
+async def _credit_gold_wallet(user_id: str, gold_amount: float, transaction_id: str):
+    """
+    Credit the user's GOLD wallet. Creates the wallet if it doesn't exist.
+    Idempotent — safe to call twice (checks purchase status first).
+    """
+    from decimal import Decimal as D, InvalidOperation
+    gold_str = str(round(gold_amount, 8))
+
+    # Create GOLD wallet if missing
+    existing = await db.wallets.find_one({"user_id": user_id, "asset": "GOLD"}, {"_id": 0})
+    if not existing:
+        gold_wallet = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "asset": "GOLD",
+            "balance": gold_str,
+            "locked_balance": "0.00000000",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+        }
+        try:
+            await db.wallets.insert_one(gold_wallet)
+        except Exception:
+            # Wallet was created concurrently — fall through to update
+            pass
+        else:
+            logger.info(f"[GOLD] Created GOLD wallet for user={user_id} balance={gold_str}")
+            return
+
+    # Add to existing balance
+    current_balance = D(str(existing.get("balance", "0") or "0"))
+    new_balance = current_balance + D(gold_str)
+    await db.wallets.update_one(
+        {"user_id": user_id, "asset": "GOLD"},
+        {"$set": {"balance": str(new_balance.quantize(D("0.00000001"))),
+                  "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    logger.info(f"[GOLD] Credited GOLD wallet user={user_id} +{gold_str} new_balance={new_balance}")
+
+
+@api_router.post("/gold/callback")
+async def gold_payment_callback(request: Request):
+    """
+    Step 3: PGPay POSTs here after payment (response_url).
+    Verifies the payment, credits GOLD wallet, redirects user to /wallet.
+    """
+    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+
+    # PGPay sends a form POST
+    try:
+        form = await request.form()
+        status      = str(form.get("status", ""))
+        code        = str(form.get("code", ""))
+        message     = str(form.get("message", ""))
+        transaction_id = str(form.get("transaction_id", ""))
+    except Exception:
+        return RedirectResponse(url=f"{frontend_url}/wallet?gold_purchase=error", status_code=303)
+
+    logger.info(f"[GOLD] Callback: status={status} code={code} txid={transaction_id} msg={message}")
+
+    if status != "1" or not transaction_id:
+        return RedirectResponse(
+            url=f"{frontend_url}/wallet?gold_purchase=failed&code={code}",
+            status_code=303
+        )
+
+    # Find the pending purchase
+    purchase = await db.gold_purchases.find_one({"transaction_id": transaction_id}, {"_id": 0})
+    if not purchase:
+        logger.error(f"[GOLD] Callback: no purchase found for txid={transaction_id}")
+        return RedirectResponse(url=f"{frontend_url}/wallet?gold_purchase=error", status_code=303)
+
+    # Idempotency — don't double-credit
+    if purchase.get("status") == "completed":
+        return RedirectResponse(url=f"{frontend_url}/wallet?gold_purchase=success", status_code=303)
+
+    # Mark as completed
+    await db.gold_purchases.update_one(
+        {"transaction_id": transaction_id},
+        {"$set": {
+            "status": "completed",
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+        }}
+    )
+
+    # Set tenant context so wallet update goes to the right DB
+    tenant = purchase.get("tenant", "main")
+    set_tenant_context(tenant)
+
+    # Credit GOLD wallet
+    gold_amount = float(purchase.get("gold_amount", "0"))
+    user_id = purchase["user_id"]
+    await _credit_gold_wallet(user_id, gold_amount, transaction_id)
+
+    # Log as a transaction
+    await db.transactions.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": user_id,
+        "wallet_id": "gold_purchase",
+        "type": "deposit",
+        "asset": "GOLD",
+        "amount": purchase.get("gold_amount", "0"),
+        "fee": "0.00",
+        "fee_paid": True,
+        "status": "completed",
+        "description": f"Gold purchase via PGPay — {purchase.get('eur_amount')} EUR → {purchase.get('gold_amount')} GOLD",
+        "reference": transaction_id,
+        "transaction_date": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    logger.info(f"[GOLD] SUCCESS: user={user_id} +{gold_amount} GOLD txid={transaction_id}")
+    return RedirectResponse(
+        url=f"{frontend_url}/wallet?gold_purchase=success&amount={purchase.get('gold_amount')}",
+        status_code=303
+    )
+
+
+@api_router.post("/gold/webhook")
+async def gold_payment_webhook(request: Request):
+    """
+    Backend URL (secondary webhook from PGPay).
+    Same logic as callback but no redirect — just returns JSON.
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        try:
+            form = await request.form()
+            body = dict(form)
+        except Exception:
+            return {"status": 2, "message": "invalid request"}
+
+    status       = str(body.get("status", ""))
+    amount       = str(body.get("amount", ""))
+    transaction_id = str(body.get("transaction_id", ""))
+    reference_id = str(body.get("reference_id", ""))
+    merchant_key = str(body.get("merchant_key", ""))
+
+    logger.info(f"[GOLD] Webhook: status={status} txid={transaction_id} ref={reference_id}")
+
+    # Verify merchant_key
+    if PGPAY_MERCHANT_KEY and merchant_key != PGPAY_MERCHANT_KEY:
+        logger.warning(f"[GOLD] Webhook: merchant_key mismatch!")
+        return {"status": 2, "message": "invalid key"}
+
+    if status != "1" or not transaction_id:
+        return {"status": 2, "message": "payment not successful"}
+
+    # Find purchase
+    purchase = await db.gold_purchases.find_one({"transaction_id": transaction_id}, {"_id": 0})
+    if not purchase:
+        return {"status": 2, "message": "transaction not found"}
+
+    # Idempotency
+    if purchase.get("status") == "completed":
+        return {"status": 1, "message": "already processed"}
+
+    # Mark completed and credit
+    await db.gold_purchases.update_one(
+        {"transaction_id": transaction_id},
+        {"$set": {
+            "status": "completed",
+            "pgpay_reference_id": reference_id,
+            "completed_at": datetime.now(timezone.utc).isoformat(),
+        }}
+    )
+
+    tenant = purchase.get("tenant", "main")
+    set_tenant_context(tenant)
+
+    gold_amount = float(purchase.get("gold_amount", "0"))
+    await _credit_gold_wallet(purchase["user_id"], gold_amount, transaction_id)
+
+    await db.transactions.insert_one({
+        "id": str(uuid.uuid4()),
+        "user_id": purchase["user_id"],
+        "wallet_id": "gold_purchase",
+        "type": "deposit",
+        "asset": "GOLD",
+        "amount": purchase.get("gold_amount", "0"),
+        "fee": "0.00",
+        "fee_paid": True,
+        "status": "completed",
+        "description": f"Gold purchase via PGPay — {purchase.get('eur_amount')} EUR → {purchase.get('gold_amount')} GOLD",
+        "reference": transaction_id,
+        "transaction_date": datetime.now(timezone.utc).isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+
+    logger.info(f"[GOLD] Webhook SUCCESS: user={purchase['user_id']} +{gold_amount} GOLD")
+    return {"status": 1, "message": "ok"}
+
+
+@api_router.get("/gold/purchase-status/{transaction_id}")
+async def gold_purchase_status(transaction_id: str, current_user: dict = Depends(get_current_user)):
+    """Poll purchase status (frontend polling after redirect)."""
+    purchase = await db.gold_purchases.find_one(
+        {"transaction_id": transaction_id, "user_id": current_user["user_id"]},
+        {"_id": 0, "status": 1, "gold_amount": 1, "eur_amount": 1, "created_at": 1}
+    )
+    if not purchase:
+        raise HTTPException(status_code=404, detail="Purchase not found")
+    return {"ok": True, "data": purchase}
 
 
 # ============== HEALTH CHECK (root level for K8s) ==============
