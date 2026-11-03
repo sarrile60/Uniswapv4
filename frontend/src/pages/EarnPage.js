@@ -80,7 +80,7 @@ const EarnPage = () => {
               </div>
               {isAuthenticated
                 ? <Link to="/wallet" style={{display:'block',textAlign:'center',padding:'10px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none'}}>{t.stakeNow}</Link>
-                : <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" style={{display:'block',textAlign:'center',padding:'10px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none'}}>{t.stakeNow}</a>
+                : <Link to="/register" style={{display:'block',textAlign:'center',padding:'10px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none'}}>{t.stakeNow}</Link>
               }
             </div>
           ))}

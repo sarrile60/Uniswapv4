@@ -189,7 +189,7 @@ const LandingPage = () => {
               <div className="banner__content">
                 <h2 className="title">{t.land_bannerTitle}</h2>
                 <p className="fs-20 desc">{t.land_bannerDesc}</p>
-                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" className="btn-action"><span>{t.land_getStarted}</span></a>
+                <Link to="/register" className="btn-action"><span>{t.land_getStarted}</span></Link>
                 <div className="stats-row">
                   <div className="stat-item">
                     <h4 className="stat-number">{t.land_stat1}</h4>
@@ -436,7 +436,7 @@ const LandingPage = () => {
                             <td>{coin.low}</td>
                             <td>{coin.turnover}</td>
                             <td><Sparkline up={coin.up} /></td>
-                            <td><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" className="btn-trade">{t.land_trade}</a></td>
+                            <td><Link to="/register" className="btn-trade">{t.land_trade}</Link></td>
                           </tr>
                         ))}
                       </tbody>
@@ -536,7 +536,7 @@ const LandingPage = () => {
                     <p className="text">{t.land_feature2Desc}</p>
                   </li>
                 </ul>
-                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" className="btn-action">{t.land_exploreMore}</a>
+                <Link to="/register" className="btn-action">{t.land_exploreMore}</Link>
               </div>
             </div>
           </div>
@@ -602,7 +602,7 @@ const LandingPage = () => {
             </div>
             <div className="col-md-5">
               <div className="sale-button">
-                <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy">{t.land_createAccount}</a>
+                <Link to="/register">{t.land_createAccount}</Link>
               </div>
             </div>
           </div>
@@ -640,9 +640,9 @@ const LandingPage = () => {
                 <div className="widget-link s2">
                   <h6 className="title">{t.land_services}</h6>
                   <ul>
-                    <li><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy">{t.land_buyCrypto}</a></li>
+                    <li><Link to="/register">{t.land_buyCrypto}</Link></li>
                     <li><a href="#crypto-section">{t.land_markets}</a></li>
-                    <li><a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy">{t.land_trading}</a></li>
+                    <li><Link to="/register">{t.land_trading}</Link></li>
                   </ul>
                 </div>
               </div>
