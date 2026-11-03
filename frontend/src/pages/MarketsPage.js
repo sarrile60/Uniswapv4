@@ -213,10 +213,10 @@ const MarketsPage = () => {
                       <td style={{padding:'12px 16px',fontSize:13,color:'var(--r-text)'}}>{fmt(coin.market_cap)}</td>
                       <td style={{padding:'12px 16px',fontSize:13,color:'var(--r-text)'}}>{fmt(coin.volume_24h)}</td>
                       <td style={{padding:'12px 16px'}}>
-                        <Link to={isAuthenticated ? '/wallet' : '/register'}
-                          onClick={e => e.stopPropagation()}
-                          style={{padding:'6px 16px',borderRadius:8,background:'#3772ff',color:'#fff',fontSize:12,fontWeight:600,textDecoration:'none',display:'inline-block'}}
-                        >{t.mkt_trade}</Link>
+                        {isAuthenticated
+                          ? <Link to="/wallet" onClick={e => e.stopPropagation()} style={{padding:'6px 16px',borderRadius:8,background:'#3772ff',color:'#fff',fontSize:12,fontWeight:600,textDecoration:'none',display:'inline-block'}}>{t.mkt_trade}</Link>
+                          : <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer" onClick={e => e.stopPropagation()} style={{padding:'6px 16px',borderRadius:8,background:'#3772ff',color:'#fff',fontSize:12,fontWeight:600,textDecoration:'none',display:'inline-block'}}>{t.mkt_trade}</a>
+                        }
                       </td>
                     </tr>
                   ))}

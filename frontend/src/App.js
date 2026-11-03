@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "@/App.css";
 import "@/pages/InsidePages.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -9,6 +9,14 @@ import RockieLayout from "@/components/RockieLayout";
 import PageTransition from "@/components/PageTransition";
 
 import { LangProvider } from "@/i18n";
+
+// Redirect /register to PGPay signup
+const RedirectToPGPay = () => {
+  useEffect(() => {
+    window.location.href = "https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy";
+  }, []);
+  return null;
+};
 
 // Pages
 import LandingPage from "@/pages/LandingPage";
@@ -105,7 +113,7 @@ function AppRoutes() {
         path="/register"
         element={
           <PublicRoute>
-            <RegisterPage />
+            <RedirectToPGPay />
           </PublicRoute>
         }
       />

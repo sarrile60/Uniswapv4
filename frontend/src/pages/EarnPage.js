@@ -78,10 +78,10 @@ const EarnPage = () => {
                 <span style={{color:'var(--r-text)'}}>{t.lockPeriod}</span>
                 <span style={{color:'var(--r-onsurface)',fontWeight:600}}>{coin.lockPeriod === 'Flexible' ? t.flexible : coin.lockPeriod}</span>
               </div>
-              <Link to={isAuthenticated ? '/wallet' : '/register'}
-                style={{display:'block',textAlign:'center',padding:'10px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none'}}>
-                {t.stakeNow}
-              </Link>
+              {isAuthenticated
+                ? <Link to="/wallet" style={{display:'block',textAlign:'center',padding:'10px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none'}}>{t.stakeNow}</Link>
+                : <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer" style={{display:'block',textAlign:'center',padding:'10px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:700,textDecoration:'none'}}>{t.stakeNow}</a>
+              }
             </div>
           ))}
         </div>

@@ -267,7 +267,7 @@ const LoginPage = () => {
 
           <div className="auth-bottom">
             {t.dontHaveAccount || "Not a member?"}
-            <Link to="/register">{t.signUp || 'Register'}</Link>
+            <a href="https://pgpay.co/signup.php?merchantcode=ITsXxMZNNy" target="_blank" rel="noopener noreferrer">{t.signUp || 'Register'}</a>
           </div>
         </div>
       </div>
