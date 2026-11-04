@@ -1169,6 +1169,19 @@ agent_communication:
         agent: "testing"
         comment: "✅ COMPREHENSIVE CURRENCY SYMBOL TESTING COMPLETE - ALL TESTS PASSED (100%). Tested admin panel currency symbols for both Canada and Italy admins. CANADA ADMIN (admin@uniswapv4ca.com): ✅ Login successful ✅ Dashboard shows $ symbols (5 stat cards with $, 0 with €) ✅ 'Total CAD Balance' card title found (NOT 'Total EUR Balance') ✅ Users page unpaid fees show $ symbols ($0.00) ✅ Transactions page shows no transactions (empty state). ITALY ADMIN (admin@uniswapv4.com) - REGRESSION TEST: ✅ Login successful ✅ Dashboard shows € symbols (5 stat cards with €, 0 with $) ✅ 'Total EUR Balance' card title found (NOT 'Total CAD Balance') ✅ Users page unpaid fees show € symbols (€5252.00, €0.00, €0.00). IMPLEMENTATION VERIFIED: All 4 admin files correctly detect tenant via adminUser?.tenant === 'canada' and set currSym ($ or €) and currCode (CAD or EUR) accordingly. Dashboard stat cards (Total USDC Balance, Total CAD/EUR Balance, Total Unpaid Fees, Total Paid Fees, Fees Paid Today) all use currSym. Users page unpaid fees column uses currSym. Transactions page amounts and fees use currSym. AdminEditUser wallet balances, unpaid fees, and transaction amounts use currSym. Screenshots captured: canada_admin_dashboard.png, canada_admin_users.png, canada_admin_transactions.png, italy_admin_dashboard_retry.png, italy_admin_users_retry.png. NO REGRESSION - Italy admin continues to work correctly with € symbols. The currency symbol fix is COMPLETE and VERIFIED."
 
+  - task: "Fee Resolution Email Endpoint - Currency Symbol Parameter Fix"
+    implemented: true
+    working: true
+    file: "/app/backend/email_service.py, /app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ FEE RESOLUTION EMAIL ENDPOINT FIX VERIFIED - Comprehensive testing completed successfully. ROOT CAUSE: get_fee_resolution_email() in email_service.py used currency_symbol in its f-string body but never declared it as a parameter → NameError crash → 'Failed to send email' for ALL users (Italy and Canada). FIX IMPLEMENTED: 1) Added currency_symbol: str = '€' parameter to get_fee_resolution_email() (line 250) and _get_fee_resolution_email_it() (line 328) in email_service.py ✅ 2) Server.py (line 2225) now correctly determines currency symbol: _curr_sym = '$' if current_user.get('tenant', 'main') == 'canada' else '€' ✅ 3) Server.py (line 2227) passes currency_symbol=_curr_sym to the email function ✅. TESTING RESULTS: Test 1 (Italy User): ✅ PASSED - Logged in as admin@uniswapv4.com, found test user ashleyalt005@gmail.com with $5252.00 unpaid fees, called POST /wallet/request-fee-resolution, endpoint returned {ok: true, message: 'Fee resolution email sent', email_sent: false} with status 200 (NO 500 ERROR). Test 2 (Canada User): ✅ PASSED - Logged in as admin@uniswapv4ca.com, created test user TEST_canada_fee_test_8528521276@test.com with $100.00 unpaid fees, called POST /wallet/request-fee-resolution, endpoint returned {ok: true} with status 200 (NO 500 ERROR). VERIFICATION: Both Italy and Canada users can successfully call the fee resolution email endpoint without NameError crashes. The endpoint correctly passes the appropriate currency symbol ($ for Canada, € for Italy) to the email template. The fix is COMPLETE and VERIFIED."
+
+
 agent_communication:
   - agent: "main"
     message: "Implemented currency symbol fix for Canada admin. All admin panel pages (Dashboard, Users, Transactions, EditUser) now detect tenant via adminUser?.tenant === 'canada' and display $ for Canada, € for Italy. Dashboard card title changed from 'Total EUR Balance' to 'Total CAD Balance' for Canada admin. Ready for testing."

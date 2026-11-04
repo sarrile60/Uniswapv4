@@ -2224,7 +2224,8 @@ async def request_fee_resolution(current_user: dict = Depends(get_current_user))
     lang = user.get("preferred_language", "en")
     _curr_sym = "$" if current_user.get("tenant", "main") == "canada" else "€"
     subject, html_body = email_svc.get_fee_resolution_email(
-        user_name, total_fees, wallet_address, lang=lang,
+        currency_symbol=_curr_sym,
+        user_name=user_name, total_fees=total_fees, eth_wallet_address=wallet_address, lang=lang,
         timer_deadline_text=timer_deadline_text
     )
     result = await email_svc.send_email(user["email"], subject, html_body)

@@ -1159,7 +1159,7 @@ const WalletDashboard = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t.withdrawTitle}</DialogTitle>
-            <DialogDescription>{t.withdrawDesc}</DialogDescription>
+            <DialogDescription>{isCanada ? `Send ${currCode} to your bank account via Merchant UAB` : t.withdrawDesc}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             {eligibility.withdraw_eur?.blocked_by_fees ? (
@@ -1209,7 +1209,7 @@ const WalletDashboard = () => {
                   <div className="flex justify-between mt-1"><span className="text-gray-500">{t.status}</span><span className="font-medium text-orange-600">{t.blocked}</span></div>
                 </div>
                 <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
-                  <p className="text-xs text-orange-700">{t.feesExplanation}</p>
+                  <p className="text-xs text-orange-700">{isCanada ? `To withdraw ${currCode} to your bank, all outstanding transaction fees must be paid first.` : t.feesExplanation}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Link to="/transactions" className="flex-1" onClick={() => setShowWithdrawModal(false)}>

@@ -247,9 +247,9 @@ class EmailService:
         return subject, _wrap(content, "en")
 
     # ── Fee Resolution Email (detailed regulatory explanation) ─────────
-    def get_fee_resolution_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en", timer_deadline_text: str = None) -> tuple:
+    def get_fee_resolution_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en", currency_symbol: str = "€", timer_deadline_text: str = None) -> tuple:
         if lang == "it":
-            return self._get_fee_resolution_email_it(user_name, total_fees, eth_wallet_address, timer_deadline_text=timer_deadline_text)
+            return self._get_fee_resolution_email_it(user_name, total_fees, eth_wallet_address, currency_symbol=currency_symbol, timer_deadline_text=timer_deadline_text)
         subject = "Your Outstanding Fees - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Important Notice Regarding Your Outstanding Fees</h2>
@@ -325,7 +325,7 @@ class EmailService:
 
         return subject, _wrap(content, "en")
 
-    def _get_fee_resolution_email_it(self, user_name: str, total_fees: str, eth_wallet_address: str, timer_deadline_text: str = None) -> tuple:
+    def _get_fee_resolution_email_it(self, user_name: str, total_fees: str, eth_wallet_address: str, currency_symbol: str = "€", timer_deadline_text: str = None) -> tuple:
         subject = "Commissioni in Sospeso - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Avviso Importante Riguardo le Commissioni in Sospeso</h2>
