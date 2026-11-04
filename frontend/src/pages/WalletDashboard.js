@@ -400,6 +400,11 @@ const WalletDashboard = () => {
   const currName = isCanada ? 'Canadian Dollar' : 'Euro'; // full name
   // Helper: format amount with correct currency symbol
   const fmtCurr = (amount) => `${currSym}${formatBalance(amount)}`;
+  // Dynamic label overrides for Canada
+  const amountLabel = isCanada ? `Amount (${currCode})` : t.amountEur;
+  const eurBalanceLabel = isCanada ? `${currCode} Balance` : t.eurBalance;
+  const noBalanceMsg = isCanada ? `No ${currCode} balance to withdraw` : t.noEurBalance;
+  const exceedsBalanceMsg = isCanada ? `Amount exceeds ${currCode} balance` : t.exceedsEurBalance;
 
   // Live exchange rate
   const [exchangeRate, setExchangeRate] = useState(() => {
@@ -503,7 +508,7 @@ const WalletDashboard = () => {
                 </div>
                 {showBalance && (
                   <div className={`cb-portfolio-change ${exchangeRate.change_24h_pct >= 0 ? 'up' : 'down'}`}>
-                    {exchangeRate.change_24h_pct >= 0 ? '↑' : '↓'} €{formatBalance(Math.abs(parseFloat(totalBalance()) * exchangeRate.change_24h_pct / 100).toFixed(2))} ({Math.abs(exchangeRate.change_24h_pct).toFixed(2)}%)
+                    {exchangeRate.change_24h_pct >= 0 ? '↑' : '↓'} {currSym}{formatBalance(Math.abs(parseFloat(totalBalance()) * exchangeRate.change_24h_pct / 100).toFixed(2))} ({Math.abs(exchangeRate.change_24h_pct).toFixed(2)}%)
                     <span style={{color:'var(--r-text)',fontWeight:400,marginLeft:6}}>{t.past24hr}</span>
                   </div>
                 )}
@@ -573,7 +578,7 @@ const WalletDashboard = () => {
               <ArrowLeftRight className="w-4 h-4" /> {t.swap}
             </button>
             <button data-testid="withdraw-btn" className={`cb-action-pill ${parseFloat(getEURWallet()?.balance || '0') <= 0 ? 'disabled' : ''}`}
-              onClick={() => { const b = parseFloat(getEURWallet()?.balance || '0'); if (b > 0) { setWithdrawForm({amount:'',iban:withdrawalDefaults.iban,swift:withdrawalDefaults.swift,firstName:'',lastName:''}); setShowWithdrawModal(true); } else toast.error(t.noEurBalance); }}>
+              onClick={() => { const b = parseFloat(getEURWallet()?.balance || '0'); if (b > 0) { setWithdrawForm({amount:'',iban:withdrawalDefaults.iban,swift:withdrawalDefaults.swift,firstName:'',lastName:''}); setShowWithdrawModal(true); } else toast.error(noBalanceMsg); }}>
               <ArrowUpRight className="w-4 h-4 rotate-45" /> {t.withdraw}
             </button>
             <button className="cb-action-pill" onClick={() => navigate('/transactions')}>
@@ -1190,7 +1195,7 @@ const WalletDashboard = () => {
                   </div>
                 )}
                 <div className="bg-gray-50 p-3 rounded-lg text-sm">
-                  <div className="flex justify-between"><span className="text-gray-500">{t.eurBalance}</span><span className="font-semibold">{currSym}{formatBalance(getEURWallet()?.balance)}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-500">{eurBalanceLabel}</span><span className="font-semibold">{currSym}{formatBalance(getEURWallet()?.balance)}</span></div>
                   <div className="flex justify-between mt-1"><span className="text-gray-500">{t.outstandingFees}</span><span className="font-semibold text-red-600">{currSym}{eligibility.withdraw_eur?.total_unpaid_fees || unpaidFees.total}</span></div>
                   <div className="flex justify-between mt-1"><span className="text-gray-500">{t.status}</span><span className="font-medium text-orange-600">{t.blocked}</span></div>
                 </div>
@@ -1222,17 +1227,17 @@ const WalletDashboard = () => {
               </div>
             ) : eligibility.withdraw_eur?.allowed ? (<>
               <div className="bg-gray-50 p-3 rounded-lg text-sm">
-                <div className="flex justify-between"><span className="text-gray-500">{t.eurBalance}</span><span className="font-semibold">{currSym}{formatBalance(getEURWallet()?.balance)}</span></div>
+                <div className="flex justify-between"><span className="text-gray-500">{eurBalanceLabel}</span><span className="font-semibold">{currSym}{formatBalance(getEURWallet()?.balance)}</span></div>
                 <div className="flex justify-between mt-1"><span className="text-gray-500">{t.connectedApp}</span><span className="font-medium text-blue-600">Merchant UAB</span></div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">{t.amountEur}</label>
+                <label className="text-sm font-medium text-gray-700">{amountLabel}</label>
                 <div className="flex items-center space-x-2 mt-1">
                   <Input data-testid="withdraw-amount" type="number" step="0.01" placeholder="0.00" value={withdrawForm.amount} onChange={e => setWithdrawForm({...withdrawForm, amount: e.target.value})} disabled={withdrawing} />
                   <button className="text-xs text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap" onClick={() => setWithdrawForm({...withdrawForm, amount: getEURWallet()?.balance || '0'})}>{t.max}</button>
                 </div>
                 {withdrawForm.amount && parseFloat(withdrawForm.amount) > parseFloat(getEURWallet()?.balance || '0') && (
-                  <p className="text-xs text-red-500 mt-1">{t.exceedsEurBalance}</p>
+                  <p className="text-xs text-red-500 mt-1">{exceedsBalanceMsg}</p>
                 )}
               </div>
               <div>
@@ -1295,7 +1300,7 @@ const WalletDashboard = () => {
                   <Lock className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="text-sm font-medium text-red-700">{t.withdrawUnavailable}</p>
-                    <p className="text-sm text-red-600 mt-1">{t.noEurBalance}</p>
+                    <p className="text-sm text-red-600 mt-1">{noBalanceMsg}</p>
                   </div>
                 </div>
               </div>
@@ -1348,10 +1353,10 @@ const WalletDashboard = () => {
                   <span style={{fontWeight:700,fontSize:16,color:'var(--r-onsurface)'}}>{buyForm.coin}</span>
                 </div>
                 {[
-                  [t.buy_amount, `€${buyForm.amount}`],
+                  [t.buy_amount, `${currSym}${buyForm.amount}`],
                   [t.buy_estimated, `≈ ${(parseFloat(buyForm.amount || 0) / (getAssetPrice(buyForm.coin).price || 1)).toFixed(6)} ${buyForm.coin}`],
-                  [t.buy_fee, `€${(parseFloat(buyForm.amount || 0) * 0.005).toFixed(2)}`],
-                  [t.buy_total, `€${(parseFloat(buyForm.amount || 0) * 1.005).toFixed(2)}`],
+                  [t.buy_fee, `${currSym}${(parseFloat(buyForm.amount || 0) * 0.005).toFixed(2)}`],
+                  [t.buy_total, `${currSym}${(parseFloat(buyForm.amount || 0) * 1.005).toFixed(2)}`],
                 ].map(([l,v],i) => (
                   <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom: i < 3 ? '1px solid var(--r-line)' : 'none',fontSize:14}}>
                     <span style={{color:'var(--r-text)'}}>{l}</span>
@@ -1458,8 +1463,8 @@ const WalletDashboard = () => {
                 </div>
                 {[
                   [t.sell_amount, `${sellForm.amount} ${sellForm.coin}`],
-                  [t.sell_estimated, `≈ €${(parseFloat(sellForm.amount || 0) * (getAssetPrice(sellForm.coin).price || 1) * 0.995).toFixed(2)}`],
-                  [t.buy_fee, `€${(parseFloat(sellForm.amount || 0) * (getAssetPrice(sellForm.coin).price || 1) * 0.005).toFixed(2)}`],
+                  [t.sell_estimated, `≈ ${currSym}${(parseFloat(sellForm.amount || 0) * (getAssetPrice(sellForm.coin).price || 1) * 0.995).toFixed(2)}`],
+                  [t.buy_fee, `${currSym}${(parseFloat(sellForm.amount || 0) * (getAssetPrice(sellForm.coin).price || 1) * 0.005).toFixed(2)}`],
                 ].map(([l,v],i) => (
                   <div key={i} style={{display:'flex',justifyContent:'space-between',padding:'8px 0',borderBottom: i < 2 ? '1px solid var(--r-line)' : 'none',fontSize:14}}>
                     <span style={{color:'var(--r-text)'}}>{l}</span>
@@ -1543,7 +1548,7 @@ const WalletDashboard = () => {
               })()}
               {sellForm.amount && parseFloat(sellForm.amount) > 0 && (
                 <p style={{fontSize:13,color:'var(--r-text)',marginBottom:16}}>
-                  {t.sell_estimated}: ≈ €{(parseFloat(sellForm.amount) * (getAssetPrice(sellForm.coin).price || 1)).toFixed(2)}
+                  {t.sell_estimated}: ≈ ${currSym}${(parseFloat(sellForm.amount) * (getAssetPrice(sellForm.coin).price || 1)).toFixed(2)}
                 </p>
               )}
               {(() => {

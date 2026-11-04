@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useLang } from '@/i18n';
+import { useAuth } from '@/contexts/AuthContext';
 import CryptoIcon from '@/components/CryptoIcons';
 import { ShieldAlert, ArrowRight, X, ChevronDown, RefreshCw } from 'lucide-react';
 
@@ -92,6 +93,9 @@ const CoinPicker = ({ selectedCoin, setSelectedCoin, setShowCoinPicker, marketPr
  */
 const TradeModal = ({ open, onClose }) => {
   const { lang, t } = useLang();
+  const { user } = useAuth();
+  const currSym = user?.tenant === 'canada' ? '$' : '€';
+  const currCode = user?.tenant === 'canada' ? 'CAD' : 'EUR';
   const [tab, setTab] = useState('buy'); // 'buy' | 'sell'
   const [step, setStep] = useState(1); // 1: form, 2: preview, 3: error/under-review
   const [selectedCoin, setSelectedCoin] = useState('BTC');
@@ -107,7 +111,7 @@ const TradeModal = ({ open, onClose }) => {
     sell: t.sell || 'Sell',
     selectAsset: lang === 'it' ? 'Seleziona Asset' : 'Select Asset',
     amount: lang === 'it' ? 'Importo' : 'Amount',
-    amountEur: lang === 'it' ? 'Importo (EUR)' : 'Amount (EUR)',
+    amountEur: lang === 'it' ? `Importo (${currCode})` : `Amount (${currCode})`,
     amountCrypto: lang === 'it' ? 'Importo' : 'Amount',
     youPay: lang === 'it' ? 'Paghi' : 'You Pay',
     youReceive: lang === 'it' ? 'Ricevi' : 'You Receive',
@@ -331,15 +335,15 @@ const TradeModal = ({ open, onClose }) => {
 
                 {/* Summary rows */}
                 {(isBuy ? [
-                  [tr.youPay, `€${amountNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+                  [tr.youPay, `${currSym}${amountNum.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
                   [tr.price, `$${coinPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`],
-                  [tr.fee, `€${feeAmount.toFixed(2)}`],
+                  [tr.fee, `${currSym}${feeAmount.toFixed(2)}`],
                   [tr.youReceive, `≈ ${estimatedReceive.toFixed(6)} ${selectedCoin}`],
                 ] : [
                   [tr.selling, `${amountNum} ${selectedCoin}`],
                   [tr.price, `$${coinPrice.toLocaleString('en-US', { maximumFractionDigits: 2 })}`],
-                  [tr.fee, `€${feeAmount.toFixed(2)}`],
-                  [tr.youReceive, `≈ €${estimatedReceive.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
+                  [tr.fee, `${currSym}${feeAmount.toFixed(2)}`],
+                  [tr.youReceive, `≈ ${currSym}${estimatedReceive.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`],
                 ]).map(([label, value], i, arr) => (
                   <div key={i} style={{
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -432,7 +436,7 @@ const TradeModal = ({ open, onClose }) => {
                     padding: '0 0 0 16px', fontSize: 20, fontWeight: 700,
                     color: '#8a8f9e',
                   }}>
-                    {isBuy ? '€' : ''}
+                    {isBuy ? currSym : ''}
                   </span>
                   <input
                     type="number"
@@ -470,7 +474,7 @@ const TradeModal = ({ open, onClose }) => {
                     <div style={{ fontSize: 18, fontWeight: 700, color: isBuy ? '#22c55e' : '#3772ff' }}>
                       {isBuy
                         ? `${estimatedReceive.toFixed(6)} ${selectedCoin}`
-                        : `€${estimatedReceive.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                        : `${currSym}${estimatedReceive.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                       }
                     </div>
                   </div>

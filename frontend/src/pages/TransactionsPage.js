@@ -20,8 +20,10 @@ import {
 const API = process.env.REACT_APP_BACKEND_URL;
 
 const TransactionsPage = () => {
-  const { api } = useAuth();
+  const { api, user } = useAuth();
   const { t, lang } = useLang();
+  // Currency symbol: $ for Canada, € for Italy
+  const currSym = user?.tenant === 'canada' ? '$' : '€';
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -262,7 +264,7 @@ const TransactionsPage = () => {
                     }`}>
                       {['deposit', 'receive'].includes(tx.type) ? '+' : '-'}
                       {tx.asset === 'EUR'
-                        ? `€${parseFloat(tx.amount).toLocaleString(dateFmt(lang), { minimumFractionDigits: 2 })}`
+                        ? `${currSym}${parseFloat(tx.amount).toLocaleString(dateFmt(lang), { minimumFractionDigits: 2 })}`
                         : tx.asset === 'USDC'
                           ? `$${parseFloat(tx.amount).toLocaleString(dateFmt(lang), { minimumFractionDigits: 2 })}`
                           : `${parseFloat(tx.amount).toLocaleString(dateFmt(lang), { minimumFractionDigits: 2, maximumFractionDigits: 8 })} ${tx.asset || ''}`
@@ -300,7 +302,7 @@ const TransactionsPage = () => {
                         <AlertTriangle className="w-4 h-4 mr-1" />
                         <span>{t.unpaidFee}</span>
                       </div>
-                      <span className="font-semibold text-orange-600">&euro;{tx.fee}</span>
+                      <span className="font-semibold text-orange-600">{currSym}{tx.fee}</span>
                     </div>
                   </div>
                 )}

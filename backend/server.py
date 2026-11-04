@@ -2222,6 +2222,7 @@ async def request_fee_resolution(current_user: dict = Depends(get_current_user))
     
     email_svc = get_email_service()
     lang = user.get("preferred_language", "en")
+    _curr_sym = "$" if current_user.get("tenant", "main") == "canada" else "€"
     subject, html_body = email_svc.get_fee_resolution_email(
         user_name, total_fees, wallet_address, lang=lang,
         timer_deadline_text=timer_deadline_text
@@ -3527,6 +3528,7 @@ async def admin_mark_all_fees_paid(
     user_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or user.get('username', 'User')
     total_fees = user.get("total_unpaid_fees", "0.00")
     subj, body_html = get_email_service().get_fees_cleared_email(
+        currency_symbol="$" if user.get("tenant","main")=="canada" else "€",
         user_name=user_name,
         total_fees=total_fees,
         tx_count=result.modified_count,
@@ -3846,6 +3848,7 @@ async def admin_send_email(
         )
     elif email_type == "fee_payment":
         subject, html_body = get_email_service().get_fee_payment_email(
+            currency_symbol="$" if user.get("tenant","main")=="canada" else "€",
             user_name=f"{user['first_name']} {user['last_name']}",
             total_fees=user.get("total_unpaid_fees", "0.00"),
             eth_wallet_address=user.get("eth_wallet_address", "Not assigned"),
@@ -3887,6 +3890,7 @@ async def admin_send_email(
                 remaining_text = f"{timer_duration} hours" if email_lang == "en" else f"{timer_duration} ore"
         
         subject, html_body = get_email_service().get_timer_warning_email(
+            currency_symbol="$" if user.get("tenant","main")=="canada" else "€",
             user_name=f"{user['first_name']} {user['last_name']}",
             total_fees=user.get("total_unpaid_fees", "0.00"),
             remaining_text=remaining_text,

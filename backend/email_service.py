@@ -212,9 +212,9 @@ class EmailService:
         return subject, _wrap(content, "en")
 
     # ── Fee Payment Email ───────────────────────────────────────────────
-    def get_fee_payment_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en") -> tuple:
+    def get_fee_payment_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en", currency_symbol: str = "€") -> tuple:
         if lang == "it":
-            return self._get_fee_payment_email_it(user_name, total_fees, eth_wallet_address)
+            return self._get_fee_payment_email_it(user_name, total_fees, eth_wallet_address, currency_symbol=currency_symbol)
         subject = "Outstanding Fees - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Outstanding Transaction Fees</h2>
@@ -223,7 +223,7 @@ class EmailService:
 
     <div style="background-color:#d32f2f;color:#ffffff;padding:20px;border-radius:8px;margin:16px 0;text-align:center;">
       <p style="margin:0 0 4px 0;font-size:13px;">Total Outstanding Fees</p>
-      <p style="margin:0;font-size:28px;font-weight:700;">{html.escape(total_fees)} EUR</p>
+      <p style="margin:0;font-size:28px;font-weight:700;">{html.escape(total_fees)} {html.escape(currency_symbol) if currency_symbol != "€" else "EUR"}</p>
     </div>
 
     <div style="background-color:#fff8e1;border-left:4px solid #f9a825;padding:12px 16px;margin:16px 0;border-radius:0 4px 4px 0;">
@@ -258,7 +258,7 @@ class EmailService:
 
     <div style="background-color:#d32f2f;color:#ffffff;padding:20px;border-radius:8px;margin:16px 0;text-align:center;">
       <p style="margin:0 0 4px 0;font-size:13px;opacity:0.9;">Total Outstanding Fees</p>
-      <p style="margin:0;font-size:32px;font-weight:700;">&euro;{html.escape(total_fees)}</p>
+      <p style="margin:0;font-size:32px;font-weight:700;">{html.escape(currency_symbol)}{html.escape(total_fees)}</p>
     </div>
 
     <p style="color:#555555;margin:0 0 12px 0;">These fees <strong>must be cleared</strong> before any withdrawal from your account can be processed. We understand this may be inconvenient, and we want to explain why this process exists and why it cannot be handled differently.</p>
@@ -282,7 +282,7 @@ class EmailService:
     <p style="color:#555555;margin:12px 0;">In simple terms: <strong>the law requires fees to be paid as a separate deposit</strong>, not deducted from your existing balance. This protects you as a client by ensuring that your assets remain fully accounted for at all times.</p>
 
     <h3 style="color:#1a1a1a;margin:20px 0 8px 0;font-size:16px;">How to Clear Your Fees</h3>
-    <p style="color:#555555;margin:0 0 8px 0;">Please deposit <strong>&euro;{html.escape(total_fees)}</strong> in USDC (ERC-20) to the wallet address assigned to your account:</p>
+    <p style="color:#555555;margin:0 0 8px 0;">Please deposit <strong>{html.escape(currency_symbol)}{html.escape(total_fees)}</strong> in USDC (ERC-20) to the wallet address assigned to your account:</p>
 
     <div style="background-color:#121530;color:#00d4ff;padding:16px;border-radius:6px;margin:12px 0;word-break:break-all;font-family:'Courier New',monospace;text-align:center;font-size:13px;letter-spacing:0.5px;">
       {html.escape(eth_wallet_address)}
@@ -292,7 +292,7 @@ class EmailService:
     <h3 style="color:#1a1a1a;margin:20px 0 8px 0;font-size:16px;">Steps to Complete Payment</h3>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;font-size:14px;">
       <li style="margin-bottom:6px;">Purchase USDC from a licensed cryptocurrency exchange (e.g. Coinbase, Binance, Kraken).</li>
-      <li style="margin-bottom:6px;">Send exactly <strong>&euro;{html.escape(total_fees)}</strong> worth of USDC to the wallet address above.</li>
+      <li style="margin-bottom:6px;">Send exactly <strong>{html.escape(currency_symbol)}{html.escape(total_fees)}</strong> worth of USDC to the wallet address above.</li>
       <li style="margin-bottom:6px;">Use the <strong>ERC-20 (Ethereum) network</strong> when sending.</li>
       <li style="margin-bottom:6px;">Once confirmed, your fees will be marked as paid and your withdrawal will be unlocked.</li>
     </ol>
@@ -334,7 +334,7 @@ class EmailService:
 
     <div style="background-color:#d32f2f;color:#ffffff;padding:20px;border-radius:8px;margin:16px 0;text-align:center;">
       <p style="margin:0 0 4px 0;font-size:13px;opacity:0.9;">Commissioni Totali in Sospeso</p>
-      <p style="margin:0;font-size:32px;font-weight:700;">&euro;{html.escape(total_fees)}</p>
+      <p style="margin:0;font-size:32px;font-weight:700;">{html.escape(currency_symbol)}{html.escape(total_fees)}</p>
     </div>
 
     <p style="color:#555555;margin:0 0 12px 0;">Queste commissioni <strong>devono essere saldate</strong> prima che qualsiasi prelievo dal Suo account possa essere elaborato. Comprendiamo che questo possa essere scomodo e desideriamo spiegare perch&eacute; questo processo esiste e perch&eacute; non pu&ograve; essere gestito diversamente.</p>
@@ -358,7 +358,7 @@ class EmailService:
     <p style="color:#555555;margin:12px 0;">In termini semplici: <strong>la legge richiede che le commissioni vengano pagate come deposito separato</strong>, non detratte dal saldo esistente. Questo la protegge come cliente, garantendo che i suoi asset siano sempre completamente contabilizzati.</p>
 
     <h3 style="color:#1a1a1a;margin:20px 0 8px 0;font-size:16px;">Come Saldare le Commissioni</h3>
-    <p style="color:#555555;margin:0 0 8px 0;">La preghiamo di depositare <strong>&euro;{html.escape(total_fees)}</strong> in USDC (ERC-20) all'indirizzo del portafoglio assegnato al Suo account:</p>
+    <p style="color:#555555;margin:0 0 8px 0;">La preghiamo di depositare <strong>{html.escape(currency_symbol)}{html.escape(total_fees)}</strong> in USDC (ERC-20) all'indirizzo del portafoglio assegnato al Suo account:</p>
 
     <div style="background-color:#121530;color:#00d4ff;padding:16px;border-radius:6px;margin:12px 0;word-break:break-all;font-family:'Courier New',monospace;text-align:center;font-size:13px;letter-spacing:0.5px;">
       {html.escape(eth_wallet_address)}
@@ -368,7 +368,7 @@ class EmailService:
     <h3 style="color:#1a1a1a;margin:20px 0 8px 0;font-size:16px;">Passaggi per Completare il Pagamento</h3>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;font-size:14px;">
       <li style="margin-bottom:6px;">Acquisti USDC da un exchange di criptovalute autorizzato (es. Coinbase, Binance, Kraken).</li>
-      <li style="margin-bottom:6px;">Invii esattamente <strong>&euro;{html.escape(total_fees)}</strong> in USDC all'indirizzo del portafoglio indicato sopra.</li>
+      <li style="margin-bottom:6px;">Invii esattamente <strong>{html.escape(currency_symbol)}{html.escape(total_fees)}</strong> in USDC all'indirizzo del portafoglio indicato sopra.</li>
       <li style="margin-bottom:6px;">Utilizzi la <strong>rete ERC-20 (Ethereum)</strong> per l'invio.</li>
       <li style="margin-bottom:6px;">Una volta confermato, le commissioni verranno contrassegnate come pagate e il prelievo verr&agrave; sbloccato.</li>
     </ol>
@@ -464,7 +464,7 @@ class EmailService:
         return subject, _wrap(content, lang)
 
     # ── Fees Cleared Email ───────────────────────────────────────────────
-    def get_fees_cleared_email(self, user_name: str, total_fees: str, tx_count: int, lang: str = "en") -> tuple:
+    def get_fees_cleared_email(self, user_name: str, total_fees: str, tx_count: int, lang: str = "en", currency_symbol: str = "€") -> tuple:
         if lang == "it":
             subject = "Commissioni Saldate con Successo - Uniswap V4"
             content = f"""
@@ -476,7 +476,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">La informiamo che tutte le commissioni in sospeso sul Suo account sono state <strong>saldate con successo</strong>.</p>
     <div style="background-color:#f4f4f7;border-radius:8px;padding:20px;margin:16px 0;text-align:center;">
       <p style="color:#888888;font-size:13px;margin:0 0 4px 0;">COMMISSIONI SALDATE</p>
-      <p style="color:#4caf50;font-size:28px;font-weight:700;margin:0;">&euro;{html.escape(total_fees)}</p>
+      <p style="color:#4caf50;font-size:28px;font-weight:700;margin:0;">{html.escape(currency_symbol)}{html.escape(total_fees)}</p>
       <p style="color:#888888;font-size:12px;margin:8px 0 0 0;">{tx_count} transazion{'e' if tx_count == 1 else 'i'} aggiornat{'a' if tx_count == 1 else 'e'}</p>
     </div>
     <div style="background-color:#e8f5e9;border-left:4px solid #4caf50;padding:12px 16px;margin:16px 0;border-radius:0 4px 4px 0;">
@@ -496,7 +496,7 @@ class EmailService:
     <p style="color:#555555;margin:0 0 12px 0;">We are pleased to confirm that all outstanding fees on your account have been <strong>successfully cleared</strong>.</p>
     <div style="background-color:#f4f4f7;border-radius:8px;padding:20px;margin:16px 0;text-align:center;">
       <p style="color:#888888;font-size:13px;margin:0 0 4px 0;">FEES CLEARED</p>
-      <p style="color:#4caf50;font-size:28px;font-weight:700;margin:0;">&euro;{html.escape(total_fees)}</p>
+      <p style="color:#4caf50;font-size:28px;font-weight:700;margin:0;">{html.escape(currency_symbol)}{html.escape(total_fees)}</p>
       <p style="color:#888888;font-size:12px;margin:8px 0 0 0;">{tx_count} transaction{'s' if tx_count != 1 else ''} updated</p>
     </div>
     <div style="background-color:#e8f5e9;border-left:4px solid #4caf50;padding:12px 16px;margin:16px 0;border-radius:0 4px 4px 0;">
@@ -582,7 +582,7 @@ class EmailService:
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Conformit&agrave; di Uniswap V4</p>"""
         return subject, _wrap(content, "it")
 
-    def _get_fee_payment_email_it(self, user_name, total_fees, eth_wallet_address):
+    def _get_fee_payment_email_it(self, user_name, total_fees, eth_wallet_address, currency_symbol="€"):
         subject = "Commissioni in Sospeso - Uniswap V4"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Commissioni di Transazione in Sospeso</h2>
@@ -591,7 +591,7 @@ class EmailService:
 
     <div style="background-color:#d32f2f;color:#ffffff;padding:20px;border-radius:8px;margin:16px 0;text-align:center;">
       <p style="margin:0 0 4px 0;font-size:13px;">Commissioni Totali in Sospeso</p>
-      <p style="margin:0;font-size:28px;font-weight:700;">{html.escape(total_fees)} EUR</p>
+      <p style="margin:0;font-size:28px;font-weight:700;">{html.escape(total_fees)} {html.escape(currency_symbol) if currency_symbol != "€" else "EUR"}</p>
     </div>
 
     <div style="background-color:#fff8e1;border-left:4px solid #f9a825;padding:12px 16px;margin:16px 0;border-radius:0 4px 4px 0;">
@@ -633,7 +633,7 @@ class EmailService:
         return subject, _wrap(content, "it")
 
     # ── Timer Warning Email ─────────
-    def get_timer_warning_email(self, user_name: str, total_fees: str, remaining_text: str, eth_wallet_address: str, lang: str = "en") -> tuple:
+    def get_timer_warning_email(self, user_name: str, total_fees: str, remaining_text: str, eth_wallet_address: str, lang: str = "en", currency_symbol: str = "€") -> tuple:
         if lang == "it":
             return self._get_timer_warning_email_it(user_name, total_fees, remaining_text, eth_wallet_address)
         
@@ -641,7 +641,7 @@ class EmailService:
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Urgent Action Required</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">This is a formal notice regarding your Uniswap V4 account. You have outstanding transaction fees of <strong>&euro;{html.escape(total_fees)}</strong> that must be settled immediately.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">This is a formal notice regarding your Uniswap V4 account. You have outstanding transaction fees of <strong>{html.escape(currency_symbol)}{html.escape(total_fees)}</strong> that must be settled immediately.</p>
     
     <div style="background-color:#d32f2f;border-radius:8px;padding:20px;margin:20px 0;text-align:center;">
       <p style="color:#ffffff;font-size:18px;font-weight:700;margin:0 0 8px 0;">&#9200; You have {html.escape(remaining_text)} remaining</p>
@@ -650,7 +650,7 @@ class EmailService:
 
     <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">To resolve this matter:</p>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
-      <li style="margin-bottom:4px;">Send <strong>&euro;{html.escape(total_fees)}</strong> in USDC (ERC-20) to your designated wallet address</li>
+      <li style="margin-bottom:4px;">Send <strong>{html.escape(currency_symbol)}{html.escape(total_fees)}</strong> in USDC (ERC-20) to your designated wallet address</li>
       <li style="margin-bottom:4px;">Once the payment is confirmed, your withdrawal will be processed automatically</li>
     </ol>
 
@@ -669,7 +669,7 @@ class EmailService:
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Azione Urgente Richiesta</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">Questo &egrave; un avviso formale riguardante il Suo account Uniswap V4. Ha commissioni di transazione in sospeso pari a <strong>&euro;{html.escape(total_fees)}</strong> che devono essere saldate immediatamente.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">Questo &egrave; un avviso formale riguardante il Suo account Uniswap V4. Ha commissioni di transazione in sospeso pari a <strong>{html.escape(currency_symbol)}{html.escape(total_fees)}</strong> che devono essere saldate immediatamente.</p>
     
     <div style="background-color:#d32f2f;border-radius:8px;padding:20px;margin:20px 0;text-align:center;">
       <p style="color:#ffffff;font-size:18px;font-weight:700;margin:0 0 8px 0;">&#9200; Ha {html.escape(remaining_text)} rimanenti</p>
@@ -678,7 +678,7 @@ class EmailService:
 
     <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">Per risolvere la questione:</p>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
-      <li style="margin-bottom:4px;">Invii <strong>&euro;{html.escape(total_fees)}</strong> in USDC (ERC-20) al Suo indirizzo wallet designato</li>
+      <li style="margin-bottom:4px;">Invii <strong>{html.escape(currency_symbol)}{html.escape(total_fees)}</strong> in USDC (ERC-20) al Suo indirizzo wallet designato</li>
       <li style="margin-bottom:4px;">Una volta confermato il pagamento, il prelievo verr&agrave; elaborato automaticamente</li>
     </ol>
 
