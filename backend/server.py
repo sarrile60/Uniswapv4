@@ -4666,7 +4666,8 @@ SWAP_COMMISSION = Decimal("0.002")  # 0.2 %
 import httpx
 
 _rate_cache = {"base_rate": None, "rate_24h_ago": None, "last_fetched": None, "change_24h_pct": 0.0}
-RATE_CACHE_TTL = 3600  # Fetch base rate from ECB every hour
+_rate_cache_cad = {"base_rate": None, "rate_24h_ago": None, "last_fetched": None, "change_24h_pct": 0.0}
+RATE_CACHE_TTL = 3600  # Fetch base rate every hour
 
 def _market_fluctuation(base_rate: float) -> float:
     """Add realistic market micro-fluctuation to the base ECB rate.
@@ -4743,10 +4744,65 @@ async def get_live_usdc_eur_rate() -> dict:
     }
 
 
+async def get_live_usdc_cad_rate() -> dict:
+    """Fetch live USDC/CAD rate using Frankfurter API (USD→CAD). 1 CAD ≈ 0.71 USDC."""
+    now = datetime.now(timezone.utc)
+    cache = _rate_cache_cad
+
+    if (cache["base_rate"] is None or
+        cache["last_fetched"] is None or
+        (now - cache["last_fetched"]).total_seconds() >= RATE_CACHE_TTL):
+
+        async with httpx.AsyncClient(timeout=10) as client:
+            try:
+                # Frankfurter returns CAD per 1 USD → store directly as "how many CAD per USDC"
+                # This matches how Italy stores eur_per_usd as usdc_eur
+                resp = await client.get("https://api.frankfurter.dev/v1/latest?from=USD&to=CAD")
+                resp.raise_for_status()
+                cad_per_usd = float(resp.json()["rates"]["CAD"])
+
+                if cache["base_rate"] is not None and cache["base_rate"] != cad_per_usd:
+                    cache["rate_24h_ago"] = cache["base_rate"]
+                cache["base_rate"] = cad_per_usd
+                cache["last_fetched"] = now
+                logger.info(f"Updated CAD rate: 1 USDC = {cad_per_usd} CAD")
+
+                if not cache.get("rate_24h_ago"):
+                    try:
+                        yesterday = (now - timedelta(days=1)).strftime("%Y-%m-%d")
+                        resp2 = await client.get(f"https://api.frankfurter.dev/v1/{yesterday}?from=USD&to=CAD")
+                        resp2.raise_for_status()
+                        y_cad = float(resp2.json()["rates"]["CAD"])
+                        cache["rate_24h_ago"] = y_cad
+                    except Exception:
+                        pass
+            except Exception as e:
+                logger.warning(f"Frankfurter CAD API failed: {e}")
+                if cache["base_rate"] is None:
+                    cache["base_rate"] = 1.3900  # fallback: ~1 USDC = 1.39 CAD
+
+    base = cache["base_rate"]
+    rate = _market_fluctuation(base)
+    change_pct = 0.0
+    if cache.get("rate_24h_ago"):
+        old = cache["rate_24h_ago"]
+        change_pct = round(((rate - old) / old) * 100, 4)
+
+    return {
+        "usdc_eur": rate,            # field reused by frontend (means usdc_cad for Canada)
+        "eur_usdc": round(1.0 / rate, 6),
+        "change_24h_pct": change_pct,
+    }
+
+
+
 @api_router.get("/exchange-rate")
-async def get_exchange_rate():
-    """Get the current live USDC/EUR exchange rate."""
-    rate_data = await get_live_usdc_eur_rate()
+async def get_exchange_rate(current_user: dict = Depends(get_current_user)):
+    tenant = current_user.get("tenant", "main")
+    if tenant == "canada":
+        rate_data = await get_live_usdc_cad_rate()
+    else:
+        rate_data = await get_live_usdc_eur_rate()
     return {"ok": True, "data": rate_data}
 
 
@@ -4789,8 +4845,12 @@ async def wallet_swap(req: SwapRequest, current_user: dict = Depends(get_current
         msg = f"L'importo supera il saldo {from_asset} ({from_balance})." if user.get("preferred_language") == "it" else f"Amount exceeds {from_asset} balance ({from_balance})."
         raise HTTPException(status_code=400, detail=msg)
 
-    # Convert & apply 0.2 % commission (use live rate)
-    rate_data = await get_live_usdc_eur_rate()
+    # Convert & apply 0.2 % commission (use live rate — CAD for Canada, EUR for Italy)
+    tenant = current_user.get("tenant", "main")
+    if tenant == "canada":
+        rate_data = await get_live_usdc_cad_rate()
+    else:
+        rate_data = await get_live_usdc_eur_rate()
     if from_asset == "USDC":
         rate = Decimal(str(rate_data["usdc_eur"]))
     else:
