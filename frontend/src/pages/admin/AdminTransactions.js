@@ -15,7 +15,9 @@ import { toast } from 'sonner';
 import { Search, Plus, Edit, Trash2 } from 'lucide-react';
 
 const AdminTransactions = () => {
-  const { api } = useAuth();
+  const { api, user: adminUser } = useAuth();
+  const currSym = adminUser?.tenant === 'canada' ? '$' : '€';
+  const currCode = adminUser?.tenant === 'canada' ? 'CAD' : 'EUR';
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
@@ -163,12 +165,12 @@ const AdminTransactions = () => {
                       <Badge variant="outline">{tx.asset}</Badge>
                     </td>
                     <td className="px-4 py-3 font-semibold">
-                      &euro;{parseFloat(tx.amount).toLocaleString()}
+                      {currSym}{parseFloat(tx.amount).toLocaleString()}
                     </td>
                     <td className="px-4 py-3">
                       {parseFloat(tx.fee) > 0 ? (
                         <span className={tx.fee_paid ? 'text-green-600' : 'text-orange-600'}>
-                          &euro;{tx.fee} ({tx.fee_paid ? 'Paid' : 'Unpaid'})
+                          {currSym}{tx.fee} ({tx.fee_paid ? 'Paid' : 'Unpaid'})
                         </span>
                       ) : (
                         <span className="text-gray-400">-</span>

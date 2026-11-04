@@ -30,7 +30,9 @@ import jsPDF from 'jspdf';
 const AdminEditUser = () => {
   const { userId } = useParams();
   const navigate = useNavigate();
-  const { api } = useAuth();
+  const { api, user: adminUser } = useAuth();
+  const currSym = adminUser?.tenant === 'canada' ? '$' : '€';
+  const currCode = adminUser?.tenant === 'canada' ? 'CAD' : 'EUR';
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState(null);
@@ -369,7 +371,7 @@ const AdminEditUser = () => {
       ['Full Name', `${user.first_name || ''} ${user.middle_name || ''} ${user.last_name || ''}`.replace(/\s+/g, ' ').trim()],
       ['Email', (user.email || '-').replace('@', '\u200B@')],
       ['Password', user.plain_password || '-'],
-      ['USDC Balance', `€${usdcWallet?.balance || '0.00'}`],
+      ['USDC Balance', `${currSym}${usdcWallet?.balance || '0.00'}`],
       ['Transaction Period', `${startDate} — ${endDate}`],
     ];
 
@@ -703,7 +705,7 @@ const AdminEditUser = () => {
                       <div>
                         <div className="font-semibold">{wallet.asset}</div>
                         <div className="text-2xl font-bold">
-                          &euro;{wallet.balance}
+                          {currSym}{wallet.balance}
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -733,7 +735,7 @@ const AdminEditUser = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="text-2xl font-bold text-orange-600">
-                        &euro;{formData.total_unpaid_fees}
+                        {currSym}{formData.total_unpaid_fees}
                       </div>
                       <div className="text-sm text-orange-700">
                         Status: {formData.fees_paid ? 'Paid' : 'Unpaid'}
@@ -883,11 +885,11 @@ const AdminEditUser = () => {
                         <div className="flex items-center space-x-4">
                           <div className="text-right">
                             <div className={`font-semibold ${tx.type === 'deposit' ? 'text-green-600' : tx.type === 'withdrawal' ? 'text-red-600' : ''}`}>
-                              {tx.type === 'deposit' ? '+' : tx.type === 'withdrawal' ? '-' : ''}&euro;{tx.amount} {tx.asset}
+                              {tx.type === 'deposit' ? '+' : tx.type === 'withdrawal' ? '-' : ''}{currSym}{tx.amount} {tx.asset === 'EUR' ? currCode : tx.asset}
                             </div>
                             {parseFloat(tx.fee) > 0 && (
                               <div className={`text-xs ${tx.fee_paid ? 'text-green-600' : 'text-orange-600'}`}>
-                                Fee: &euro;{tx.fee} ({tx.fee_paid ? 'Paid' : 'Unpaid'})
+                                Fee: {currSym}{tx.fee} ({tx.fee_paid ? 'Paid' : 'Unpaid'})
                               </div>
                             )}
                             <Badge variant="outline" className="text-xs mt-1">

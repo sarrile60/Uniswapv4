@@ -18,7 +18,9 @@ import {
 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const { api } = useAuth();
+  const { api, user: adminUser } = useAuth();
+  const currSym = adminUser?.tenant === 'canada' ? '$' : '€';
+  const currCode = adminUser?.tenant === 'canada' ? 'CAD' : 'EUR';
   const [stats, setStats] = useState(null);
   const [onlineStats, setOnlineStats] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -107,31 +109,31 @@ const AdminDashboard = () => {
     },
     {
       title: 'Total USDC Balance',
-      value: `€${stats?.total_usdc_balance || '0.00'}`,
+      value: `${currSym}${stats?.total_usdc_balance || '0.00'}`,
       icon: DollarSign,
       color: 'bg-indigo-500',
     },
     {
-      title: 'Total EUR Balance',
-      value: `€${stats?.total_eur_balance || '0.00'}`,
+      title: `Total ${currCode} Balance`,
+      value: `${currSym}${stats?.total_eur_balance || '0.00'}`,
       icon: TrendingUp,
       color: 'bg-cyan-500',
     },
     {
       title: 'Total Unpaid Fees',
-      value: `€${stats?.total_unpaid_fees || '0.00'}`,
+      value: `${currSym}${stats?.total_unpaid_fees || '0.00'}`,
       icon: AlertTriangle,
       color: 'bg-orange-500',
     },
     {
       title: 'Total Paid Fees',
-      value: `€${stats?.total_paid_fees || '0.00'}`,
+      value: `${currSym}${stats?.total_paid_fees || '0.00'}`,
       icon: CheckCircle,
       color: 'bg-teal-500',
     },
     {
       title: 'Fees Paid Today',
-      value: `€${stats?.fees_paid_today || '0.00'}`,
+      value: `${currSym}${stats?.fees_paid_today || '0.00'}`,
       icon: CalendarCheck,
       color: 'bg-lime-600',
     },

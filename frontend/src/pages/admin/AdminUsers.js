@@ -50,7 +50,9 @@ import {
 } from '@/components/ui/alert-dialog';
 
 const AdminUsers = () => {
-  const { api } = useAuth();
+  const { api, user: adminUser } = useAuth();
+  const currSym = adminUser?.tenant === 'canada' ? '$' : '€';
+  const currCode = adminUser?.tenant === 'canada' ? 'CAD' : 'EUR';
   const [searchParams, setSearchParams] = useSearchParams();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -416,7 +418,7 @@ const AdminUsers = () => {
                     </td>
                     <td className="px-4 py-3">
                       <span className={`text-sm font-medium ${parseFloat(user.total_unpaid_fees) > 0 ? 'text-orange-600' : 'text-gray-500'}`}>
-                        &euro;{user.total_unpaid_fees}
+                        {currSym}{user.total_unpaid_fees}
                       </span>
                     </td>
                     <td className="px-4 py-3" data-testid={`user-timer-${user.id}`}>
