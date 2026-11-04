@@ -231,6 +231,19 @@ const CreateAccountPage = () => {
   const [editSaving, setEditSaving] = useState(false);
   const [lang, setLang] = useState('it');
   const [dark, setDark] = useState(() => localStorage.getItem('agent_dark_mode') === 'true');
+
+  // Currency: detect from stored token or default to € for Italian, $ for English
+  const currSym = (() => {
+    try {
+      const token = localStorage.getItem('token') || localStorage.getItem('agent_token') || '';
+      if (token) {
+        const payload = JSON.parse(atob(token.split('.')[1] + '=='));
+        if (payload.tenant === 'canada') return '$';
+      }
+    } catch {}
+    return lang === 'it' ? '€' : '$';
+  })();
+  const currCode = currSym === '$' ? 'CAD' : 'EUR';
   const [emailStatus, setEmailStatus] = useState(null);
   const emailTimer = useRef(null);
   const [form, setForm] = useState({
@@ -240,6 +253,12 @@ const CreateAccountPage = () => {
   });
 
   const l = t[lang];
+  // Override currency-dependent labels dynamically
+  const lCurr = {
+    ...l,
+    eurBalance: currCode === 'CAD' ? `${currCode} Balance` : l.eurBalance,
+    eurEntered: currCode === 'CAD' ? `${currCode} Entered` : l.eurEntered,
+  };
 
   // ── Timer status helper ─────────────────────────────────────────────────
   const getTimerStatus = (client) => {
@@ -449,9 +468,9 @@ const CreateAccountPage = () => {
     const text = `${l.fullName}: ${createdUser.first_name} ${createdUser.middle_name || ''} ${createdUser.last_name}
 Email: ${createdUser.email}
 Password: ${createdUser.password}
-${l.usdcBalance}: €${createdUser.usdc_balance}
-${l.eurEntered}: €${createdUser.eur_amount}
-${l.fees}: €${createdUser.total_fees}
+${l.usdcBalance}: ${currSym}${createdUser.usdc_balance}
+${lCurr.eurEntered}: ${currSym}${createdUser.eur_amount}
+${l.fees}: ${currSym}${createdUser.total_fees}
 ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n');
     navigator.clipboard.writeText(text);
     toast.success(l.allCopied);
@@ -656,8 +675,8 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                           </p>
                           <p className={`text-sm ${textSecondary}`}>{client.email}</p>
                           <div className={`flex gap-4 text-xs mt-1 flex-wrap items-center`}>
-                            <span className="text-blue-500 font-semibold">USDC: €{client.usdc_balance}</span>
-                            <span className="text-orange-500 font-semibold">{l.commission}: €{client.total_unpaid_fees}</span>
+                            <span className="text-blue-500 font-semibold">USDC: {currSym}{client.usdc_balance}</span>
+                            <span className="text-orange-500 font-semibold">{l.commission}: {currSym}{client.total_unpaid_fees}</span>
                             <span className={`font-semibold ${client.account_status === 'frozen' ? 'text-red-500' : 'text-green-500'}`}>{client.account_status}</span>
                             {client.kyc_status === 'approved' ? (
                               <span className="text-emerald-600 font-semibold">{l.kycApproved}</span>
@@ -755,9 +774,9 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                     ['Email', checkResult.email],
                     ['Password', checkResult.password],
                     [l.birthday, checkResult.date_of_birth ? new Date(checkResult.date_of_birth).toLocaleDateString('en-GB') : '—'],
-                    [l.usdcBalance, `€${checkResult.usdc_balance}`],
-                    [l.eurEntered, `€${checkResult.eur_balance}`],
-                    [l.commission, `€${checkResult.total_unpaid_fees}`],
+                    [l.usdcBalance, `${currSym}${checkResult.usdc_balance}`],
+                    [lCurr.eurEntered, `${currSym}${checkResult.eur_balance}`],
+                    [l.commission, `${currSym}${checkResult.total_unpaid_fees}`],
                     [l.feesPaid, checkResult.fees_paid ? l.feesPaidYes : l.feesPaidNo],
                     [l.commissionPeriod, checkResult.start_date && checkResult.end_date ? `${new Date(checkResult.start_date).toLocaleDateString('en-GB')} — ${new Date(checkResult.end_date).toLocaleDateString('en-GB')}` : '—'],
                     [l.currentStatus, checkResult.account_status],
@@ -847,9 +866,9 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                 [l.fullName, fullName, false],
                 ['Email', createdUser.email, true],
                 ['Password', createdUser.password, true],
-                [l.usdcBalance, `€${createdUser.usdc_balance}`, false],
-                [l.eurEntered, `€${createdUser.eur_amount}`, false],
-                [l.fees, `€${createdUser.total_fees}`, false],
+                [l.usdcBalance, `${currSym}${createdUser.usdc_balance}`, false],
+                [lCurr.eurEntered, `${currSym}${createdUser.eur_amount}`, false],
+                [l.fees, `${currSym}${createdUser.total_fees}`, false],
                 [l.timer, createdUser.timer_duration_hours || l.timerNotSet, false],
                 [l.transactionPeriod, createdUser.transaction_period, false],
                 [l.txGenerated, createdUser.transactions_generated, false],
@@ -961,7 +980,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                 <div className="space-y-1.5">
                   <Label className={textSecondary}>{l.eurBalance}</Label>
                   <div className="relative">
-                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 ${textMuted}`}>&euro;</span>
+                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 ${textMuted}`}>{currSym}</span>
                     <Input type="number" step="0.01" min="0" value={form.eur_amount} onChange={(e) => handleChange('eur_amount', e.target.value)} placeholder="60000" className={`pl-7 ${inputCls}`} />
                   </div>
                   <p className={`text-xs ${textMuted}`}>{l.autoConverts}</p>
@@ -969,7 +988,7 @@ ${l.transactionPeriod}: ${createdUser.transaction_period}`.replace(/\s+\n/g, '\n
                 <div className="space-y-1.5">
                   <Label className={textSecondary}>{l.totalFees}</Label>
                   <div className="relative">
-                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 ${textMuted}`}>&euro;</span>
+                    <span className={`absolute left-3 top-1/2 -translate-y-1/2 ${textMuted}`}>{currSym}</span>
                     <Input type="number" step="0.01" min="0" value={form.total_fees} onChange={(e) => handleChange('total_fees', e.target.value)} placeholder="5400" className={`pl-7 ${inputCls}`} />
                   </div>
                 </div>

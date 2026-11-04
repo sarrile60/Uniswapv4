@@ -723,7 +723,7 @@ const WalletDashboard = () => {
                     </div>
                     <div style={{textAlign:'right'}}>
                       <div style={{fontWeight:700,fontSize:14,color: isPositive ? '#22c55e' : isSend ? '#ef4444' : 'var(--r-onsurface)'}}>
-                        {isPositive ? '+' : isSend ? '-' : ''}{tx.amount} {tx.asset}
+                        {isPositive ? '+' : isSend ? '-' : ''}{tx.amount} {tx.asset === 'EUR' && isCanada ? currCode : tx.asset}
                       </div>
                     </div>
                   </div>
@@ -814,10 +814,12 @@ const WalletDashboard = () => {
                     .map((w, i) => {
                       const pct = (w.eurVal / total) * 100;
                       const market = marketPrices.find(m => m.symbol === w.asset);
+                      // Display EUR as CAD for Canada users
+                      const assetLabel = (w.asset === 'EUR' && isCanada) ? currCode : w.asset;
                       return (
                         <div key={w.asset} style={{display:'flex',alignItems:'center',gap:8}}>
                           <CryptoIcon symbol={w.asset} size={20} imageUrl={market?.image || ''} />
-                          <span style={{flex:1,color:'var(--r-text)',fontSize:12,fontWeight:500}}>{w.asset}</span>
+                          <span style={{flex:1,color:'var(--r-text)',fontSize:12,fontWeight:500}}>{assetLabel}</span>
                           <span style={{color:'var(--r-onsurface)',fontSize:12,fontWeight:700}}>{pct.toFixed(1)}%</span>
                         </div>
                       );
@@ -1496,7 +1498,7 @@ const WalletDashboard = () => {
                         style={{width:'100%',padding:'10px 14px',borderRadius:10,border:'1px solid var(--r-line)',background:'var(--r-surface)',color:'var(--r-onsurface)',fontSize:14,display:'flex',alignItems:'center',gap:10,cursor:'pointer',textAlign:'left'}}>
                         <CryptoIcon symbol={currentWallet.asset} size={24} />
                         <div style={{flex:1}}>
-                          <span style={{fontWeight:600}}>{currentWallet.asset}</span>
+                          <span style={{fontWeight:600}}>{currentWallet.asset === 'EUR' && isCanada ? currCode : currentWallet.asset}</span>
                           <span style={{color:'var(--r-text)',marginLeft:6,fontSize:12}}>{t.balance}: {currentWallet.balance}</span>
                         </div>
                         <span style={{fontSize:12,color:'var(--r-text)'}}>${mp.price?.toLocaleString('en-US',{maximumFractionDigits:2})}</span>
@@ -1512,7 +1514,7 @@ const WalletDashboard = () => {
                                 onMouseLeave={e => { if(sellForm.coin!==w.asset) e.currentTarget.style.background='transparent'; }}>
                                 <CryptoIcon symbol={w.asset} size={28} />
                                 <div style={{flex:1}}>
-                                  <span style={{fontWeight:600,color:'var(--r-onsurface)'}}>{w.asset}</span>
+                                  <span style={{fontWeight:600,color:'var(--r-onsurface)'}}>{w.asset === 'EUR' && isCanada ? currCode : w.asset}</span>
                                   <span style={{color:'var(--r-text)',marginLeft:6,fontSize:12}}>{t.balance}: {w.balance}</span>
                                 </div>
                                 <div style={{textAlign:'right'}}>
