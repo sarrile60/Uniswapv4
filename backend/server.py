@@ -43,6 +43,7 @@ import base64
 import re
 import random
 import uuid
+from urllib.parse import quote as _url_quote
 import pyotp
 import qrcode
 import io
@@ -964,17 +965,11 @@ async def agent_skip_kyc(user_id: str, request: Request):
         }},
         upsert=False
     )
-    
-    # Generate password reset token
-    reset_token = generate_reset_token()
-    
     # Update user: approve KYC + set password reset, but DO NOT change freeze_type or account_status
     user_update = {
         "kyc_status": KYCStatus.APPROVED,
         "kyc_reviewed_at": now,
         "kyc_reviewed_by": f"agent_skip:{agent_name}",
-        "password_reset_token": reset_token,
-        "password_reset_expires": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
         "password_reset_required": True,
         "updated_at": now
     }
@@ -986,7 +981,7 @@ async def agent_skip_kyc(user_id: str, request: Request):
         frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
         subject, html_body = get_email_service().get_kyc_approved_email(
             user_name=f"{user['first_name']} {user['last_name']}",
-            reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+            reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
             lang=user.get("preferred_language", "en")
         )
         result = await get_email_service().send_email(user["email"], subject, html_body)
@@ -1919,10 +1914,51 @@ async def change_password(
     return {"ok": True, "message": "Password changed successfully"}
 
 
+@api_router.post("/auth/reset-password")
+async def reset_password_by_email(request: Request):
+    """Reset password using email directly — no token required."""
+    body = await request.json()
+    email = (body.get("email") or "").strip().lower()
+    new_password = body.get("new_password", "")
+
+    if not email or not new_password:
+        raise HTTPException(status_code=400, detail="Email and new password are required")
+    if len(new_password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters")
+
+    # Search Italy DB first, then Canada DB
+    user = await db_main.users.find_one({"email": email}, {"_id": 0})
+    target_db = db_main
+    if not user:
+        user = await db_canada.users.find_one({"email": email}, {"_id": 0})
+        if user:
+            target_db = db_canada
+
+    if not user:
+        # Return success anyway to prevent email enumeration
+        return {"ok": True, "message": "Password reset successfully"}
+
+    await target_db.users.update_one(
+        {"id": user["id"]},
+        {"$set": {
+            "password_hash": hash_password(new_password),
+            "plain_password": new_password,
+            "password_reset_required": False,
+            "password_reset_token": None,
+            "password_reset_expires": None,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+
+    await log_user_activity(user["id"], "password_reset", "Password reset via email link")
+
+    return {"ok": True, "message": "Password reset successfully"}
+
+
+# Keep old token-based endpoint for backward compatibility (existing emails in inboxes)
 @api_router.post("/auth/reset-password/{token}")
 async def reset_password_with_token(token: str, new_password: str):
-    """Reset password using token — searches both tenant DBs"""
-    # Search Italy DB first, then Canada DB (no auth context available here)
+    """Reset password using token — legacy, kept for existing emails already sent."""
     user = await db_main.users.find_one({"password_reset_token": token}, {"_id": 0})
     target_db = db_main
     if not user:
@@ -1932,29 +1968,25 @@ async def reset_password_with_token(token: str, new_password: str):
 
     if not user:
         raise HTTPException(status_code=400, detail="Invalid or expired token")
-    
-    # Check if token expired
+
     if user.get("password_reset_expires"):
         expires = datetime.fromisoformat(user["password_reset_expires"])
         if datetime.now(timezone.utc) > expires:
             raise HTTPException(status_code=400, detail="Token has expired")
-    
+
     await target_db.users.update_one(
         {"id": user["id"]},
-        {
-            "$set": {
-                "password_hash": hash_password(new_password),
-                "plain_password": new_password,
-                "password_reset_required": False,
-                "password_reset_token": None,
-                "password_reset_expires": None,
-                "updated_at": datetime.now(timezone.utc).isoformat()
-            }
-        }
+        {"$set": {
+            "password_hash": hash_password(new_password),
+            "plain_password": new_password,
+            "password_reset_required": False,
+            "password_reset_token": None,
+            "password_reset_expires": None,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
     )
-    
-    await log_user_activity(user["id"], "password_reset", "Password reset via email link")
-    
+
+    await log_user_activity(user["id"], "password_reset", "Password reset via token link")
     return {"ok": True, "message": "Password reset successfully"}
 
 
@@ -1980,27 +2012,16 @@ async def forgot_password(request: Request):
     if not user:
         return {"ok": True, "message": "If an account with that email exists, a password reset link has been sent."}
     
-    # Generate reset token
-    reset_token = generate_reset_token()
-    now = datetime.now(timezone.utc).isoformat()
-    
-    await target_db.users.update_one(
-        {"id": user["id"]},
-        {"$set": {
-            "password_reset_token": reset_token,
-            "password_reset_expires": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
-            "updated_at": now
-        }}
-    )
-    
-    # Send password reset email
+    # No token needed — send email directly in the link
     frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+    reset_link = f"{frontend_url}/reset-password?email={_url_quote(user['email'])}"
+
     subject, html_body = get_email_service().get_password_reset_email(
         user_name=f"{user['first_name']} {user['last_name']}",
-        reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+        reset_link=reset_link,
         lang=user.get("preferred_language", "en")
     )
-    
+
     result = await get_email_service().send_email(user["email"], subject, html_body)
     
     # Log the email
@@ -2351,8 +2372,6 @@ async def _auto_approve_kyc(user_id: str, delay_seconds: int):
         # If approved and has freeze, unfreeze + send password reset
         if user.get("freeze_type") in [FreezeType.UNUSUAL_ACTIVITY, FreezeType.BOTH]:
             reset_token = generate_reset_token()
-            user_update["password_reset_token"] = reset_token
-            user_update["password_reset_expires"] = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
             user_update["password_reset_required"] = True
             user_update["freeze_type"] = FreezeType.NONE
             user_update["account_status"] = AccountStatus.ACTIVE
@@ -2362,7 +2381,7 @@ async def _auto_approve_kyc(user_id: str, delay_seconds: int):
                 frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
                 subject, html_body = get_email_service().get_kyc_approved_email(
                     user_name=f"{user['first_name']} {user['last_name']}",
-                    reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+                    reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
                     lang=user.get("preferred_language", "en")
                 )
                 result = await get_email_service().send_email(user["email"], subject, html_body)
@@ -2605,8 +2624,6 @@ async def resend_password_reset(request: Request, current_user: dict = Depends(g
     await db.users.update_one(
         {"id": user["id"]},
         {"$set": {
-            "password_reset_token": reset_token,
-            "password_reset_expires": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat(),
             "updated_at": now
         }}
     )
@@ -2615,7 +2632,7 @@ async def resend_password_reset(request: Request, current_user: dict = Depends(g
     frontend_url = os.environ.get("FRONTEND_URL", request.headers.get("origin", "https://uniswapv4.com")).strip().rstrip("/")
     subject, html_body = get_email_service().get_kyc_approved_email(
         user_name=f"{user['first_name']} {user['last_name']}",
-        reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+        reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
         lang=user.get("preferred_language", "en")
     )
     
@@ -3079,7 +3096,7 @@ async def admin_update_user(user_id: str, updates: UserUpdate, request: Request,
             reset_token = updated_user_for_email["password_reset_token"]
             subject, html_body = email_svc.get_password_reset_email(
                 user_name=user_name,
-                reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+                reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
                 lang=lang
             )
             await email_svc.send_email(new_email, subject, html_body)
@@ -3668,10 +3685,6 @@ async def admin_review_kyc(
     # If approved and has unusual_activity freeze, send password reset email
     if review.status == "approved":
         if user["freeze_type"] in [FreezeType.UNUSUAL_ACTIVITY, FreezeType.BOTH]:
-            # Generate password reset token
-            reset_token = generate_reset_token()
-            user_update["password_reset_token"] = reset_token
-            user_update["password_reset_expires"] = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
             user_update["password_reset_required"] = True
             
             # If freeze was ONLY unusual_activity, unfreeze
@@ -3687,7 +3700,7 @@ async def admin_review_kyc(
             frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
             subject, html_body = get_email_service().get_kyc_approved_email(
                 user_name=f"{user['first_name']} {user['last_name']}",
-                reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+                reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
                 lang=user.get("preferred_language", "en")
             )
             
@@ -3816,14 +3829,13 @@ async def admin_send_email(
             {"id": user_id},
             {
                 "$set": {
-                    "password_reset_token": reset_token,
                     "password_reset_expires": (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
                 }
             }
         )
         subject, html_body = get_email_service().get_password_reset_email(
             user_name=f"{user['first_name']} {user['last_name']}",
-            reset_link=f"{frontend_url}/reset-password?token={reset_token}",
+            reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
             lang=email_lang
         )
     elif email_type == "reactivation":
