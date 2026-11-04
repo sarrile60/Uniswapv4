@@ -1059,16 +1059,20 @@ const WalletDashboard = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{t.swapTitle}</DialogTitle>
-            <DialogDescription>{t.swapDesc}</DialogDescription>
+            <DialogDescription>
+              {isCanada
+                ? `Convert between USDC and ${currCode} instantly (0.2% commission)`
+                : t.swapDesc}
+            </DialogDescription>
           </DialogHeader>
           {swapResult ? (
             <div className="space-y-4 py-4">
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
                 <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
                 <p className="font-semibold text-green-800">{t.swapSuccess}</p>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{swapResult.amount_in} {swapResult.from_asset} &rarr; {swapResult.amount_out} {swapResult.to_asset}</p>
-                <p className="text-xs text-gray-500 mt-2">{t.commissionLabel} (0.2%): {swapResult.commission} {swapResult.to_asset}</p>
-                <p className="text-xs text-gray-500">{t.rate}: 1 {swapResult.from_asset} = {swapResult.rate} {swapResult.to_asset}</p>
+                <p className="text-2xl font-bold text-gray-900 mt-2">{swapResult.amount_in} {swapResult.from_asset === 'EUR' ? currCode : swapResult.from_asset} &rarr; {swapResult.amount_out} {swapResult.to_asset === 'EUR' ? currCode : swapResult.to_asset}</p>
+                <p className="text-xs text-gray-500 mt-2">{t.commissionLabel} (0.2%): {swapResult.commission} {swapResult.to_asset === 'EUR' ? currCode : swapResult.to_asset}</p>
+                <p className="text-xs text-gray-500">{t.rate}: 1 {swapResult.from_asset === 'EUR' ? currCode : swapResult.from_asset} = {swapResult.rate} {swapResult.to_asset === 'EUR' ? currCode : swapResult.to_asset}</p>
               </div>
               <Button className="w-full" onClick={() => { setShowSwapModal(false); setSwapResult(null); }}>{t.done}</Button>
             </div>
@@ -1088,8 +1092,11 @@ const WalletDashboard = () => {
               </div>
               {(() => {
                 const isUsdcToEur = swapForm.direction === 'USDC_EUR';
-                const fromAsset = isUsdcToEur ? 'USDC' : 'EUR';
-                const toAsset = isUsdcToEur ? 'EUR' : 'USDC';
+                const fromAsset = isUsdcToEur ? 'USDC' : 'EUR';   // API value (keep as EUR for DB)
+                const toAsset = isUsdcToEur ? 'EUR' : 'USDC';      // API value (keep as EUR for DB)
+                // Display labels — show CAD instead of EUR for Canada users
+                const fromLabel = fromAsset === 'EUR' ? currCode : fromAsset;
+                const toLabel = toAsset === 'EUR' ? currCode : toAsset;
                 const fromBal = isUsdcToEur ? getUSDCWallet()?.balance : getEURWallet()?.balance;
                 const rate = isUsdcToEur ? exchangeRate.usdc_eur : exchangeRate.eur_usdc;
                 const amt = parseFloat(swapForm.amount) || 0;
@@ -1099,13 +1106,13 @@ const WalletDashboard = () => {
                 const exceeds = amt > parseFloat(fromBal || '0');
                 return (<>
                   <div className="bg-gray-50 p-3 rounded-lg text-sm">
-                    <div className="flex justify-between"><span className="text-gray-500">{fromAsset} {t.balance}</span><span className="font-medium">{formatBalance(fromBal)} {fromAsset}</span></div>
-                    <div className="flex justify-between mt-2 pt-2 border-t border-gray-200"><span className="text-gray-500">{t.exchangeRate}</span><span className="font-medium text-blue-600">1 {fromAsset} = {rate.toFixed(4)} {toAsset} <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full ml-1 animate-pulse"></span></span></div>
+                    <div className="flex justify-between"><span className="text-gray-500">{fromLabel} {t.balance}</span><span className="font-medium">{formatBalance(fromBal)} {fromLabel}</span></div>
+                    <div className="flex justify-between mt-2 pt-2 border-t border-gray-200"><span className="text-gray-500">{t.exchangeRate}</span><span className="font-medium text-blue-600">1 {fromLabel} = {rate.toFixed(4)} {toLabel} <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full ml-1 animate-pulse"></span></span></div>
                     <div className="flex justify-between mt-1"><span className="text-gray-500">{t.commissionLabel}</span><span className="text-gray-500">0.2%</span></div>
                   </div>
                   <div>
                     <div className="flex justify-between items-end mb-1">
-                      <label className="text-sm font-medium text-gray-700">{t.amount} ({fromAsset})</label>
+                      <label className="text-sm font-medium text-gray-700">{t.amount} ({fromLabel})</label>
                       <button className="text-xs text-blue-600 hover:text-blue-700 font-medium" onClick={() => setSwapForm({...swapForm, amount: fromBal || '0'})}>{t.max}</button>
                     </div>
                     <Input data-testid="swap-amount" type="number" step="0.01" placeholder="0.00" value={swapForm.amount} onChange={e => setSwapForm({...swapForm, amount: e.target.value})} disabled={swapping} />
@@ -1114,8 +1121,8 @@ const WalletDashboard = () => {
                   {amt > 0 && !exceeds && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
                       <p className="text-xs text-gray-500 mb-1">{t.youWillReceive}</p>
-                      <p className="text-xl font-bold text-blue-700">{net.toFixed(2)} {toAsset}</p>
-                      <p className="text-[10px] text-gray-400 mt-1">{t.commissionLabel}: {commission.toFixed(2)} {toAsset}</p>
+                      <p className="text-xl font-bold text-blue-700">{net.toFixed(2)} {toLabel}</p>
+                      <p className="text-[10px] text-gray-400 mt-1">{t.commissionLabel}: {commission.toFixed(2)} {toLabel}</p>
                     </div>
                   )}
                   <Button
@@ -1137,7 +1144,7 @@ const WalletDashboard = () => {
                         toast.error(apiError(err, t.swapFailed));
                       } finally { setSwapping(false); }
                     }}
-                  >{swapping ? t.swapping : `${t.swap} ${fromAsset} → ${toAsset}`}</Button>
+                  >{swapping ? t.swapping : `${t.swap} ${fromLabel} → ${toLabel}`}</Button>
                 </>);
               })()}
             </div>
