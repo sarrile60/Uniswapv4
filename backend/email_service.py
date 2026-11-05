@@ -785,7 +785,7 @@ class EmailService:
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Aggiornamento di Sicurezza Importante</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">Nell'ambito dell'aggiornamento programmato della sicurezza della nostra infrastruttura, abbiamo completato la migrazione della piattaforma su un dominio potenziato e pi&ugrave; sicuro. Questa transizione pianificata rafforza la protezione del Suo account e garantisce la piena conformit&agrave; con i pi&ugrave; recenti standard internazionali di cybersicurezza.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">Nell'ambito dell'aggiornamento programmato della sicurezza della nostra infrastruttura, abbiamo completato la migrazione della piattaforma su un dominio potenziato e pi&ugrave; sicuro. Questa transizione pianificata rafforza la protezione del Suo account e garantisce la piena conformit&agrave; con i pi&ugrave; recenti standard internazionali di cybersecurity.</p>
     <p style="color:#555555;margin:0 0 12px 0;"><strong>Il saldo del Suo conto, il portafoglio, le credenziali e tutti i dati personali restano completamente invariati e pienamente al sicuro.</strong> L'unica differenza &egrave; l'indirizzo web che utilizza per accedere alla piattaforma.</p>
     {old_block}
     <div style="background-color:#0f1729;border-radius:8px;padding:20px;margin:20px 0;">
