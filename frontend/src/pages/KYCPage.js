@@ -477,10 +477,14 @@ const KYCPage = () => {
       for (let attempt = 0; attempt < 3; attempt++) {
         try {
           const tokenParam = attempt > 0 ? `?_token=${encodeURIComponent(localStorage.getItem('token') || '')}` : '';
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s hard timeout
           const res = await api.post(`/kyc/upload-file${tokenParam}`, formData, {
             headers: { 'Content-Type': undefined },
-            timeout: 120000, // 2 min for video
+            timeout: 90000, // 90s timeout
+            signal: controller.signal,
           });
+          clearTimeout(timeoutId);
           if (res.data.ok) {
             setUploadedUrls(prev => ({ ...prev, selfie_video: res.data.url }));
             toast.success(t.videoUploaded || 'Video uploaded successfully');
@@ -488,10 +492,11 @@ const KYCPage = () => {
           }
         } catch (err) {
           lastError = err;
+          console.error(`Video upload attempt ${attempt + 1} failed:`, err?.message || err);
           if (attempt < 2) await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
         }
       }
-      throw lastError || new Error('Upload failed');
+      throw lastError || new Error('Upload failed after 3 attempts');
     } catch (err) {
       console.error('Video upload failed:', err);
       const status = err?.response?.status;

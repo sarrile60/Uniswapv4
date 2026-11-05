@@ -2337,6 +2337,7 @@ async def upload_kyc_file(
             "public_id": field,
             "overwrite": True,
             "resource_type": "auto",
+            "timeout": 120,  # 2-minute timeout for Cloudinary API
         }
         # Force jpg conversion for images only — not videos or PDFs
         filename_lower = (file.filename or "").lower()
@@ -2344,7 +2345,26 @@ async def upload_kyc_file(
         if field != "selfie_video" and not is_pdf:
             upload_opts["format"] = "jpg"
         
-        result = cloudinary.uploader.upload(contents, **upload_opts)
+        # For video files > 5MB, use chunked upload to avoid timeouts
+        is_video = field == "selfie_video" or content_type.startswith("video/")
+        if is_video and file_size > 5 * 1024 * 1024:
+            logger.info(f"KYC video upload: using upload_large (chunked) for {file_size} bytes")
+            import io
+            result = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: cloudinary.uploader.upload_large(
+                    io.BytesIO(contents),
+                    chunk_size=6_000_000,
+                    **upload_opts
+                )
+            )
+        else:
+            # Run synchronous Cloudinary upload in thread pool to avoid blocking
+            result = await asyncio.get_event_loop().run_in_executor(
+                None,
+                lambda: cloudinary.uploader.upload(contents, **upload_opts)
+            )
+        
         logger.info(f"KYC upload success: user={uid}, field={field}, url={result['secure_url']}")
         return {"ok": True, "url": result["secure_url"]}
     except HTTPException:
