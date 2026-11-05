@@ -198,7 +198,7 @@ def test_5_canada_reset() -> bool:
     print_test("Test 5: Canada DB Password Reset")
     
     # Use existing Canada admin
-    canada_admin_email = "admin@uniswapv4ca.com"
+    canada_admin_email = "canada@uniswapv4.net"
     canada_admin_password = "Admin@123456"
     
     # Test forgot-password for Canada admin

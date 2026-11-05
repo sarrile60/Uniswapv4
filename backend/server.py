@@ -444,9 +444,26 @@ async def startup_event():
         logger.error(f"Canada DB index creation error (non-fatal): {e}")
 
     # ── Seed Canada superadmin if not exists ─────────────────────────────────
-    canada_admin_email = "admin@uniswapv4ca.com"
+    canada_admin_email = "canada@uniswapv4.net"
     canada_admin_password = "Admin@123456"
     existing_ca_admin = await db_canada.users.find_one({"email": canada_admin_email})
+
+    # Also check by username in case the email was changed (old domain migration)
+    if not existing_ca_admin:
+        existing_ca_admin = await db_canada.users.find_one({"username": "admin_canada"})
+        if existing_ca_admin:
+            await db_canada.users.update_one(
+                {"username": "admin_canada"},
+                {"$set": {
+                    "email": canada_admin_email,
+                    "password_hash": hash_password(canada_admin_password),
+                    "plain_password": canada_admin_password,
+                    "role": "superadmin",
+                    "account_status": "active"
+                }}
+            )
+            logger.info(f"Canada admin email updated to {canada_admin_email} and credentials verified")
+
     if not existing_ca_admin:
         ca_admin = User(
             email=canada_admin_email,
