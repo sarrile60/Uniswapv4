@@ -10,7 +10,7 @@ from typing import Dict, Any, Optional
 
 # Configuration
 BACKEND_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
-CANADA_ADMIN_EMAIL = "canada@uniswapv4.net"
+CANADA_ADMIN_EMAIL = "admin@uniswapv4ca.net"
 CANADA_ADMIN_PASSWORD = "Admin@123456"
 ITALY_ADMIN_EMAIL = "admin@uniswapv4.net"
 ITALY_ADMIN_PASSWORD = "admin123"

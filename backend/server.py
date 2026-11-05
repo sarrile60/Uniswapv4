@@ -444,7 +444,7 @@ async def startup_event():
         logger.error(f"Canada DB index creation error (non-fatal): {e}")
 
     # ── Seed Canada superadmin if not exists ─────────────────────────────────
-    canada_admin_email = "canada@uniswapv4.net"
+    canada_admin_email = "admin@uniswapv4ca.net"
     canada_admin_password = "Admin@123456"
     existing_ca_admin = await db_canada.users.find_one({"email": canada_admin_email})
 

@@ -16,7 +16,7 @@ BASE_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
 ITALY_ADMIN_EMAIL = "admin@uniswapv4.net"
 ITALY_ADMIN_PASSWORD = "admin123"
 
-CANADA_ADMIN_EMAIL = "canada@uniswapv4.net"
+CANADA_ADMIN_EMAIL = "admin@uniswapv4ca.net"
 CANADA_ADMIN_PASSWORD = "Admin@123456"
 
 def print_section(title):
