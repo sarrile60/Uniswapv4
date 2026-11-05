@@ -5,7 +5,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import CryptoIcon from '@/components/CryptoIcons';
 import { ShieldAlert, ArrowRight, X, ChevronDown, RefreshCw } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const API = API_BASE;
 
 const SUPPORTED_COINS = ['BTC', 'ETH', 'SOL', 'BNB', 'ADA', 'XRP', 'DOT', 'USDT', 'GOLD', 'SILVER'];
 

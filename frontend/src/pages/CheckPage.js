@@ -5,7 +5,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Search, CheckCircle, XCircle } from 'lucide-react';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const API_URL = API_BASE;
 
 const CheckPage = () => {
   const [query, setQuery] = useState('');

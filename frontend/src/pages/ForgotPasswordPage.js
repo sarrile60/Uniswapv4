@@ -5,7 +5,8 @@ import { toast } from 'sonner';
 import axios from 'axios';
 import './AuthPages.css';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const BACKEND_URL = API_BASE;
 const API = `${BACKEND_URL}/api`;
 
 const ForgotPasswordPage = () => {

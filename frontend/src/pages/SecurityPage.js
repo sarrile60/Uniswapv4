@@ -5,7 +5,8 @@ import { Shield, Smartphone, Key, Lock, Copy, CheckCircle, X, Eye, EyeOff } from
 import { toast } from 'sonner';
 import './RockieWallet.css';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const BACKEND_URL = API_BASE;
 
 const SecurityPage = () => {
   const { user, api } = useAuth();

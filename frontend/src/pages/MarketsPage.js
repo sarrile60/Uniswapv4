@@ -6,7 +6,8 @@ import CryptoIcon from '@/components/CryptoIcons';
 import { Search, Star, ArrowUpDown } from 'lucide-react';
 import './RockieWallet.css';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const API = API_BASE;
 
 const CATEGORIES = {
   all: null,

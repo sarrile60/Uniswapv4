@@ -6,7 +6,7 @@
 set -e
 
 APP_DIR="/opt/uniswapv4"
-DOMAIN="uniswapv4.com"
+DOMAIN="uniswapv4.net"
 
 cd "$APP_DIR"
 

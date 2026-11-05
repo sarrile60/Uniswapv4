@@ -35,6 +35,7 @@ dist/
 # Environment files
 *.env
 *.env.*
+!frontend/.env.production
 *token.json*
 *credentials.json*
 

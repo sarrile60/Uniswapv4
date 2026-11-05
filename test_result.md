@@ -179,6 +179,18 @@ frontend:
         agent: "testing"
         comment: "Landing page loads correctly. Logo, navigation links (Features, Security, About), and CTA buttons ('Create Wallet', 'Access Wallet') all present and functional."
 
+  - task: "API URL Fallback Fix - Crypto Prices"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/config/api.js, /app/frontend/src/pages/LandingPage.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ VERIFIED: API URL fallback fix is working correctly. Comprehensive testing completed successfully. NETWORK ANALYSIS: 1) API endpoint /api/market/prices is being called correctly (8 requests made, 4 responses received) ✅ 2) All API responses return 200 status ✅ 3) API returns valid JSON with real crypto data: {\"ok\":true,\"data\":[...]} ✅ 4) Bitcoin price: USD 80,313.00 (expected ~$80,000+) ✅ 5) Ethereum price: USD 2,418.78 (expected ~$2,400+) ✅ 6) Tether price: USD 1.00 ✅ 7) BNB price: USD 716.09 ✅. CRYPTO CARDS VERIFICATION: All 4 crypto boxes display REAL prices (NOT 'USD 0.0000'). The fallback mechanism in /app/frontend/src/config/api.js correctly uses process.env.REACT_APP_BACKEND_URL (https://multitenant-vault--91znyxas.preview.emergentagent.com) and falls back to window.location.origin when needed. The landing page successfully fetches and displays live market data from CoinGecko API via the backend. Screenshot captured showing all 4 crypto cards with valid prices. The API URL fallback fix is COMPLETE and VERIFIED."
+
   - task: "Login Flow - Admin"
     implemented: true
     working: true
@@ -1206,4 +1218,6 @@ agent_communication:
     message: "✅ ADMIN LOGIN VERIFICATION COMPLETE - Tested admin login with credentials admin@uniswapv4.net / admin123 on dev environment (https://multitenant-vault--91znyxas.preview.emergentagent.com). All test steps passed: login page loads correctly, credentials accepted, no 'Invalid credentials' error, successful redirect to /admin, admin dashboard loads with all stat cards and Quick Actions, sidebar displays correct email 'admin@uniswapv4.net'. No issues found. Admin login is working perfectly."
   - agent: "testing"
     message: "✅ DOMAIN MIGRATION NOTIFICATION FEATURE TESTING COMPLETE - All 16 tests passed successfully. Feature is fully functional with all required elements (Old Domain input, New Domain input, Send To dropdown with 'All users' default and support for individual users, Email Language dropdown with Italian/English, Send button with dynamic text, warning text for 'All' selection, and confirmation dialog). No issues found. Ready for production use."
+  - agent: "testing"
+    message: "✅ API URL FALLBACK FIX TESTING COMPLETE - Comprehensive testing of landing page crypto prices and admin login after API URL fallback fix. RESULTS: 1) Crypto Prices: ✅ PASSED - All 4 crypto cards display REAL prices (Bitcoin: USD 80,313.00, Ethereum: USD 2,418.78, Tether: USD 1.00, BNB: USD 716.09). NOT showing 'USD 0.0000'. API endpoint /api/market/prices returns 200 status with valid data. Network analysis shows 8 requests made, 4 successful responses received. 2) Admin Login: ✅ PASSED - Login with admin@uniswapv4.net / admin123 successful, redirected to /admin dashboard correctly. The API URL fallback mechanism in /app/frontend/src/config/api.js is working correctly (uses REACT_APP_BACKEND_URL with fallback to window.location.origin). No issues found. Both features working as expected."
 

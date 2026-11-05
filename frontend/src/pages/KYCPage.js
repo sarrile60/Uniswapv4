@@ -11,7 +11,8 @@ import { toast } from 'sonner';
 import { ArrowLeft, Upload, Camera, CheckCircle, Clock, Loader2, Video, Square, ArrowLeftCircle, ArrowRightCircle, Eye } from 'lucide-react';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const BACKEND_URL = API_BASE;
 const API = `${BACKEND_URL}/api`;
 
 // Detect in-app browsers (WhatsApp, Instagram, Facebook, Telegram, etc.)

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const API = API_BASE;
 
 const gateText = {
   it: {

@@ -6,7 +6,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLang } from "@/i18n";
 import "./LandingPage.css";
 
-const API = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const API = API_BASE;
 
 const LandingPage = () => {
   const [darkMode, setDarkMode] = useState(() => {

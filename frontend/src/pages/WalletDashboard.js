@@ -40,7 +40,8 @@ import {
   Banknote
 } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const API = API_BASE;
 
 const WalletDashboard = () => {
   const navigate = useNavigate();

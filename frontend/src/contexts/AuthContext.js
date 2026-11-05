@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const BACKEND_URL = API_BASE;
 const API = `${BACKEND_URL}/api`;
 
 // Create axios instance with interceptors

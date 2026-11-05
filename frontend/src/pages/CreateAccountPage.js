@@ -8,7 +8,8 @@ import { Lock, UserPlus, Copy, CheckCircle, Wallet, Moon, Sun, Globe, ArrowLeft,
 import { DateInput } from '@/components/DateInput';
 import axios from 'axios';
 
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const API_URL = API_BASE;
 
 const t = {
   it: {

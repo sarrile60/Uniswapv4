@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useLang } from "@/i18n";
 import TradeModal from "@/components/TradeModal";
 
-const API = process.env.REACT_APP_BACKEND_URL;
+import API_BASE from '@/config/api';
+const API = API_BASE;
 
 /* Inline Bitcoin SVG icon — reliable, no external dependency */
 const BtcIcon = ({ size = 16 }) => (

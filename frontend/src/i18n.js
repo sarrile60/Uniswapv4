@@ -310,7 +310,7 @@ export const LangProvider = ({ children }) => {
       // Sync to backend if user is logged in
       const token = localStorage.getItem('token');
       if (token) {
-        const API = process.env.REACT_APP_BACKEND_URL;
+        const API = process.env.REACT_APP_BACKEND_URL || window.location.origin;
         fetch(`${API}/api/auth/language?lang=${next}`, {
           method: 'PUT',
           headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' }
