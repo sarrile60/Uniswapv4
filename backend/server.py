@@ -3825,6 +3825,13 @@ async def admin_send_email(
     lang: str = None
 ):
     """Manually send an email to user (admin only)"""
+    # Parse optional JSON body (used for domain_change with old/new domain)
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+
     user = await get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")

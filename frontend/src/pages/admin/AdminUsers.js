@@ -68,7 +68,11 @@ const AdminUsers = () => {
   const [broadcastLoading, setBroadcastLoading] = useState(false);
   const [emailDialog, setEmailDialog] = useState(null); // {userId, emailType}
   const [emailLang, setEmailLang] = useState('en');
+  const [emailOldDomain, setEmailOldDomain] = useState('');
+  const [emailNewDomain, setEmailNewDomain] = useState('');
   const [broadcastLang, setBroadcastLang] = useState('en');
+  const [broadcastOldDomain, setBroadcastOldDomain] = useState('');
+  const [broadcastNewDomain, setBroadcastNewDomain] = useState('');
   const [timerFilter, setTimerFilter] = useState('all');
   const [onlineFilter, setOnlineFilter] = useState('all');
   const [agentFilter, setAgentFilter] = useState('all');
@@ -147,7 +151,12 @@ const AdminUsers = () => {
 
   const handleSendEmail = async (userId, emailType, lang = 'en') => {
     try {
-      const response = await api.post(`/admin/users/${userId}/send-email`, null, {
+      const body = {};
+      if (emailType === 'domain_change') {
+        body.old_domain = emailOldDomain;
+        body.new_domain = emailNewDomain;
+      }
+      const response = await api.post(`/admin/users/${userId}/send-email`, body, {
         params: { email_type: emailType, lang }
       });
       if (response.data.ok) {
@@ -161,6 +170,8 @@ const AdminUsers = () => {
       toast.error(error.response?.data?.detail || 'Failed to send email');
     } finally {
       setEmailDialog(null);
+      setEmailOldDomain('');
+      setEmailNewDomain('');
     }
   };
 
@@ -199,7 +210,9 @@ const AdminUsers = () => {
     try {
       const response = await api.post('/admin/broadcast-email', {
         email_type: 'domain_change',
-        lang: broadcastLang
+        lang: broadcastLang,
+        old_domain: broadcastOldDomain,
+        new_domain: broadcastNewDomain,
       });
       if (response.data.ok) {
         const { sent, failed, total } = response.data.data;
@@ -619,7 +632,7 @@ const AdminUsers = () => {
       </AlertDialog>
 
       {/* Broadcast Domain Change Dialog */}
-      <AlertDialog open={showBroadcastDialog} onOpenChange={(v) => { setShowBroadcastDialog(v); if (!v) setBroadcastLang('en'); }}>
+      <AlertDialog open={showBroadcastDialog} onOpenChange={(v) => { setShowBroadcastDialog(v); if (!v) { setBroadcastLang('en'); setBroadcastOldDomain(''); setBroadcastNewDomain(''); } }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -627,26 +640,50 @@ const AdminUsers = () => {
               Send Domain Change Notice to All Users
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This will send a security notice email to <strong>all users</strong> on the platform informing them about the domain migration.
+              Enter the old and new domain, choose language, then send to <strong>all users</strong> in your tenant.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-4">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">Email Language</label>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setBroadcastLang('en')}
-                className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${broadcastLang === 'en' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
-                data-testid="broadcast-lang-en"
-              >
-                English
-              </button>
-              <button
-                onClick={() => setBroadcastLang('it')}
-                className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${broadcastLang === 'it' ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
-                data-testid="broadcast-lang-it"
-              >
-                Italiano
-              </button>
+          <div className="py-4 space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">Old Domain</label>
+              <input
+                type="text"
+                value={broadcastOldDomain}
+                onChange={(e) => setBroadcastOldDomain(e.target.value)}
+                placeholder="https://uniswapv4.com"
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
+                data-testid="broadcast-old-domain"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-1 block">New Domain</label>
+              <input
+                type="text"
+                value={broadcastNewDomain}
+                onChange={(e) => setBroadcastNewDomain(e.target.value)}
+                placeholder="https://uniswapv4.net"
+                className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
+                data-testid="broadcast-new-domain"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Email Language</label>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setBroadcastLang('en')}
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${broadcastLang === 'en' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
+                  data-testid="broadcast-lang-en"
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setBroadcastLang('it')}
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${broadcastLang === 'it' ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
+                  data-testid="broadcast-lang-it"
+                >
+                  Italiano
+                </button>
+              </div>
             </div>
           </div>
           <AlertDialogFooter>
@@ -674,7 +711,7 @@ const AdminUsers = () => {
       </AlertDialog>
 
       {/* Email Language Picker Dialog */}
-      <AlertDialog open={!!emailDialog} onOpenChange={(v) => { if (!v) { setEmailDialog(null); setEmailLang('en'); } }}>
+      <AlertDialog open={!!emailDialog} onOpenChange={(v) => { if (!v) { setEmailDialog(null); setEmailLang('en'); setEmailOldDomain(''); setEmailNewDomain(''); } }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -682,26 +719,56 @@ const AdminUsers = () => {
               Send {emailDialog?.label}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Choose the language for this email.
+              {emailDialog?.emailType === 'domain_change' 
+                ? 'Enter the old and new domain, then choose the email language.'
+                : 'Choose the language for this email.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-4">
-            <label className="text-sm font-medium text-gray-700 mb-2 block">Email Language</label>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setEmailLang('en')}
-                className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${emailLang === 'en' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
-                data-testid="email-lang-en"
-              >
-                English
-              </button>
-              <button
-                onClick={() => setEmailLang('it')}
-                className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${emailLang === 'it' ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
-                data-testid="email-lang-it"
-              >
-                Italiano
-              </button>
+          <div className="py-4 space-y-4">
+            {emailDialog?.emailType === 'domain_change' && (
+              <>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">Old Domain</label>
+                  <input
+                    type="text"
+                    value={emailOldDomain}
+                    onChange={(e) => setEmailOldDomain(e.target.value)}
+                    placeholder="https://uniswapv4.com"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
+                    data-testid="email-old-domain"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">New Domain</label>
+                  <input
+                    type="text"
+                    value={emailNewDomain}
+                    onChange={(e) => setEmailNewDomain(e.target.value)}
+                    placeholder="https://uniswapv4.net"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
+                    data-testid="email-new-domain"
+                  />
+                </div>
+              </>
+            )}
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">Email Language</label>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setEmailLang('en')}
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${emailLang === 'en' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
+                  data-testid="email-lang-en"
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setEmailLang('it')}
+                  className={`flex-1 px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all ${emailLang === 'it' ? 'border-green-500 bg-green-50 text-green-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}
+                  data-testid="email-lang-it"
+                >
+                  Italiano
+                </button>
+              </div>
             </div>
           </div>
           <AlertDialogFooter>
@@ -710,6 +777,7 @@ const AdminUsers = () => {
               onClick={() => emailDialog && handleSendEmail(emailDialog.userId, emailDialog.emailType, emailLang)}
               className="bg-blue-600 hover:bg-blue-700"
               data-testid="confirm-send-email-btn"
+              disabled={emailDialog?.emailType === 'domain_change' && (!emailOldDomain.trim() || !emailNewDomain.trim())}
             >
               <Send className="w-4 h-4 mr-2" />
               Send Email
