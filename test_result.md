@@ -190,6 +190,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "Admin login successful. Logged in with admin@blockchain.com / admin123, successfully redirected to /admin dashboard. No error messages displayed."
+      - working: true
+        agent: "testing"
+        comment: "✅ RE-VERIFIED: Admin login with admin@uniswapv4.net / admin123 works perfectly on dev environment (https://multitenant-vault--91znyxas.preview.emergentagent.com). COMPREHENSIVE TEST RESULTS: 1) Login page loaded correctly with title 'Log In to Uniswap V4' ✅ 2) Email field accepted admin@uniswapv4.net ✅ 3) Password field accepted admin123 ✅ 4) Login button clicked successfully ✅ 5) NO 'Invalid credentials' error displayed ✅ 6) Successfully redirected to /admin dashboard ✅ 7) Admin panel loaded correctly with all stat cards: Online Now: 0, Total Users: 2, Registered Today: 0, Active Users: 1, Frozen Accounts: 1, Pending KYC: 0, Total Transactions: 16, Total USDC Balance: €289523.39, Total EUR Balance: €4954.78, Total Unpaid Fees: €5252.00, Total Paid Fees: €99.52, Fees Paid Today: €0.00 ✅ 8) Quick Actions section visible with all 4 buttons (Create User, Review KYC, Manage Transactions, System Settings) ✅ 9) Sidebar correctly displays 'System Administrator' with email 'admin@uniswapv4.net' ✅ 10) No error toasts visible ✅. Screenshot captured showing full admin dashboard in dark mode. The admin login flow is working flawlessly with the specified credentials."
 
   - task: "Admin Dashboard"
     implemented: true
@@ -1199,6 +1202,8 @@ agent_communication:
     message: "Implemented currency symbol fix for Canada admin. All admin panel pages (Dashboard, Users, Transactions, EditUser) now detect tenant via adminUser?.tenant === 'canada' and display $ for Canada, € for Italy. Dashboard card title changed from 'Total EUR Balance' to 'Total CAD Balance' for Canada admin. Ready for testing."
   - agent: "testing"
     message: "✅ CURRENCY SYMBOL FIX VERIFIED - ALL TESTS PASSED. Canada admin correctly shows $ symbols everywhere (Dashboard, Users, Transactions). 'Total CAD Balance' card title confirmed. Italy admin regression test passed - still shows € symbols correctly with 'Total EUR Balance' title. No issues found. Implementation is working as expected."
+  - agent: "testing"
+    message: "✅ ADMIN LOGIN VERIFICATION COMPLETE - Tested admin login with credentials admin@uniswapv4.net / admin123 on dev environment (https://multitenant-vault--91znyxas.preview.emergentagent.com). All test steps passed: login page loads correctly, credentials accepted, no 'Invalid credentials' error, successful redirect to /admin, admin dashboard loads with all stat cards and Quick Actions, sidebar displays correct email 'admin@uniswapv4.net'. No issues found. Admin login is working perfectly."
   - agent: "testing"
     message: "✅ DOMAIN MIGRATION NOTIFICATION FEATURE TESTING COMPLETE - All 16 tests passed successfully. Feature is fully functional with all required elements (Old Domain input, New Domain input, Send To dropdown with 'All users' default and support for individual users, Email Language dropdown with Italian/English, Send button with dynamic text, warning text for 'All' selection, and confirmation dialog). No issues found. Ready for production use."
 

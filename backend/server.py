@@ -448,12 +448,15 @@ async def startup_event():
     canada_admin_password = "Admin@123456"
     existing_ca_admin = await db_canada.users.find_one({"email": canada_admin_email})
 
-    # Also check by username in case the email was changed (old domain migration)
+    # Also check by old .com email or username (domain migration)
     if not existing_ca_admin:
-        existing_ca_admin = await db_canada.users.find_one({"username": "admin_canada"})
+        existing_ca_admin = await db_canada.users.find_one({"email": "admin@uniswapv4ca.com"})
+        if not existing_ca_admin:
+            existing_ca_admin = await db_canada.users.find_one({"username": "admin_canada"})
         if existing_ca_admin:
+            old_ca_email = existing_ca_admin.get("email", "unknown")
             await db_canada.users.update_one(
-                {"username": "admin_canada"},
+                {"id": existing_ca_admin["id"]},
                 {"$set": {
                     "email": canada_admin_email,
                     "password_hash": hash_password(canada_admin_password),
@@ -462,7 +465,7 @@ async def startup_event():
                     "account_status": "active"
                 }}
             )
-            logger.info(f"Canada admin email updated to {canada_admin_email} and credentials verified")
+            logger.info(f"Canada admin email migrated from {old_ca_email} to {canada_admin_email} and credentials verified")
 
     if not existing_ca_admin:
         ca_admin = User(
@@ -503,13 +506,17 @@ async def startup_event():
     admin_email = "admin@uniswapv4.net"
     existing_admin = await db_main.users.find_one({"email": admin_email})
     
-    # Also check for admin by username (in case email was changed)
+    # Also check for admin by username or old email (domain migration)
     if not existing_admin:
-        existing_admin = await db_main.users.find_one({"username": "admin"})
+        # Try old .com email first (production migration path)
+        existing_admin = await db_main.users.find_one({"email": "admin@uniswapv4.com"})
+        if not existing_admin:
+            existing_admin = await db_main.users.find_one({"username": "admin"})
         if existing_admin:
+            old_email = existing_admin.get("email", "unknown")
             # Update existing admin's email to the new domain
             await db_main.users.update_one(
-                {"username": "admin"},
+                {"id": existing_admin["id"]},
                 {"$set": {
                     "email": admin_email,
                     "password_hash": hash_password("admin123"),
@@ -518,7 +525,7 @@ async def startup_event():
                     "account_status": "active"
                 }}
             )
-            logger.info(f"Admin email updated to {admin_email} and credentials verified")
+            logger.info(f"Admin email migrated from {old_email} to {admin_email} and credentials verified")
     
     if not existing_admin:
         admin_user = User(
