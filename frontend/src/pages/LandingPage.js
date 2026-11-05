@@ -621,7 +621,7 @@ const LandingPage = () => {
                   </Link>
                   <h6>{t.land_footerTalk}</h6>
                   <ul className="list">
-                    <li><p>info@uniswapv4.com</p></li>
+                    <li><p>info@uniswapv4.net</p></li>
                     <li><p>{t.land_footerSecure}</p></li>
                   </ul>
                 </div>
@@ -650,7 +650,7 @@ const LandingPage = () => {
                 <div className="widget-link s3">
                   <h6 className="title">{t.land_support}</h6>
                   <ul>
-                    <li><a href="mailto:info@uniswapv4.com">{t.land_helpCenter}</a></li>
+                    <li><a href="mailto:info@uniswapv4.net">{t.land_helpCenter}</a></li>
                     <li><Link to="/about">{t.land_about}</Link></li>
                     <li><Link to="/privacy">{t.land_privacyPolicy}</Link></li>
                   </ul>
@@ -662,7 +662,7 @@ const LandingPage = () => {
                   <ul>
                     <li><Link to="/about">{t.land_about}</Link></li>
                     <li><Link to="/terms">{t.land_termsOfService}</Link></li>
-                    <li><a href="mailto:info@uniswapv4.com">{t.land_contact}</a></li>
+                    <li><a href="mailto:info@uniswapv4.net">{t.land_contact}</a></li>
                   </ul>
                 </div>
               </div>

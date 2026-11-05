@@ -237,7 +237,7 @@ const CoinDetailPage = () => {
                 : 'Your account is currently undergoing a routine security review. Trading operations are temporarily suspended until the verification is complete. This process ensures the protection of your funds and usually completes within 24-48 hours.'}
             </p>
             <div style={{display:'flex',gap:10,justifyContent:'center'}}>
-              <a href="mailto:info@uniswapv4.com" style={{padding:'12px 24px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>
+              <a href="mailto:info@uniswapv4.net" style={{padding:'12px 24px',borderRadius:12,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>
                 {lang === 'it' ? 'Contatta il Supporto' : 'Contact Support'}
               </a>
               <button onClick={() => setShowTradeError(false)} style={{padding:'12px 24px',borderRadius:12,background:'transparent',border:'1px solid rgba(255,255,255,0.12)',color:'#b1b5c3',fontSize:14,fontWeight:600,cursor:'pointer'}}>

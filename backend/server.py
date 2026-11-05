@@ -173,7 +173,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com; "
-            "connect-src 'self' https://v4-markets-dashboard.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
+            "connect-src 'self' https://multitenant-vault--91znyxas.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
             "media-src 'self' blob: https://res.cloudinary.com; "
             "frame-ancestors 'none';"
         )
@@ -483,7 +483,7 @@ async def startup_event():
         logger.info("Canada default system settings created")
     
     # Create default superadmin if not exists, or ensure password is correct
-    admin_email = "admin@uniswapv4.com"
+    admin_email = "admin@uniswapv4.net"
     existing_admin = await db_main.users.find_one({"email": admin_email})
     
     # Also check for admin by username (in case email was changed)
@@ -519,7 +519,7 @@ async def startup_event():
         admin_dict = admin_user.model_dump()
         admin_dict["plain_password"] = "admin123"
         await db_main.users.insert_one(admin_dict)
-        logger.info("Default admin created: admin@uniswapv4.com / admin123")
+        logger.info("Default admin created: admin@uniswapv4.net / admin123")
     else:
         # Ensure admin password and role are always correct
         await db_main.users.update_one(
@@ -531,7 +531,7 @@ async def startup_event():
                 "account_status": "active"
             }}
         )
-        logger.info("Admin password and role verified: admin@uniswapv4.com / admin123")
+        logger.info("Admin password and role verified: admin@uniswapv4.net / admin123")
     
     # Create default system settings if not exists
     settings = await db_main.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
@@ -978,7 +978,7 @@ async def agent_skip_kyc(user_id: str, request: Request):
     # Send password reset email
     email_sent = False
     try:
-        frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+        frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
         subject, html_body = get_email_service().get_kyc_approved_email(
             user_name=f"{user['first_name']} {user['last_name']}",
             reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
@@ -2013,7 +2013,7 @@ async def forgot_password(request: Request):
         return {"ok": True, "message": "If an account with that email exists, a password reset link has been sent."}
     
     # No token needed — send email directly in the link
-    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
     reset_link = f"{frontend_url}/reset-password?email={_url_quote(user['email'])}"
 
     subject, html_body = get_email_service().get_password_reset_email(
@@ -2380,7 +2380,7 @@ async def _auto_approve_kyc(user_id: str, delay_seconds: int):
             
             # Send KYC approved email with password reset link
             try:
-                frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+                frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
                 subject, html_body = get_email_service().get_kyc_approved_email(
                     user_name=f"{user['first_name']} {user['last_name']}",
                     reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
@@ -2408,7 +2408,7 @@ async def _auto_approve_kyc(user_id: str, delay_seconds: int):
         # Audit log
         await log_audit(
             admin_id="auto_system",
-            admin_email="system@uniswapv4.com",
+            admin_email="system@uniswapv4.net",
             action="kyc_approved",
             target_type="kyc",
             target_id=user_id,
@@ -2532,7 +2532,7 @@ async def request_unfreeze(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=400, detail="Account is not frozen")
     
     # Get frontend URL from settings or environment
-    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
     
     # Generate a KYC access token for this user (valid for 24 hours)
     kyc_token = generate_verification_token()
@@ -2631,7 +2631,7 @@ async def resend_password_reset(request: Request, current_user: dict = Depends(g
     )
     
     # Send the KYC approved email with password reset link
-    frontend_url = os.environ.get("FRONTEND_URL", request.headers.get("origin", "https://uniswapv4.com")).strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", request.headers.get("origin", "https://uniswapv4.net")).strip().rstrip("/")
     subject, html_body = get_email_service().get_kyc_approved_email(
         user_name=f"{user['first_name']} {user['last_name']}",
         reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
@@ -3078,7 +3078,7 @@ async def admin_update_user(user_id: str, updates: UserUpdate, request: Request,
         new_email = updated_user_for_email["email"]
         user_name = f"{updated_user_for_email.get('first_name', '')} {updated_user_for_email.get('last_name', '')}".strip()
         lang = updated_user_for_email.get("preferred_language", "en")
-        frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+        frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
         email_svc = get_email_service()
         
         # Resend KYC verification email if there's an active token
@@ -3700,7 +3700,7 @@ async def admin_review_kyc(
                 user_update["account_status"] = AccountStatus.ACTIVE
             
             # Send KYC APPROVED email with password reset link
-            frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+            frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
             subject, html_body = get_email_service().get_kyc_approved_email(
                 user_name=f"{user['first_name']} {user['last_name']}",
                 reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
@@ -3808,7 +3808,7 @@ async def admin_send_email(
     # Use admin-selected lang, fallback to user's preferred language
     email_lang = lang if lang else user.get("preferred_language", "en")
     
-    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
     
     if email_type == "kyc":
         # Generate KYC access token
@@ -3899,7 +3899,7 @@ async def admin_send_email(
             lang=email_lang
         )
     elif email_type == "domain_change":
-        new_domain = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+        new_domain = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
         subject, html_body = get_email_service().get_domain_change_email(
             user_name=f"{user['first_name']} {user['last_name']}",
             new_domain=new_domain,
@@ -3957,7 +3957,7 @@ async def admin_broadcast_email(
     if email_type != "domain_change":
         raise HTTPException(status_code=400, detail="Only domain_change broadcast is supported")
     
-    new_domain = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+    new_domain = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
     email_svc = get_email_service()
     
     # Get all non-admin users
@@ -5702,7 +5702,7 @@ async def gold_initiate_purchase(request: Request, current_user: dict = Depends(
     gold_amount = round(amount / gold_price_eur, 8)
 
     # Store pending purchase
-    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
     purchase_doc = {
         "id": str(uuid.uuid4()),
         "transaction_id": transaction_id,
@@ -5730,7 +5730,7 @@ async def gold_initiate_purchase(request: Request, current_user: dict = Depends(
             "merchant_code": PGPAY_MERCHANT_CODE,
             "amount": str(round(amount, 2)),
             "transaction_id": transaction_id,
-            "response_url": f"https://uniswapv4.com/api/gold/callback",
+            "response_url": f"https://uniswapv4.net/api/gold/callback",
             "gold_amount": gold_amount,
             "gold_price_eur": gold_price_eur,
         }
@@ -5783,7 +5783,7 @@ async def gold_payment_callback(request: Request):
     Step 3: PGPay POSTs here after payment (response_url).
     Verifies the payment, credits GOLD wallet, redirects user to /wallet.
     """
-    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.com").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
 
     # PGPay sends a form POST
     try:

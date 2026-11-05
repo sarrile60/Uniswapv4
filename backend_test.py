@@ -10,8 +10,8 @@ from typing import Dict, Any, Optional
 from urllib.parse import quote as url_quote
 
 # Configuration
-BACKEND_URL = "https://v4-markets-dashboard.preview.emergentagent.com/api"
-ITALY_ADMIN_EMAIL = "admin@uniswapv4.com"
+BACKEND_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
+ITALY_ADMIN_EMAIL = "admin@uniswapv4.net"
 ITALY_ADMIN_PASSWORD = "admin123"
 
 class Colors:

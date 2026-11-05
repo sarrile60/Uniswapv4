@@ -18,20 +18,20 @@ MongoDB (local, port 27017, database: uniswapv4-prod)
 
 | Item | Value |
 |------|-------|
-| Domain | uniswapv4.com |
+| Domain | uniswapv4.net |
 | VPS IP | 179.198.211.231 |
 | VPS directory | /opt/uniswapv4 |
 | Database | uniswapv4-prod |
-| Admin login | admin@uniswapv4.com / admin123 |
+| Admin login | admin@uniswapv4.net / admin123 |
 | PM2 process | uniswapv4-backend |
-| Sender email | info@uniswapv4.com |
+| Sender email | info@uniswapv4.net |
 | GitHub repo | https://github.com/sarrile60/Uniswapv4 |
 
 ---
 
 ## Step 1: DNS Setup (Do This First)
 
-Go to your domain registrar (where you bought uniswapv4.com) and add these DNS records:
+Go to your domain registrar (where you bought uniswapv4.net) and add these DNS records:
 
 ### A Records (Required)
 | Type | Name | Value | TTL |
@@ -41,7 +41,7 @@ Go to your domain registrar (where you bought uniswapv4.com) and add these DNS r
 
 ### Email DNS Records (Required for Resend emails to work)
 
-Log into your Resend dashboard at https://resend.com/domains and add the domain `uniswapv4.com`. Resend will give you specific DNS records to add. They typically look like:
+Log into your Resend dashboard at https://resend.com/domains and add the domain `uniswapv4.net`. Resend will give you specific DNS records to add. They typically look like:
 
 | Type | Name | Value | Purpose |
 |------|------|-------|---------|
@@ -50,13 +50,13 @@ Log into your Resend dashboard at https://resend.com/domains and add the domain 
 | TXT | `_dmarc` | `v=DMARC1; p=none;` | DMARC — email policy |
 | MX | @ | `feedback-smtp.us-east-1.amazonses.com` (priority 10) | MX — for bounce handling |
 
-> **Important:** The exact DKIM value comes from your Resend dashboard. Go to https://resend.com/domains → Add Domain → `uniswapv4.com` → it will show you the exact records to add.
+> **Important:** The exact DKIM value comes from your Resend dashboard. Go to https://resend.com/domains → Add Domain → `uniswapv4.net` → it will show you the exact records to add.
 
 Wait 5-30 minutes for DNS propagation before proceeding.
 
 You can verify propagation with:
 ```bash
-dig uniswapv4.com +short
+dig uniswapv4.net +short
 # Should return: 179.198.211.231
 ```
 
@@ -156,7 +156,7 @@ chmod +x /opt/uniswapv4/deployment/deploy.sh
 This will:
 1. Create Python virtual environment & install backend dependencies
 2. Install frontend dependencies with Yarn
-3. Build the React frontend with `REACT_APP_BACKEND_URL=https://uniswapv4.com`
+3. Build the React frontend with `REACT_APP_BACKEND_URL=https://uniswapv4.net`
 4. Start the FastAPI backend via PM2
 
 ---
@@ -172,7 +172,7 @@ chmod +x /opt/uniswapv4/deployment/setup-nginx.sh
 sudo /opt/uniswapv4/deployment/setup-nginx.sh
 
 # Get SSL certificate (domain MUST already point to this VPS!)
-sudo certbot --nginx -d uniswapv4.com -d www.uniswapv4.com
+sudo certbot --nginx -d uniswapv4.net -d www.uniswapv4.net
 ```
 
 Certbot will:
@@ -184,9 +184,9 @@ Certbot will:
 
 ## Step 7: Verify
 
-1. Visit `https://uniswapv4.com` — you should see the Access Gate
+1. Visit `https://uniswapv4.net` — you should see the Access Gate
 2. Enter code: `DMTL610Q` (or whatever you set in `.env`)
-3. Login with admin: `admin@uniswapv4.com` / `admin123`
+3. Login with admin: `admin@uniswapv4.net` / `admin123`
 4. **Change the admin password immediately after first login!**
 
 ---
@@ -253,7 +253,7 @@ pm2 restart uniswapv4-backend
 **SSL certificate issues:**
 ```bash
 # Make sure DNS is pointing to the VPS first, then:
-sudo certbot --nginx -d uniswapv4.com -d www.uniswapv4.com
+sudo certbot --nginx -d uniswapv4.net -d www.uniswapv4.net
 ```
 
 **Emails not sending:**
@@ -316,7 +316,7 @@ mongorestore --db uniswapv4-prod /opt/uniswapv4/backups/YYYYMMDD/uniswapv4-prod/
 After adding DNS records, verify in Resend:
 
 1. Go to https://resend.com/domains
-2. Click on `uniswapv4.com`
+2. Click on `uniswapv4.net`
 3. All records should show green checkmarks ✅
 4. If any are pending, wait a few more minutes for DNS propagation
 5. You can send a test email from the Resend dashboard to verify

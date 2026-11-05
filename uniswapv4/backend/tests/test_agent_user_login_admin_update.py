@@ -17,7 +17,7 @@ import pytest
 import requests
 from datetime import datetime, timezone
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://v4-markets-dashboard.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://multitenant-vault--91znyxas.preview.emergentagent.com").rstrip("/")
 API = f"{BASE_URL}/api"
 
 # Browser UA required (bot-detection middleware blocks curl)
@@ -29,7 +29,7 @@ HEADERS = {
 AGENT_PIN = "8971"
 AGENT_USER = "marco"
 AGENT_PASS = "agent123"
-ADMIN_EMAIL = "admin@uniswapv4.com"
+ADMIN_EMAIL = "admin@uniswapv4.net"
 ADMIN_PASS = "admin123"
 
 # Existing agent-created client per handoff notes

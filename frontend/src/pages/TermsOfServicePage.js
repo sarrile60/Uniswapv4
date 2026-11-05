@@ -62,7 +62,7 @@ const TermsOfServicePage = () => {
                 <div style={{ background: 'var(--r-bg1)', border: '1px solid var(--r-line)', borderRadius: 12, padding: 24, marginBottom: 32 }}>
                   <p style={{ color: 'var(--r-onsurface)', fontWeight: 500 }}>Uniswap V4</p>
                   <p style={{ color: 'var(--r-text)' }}>45 Queen Street, Deal, Kent, England, CT14 6EY</p>
-                  <p style={{ color: 'var(--r-text)' }}>Email: <a href="mailto:info@uniswapv4.com" style={{ color: '#3772ff' }}>info@uniswapv4.com</a></p>
+                  <p style={{ color: 'var(--r-text)' }}>Email: <a href="mailto:info@uniswapv4.net" style={{ color: '#3772ff' }}>info@uniswapv4.net</a></p>
                 </div>
               </>
             ) : (

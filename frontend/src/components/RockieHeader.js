@@ -182,7 +182,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                             <li className="menu-item"><Link to="/about">{t.nav_about}</Link></li>
                             <li className="menu-item"><Link to="/earn">{lang === 'it' ? 'Guadagna' : 'Earn'}</Link></li>
                             <li className="menu-item"><Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link></li>
-                            <li className="menu-item"><a href="mailto:info@uniswapv4.com">{t.nav_contact}</a></li>
+                            <li className="menu-item"><a href="mailto:info@uniswapv4.net">{t.nav_contact}</a></li>
                             <li className="menu-item"><Link to="/terms">{t.nav_faq}</Link></li>
                           </ul>
                         </li>

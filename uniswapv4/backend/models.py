@@ -442,7 +442,7 @@ class SystemSettings(BaseModel):
     
     # Email settings
     resend_api_key: Optional[str] = None
-    sender_email: str = "info@uniswapv4.com"
+    sender_email: str = "info@uniswapv4.net"
     sender_name: str = "Zenthos"
     
     # Withdrawal bank details (default IBAN & SWIFT for client withdrawals)

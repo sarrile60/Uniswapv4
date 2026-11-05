@@ -80,7 +80,7 @@ A production-grade simulated crypto exchange platform branded as **Uniswap V4**,
 - Email: Resend
 
 ## Credentials
-- Admin: `admin@uniswapv4.com` / `admin123`
+- Admin: `admin@uniswapv4.net` / `admin123`
 
 ### Phase 3 — Trade Experience, Learn Articles & BTC Icon Fix
 

@@ -81,7 +81,7 @@ const PrivacyPolicyPage = () => {
             <li>Withdraw consent at any time where processing is based on consent.</li>
           </ul>
           <p className="text-gray-700 mb-6 leading-relaxed">
-            To exercise any of these rights, please contact us at <a href="mailto:info@uniswapv4.com" className="text-blue-600 hover:underline">info@uniswapv4.com</a>.
+            To exercise any of these rights, please contact us at <a href="mailto:info@uniswapv4.net" className="text-blue-600 hover:underline">info@uniswapv4.net</a>.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Cookies</h2>
@@ -101,7 +101,7 @@ const PrivacyPolicyPage = () => {
           <div className="bg-gray-50 rounded-lg p-6 mb-8">
             <p className="text-gray-800 font-medium">Zenthos</p>
             <p className="text-gray-600">45 Queen Street, Deal, Kent, England, CT14 6EY</p>
-            <p className="text-gray-600">Email: <a href="mailto:info@uniswapv4.com" className="text-blue-600 hover:underline">info@uniswapv4.com</a></p>
+            <p className="text-gray-600">Email: <a href="mailto:info@uniswapv4.net" className="text-blue-600 hover:underline">info@uniswapv4.net</a></p>
           </div>
 
           <p className="text-gray-700 mb-6 leading-relaxed">

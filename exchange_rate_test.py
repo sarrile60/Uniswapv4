@@ -9,10 +9,10 @@ import json
 from typing import Dict, Any, Optional
 
 # Configuration
-BACKEND_URL = "https://v4-markets-dashboard.preview.emergentagent.com/api"
+BACKEND_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
 CANADA_ADMIN_EMAIL = "admin@uniswapv4ca.com"
 CANADA_ADMIN_PASSWORD = "Admin@123456"
-ITALY_ADMIN_EMAIL = "admin@uniswapv4.com"
+ITALY_ADMIN_EMAIL = "admin@uniswapv4.net"
 ITALY_ADMIN_PASSWORD = "admin123"
 
 class Colors:

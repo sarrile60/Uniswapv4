@@ -10,10 +10,10 @@ import sys
 import jwt
 
 # Backend URL
-BASE_URL = "https://v4-markets-dashboard.preview.emergentagent.com/api"
+BASE_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
 
 # Admin credentials
-ITALY_ADMIN_EMAIL = "admin@uniswapv4.com"
+ITALY_ADMIN_EMAIL = "admin@uniswapv4.net"
 ITALY_ADMIN_PASSWORD = "admin123"
 
 CANADA_ADMIN_EMAIL = "admin@uniswapv4ca.com"

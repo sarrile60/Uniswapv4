@@ -6,7 +6,7 @@ Create a Canada test user with unpaid fees for testing fee resolution email endp
 import requests
 import json
 
-BACKEND_URL = "https://v4-markets-dashboard.preview.emergentagent.com/api"
+BACKEND_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
 CANADA_ADMIN_EMAIL = "admin@uniswapv4ca.com"
 CANADA_ADMIN_PASSWORD = "Admin@123456"
 

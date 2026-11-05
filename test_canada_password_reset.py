@@ -14,7 +14,7 @@ import uuid
 from passlib.context import CryptContext
 
 # Configuration
-BACKEND_URL = "https://v4-markets-dashboard.preview.emergentagent.com/api"
+BACKEND_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 DB_NAME_CANADA = 'uniswapv4-canada'
 DB_NAME_ITALY = 'blockchain_wallet'
@@ -291,10 +291,10 @@ async def test_italy_password_reset_regression():
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         }
-        # Use admin@uniswapv4.com from Italy DB
+        # Use admin@uniswapv4.net from Italy DB
         response = requests.post(
             f"{BACKEND_URL}/auth/forgot-password",
-            json={"email": "admin@uniswapv4.com"},
+            json={"email": "admin@uniswapv4.net"},
             headers=headers,
             timeout=30
         )

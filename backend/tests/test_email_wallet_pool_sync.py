@@ -13,14 +13,14 @@ import time
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://v4-markets-dashboard.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://multitenant-vault--91znyxas.preview.emergentagent.com").rstrip("/")
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
 HEADERS = {"Content-Type": "application/json", "User-Agent": UA}
 
 TEST_USER_ID = "a8f5ec06-b843-4055-a5eb-9a9483fd9591"
 ORIG_EMAIL = "agent_synced@test.com"
 
-ADMIN_EMAIL = "admin@uniswapv4.com"
+ADMIN_EMAIL = "admin@uniswapv4.net"
 ADMIN_PASSWORD = "admin123"
 AGENT_USERNAME = "marco"
 AGENT_PASSWORD = "agent123"

@@ -10,7 +10,7 @@ import os
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://v4-markets-dashboard.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://multitenant-vault--91znyxas.preview.emergentagent.com").rstrip("/")
 BROWSER_UA = (
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0 Safari/537.36"
@@ -20,7 +20,7 @@ AGENT_USERNAME = "marco"
 AGENT_PASSWORD = "agent123"
 AGENT_PIN = "8971"
 
-ADMIN_EMAIL = "admin@uniswapv4.com"
+ADMIN_EMAIL = "admin@uniswapv4.net"
 ADMIN_PASSWORD = "admin123"
 
 

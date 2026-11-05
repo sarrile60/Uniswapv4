@@ -9,7 +9,7 @@ import time
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://v4-markets-dashboard.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://multitenant-vault--91znyxas.preview.emergentagent.com").rstrip("/")
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36"}
 
 
@@ -28,7 +28,7 @@ def agent_token():
 def admin_token():
     r = requests.post(
         f"{BASE_URL}/api/auth/login",
-        json={"email": "admin@uniswapv4.com", "password": "admin123"},
+        json={"email": "admin@uniswapv4.net", "password": "admin123"},
         headers=UA,
     )
     assert r.status_code == 200, f"Admin login failed: {r.status_code} {r.text}"

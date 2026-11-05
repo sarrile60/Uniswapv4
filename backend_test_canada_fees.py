@@ -10,7 +10,7 @@ from typing import Dict, Any, Optional
 from decimal import Decimal
 
 # Configuration
-BACKEND_URL = "https://v4-markets-dashboard.preview.emergentagent.com/api"
+BACKEND_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
 CANADA_ADMIN_EMAIL = "admin@uniswapv4ca.com"
 CANADA_ADMIN_PASSWORD = "Admin@123456"
 

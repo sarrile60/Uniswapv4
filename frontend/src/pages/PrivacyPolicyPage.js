@@ -11,7 +11,7 @@ const content = {
     { h: '5. Data Sharing', p: 'We may share with: Service Providers (hosting, email, identity verification); Regulatory Authorities (where required by law); Professional Advisors (lawyers, auditors). We do not sell your personal data.' },
     { h: '6. Data Retention', p: 'We retain data only as long as necessary for the purposes collected, including legal, regulatory, accounting, or reporting requirements.' },
     { h: '7. Data Security', p: 'We implement appropriate technical and organisational measures to protect your personal data against unauthorised access, alteration, disclosure, or destruction.' },
-    { h: '8. Your Rights', p: 'You have the right to: access your data; request correction; request erasure; object to or restrict processing; request portability; withdraw consent. Contact info@uniswapv4.com.' },
+    { h: '8. Your Rights', p: 'You have the right to: access your data; request correction; request erasure; object to or restrict processing; request portability; withdraw consent. Contact info@uniswapv4.net.' },
     { h: '9. Cookies', p: 'We use essential cookies for session management and authentication. No third-party tracking or advertising cookies.' },
     { h: '10. Changes', p: 'We may update this policy from time to time. Material changes will be posted on this page.' },
     { h: '11. Contact Us', p: 'If you have any questions, contact us at:' },
@@ -24,7 +24,7 @@ const content = {
     { h: '5. Condivisione Dati', p: 'Possiamo condividere con: Fornitori di Servizi (hosting, email, verifica identit\u00e0); Autorit\u00e0 (ove richiesto dalla legge); Consulenti (avvocati, revisori). Non vendiamo i tuoi dati.' },
     { h: '6. Conservazione', p: 'Conserviamo i dati solo per il tempo necessario alle finalit\u00e0 per cui sono stati raccolti, compresi obblighi legali e contabili.' },
     { h: '7. Sicurezza', p: 'Implementiamo misure tecniche e organizzative appropriate per proteggere i tuoi dati personali.' },
-    { h: '8. I Tuoi Diritti', p: 'Hai diritto di: accedere ai dati; richiedere rettifica; richiedere cancellazione; opporti al trattamento; richiedere portabilit\u00e0; revocare consenso. Contattaci a info@uniswapv4.com.' },
+    { h: '8. I Tuoi Diritti', p: 'Hai diritto di: accedere ai dati; richiedere rettifica; richiedere cancellazione; opporti al trattamento; richiedere portabilit\u00e0; revocare consenso. Contattaci a info@uniswapv4.net.' },
     { h: '9. Cookie', p: 'Utilizziamo cookie essenziali per sessioni e autenticazione. Nessun cookie di tracciamento o pubblicitario di terze parti.' },
     { h: '10. Modifiche', p: 'Possiamo aggiornare questa informativa. Le modifiche sostanziali verranno pubblicate su questa pagina.' },
     { h: '11. Contattaci', p: 'Se hai domande, contattaci a:' },
@@ -54,7 +54,7 @@ const PrivacyPolicyPage = () => {
                 <div style={{ background: 'var(--r-bg1)', border: '1px solid var(--r-line)', borderRadius: 12, padding: 24, marginBottom: 32 }}>
                   <p style={{ color: 'var(--r-onsurface)', fontWeight: 500 }}>Uniswap V4</p>
                   <p style={{ color: 'var(--r-text)' }}>45 Queen Street, Deal, Kent, England, CT14 6EY</p>
-                  <p style={{ color: 'var(--r-text)' }}>Email: <a href="mailto:info@uniswapv4.com" style={{ color: '#3772ff' }}>info@uniswapv4.com</a></p>
+                  <p style={{ color: 'var(--r-text)' }}>Email: <a href="mailto:info@uniswapv4.net" style={{ color: '#3772ff' }}>info@uniswapv4.net</a></p>
                 </div>
                 <p style={{ color: 'var(--r-text)', lineHeight: 1.7 }}>{m.icoNote}</p>
               </>
