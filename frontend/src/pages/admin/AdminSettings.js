@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { toast } from 'sonner';
-import { Save, Mail, Shield, Info, Landmark, Building2, Upload, CheckCircle } from 'lucide-react';
+import { Save, Mail, Shield, Info, Landmark, Building2, Upload, CheckCircle, Globe, Send, Users, User } from 'lucide-react';
 
 const AdminSettings = () => {
   const { api, user } = useAuth();
@@ -28,8 +28,20 @@ const AdminSettings = () => {
     auto_approve_kyc_minutes: 30,
   });
 
+  // Domain migration notification state
+  const [domainNotif, setDomainNotif] = useState({
+    old_domain: '',
+    new_domain: '',
+    target: 'all', // 'all' or a specific user email
+    lang: 'it',
+  });
+  const [sendingDomain, setSendingDomain] = useState(false);
+  const [usersList, setUsersList] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+
   useEffect(() => {
     loadSettings();
+    loadUsersList();
   }, []);
 
   const loadSettings = async () => {
@@ -42,6 +54,80 @@ const AdminSettings = () => {
       toast.error('Failed to load settings');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadUsersList = async () => {
+    setLoadingUsers(true);
+    try {
+      const response = await api.get('/admin/users?page=1&page_size=500');
+      if (response.data.ok) {
+        const allUsers = response.data.data.users || [];
+        // Filter to only show non-admin users (clients)
+        const clients = allUsers.filter(u => u.role === 'user');
+        setUsersList(clients);
+      }
+    } catch (error) {
+      console.error('Failed to load users for domain notification');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  const handleSendDomainNotification = async () => {
+    if (!domainNotif.old_domain.trim()) {
+      toast.error('Please enter the old domain');
+      return;
+    }
+    if (!domainNotif.new_domain.trim()) {
+      toast.error('Please enter the new domain');
+      return;
+    }
+
+    const targetLabel = domainNotif.target === 'all' 
+      ? 'ALL registered users in your tenant' 
+      : domainNotif.target;
+
+    if (!window.confirm(`Are you sure you want to send the domain migration email to ${targetLabel}?`)) {
+      return;
+    }
+
+    setSendingDomain(true);
+    try {
+      if (domainNotif.target === 'all') {
+        // Broadcast to all users in admin's tenant
+        const response = await api.post('/admin/broadcast-email', {
+          email_type: 'domain_change',
+          lang: domainNotif.lang,
+          old_domain: domainNotif.old_domain.trim(),
+          new_domain: domainNotif.new_domain.trim(),
+        });
+        if (response.data.ok) {
+          const d = response.data.data;
+          toast.success(`Domain notification sent! ${d.sent}/${d.total} emails delivered${d.failed > 0 ? `, ${d.failed} failed` : ''}`);
+        }
+      } else {
+        // Send to a single user — find user by email
+        const targetUser = usersList.find(u => u.email === domainNotif.target);
+        if (!targetUser) {
+          toast.error('Selected user not found');
+          setSendingDomain(false);
+          return;
+        }
+        const response = await api.post(`/admin/users/${targetUser.id}/send-email`, {
+          email_type: 'domain_change',
+          lang: domainNotif.lang,
+          old_domain: domainNotif.old_domain.trim(),
+          new_domain: domainNotif.new_domain.trim(),
+        });
+        if (response.data.ok) {
+          toast.success(`Domain notification sent to ${domainNotif.target}`);
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to send domain notification');
+    } finally {
+      setSendingDomain(false);
     }
   };
 
@@ -340,6 +426,101 @@ const AdminSettings = () => {
                 <p className="text-xs text-gray-500">Minimum 1 minute. KYC will be auto-approved this many minutes after submission.</p>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Domain Migration Notification */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <Globe className="w-5 h-5 mr-2" />
+              Domain Migration Notification
+            </CardTitle>
+            <CardDescription>
+              Notify users about a domain change. Emails are sent only to users in your tenant (Italy admin → Italy users, Canada admin → Canada users).
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="p-4 bg-blue-50 rounded-lg">
+              <div className="flex items-start space-x-2">
+                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-blue-700">
+                  A professional security-themed email will be sent informing clients about the infrastructure upgrade and new platform address. Their credentials remain unchanged.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Old Domain</Label>
+                <Input
+                  data-testid="domain-notif-old"
+                  value={domainNotif.old_domain}
+                  onChange={(e) => setDomainNotif(s => ({ ...s, old_domain: e.target.value }))}
+                  placeholder="https://uniswapv4.com"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>New Domain</Label>
+                <Input
+                  data-testid="domain-notif-new"
+                  value={domainNotif.new_domain}
+                  onChange={(e) => setDomainNotif(s => ({ ...s, new_domain: e.target.value }))}
+                  placeholder="https://uniswapv4.net"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Send To</Label>
+              <select
+                data-testid="domain-notif-target"
+                value={domainNotif.target}
+                onChange={(e) => setDomainNotif(s => ({ ...s, target: e.target.value }))}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="all">📧 All Registered Users (your tenant only)</option>
+                {usersList.map(u => (
+                  <option key={u.id} value={u.email}>
+                    👤 {u.first_name} {u.last_name} — {u.email}
+                  </option>
+                ))}
+              </select>
+              {domainNotif.target === 'all' && (
+                <p className="text-xs text-amber-600 font-medium">
+                  ⚠️ This will send an email to ALL registered clients in your tenant database.
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label>Email Language</Label>
+              <select
+                data-testid="domain-notif-lang"
+                value={domainNotif.lang}
+                onChange={(e) => setDomainNotif(s => ({ ...s, lang: e.target.value }))}
+                className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              >
+                <option value="it">🇮🇹 Italiano</option>
+                <option value="en">🇬🇧 English</option>
+              </select>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <Button
+                data-testid="domain-notif-send"
+                onClick={handleSendDomainNotification}
+                disabled={sendingDomain || !domainNotif.old_domain || !domainNotif.new_domain}
+                className="bg-indigo-600 hover:bg-indigo-700"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                {sendingDomain 
+                  ? 'Sending...' 
+                  : domainNotif.target === 'all' 
+                    ? 'Send to All Users' 
+                    : 'Send to Selected User'}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 

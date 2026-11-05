@@ -3916,11 +3916,13 @@ async def admin_send_email(
             lang=email_lang
         )
     elif email_type == "domain_change":
-        new_domain = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
+        new_domain = body.get("new_domain") or os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
+        old_domain = body.get("old_domain", "")
         subject, html_body = get_email_service().get_domain_change_email(
             user_name=f"{user['first_name']} {user['last_name']}",
             new_domain=new_domain,
-            lang=email_lang
+            lang=email_lang,
+            old_domain=old_domain
         )
     else:
         raise HTTPException(status_code=400, detail="Invalid email type")
@@ -3966,7 +3968,8 @@ async def admin_broadcast_email(
     request: Request,
     admin: dict = Depends(require_admin)
 ):
-    """Send an email to all users (admin only)"""
+    """Send an email to all users in the admin's tenant DB (admin only).
+    Italy admin → only Italy users. Canada admin → only Canada users."""
     body = await request.json()
     email_type = body.get("email_type", "")
     broadcast_lang = body.get("lang", "en")
@@ -3974,12 +3977,14 @@ async def admin_broadcast_email(
     if email_type != "domain_change":
         raise HTTPException(status_code=400, detail="Only domain_change broadcast is supported")
     
-    new_domain = os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
+    new_domain = body.get("new_domain") or os.environ.get("FRONTEND_URL", "https://uniswapv4.net").strip().rstrip("/")
+    old_domain = body.get("old_domain", "")
     email_svc = get_email_service()
     
-    # Get all non-admin users
+    # db is tenant-proxied: Italy admin → db_main.users, Canada admin → db_canada.users
+    # Fetch all non-admin/superadmin users from the current tenant's DB
     users_cursor = db.users.find(
-        {"role": {"$ne": "admin"}},
+        {"role": {"$nin": ["admin", "superadmin"]}},
         {"_id": 0, "id": 1, "email": 1, "first_name": 1, "last_name": 1, "preferred_language": 1}
     )
     users = await users_cursor.to_list(length=10000)
@@ -3988,8 +3993,8 @@ async def admin_broadcast_email(
     failed_count = 0
     
     for i, user in enumerate(users):
-        user_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip()
-        subject, html_body = email_svc.get_domain_change_email(user_name, new_domain, broadcast_lang)
+        user_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or "Valued Client"
+        subject, html_body = email_svc.get_domain_change_email(user_name, new_domain, broadcast_lang, old_domain)
         result = await email_svc.send_email(user["email"], subject, html_body)
         
         if result.get("success"):
@@ -4021,6 +4026,7 @@ async def admin_broadcast_email(
         if (i + 1) % 4 == 0:
             await asyncio.sleep(1.2)
     
+    tenant = admin.get("tenant", "main")
     # Audit log
     await log_audit(
         admin_id=admin["user_id"],
@@ -4028,7 +4034,11 @@ async def admin_broadcast_email(
         action="broadcast_email",
         target_type="email",
         target_id="all_users",
-        details={"email_type": email_type, "sent": sent_count, "failed": failed_count, "total": len(users)},
+        details={
+            "email_type": email_type, "sent": sent_count, "failed": failed_count,
+            "total": len(users), "tenant": tenant,
+            "old_domain": old_domain, "new_domain": new_domain
+        },
         ip_address=request.client.host if request.client else None
     )
     

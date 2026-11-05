@@ -733,57 +733,81 @@ class EmailService:
         return subject, _wrap(content, "it")
 
     # ── Domain Change Security Notice Email ─────────
-    def get_domain_change_email(self, user_name: str, new_domain: str, lang: str = "en") -> tuple:
+    def get_domain_change_email(self, user_name: str, new_domain: str, lang: str = "en", old_domain: str = "") -> tuple:
         if lang == "it":
-            return self._get_domain_change_email_it(user_name, new_domain)
+            return self._get_domain_change_email_it(user_name, new_domain, old_domain)
         
-        subject = "Platform Update — New Web Address"
+        subject = "Important Security Update — Platform Address Migration"
+        old_block = ""
+        if old_domain:
+            old_block = f"""
+    <div style="background-color:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px;margin:0 0 16px 0;">
+      <p style="color:#92400e;font-size:13px;font-weight:600;margin:0 0 4px 0;">&#9888; Previous address (no longer active):</p>
+      <p style="color:#92400e;font-size:15px;margin:0;text-decoration:line-through;">{html.escape(old_domain)}</p>
+    </div>"""
         content = f"""
-    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Platform Update</h2>
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Important Security Update</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">We are pleased to inform you that as part of our ongoing platform improvements, we have upgraded our web address. This change is part of our continued investment in providing you with the best possible experience.</p>
-    <p style="color:#555555;margin:0 0 12px 0;"><strong>Your account, settings, and all your information remain unchanged.</strong> Simply use the new address below to access the platform going forward.</p>
-    
-    <div style="background-color:#1a3a5c;border-radius:8px;padding:20px;margin:20px 0;">
-      <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 8px 0;">Our new platform address:</p>
-      <p style="color:#4fc3f7;font-size:18px;font-weight:700;margin:0;text-align:center;">{html.escape(new_domain)}</p>
+    <p style="color:#555555;margin:0 0 12px 0;">As part of our scheduled infrastructure security upgrade, we have completed the migration of our platform to an enhanced, more secure domain. This planned transition strengthens the protection of your account and ensures full compliance with the latest international cybersecurity standards.</p>
+    <p style="color:#555555;margin:0 0 12px 0;"><strong>Your account balance, portfolio, credentials, and all personal data remain completely unchanged and fully secure.</strong> The only difference is the web address you use to access the platform.</p>
+    {old_block}
+    <div style="background-color:#0f1729;border-radius:8px;padding:20px;margin:20px 0;">
+      <p style="color:#94a3b8;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px 0;">&#x1F512; New Secure Platform Address</p>
+      <p style="color:#4fc3f7;font-size:20px;font-weight:700;margin:0;text-align:center;">{html.escape(new_domain)}</p>
     </div>
 
-    <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">A few quick steps:</p>
+    <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">What you need to do:</p>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
-      <li style="margin-bottom:4px;">Save the new address above to your bookmarks</li>
-      <li style="margin-bottom:4px;">Log in with your existing credentials — nothing has changed</li>
-      <li style="margin-bottom:4px;">If you have any questions, our support team is happy to help</li>
+      <li style="margin-bottom:6px;">Update your bookmarks with the new address shown above</li>
+      <li style="margin-bottom:6px;">Log in using your existing email and password — no changes required</li>
+      <li style="margin-bottom:6px;">For your security, do not access the platform from any other address</li>
     </ol>
 
-    <p style="color:#555555;margin:0 0 12px 0;">Thank you for being a valued member of our platform. We look forward to continuing to serve you.</p>
+    <div style="background-color:#f0fdf4;border:1px solid #22c55e;border-radius:8px;padding:16px;margin:16px 0;">
+      <p style="color:#166534;font-size:13px;margin:0;">&#x2705; <strong>Your funds are safe.</strong> This migration was conducted with zero downtime and no data loss. All account balances, transaction history, and security settings have been preserved in full.</p>
+    </div>
+
+    <p style="color:#555555;margin:0 0 12px 0;">If you have any questions or concerns, please do not hesitate to contact our dedicated support team at <a href="mailto:info@uniswapv4.net" style="color:#0052ff;text-decoration:none;font-weight:600;">info@uniswapv4.net</a>.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">We appreciate your continued trust in our platform.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Team</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Security & Infrastructure Team</p>"""
         return subject, _wrap(content, "en")
 
-    def _get_domain_change_email_it(self, user_name: str, new_domain: str) -> tuple:
-        subject = "Aggiornamento Piattaforma — Nuovo Indirizzo Web"
+    def _get_domain_change_email_it(self, user_name: str, new_domain: str, old_domain: str = "") -> tuple:
+        subject = "Aggiornamento di Sicurezza Importante — Migrazione Indirizzo Piattaforma"
+        old_block = ""
+        if old_domain:
+            old_block = f"""
+    <div style="background-color:#fef3c7;border:1px solid #f59e0b;border-radius:8px;padding:16px;margin:0 0 16px 0;">
+      <p style="color:#92400e;font-size:13px;font-weight:600;margin:0 0 4px 0;">&#9888; Indirizzo precedente (non pi&ugrave; attivo):</p>
+      <p style="color:#92400e;font-size:15px;margin:0;text-decoration:line-through;">{html.escape(old_domain)}</p>
+    </div>"""
         content = f"""
-    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Aggiornamento Piattaforma</h2>
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Aggiornamento di Sicurezza Importante</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
-    <p style="color:#555555;margin:0 0 12px 0;">Siamo lieti di informarLa che, nell'ambito dei continui miglioramenti della piattaforma, abbiamo aggiornato il nostro indirizzo web. Questo cambiamento fa parte del nostro costante impegno nel fornirLe la migliore esperienza possibile.</p>
-    <p style="color:#555555;margin:0 0 12px 0;"><strong>Il Suo account, le impostazioni e tutte le Sue informazioni restano invariati.</strong> Utilizzi semplicemente il nuovo indirizzo qui sotto per accedere alla piattaforma.</p>
-    
-    <div style="background-color:#1a3a5c;border-radius:8px;padding:20px;margin:20px 0;">
-      <p style="color:#ffffff;font-size:14px;font-weight:700;margin:0 0 8px 0;">Il nostro nuovo indirizzo:</p>
-      <p style="color:#4fc3f7;font-size:18px;font-weight:700;margin:0;text-align:center;">{html.escape(new_domain)}</p>
+    <p style="color:#555555;margin:0 0 12px 0;">Nell'ambito dell'aggiornamento programmato della sicurezza della nostra infrastruttura, abbiamo completato la migrazione della piattaforma su un dominio potenziato e pi&ugrave; sicuro. Questa transizione pianificata rafforza la protezione del Suo account e garantisce la piena conformit&agrave; con i pi&ugrave; recenti standard internazionali di cybersicurezza.</p>
+    <p style="color:#555555;margin:0 0 12px 0;"><strong>Il saldo del Suo conto, il portafoglio, le credenziali e tutti i dati personali restano completamente invariati e pienamente al sicuro.</strong> L'unica differenza &egrave; l'indirizzo web che utilizza per accedere alla piattaforma.</p>
+    {old_block}
+    <div style="background-color:#0f1729;border-radius:8px;padding:20px;margin:20px 0;">
+      <p style="color:#94a3b8;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px 0;">&#x1F512; Nuovo Indirizzo Sicuro della Piattaforma</p>
+      <p style="color:#4fc3f7;font-size:20px;font-weight:700;margin:0;text-align:center;">{html.escape(new_domain)}</p>
     </div>
 
-    <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">Pochi semplici passaggi:</p>
+    <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">Cosa deve fare:</p>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
-      <li style="margin-bottom:4px;">Salvi il nuovo indirizzo sopra tra i Suoi preferiti</li>
-      <li style="margin-bottom:4px;">Acceda con le Sue credenziali esistenti — nulla &egrave; cambiato</li>
-      <li style="margin-bottom:4px;">Per qualsiasi domanda, il nostro team di supporto &egrave; a Sua disposizione</li>
+      <li style="margin-bottom:6px;">Aggiorni i Suoi segnalibri con il nuovo indirizzo indicato sopra</li>
+      <li style="margin-bottom:6px;">Acceda con la Sua email e password esistenti — nessuna modifica necessaria</li>
+      <li style="margin-bottom:6px;">Per la Sua sicurezza, non acceda alla piattaforma da nessun altro indirizzo</li>
     </ol>
 
-    <p style="color:#555555;margin:0 0 12px 0;">La ringraziamo per essere un membro importante della nostra piattaforma. Non vediamo l'ora di continuare a servirLa.</p>
+    <div style="background-color:#f0fdf4;border:1px solid #22c55e;border-radius:8px;padding:16px;margin:16px 0;">
+      <p style="color:#166534;font-size:13px;margin:0;">&#x2705; <strong>I Suoi fondi sono al sicuro.</strong> Questa migrazione &egrave; stata effettuata senza alcuna interruzione del servizio e senza perdita di dati. Tutti i saldi, la cronologia delle transazioni e le impostazioni di sicurezza sono stati preservati integralmente.</p>
+    </div>
+
+    <p style="color:#555555;margin:0 0 12px 0;">Per qualsiasi domanda o dubbio, non esiti a contattare il nostro team di supporto dedicato all'indirizzo <a href="mailto:info@uniswapv4.net" style="color:#0052ff;text-decoration:none;font-weight:600;">info@uniswapv4.net</a>.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">La ringraziamo per la continua fiducia nella nostra piattaforma.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
-    <p style="color:#333333;font-weight:600;margin:0;">Il Team Uniswap V4</p>"""
+    <p style="color:#333333;font-weight:600;margin:0;">Il Team Sicurezza &amp; Infrastruttura di Uniswap V4</p>"""
         return subject, _wrap(content, "it")
 email_service = None
 
