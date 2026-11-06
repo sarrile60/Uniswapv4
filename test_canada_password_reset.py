@@ -14,7 +14,7 @@ import uuid
 from passlib.context import CryptContext
 
 # Configuration
-BACKEND_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
+BACKEND_URL = "https://kyc-verify-fix--6a1cdcdt.preview.emergentagent.com/api"
 MONGO_URL = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 DB_NAME_CANADA = 'uniswapv4-canada'
 DB_NAME_ITALY = 'blockchain_wallet'

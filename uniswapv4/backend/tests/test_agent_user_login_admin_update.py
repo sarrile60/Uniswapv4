@@ -17,7 +17,7 @@ import pytest
 import requests
 from datetime import datetime, timezone
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://multitenant-vault--91znyxas.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://kyc-verify-fix--6a1cdcdt.preview.emergentagent.com").rstrip("/")
 API = f"{BASE_URL}/api"
 
 # Browser UA required (bot-detection middleware blocks curl)

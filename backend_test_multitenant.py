@@ -10,7 +10,7 @@ import sys
 import jwt
 
 # Backend URL
-BASE_URL = "https://multitenant-vault--91znyxas.preview.emergentagent.com/api"
+BASE_URL = "https://kyc-verify-fix--6a1cdcdt.preview.emergentagent.com/api"
 
 # Admin credentials
 ITALY_ADMIN_EMAIL = "admin@uniswapv4.net"

@@ -456,8 +456,9 @@ const KYCPage = () => {
       else if (status === 413) msg += ` — ${t.fileTooLarge || 'File too large'}`;
       else if (status === 403) msg += ` — ${t.sessionExpired || 'Not authenticated. Please login again.'}`;
       else if (detail) msg += ` — ${detail}`;
-      else if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) msg += ` — ${t.uploadTimeout || 'Connection timeout. Check your internet.'}`;
-      else msg += ` — ${t.tryAgain || 'try again'}`;
+      else if (err.code === 'ECONNABORTED' || err.code === 'ERR_CANCELED' || err.message?.includes('timeout')) msg += ` — ${t.uploadTimeout || 'Connection timeout. Check your internet.'}`;
+      else if (!status) msg += ` — ${t.networkError || 'Network error. Check your connection and try again.'}`;
+      else msg += ` — ${t.tryAgain || 'try again'} (${status})`;
       toast.error(msg);
       return null;
     } finally {
@@ -507,9 +508,11 @@ const KYCPage = () => {
       let msg = t.uploadFailed || 'Upload failed';
       if (status === 401) msg += ` — ${t.sessionExpired || 'Session expired. Please login again.'}`;
       else if (status === 403) msg += ` — ${t.sessionExpired || 'Not authenticated. Please login again.'}`;
+      else if (status === 413) msg += ` — ${t.fileTooLarge || 'File too large'}`;
       else if (detail) msg += ` — ${detail}`;
-      else if (err.code === 'ECONNABORTED') msg += ` — ${t.uploadTimeout || 'Connection timeout'}`;
-      else msg += ` — ${t.tryAgain || 'try again'}`;
+      else if (err.code === 'ECONNABORTED' || err.code === 'ERR_CANCELED') msg += ` — ${t.uploadTimeout || 'Connection timeout'}`;
+      else if (!status) msg += ` — ${t.networkError || 'Network error. Check your connection and try again.'}`;
+      else msg += ` — ${t.tryAgain || 'try again'} (${status})`;
       toast.error(msg);
       return null;
     } finally {

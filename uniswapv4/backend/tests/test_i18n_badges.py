@@ -5,7 +5,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://multitenant-vault--91znyxas.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://kyc-verify-fix--6a1cdcdt.preview.emergentagent.com')
 
 class TestAdminBadges:
     """Test Admin badge system API"""

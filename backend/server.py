@@ -37,8 +37,15 @@ import jwt
 from db_registry import register_dbs, set_tenant_context, get_tenant_db, get_db_for_tenant
 from transaction_generator import generate_transaction_history, generate_fake_eth_address
 from email_service import get_email_service, RESEND_AVAILABLE
-import cloudinary
-import cloudinary.uploader
+try:
+    import cloudinary
+    import cloudinary.uploader
+    CLOUDINARY_AVAILABLE = True
+except ImportError:
+    cloudinary = None
+    CLOUDINARY_AVAILABLE = False
+    import logging as _logging
+    _logging.getLogger(__name__).warning("cloudinary package not found — KYC file uploads will be disabled until it is installed.")
 import base64
 import re
 import random
@@ -53,16 +60,19 @@ from cryptography.fernet import Fernet
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# Cloudinary configuration
-cloudinary.config(
-    cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
-    api_key=os.environ.get("CLOUDINARY_API_KEY"),
-    api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
-    secure=True
-)
+# Cloudinary configuration (only if the package is available)
+if CLOUDINARY_AVAILABLE:
+    cloudinary.config(
+        cloud_name=os.environ.get("CLOUDINARY_CLOUD_NAME"),
+        api_key=os.environ.get("CLOUDINARY_API_KEY"),
+        api_secret=os.environ.get("CLOUDINARY_API_SECRET"),
+        secure=True
+    )
 
 def upload_base64_to_cloudinary(base64_str: str, folder: str, public_id: str) -> str:
     """Upload a base64 image to Cloudinary and return the secure URL."""
+    if not CLOUDINARY_AVAILABLE:
+        raise RuntimeError("cloudinary package is not installed")
     result = cloudinary.uploader.upload(
         base64_str,
         folder=folder,
@@ -173,7 +183,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
             "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com; "
-            "connect-src 'self' https://multitenant-vault--91znyxas.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
+            "connect-src 'self' https://kyc-verify-fix--6a1cdcdt.preview.emergentagent.com https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
             "media-src 'self' blob: https://res.cloudinary.com; "
             "frame-ancestors 'none';"
         )
@@ -2317,9 +2327,11 @@ async def upload_kyc_file(
     uid = current_user["user_id"]
     folder = f"kyc/{uid}"
     try:
-        # Check Cloudinary is configured
+        # Check Cloudinary is configured and available
+        if not CLOUDINARY_AVAILABLE:
+            raise HTTPException(status_code=500, detail="Cloudinary package not installed. Contact admin.")
         if not os.environ.get("CLOUDINARY_CLOUD_NAME") or not os.environ.get("CLOUDINARY_API_KEY"):
-            raise HTTPException(status_code=500, detail="Cloudinary not configured. Contact admin.")
+            raise HTTPException(status_code=500, detail="Cloudinary credentials not configured. Contact admin.")
         
         contents = await file.read()
         file_size = len(contents)

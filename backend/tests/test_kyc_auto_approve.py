@@ -20,7 +20,7 @@ import uuid
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://multitenant-vault--91znyxas.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://kyc-verify-fix--6a1cdcdt.preview.emergentagent.com").rstrip("/")
 UA = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 KYCAutoApproveTest/1.0"
 
 # Add backend to sys.path so we can import server + models for direct DB access
