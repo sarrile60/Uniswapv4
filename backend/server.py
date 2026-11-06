@@ -2340,8 +2340,13 @@ async def upload_kyc_file(
         
         if file_size == 0:
             raise HTTPException(status_code=400, detail="Empty file received")
-        if file_size > 100 * 1024 * 1024:  # 100MB limit
-            raise HTTPException(status_code=413, detail="File too large (max 100MB)")
+        
+        # Size limits: 50MB for video, 20MB for images/PDFs
+        is_video_upload = field == "selfie_video" or (file.content_type or "").startswith("video/")
+        max_size = 50 * 1024 * 1024 if is_video_upload else 20 * 1024 * 1024
+        if file_size > max_size:
+            limit_mb = 50 if is_video_upload else 20
+            raise HTTPException(status_code=413, detail=f"File too large (max {limit_mb}MB)")
         
         # Use auto resource type for all files, convert images to jpg (handles HEIC)
         upload_opts = {

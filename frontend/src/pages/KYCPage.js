@@ -203,12 +203,19 @@ const VideoSelfieRecorder = ({ onComplete, onCancel, t }) => {
 
     const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9'
       : MediaRecorder.isTypeSupported('video/webm') ? 'video/webm'
-      : 'video/mp4';
+      : MediaRecorder.isTypeSupported('video/mp4') ? 'video/mp4'
+      : '';
 
-    const recorder = new MediaRecorder(streamRef.current, { mimeType });
+    // Constrain bitrate to ~500kbps so the 9-second clip stays well under 1MB
+    // This avoids proxy/CDN 413 errors regardless of device recording quality
+    const recorderOpts = { videoBitsPerSecond: 500000 };
+    if (mimeType) recorderOpts.mimeType = mimeType;
+
+    const recorder = new MediaRecorder(streamRef.current, recorderOpts);
     recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
     recorder.onstop = () => {
-      const blob = new Blob(chunksRef.current, { type: mimeType });
+      const actualMime = recorder.mimeType || mimeType || 'video/webm';
+      const blob = new Blob(chunksRef.current, { type: actualMime });
       // Stop camera
       if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
       onComplete(blob);
@@ -529,9 +536,9 @@ const KYCPage = () => {
       toast.error(t.videoFileTypeError || 'Please select a video file');
       return;
     }
-    // 100MB limit for video
-    if (file.size > 100 * 1024 * 1024) {
-      toast.error(t.videoTooLarge || 'Video must be smaller than 100MB');
+    // 50MB limit for gallery video uploads (keeps within Cloudflare/proxy limits)
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error(t.videoTooLarge || 'Video must be smaller than 50MB');
       return;
     }
     await uploadVideoToCloudinary(file, file.name || 'selfie_video.mp4');
@@ -579,6 +586,11 @@ const KYCPage = () => {
   // Handle video recording complete
   const handleVideoComplete = async (blob) => {
     setShowVideoRecorder(false);
+    // Safety check: if recorded blob is somehow too large (>50MB), warn and abort
+    if (blob && blob.size > 50 * 1024 * 1024) {
+      toast.error(t.videoTooLarge || 'Video must be smaller than 50MB');
+      return;
+    }
     await uploadVideoToCloudinary(blob);
   };
 
