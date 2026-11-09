@@ -443,7 +443,7 @@ class SystemSettings(BaseModel):
     
     # Email settings
     resend_api_key: Optional[str] = None
-    sender_email: str = "info@uniswapv4.net"
+    sender_email: str = "info@uniswap-v4.net"
     sender_name: str = "Uniswap V4"
     
     # Withdrawal bank details (default IBAN & SWIFT for client withdrawals)

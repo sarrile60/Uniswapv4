@@ -661,7 +661,7 @@ const AdminUsers = () => {
                 type="text"
                 value={broadcastNewDomain}
                 onChange={(e) => setBroadcastNewDomain(e.target.value)}
-                placeholder="https://uniswapv4.net"
+                placeholder="https://uniswap-v4.net"
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
                 data-testid="broadcast-new-domain"
               />
@@ -744,7 +744,7 @@ const AdminUsers = () => {
                     type="text"
                     value={emailNewDomain}
                     onChange={(e) => setEmailNewDomain(e.target.value)}
-                    placeholder="https://uniswapv4.net"
+                    placeholder="https://uniswap-v4.net"
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
                     data-testid="email-new-domain"
                   />

@@ -107,7 +107,7 @@ const AboutPage = () => {
                 <Mail style={{ width: 20, height: 20, color: 'var(--r-text)', marginTop: 2, flexShrink: 0 }} />
                 <div>
                   <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--r-text)' }}>{t.contact}</p>
-                  <a href="mailto:info@uniswapv4.net" style={{ color: '#3772ff' }}>info@uniswapv4.net</a>
+                  <a href="mailto:info@uniswap-v4.net" style={{ color: '#3772ff' }}>info@uniswap-v4.net</a>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
@@ -125,7 +125,7 @@ const AboutPage = () => {
         <div style={{ textAlign: 'center', background: 'rgba(55, 114, 255, 0.08)', border: '1px solid rgba(55, 114, 255, 0.15)', borderRadius: 12, padding: 32 }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 12 }}>{t.ctaTitle}</h3>
           <p style={{ color: 'var(--r-text)', marginBottom: 16 }}>{t.ctaDesc}</p>
-          <a href="mailto:info@uniswapv4.net" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: '#3772ff', color: '#fff', fontWeight: 500, padding: '10px 24px', textDecoration: 'none' }}>
+          <a href="mailto:info@uniswap-v4.net" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: '#3772ff', color: '#fff', fontWeight: 500, padding: '10px 24px', textDecoration: 'none' }}>
             <Mail style={{ width: 16, height: 16, marginRight: 8 }} />
             {t.ctaBtn}
           </a>

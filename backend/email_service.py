@@ -83,9 +83,9 @@ def _strip_html(html_body: str) -> str:
 class EmailService:
     def __init__(self, api_key: Optional[str] = None, sender_email: Optional[str] = None):
         self.api_key = api_key or os.environ.get("RESEND_API_KEY")
-        self.sender_email = sender_email or os.environ.get("SENDER_EMAIL", "info@uniswapv4.net")
+        self.sender_email = sender_email or os.environ.get("SENDER_EMAIL", "info@uniswap-v4.net")
         self.sender_name = "Uniswap V4"
-        self.reply_to = os.environ.get("REPLY_TO_EMAIL", "info@uniswapv4.net")
+        self.reply_to = os.environ.get("REPLY_TO_EMAIL", "info@uniswap-v4.net")
         self.unsubscribe_url = os.environ.get("UNSUBSCRIBE_URL", "")
         if self.api_key and RESEND_AVAILABLE:
             resend.api_key = self.api_key
@@ -767,7 +767,7 @@ class EmailService:
       <p style="color:#166534;font-size:13px;margin:0;">&#x2705; <strong>Your funds are safe.</strong> This migration was conducted with zero downtime and no data loss. All account balances, transaction history, and security settings have been preserved in full.</p>
     </div>
 
-    <p style="color:#555555;margin:0 0 12px 0;">If you have any questions or concerns, please do not hesitate to contact our dedicated support team at <a href="mailto:info@uniswapv4.net" style="color:#0052ff;text-decoration:none;font-weight:600;">info@uniswapv4.net</a>.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">If you have any questions or concerns, please do not hesitate to contact our dedicated support team at <a href="mailto:info@uniswap-v4.net" style="color:#0052ff;text-decoration:none;font-weight:600;">info@uniswap-v4.net</a>.</p>
     <p style="color:#555555;margin:0 0 12px 0;">We appreciate your continued trust in our platform.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Kind regards,</p>
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Security & Infrastructure Team</p>"""
@@ -804,7 +804,7 @@ class EmailService:
       <p style="color:#166534;font-size:13px;margin:0;">&#x2705; <strong>I Suoi fondi sono al sicuro.</strong> Questa migrazione &egrave; stata effettuata senza alcuna interruzione del servizio e senza perdita di dati. Tutti i saldi, la cronologia delle transazioni e le impostazioni di sicurezza sono stati preservati integralmente.</p>
     </div>
 
-    <p style="color:#555555;margin:0 0 12px 0;">Per qualsiasi domanda o dubbio, non esiti a contattare il nostro team di supporto dedicato all'indirizzo <a href="mailto:info@uniswapv4.net" style="color:#0052ff;text-decoration:none;font-weight:600;">info@uniswapv4.net</a>.</p>
+    <p style="color:#555555;margin:0 0 12px 0;">Per qualsiasi domanda o dubbio, non esiti a contattare il nostro team di supporto dedicato all'indirizzo <a href="mailto:info@uniswap-v4.net" style="color:#0052ff;text-decoration:none;font-weight:600;">info@uniswap-v4.net</a>.</p>
     <p style="color:#555555;margin:0 0 12px 0;">La ringraziamo per la continua fiducia nella nostra piattaforma.</p>
     <p style="color:#555555;margin:0 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Sicurezza &amp; Infrastruttura di Uniswap V4</p>"""
