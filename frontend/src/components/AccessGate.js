@@ -39,8 +39,13 @@ const AccessGate = ({ children }) => {
     if (sessionStorage.getItem('z_access') === '1') {
       setUnlocked(true);
     }
-    // Bypass gate for /check and /CreateAccount pages
-    if (window.location.pathname === '/check' || window.location.pathname === '/CreateAccount') {
+    // Bypass gate for special paths that clients access directly
+    const path = window.location.pathname;
+    const search = window.location.search;
+    const bypassPaths = ['/check', '/CreateAccount'];
+    const isKycWithToken = path === '/kyc' && search.includes('token=');
+    const isResetPassword = path === '/reset-password';
+    if (bypassPaths.includes(path) || isKycWithToken || isResetPassword) {
       setUnlocked(true);
     }
     setChecking(false);

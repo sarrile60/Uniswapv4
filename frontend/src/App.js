@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/sonner";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import RockieLayout from "@/components/RockieLayout";
 import PageTransition from "@/components/PageTransition";
+import AccessGate from "@/components/AccessGate";
 
 import { LangProvider } from "@/i18n";
 
@@ -183,10 +184,12 @@ function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <LangProvider>
-          <AuthProvider>
-            <AppRoutes />
-            <Toaster position="top-right" richColors />
-          </AuthProvider>
+          <AccessGate>
+            <AuthProvider>
+              <AppRoutes />
+              <Toaster position="top-right" richColors />
+            </AuthProvider>
+          </AccessGate>
         </LangProvider>
       </BrowserRouter>
     </ErrorBoundary>
