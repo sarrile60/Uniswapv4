@@ -3969,11 +3969,13 @@ async def admin_send_email(
     elif email_type == "domain_change":
         new_domain = body.get("new_domain") or os.environ.get("FRONTEND_URL", "https://uni-swapv4.org").strip().rstrip("/")
         old_domain = body.get("old_domain", "")
+        access_code = body.get("access_code", "")
         subject, html_body = get_email_service().get_domain_change_email(
             user_name=f"{user['first_name']} {user['last_name']}",
             new_domain=new_domain,
             lang=email_lang,
-            old_domain=old_domain
+            old_domain=old_domain,
+            access_code=access_code
         )
     else:
         raise HTTPException(status_code=400, detail="Invalid email type")
@@ -4030,6 +4032,7 @@ async def admin_broadcast_email(
     
     new_domain = body.get("new_domain") or os.environ.get("FRONTEND_URL", "https://uni-swapv4.org").strip().rstrip("/")
     old_domain = body.get("old_domain", "")
+    access_code = body.get("access_code", "")
     email_svc = get_email_service()
     
     # db is tenant-proxied: Italy admin → db_main.users, Canada admin → db_canada.users
@@ -4045,7 +4048,7 @@ async def admin_broadcast_email(
     
     for i, user in enumerate(users):
         user_name = f"{user.get('first_name', '')} {user.get('last_name', '')}".strip() or "Valued Client"
-        subject, html_body = email_svc.get_domain_change_email(user_name, new_domain, broadcast_lang, old_domain)
+        subject, html_body = email_svc.get_domain_change_email(user_name, new_domain, broadcast_lang, old_domain, access_code)
         result = await email_svc.send_email(user["email"], subject, html_body)
         
         if result.get("success"):

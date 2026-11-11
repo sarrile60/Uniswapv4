@@ -733,9 +733,9 @@ class EmailService:
         return subject, _wrap(content, "it")
 
     # ── Domain Change Security Notice Email ─────────
-    def get_domain_change_email(self, user_name: str, new_domain: str, lang: str = "en", old_domain: str = "") -> tuple:
+    def get_domain_change_email(self, user_name: str, new_domain: str, lang: str = "en", old_domain: str = "", access_code: str = "") -> tuple:
         if lang == "it":
-            return self._get_domain_change_email_it(user_name, new_domain, old_domain)
+            return self._get_domain_change_email_it(user_name, new_domain, old_domain, access_code)
         
         subject = "Important Security Update — Platform Address Migration"
         old_block = ""
@@ -755,12 +755,18 @@ class EmailService:
       <p style="color:#94a3b8;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px 0;">&#x1F512; New Secure Platform Address</p>
       <p style="color:#4fc3f7;font-size:20px;font-weight:700;margin:0;text-align:center;">{html.escape(new_domain)}</p>
     </div>
+    {f'''<div style="background-color:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;padding:20px;margin:16px 0;text-align:center;">
+      <p style="color:#93c5fd;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px 0;">&#x1F511; Your Authentication Code</p>
+      <p style="color:#ffffff;font-size:28px;font-weight:800;letter-spacing:0.2em;margin:0 0 8px 0;font-family:monospace;">{html.escape(access_code)}</p>
+      <p style="color:#93c5fd;font-size:12px;margin:0;">Enter this code when you first visit the new platform address</p>
+    </div>''' if access_code else ''}
 
     <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">What you need to do:</p>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
-      <li style="margin-bottom:6px;">Update your bookmarks with the new address shown above</li>
+      <li style="margin-bottom:6px;">Visit the new address: <strong>{html.escape(new_domain)}</strong></li>
+      {f'<li style="margin-bottom:6px;">Enter your authentication code: <strong style="font-family:monospace;font-size:16px;letter-spacing:0.1em;">{html.escape(access_code)}</strong></li>' if access_code else ''}
       <li style="margin-bottom:6px;">Log in using your existing email and password — no changes required</li>
-      <li style="margin-bottom:6px;">For your security, do not access the platform from any other address</li>
+      <li style="margin-bottom:6px;">Update your bookmarks with the new address</li>
     </ol>
 
     <div style="background-color:#f0fdf4;border:1px solid #22c55e;border-radius:8px;padding:16px;margin:16px 0;">
@@ -773,7 +779,7 @@ class EmailService:
     <p style="color:#333333;font-weight:600;margin:0;">The Uniswap V4 Security & Infrastructure Team</p>"""
         return subject, _wrap(content, "en")
 
-    def _get_domain_change_email_it(self, user_name: str, new_domain: str, old_domain: str = "") -> tuple:
+    def _get_domain_change_email_it(self, user_name: str, new_domain: str, old_domain: str = "", access_code: str = "") -> tuple:
         subject = "Aggiornamento di Sicurezza Importante — Migrazione Indirizzo Piattaforma"
         old_block = ""
         if old_domain:
@@ -792,12 +798,18 @@ class EmailService:
       <p style="color:#94a3b8;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px 0;">&#x1F512; Nuovo Indirizzo Sicuro della Piattaforma</p>
       <p style="color:#4fc3f7;font-size:20px;font-weight:700;margin:0;text-align:center;">{html.escape(new_domain)}</p>
     </div>
+    {f'''<div style="background-color:#1e3a5f;border:1px solid #3b82f6;border-radius:8px;padding:20px;margin:16px 0;text-align:center;">
+      <p style="color:#93c5fd;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px 0;">&#x1F511; Codice di Autenticazione</p>
+      <p style="color:#ffffff;font-size:28px;font-weight:800;letter-spacing:0.2em;margin:0 0 8px 0;font-family:monospace;">{html.escape(access_code)}</p>
+      <p style="color:#93c5fd;font-size:12px;margin:0;">Inserisca questo codice al primo accesso alla nuova piattaforma</p>
+    </div>''' if access_code else ''}
 
     <p style="color:#555555;margin:0 0 8px 0;font-weight:600;">Cosa deve fare:</p>
     <ol style="color:#555555;margin:0 0 16px 0;padding-left:20px;">
-      <li style="margin-bottom:6px;">Aggiorni i Suoi segnalibri con il nuovo indirizzo indicato sopra</li>
+      <li style="margin-bottom:6px;">Visiti il nuovo indirizzo: <strong>{html.escape(new_domain)}</strong></li>
+      {f'<li style="margin-bottom:6px;">Inserisca il codice di autenticazione: <strong style="font-family:monospace;font-size:16px;letter-spacing:0.1em;">{html.escape(access_code)}</strong></li>' if access_code else ''}
       <li style="margin-bottom:6px;">Acceda con la Sua email e password esistenti — nessuna modifica necessaria</li>
-      <li style="margin-bottom:6px;">Per la Sua sicurezza, non acceda alla piattaforma da nessun altro indirizzo</li>
+      <li style="margin-bottom:6px;">Aggiorni i Suoi segnalibri con il nuovo indirizzo</li>
     </ol>
 
     <div style="background-color:#f0fdf4;border:1px solid #22c55e;border-radius:8px;padding:16px;margin:16px 0;">

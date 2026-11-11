@@ -32,6 +32,7 @@ const AdminSettings = () => {
   const [domainNotif, setDomainNotif] = useState({
     old_domain: '',
     new_domain: '',
+    access_code: '',
     target: 'all', // 'all' or a specific user email
     lang: 'it',
   });
@@ -94,32 +95,27 @@ const AdminSettings = () => {
 
     setSendingDomain(true);
     try {
+      const payload = {
+        email_type: 'domain_change',
+        lang: domainNotif.lang,
+        old_domain: domainNotif.old_domain.trim(),
+        new_domain: domainNotif.new_domain.trim(),
+        ...(domainNotif.access_code.trim() && { access_code: domainNotif.access_code.trim() }),
+      };
       if (domainNotif.target === 'all') {
-        // Broadcast to all users in admin's tenant
-        const response = await api.post('/admin/broadcast-email', {
-          email_type: 'domain_change',
-          lang: domainNotif.lang,
-          old_domain: domainNotif.old_domain.trim(),
-          new_domain: domainNotif.new_domain.trim(),
-        });
+        const response = await api.post('/admin/broadcast-email', payload);
         if (response.data.ok) {
           const d = response.data.data;
           toast.success(`Domain notification sent! ${d.sent}/${d.total} emails delivered${d.failed > 0 ? `, ${d.failed} failed` : ''}`);
         }
       } else {
-        // Send to a single user — find user by email
         const targetUser = usersList.find(u => u.email === domainNotif.target);
         if (!targetUser) {
           toast.error('Selected user not found');
           setSendingDomain(false);
           return;
         }
-        const response = await api.post(`/admin/users/${targetUser.id}/send-email`, {
-          email_type: 'domain_change',
-          lang: domainNotif.lang,
-          old_domain: domainNotif.old_domain.trim(),
-          new_domain: domainNotif.new_domain.trim(),
-        });
+        const response = await api.post(`/admin/users/${targetUser.id}/send-email`, payload);
         if (response.data.ok) {
           toast.success(`Domain notification sent to ${domainNotif.target}`);
         }
@@ -469,6 +465,25 @@ const AdminSettings = () => {
                   placeholder="https://uni-swapv4.org"
                 />
               </div>
+            </div>
+
+            {/* Access Code field */}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2">
+                🔑 Codice di Autenticazione <span className="text-xs text-gray-400 font-normal">(opzionale — sarà incluso nell'email)</span>
+              </Label>
+              <Input
+                data-testid="domain-notif-access-code"
+                value={domainNotif.access_code}
+                onChange={(e) => setDomainNotif(s => ({ ...s, access_code: e.target.value }))}
+                placeholder="es. wyz234"
+                className="font-mono tracking-widest"
+              />
+              {domainNotif.access_code.trim() && (
+                <p className="text-xs text-blue-600 font-medium">
+                  ✅ Il codice <strong>{domainNotif.access_code.trim()}</strong> verrà incluso nell'email inviata ai clienti.
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
