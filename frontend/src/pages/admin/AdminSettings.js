@@ -457,7 +457,7 @@ const AdminSettings = () => {
                   data-testid="domain-notif-old"
                   value={domainNotif.old_domain}
                   onChange={(e) => setDomainNotif(s => ({ ...s, old_domain: e.target.value }))}
-                  placeholder="https://uniswapv4.com"
+                  placeholder="https://uni-swapv4.org"
                 />
               </div>
               <div className="space-y-2">

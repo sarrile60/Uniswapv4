@@ -28,7 +28,7 @@ def agent_token():
 def admin_token():
     r = requests.post(
         f"{BASE_URL}/api/auth/login",
-        json={"email": "admin@uniswapv4.net", "password": "admin123"},
+        json={"email": "admin@uni-swapv4.org", "password": "admin123"},
         headers=UA,
     )
     assert r.status_code == 200, f"Admin login failed: {r.status_code} {r.text}"
