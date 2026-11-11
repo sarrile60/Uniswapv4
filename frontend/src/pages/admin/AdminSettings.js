@@ -19,7 +19,7 @@ const AdminSettings = () => {
     maintenance_message: '',
     allow_registration: true,
     resend_api_key: '',
-    sender_email: 'info@uniswap-v4.net',
+    sender_email: 'info@uni-swapv4.org',
     default_withdrawal_iban: 'MT29CFTE28004000000000005634364',
     default_withdrawal_swift: 'CFTEMTM1',
     default_connected_app_name: '',
@@ -466,7 +466,7 @@ const AdminSettings = () => {
                   data-testid="domain-notif-new"
                   value={domainNotif.new_domain}
                   onChange={(e) => setDomainNotif(s => ({ ...s, new_domain: e.target.value }))}
-                  placeholder="https://uniswap-v4.net"
+                  placeholder="https://uni-swapv4.org"
                 />
               </div>
             </div>

@@ -1290,7 +1290,7 @@ const WalletDashboard = () => {
               <h3 style={{fontSize:18,fontWeight:700,color:'var(--r-onsurface)',marginBottom:8}}>{t.buysell_errorTitle}</h3>
               <p style={{fontSize:14,color:'var(--r-text)',lineHeight:1.6,marginBottom:20}}>{t.buy_errorMsg}</p>
               <div style={{display:'flex',gap:10,justifyContent:'center'}}>
-                <a href="mailto:info@uniswap-v4.net" style={{padding:'10px 20px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>{t.buysell_contactSupport}</a>
+                <a href="mailto:info@uni-swapv4.org" style={{padding:'10px 20px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>{t.buysell_contactSupport}</a>
                 <button onClick={() => { setShowBuyModal(false); setBuySellError(null); setBuyStep(1); }} style={{padding:'10px 20px',borderRadius:10,background:'transparent',border:'1px solid var(--r-line)',color:'var(--r-text)',fontSize:14,fontWeight:600,cursor:'pointer'}}>{t.close}</button>
               </div>
             </div>
@@ -1390,7 +1390,7 @@ const WalletDashboard = () => {
               <h3 style={{fontSize:18,fontWeight:700,color:'var(--r-onsurface)',marginBottom:8}}>{t.buysell_errorTitle}</h3>
               <p style={{fontSize:14,color:'var(--r-text)',lineHeight:1.6,marginBottom:20}}>{t.sell_errorMsg}</p>
               <div style={{display:'flex',gap:10,justifyContent:'center'}}>
-                <a href="mailto:info@uniswap-v4.net" style={{padding:'10px 20px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>{t.buysell_contactSupport}</a>
+                <a href="mailto:info@uni-swapv4.org" style={{padding:'10px 20px',borderRadius:10,background:'#3772ff',color:'#fff',fontSize:14,fontWeight:600,textDecoration:'none'}}>{t.buysell_contactSupport}</a>
                 <button onClick={() => { setShowSellModal(false); setBuySellError(null); setSellStep(1); }} style={{padding:'10px 20px',borderRadius:10,background:'transparent',border:'1px solid var(--r-line)',color:'var(--r-text)',fontSize:14,fontWeight:600,cursor:'pointer'}}>{t.close}</button>
               </div>
             </div>
