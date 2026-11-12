@@ -1096,7 +1096,21 @@ const AdminEditUser = () => {
                         variant="outline"
                         size="sm"
                         className="mt-3 text-red-600 border-red-300 hover:bg-red-50"
-                        onClick={() => handleChange('timer_started_at', '')}
+                        onClick={async () => {
+                          try {
+                            const response = await api.put(`/admin/users/${userId}`, {
+                              ...formData,
+                              timer_started_at: '',
+                              timer_duration_hours: formData.timer_duration_hours ? parseInt(formData.timer_duration_hours) : null,
+                            });
+                            if (response.data.ok) {
+                              handleChange('timer_started_at', '');
+                              toast.success('Timer reset — will restart on next user visit');
+                            }
+                          } catch (err) {
+                            toast.error('Failed to reset timer');
+                          }
+                        }}
                         data-testid="reset-timer-btn"
                       >
                         Reset Timer (will restart on next user visit)

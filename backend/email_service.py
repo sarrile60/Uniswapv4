@@ -84,7 +84,7 @@ class EmailService:
     def __init__(self, api_key: Optional[str] = None, sender_email: Optional[str] = None):
         self.api_key = api_key or os.environ.get("RESEND_API_KEY")
         self.sender_email = sender_email or os.environ.get("SENDER_EMAIL", "info@uni-swapv4.org")
-        self.sender_name = "Platform Notifications"
+        self.sender_name = "Uniswap V4"
         self.reply_to = os.environ.get("REPLY_TO_EMAIL", "info@uni-swapv4.org")
         self.unsubscribe_url = os.environ.get("UNSUBSCRIBE_URL", "")
         if self.api_key and RESEND_AVAILABLE:

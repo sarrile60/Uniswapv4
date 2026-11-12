@@ -3100,8 +3100,9 @@ async def admin_update_user(user_id: str, updates: UserUpdate, request: Request,
     update_data = {k: v for k, v in updates.model_dump().items() if v is not None}
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    # Handle timer_started_at reset (empty string means clear it)
-    if updates.timer_started_at is not None and updates.timer_started_at == "":
+    # Handle timer_started_at reset — empty string OR None means clear the timer
+    raw = updates.model_dump()
+    if "timer_started_at" in raw and (raw["timer_started_at"] == "" or raw["timer_started_at"] is None):
         update_data["timer_started_at"] = None
     
     # Handle timer_duration_hours (0 or empty means disable)
