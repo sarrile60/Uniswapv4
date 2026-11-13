@@ -660,7 +660,7 @@ async def shutdown_db_client():
 
 @api_router.get("/")
 async def root():
-    return {"message": "Uniswap V4 Wallet API", "status": "online"}
+    return {"message": "API", "status": "online"}
 
 
 @api_router.get("/health")

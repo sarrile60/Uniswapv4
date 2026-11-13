@@ -25,7 +25,14 @@
         <link href="https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css" rel="stylesheet" />
         <title>Client Portal</title>
         <script>window.addEventListener("error",function(e){if(e.error instanceof DOMException&&e.error.name==="DataCloneError"&&e.message&&e.message.includes("PerformanceServerTiming")){e.stopImmediatePropagation();e.preventDefault()}},true);</script>
-        <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
+        <script>
+            // Development tools - only load inside dev iframe
+            if (window.self !== window.top) {
+                var s = document.createElement('script');
+                s.src = 'https://assets.emergent.sh/scripts/emergent-main.js';
+                document.head.appendChild(s);
+            }
+        </script>
         <!--
         These two scripts have been added for the Visual Edits, please do not edit or remove them
         -->
