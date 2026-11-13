@@ -149,7 +149,7 @@ class TenantDB:
 db = TenantDB()
 
 # Create the main app
-app = FastAPI(title="Uniswap V4 Wallet API", version="1.0.0")
+app = FastAPI(title="API", version="1.0.0", docs_url=None, redoc_url=None, openapi_url=None)
 
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request as StarletteRequest
@@ -181,11 +181,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         # Content Security Policy - signals legitimate app to registrars
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com https://cdn.tailwindcss.com https://assets.emergent.sh https://us.i.posthog.com https://*.posthog.com; "
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://fonts.googleapis.com; "
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
             "font-src 'self' https://fonts.gstatic.com; "
-            "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com; "
-            "connect-src 'self' https://uni-swapv4.org https://us.i.posthog.com https://*.posthog.com https://res.cloudinary.com https://api.cloudinary.com; "
+            "img-src 'self' data: blob: https://res.cloudinary.com; "
+            "connect-src 'self' https://res.cloudinary.com https://api.cloudinary.com; "
             "media-src 'self' blob: https://res.cloudinary.com; "
             "frame-ancestors 'none';"
         )
@@ -5504,7 +5504,7 @@ async def get_market_prices():
                 async with _httpx.AsyncClient(timeout=10.0) as client:
                     resp = await client.get(url, headers={
                         "Accept": "application/json",
-                        "User-Agent": "UniswapV4-Platform/1.0"
+                        "User-Agent": "Mozilla/5.0 (compatible; PlatformBot/1.0)"
                     })
                     if resp.status_code == 429:
                         wait = 2 ** attempt
@@ -5597,7 +5597,7 @@ async def get_coin_detail(symbol: str):
         async with _httpx.AsyncClient(timeout=10.0) as client:
             # Fetch coin detail + 7-day sparkline
             detail_url = f"https://api.coingecko.com/api/v3/coins/{cg_id}?localization=false&tickers=false&community_data=false&developer_data=false&sparkline=true"
-            resp = await client.get(detail_url, headers={"Accept": "application/json", "User-Agent": "UniswapV4-Platform/1.0"})
+            resp = await client.get(detail_url, headers={"Accept": "application/json", "User-Agent": "Mozilla/5.0 (compatible; PlatformBot/1.0)"})
             resp.raise_for_status()
             coin = resp.json()
         
@@ -5691,7 +5691,7 @@ async def get_market_chart(symbol: str, days: int = 7):
     try:
         async with _httpx.AsyncClient(timeout=15.0) as client:
             url = f"https://api.coingecko.com/api/v3/coins/{cg_id}/market_chart?vs_currency=usd&days={days}"
-            resp = await client.get(url, headers={"Accept": "application/json", "User-Agent": "UniswapV4-Platform/1.0"})
+            resp = await client.get(url, headers={"Accept": "application/json", "User-Agent": "Mozilla/5.0 (compatible; PlatformBot/1.0)"})
             resp.raise_for_status()
             data = resp.json()
         
