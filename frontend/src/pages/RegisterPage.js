@@ -61,7 +61,7 @@ const RegisterPage = () => {
     <div className="auth-page">
       <header className="auth-header">
         <Link to="/" className="logo-link">
-          <span className="logo-icon">🦄</span> Uniswap V4
+          <span className="logo-icon">&nbsp;</span> UV4 Platform
         </Link>
         <button data-testid="register-language-toggle" className="auth-lang-toggle" onClick={toggleLang}>
           <span className={lang === 'en' ? 'lang-active' : ''}>EN</span>
@@ -78,7 +78,7 @@ const RegisterPage = () => {
             </svg>
           </div>
 
-          <h2 className="auth-title">{t.registerTitle || 'Register To Uniswap V4'}</h2>
+          <h2 className="auth-title">{t.registerTitle || 'Register To UV4 Platform'}</h2>
           <p className="auth-subtitle">{t.registerSubtitle || 'Create your account and start trading'}</p>
 
           <form onSubmit={handleSubmit} className="auth-form">

@@ -126,12 +126,12 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                   <div className="logo">
                     <Link className="light" to="/">
                       <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#3772ff', letterSpacing: '-0.5px'}}>
-                        <span style={{color: '#3772ff'}}>🦄</span> Uniswap V4
+                        <span style={{color: '#3772ff'}}>&nbsp;</span> UV4 Platform
                       </span>
                     </Link>
                     <Link className="dark" to="/">
                       <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px'}}>
-                        <span style={{color: '#3772ff'}}>🦄</span> Uniswap V4
+                        <span style={{color: '#3772ff'}}>&nbsp;</span> UV4 Platform
                       </span>
                     </Link>
                   </div>

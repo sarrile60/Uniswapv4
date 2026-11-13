@@ -32,7 +32,7 @@ const articlesData = {
         { type: 'p', text: 'Many investors view Bitcoin as "digital gold" — a store of value that protects against inflation and currency devaluation. Like gold, Bitcoin is scarce (capped at 21 million coins), durable, fungible, and divisible (down to 8 decimal places, called "satoshis").' },
         { type: 'p', text: 'Institutional adoption has accelerated dramatically, with major corporations, hedge funds, and even sovereign nations adding Bitcoin to their balance sheets. The approval of Bitcoin ETFs in traditional markets has further legitimized it as an asset class.' },
         { type: 'h2', text: 'Getting Started with Bitcoin' },
-        { type: 'p', text: 'To start using Bitcoin, you need a wallet — software that stores your private keys and allows you to send and receive BTC. Wallets come in several forms: mobile apps, desktop software, hardware devices, and web-based platforms like Uniswap V4.' },
+        { type: 'p', text: 'To start using Bitcoin, you need a wallet — software that stores your private keys and allows you to send and receive BTC. Wallets come in several forms: mobile apps, desktop software, hardware devices, and web-based platforms like UV4 Platform.' },
         { type: 'p', text: 'When you buy Bitcoin on an exchange, you can hold it in your exchange wallet for convenience or transfer it to a personal wallet for maximum security. Always remember: your private keys are the only way to access your Bitcoin. Lose them, and your funds are gone forever.' },
       ],
       related: ['what-is-ethereum', 'secure-your-crypto'],
@@ -95,7 +95,7 @@ const articlesData = {
           'Giveaway scams — "Send 1 BTC, get 2 back" is always a scam, no exceptions.',
         ]},
         { type: 'h2', text: 'Exchange Security Tips' },
-        { type: 'p', text: 'When using centralized exchanges like Uniswap V4, take additional precautions: use a unique, strong password (16+ characters), enable withdrawal address whitelisting, set up anti-phishing codes, and regularly review your active sessions and API keys. Move large amounts to personal cold storage rather than keeping them on the exchange long-term.' },
+        { type: 'p', text: 'When using centralized exchanges like UV4 Platform, take additional precautions: use a unique, strong password (16+ characters), enable withdrawal address whitelisting, set up anti-phishing codes, and regularly review your active sessions and API keys. Move large amounts to personal cold storage rather than keeping them on the exchange long-term.' },
       ],
       related: ['what-is-bitcoin', 'what-is-staking'],
     },
@@ -112,7 +112,7 @@ const articlesData = {
         { type: 'p', text: 'Unlike traditional finance where a bank holds your money and decides who gets loans, DeFi uses algorithms and community governance to manage risk, set interest rates, and facilitate transactions. This creates a more transparent, accessible, and efficient financial system.' },
         { type: 'h2', text: 'Key DeFi Categories' },
         { type: 'list', items: [
-          'Decentralized Exchanges (DEXs) — Platforms like Uniswap and SushiSwap let you trade tokens directly from your wallet, without KYC or account creation.',
+          'Decentralized Exchanges (DEXs) — Platforms like decentralized exchanges let you trade tokens directly from your wallet, without KYC or account creation.',
           'Lending & Borrowing — Protocols like Aave and Compound allow you to earn interest by lending your crypto or borrow against your holdings as collateral.',
           'Yield Farming — Strategies to maximize returns by moving assets between protocols to capture the highest available yields.',
           'Stablecoins — Tokens pegged to fiat currencies (like USDC or DAI) that provide stability in the volatile crypto market.',
@@ -149,7 +149,7 @@ const articlesData = {
           'Solo staking — Running your own validator node (requires technical knowledge and minimum stake, e.g., 32 ETH for Ethereum).',
           'Delegated staking — Delegating your tokens to an existing validator who runs the infrastructure on your behalf.',
           'Liquid staking — Staking through protocols like Lido that give you a liquid token (stETH) representing your staked position, which you can use in DeFi.',
-          'Exchange staking — The simplest method: stake directly through platforms like Uniswap V4, which handles the technical details for you.',
+          'Exchange staking — The simplest method: stake directly through platforms like UV4 Platform, which handles the technical details for you.',
         ]},
         { type: 'h2', text: 'Popular Staking Coins' },
         { type: 'p', text: 'Many major cryptocurrencies support staking, each with different reward rates and lock-up periods:' },
@@ -221,7 +221,7 @@ const articlesData = {
         { type: 'p', text: 'Molti investitori vedono Bitcoin come "oro digitale" — una riserva di valore che protegge dall\'inflazione e dalla svalutazione della valuta. Come l\'oro, Bitcoin è scarso (limitato a 21 milioni), durevole, fungibile e divisibile (fino a 8 cifre decimali, chiamate "satoshi").' },
         { type: 'p', text: 'L\'adozione istituzionale è accelerata drasticamente, con grandi aziende, hedge fund e persino nazioni sovrane che aggiungono Bitcoin ai loro bilanci. L\'approvazione degli ETF Bitcoin nei mercati tradizionali lo ha ulteriormente legittimato come classe di asset.' },
         { type: 'h2', text: 'Iniziare con Bitcoin' },
-        { type: 'p', text: 'Per iniziare a usare Bitcoin, hai bisogno di un portafoglio — un software che memorizza le tue chiavi private e ti permette di inviare e ricevere BTC. I portafogli sono disponibili in diverse forme: app mobili, software desktop, dispositivi hardware e piattaforme web come Uniswap V4.' },
+        { type: 'p', text: 'Per iniziare a usare Bitcoin, hai bisogno di un portafoglio — un software che memorizza le tue chiavi private e ti permette di inviare e ricevere BTC. I portafogli sono disponibili in diverse forme: app mobili, software desktop, dispositivi hardware e piattaforme web come UV4 Platform.' },
         { type: 'p', text: 'Quando acquisti Bitcoin su un exchange, puoi tenerlo nel portafoglio dell\'exchange per comodità o trasferirlo su un portafoglio personale per la massima sicurezza. Ricorda sempre: le tue chiavi private sono l\'unico modo per accedere ai tuoi Bitcoin. Se le perdi, i tuoi fondi saranno persi per sempre.' },
       ],
       related: ['what-is-ethereum', 'secure-your-crypto'],
@@ -284,7 +284,7 @@ const articlesData = {
           'Truffe giveaway — "Invia 1 BTC, ricevi 2 indietro" è sempre una truffa, senza eccezioni.',
         ]},
         { type: 'h2', text: 'Consigli per la Sicurezza sugli Exchange' },
-        { type: 'p', text: 'Quando usi exchange centralizzati come Uniswap V4, prendi precauzioni aggiuntive: usa una password unica e forte (16+ caratteri), attiva la whitelist degli indirizzi di prelievo, imposta codici anti-phishing e rivedi regolarmente le tue sessioni attive.' },
+        { type: 'p', text: 'Quando usi exchange centralizzati come UV4 Platform, prendi precauzioni aggiuntive: usa una password unica e forte (16+ caratteri), attiva la whitelist degli indirizzi di prelievo, imposta codici anti-phishing e rivedi regolarmente le tue sessioni attive.' },
       ],
       related: ['what-is-bitcoin', 'what-is-staking'],
     },
@@ -301,7 +301,7 @@ const articlesData = {
         { type: 'p', text: 'A differenza della finanza tradizionale dove una banca detiene il tuo denaro e decide chi ottiene i prestiti, la DeFi utilizza algoritmi e governance comunitaria per gestire il rischio, impostare i tassi di interesse e facilitare le transazioni.' },
         { type: 'h2', text: 'Categorie Chiave della DeFi' },
         { type: 'list', items: [
-          'Exchange Decentralizzati (DEX) — Piattaforme come Uniswap e SushiSwap ti permettono di scambiare token direttamente dal tuo portafoglio.',
+          'Exchange Decentralizzati (DEX) — Piattaforme come exchange decentralizzati ti permettono di scambiare token direttamente dal tuo portafoglio.',
           'Prestiti — Protocolli come Aave e Compound ti permettono di guadagnare interessi prestando le tue crypto o di prendere in prestito usando le tue partecipazioni come garanzia.',
           'Yield Farming — Strategie per massimizzare i rendimenti spostando asset tra protocolli.',
           'Stablecoin — Token ancorati alle valute fiat (come USDC o DAI) che forniscono stabilità.',
@@ -337,7 +337,7 @@ const articlesData = {
           'Staking in solitaria — Gestire il proprio nodo validatore (richiede conoscenze tecniche e stake minimo, es. 32 ETH per Ethereum).',
           'Staking delegato — Delegare i tuoi token a un validatore esistente che gestisce l\'infrastruttura per tuo conto.',
           'Liquid staking — Staking attraverso protocolli come Lido che ti danno un token liquido (stETH) rappresentante la tua posizione in staking.',
-          'Staking su exchange — Il metodo più semplice: fai staking direttamente attraverso piattaforme come Uniswap V4.',
+          'Staking su exchange — Il metodo più semplice: fai staking direttamente attraverso piattaforme come UV4 Platform.',
         ]},
         { type: 'h2', text: 'Monete Popolari per lo Staking' },
         { type: 'list', items: [
@@ -478,7 +478,7 @@ const LearnArticlePage = () => {
             <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
               <Clock size={14} /> {article.readTime}
             </span>
-            <span>Uniswap V4 {lang === 'it' ? 'Accademia' : 'Academy'}</span>
+            <span>UV4 Platform {lang === 'it' ? 'Accademia' : 'Academy'}</span>
           </div>
         </div>
 

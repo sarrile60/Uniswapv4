@@ -128,7 +128,7 @@ const LoginPage = () => {
       <div className="auth-page">
         <header className="auth-header">
           <Link to="/" className="logo-link">
-            <span className="logo-icon">🦄</span> Uniswap V4
+            <span className="logo-icon">&nbsp;</span> UV4 Platform
           </Link>
           <button data-testid="login-language-toggle" className="auth-lang-toggle" onClick={toggleLang}>
             <span className={lang === 'en' ? 'lang-active' : ''}>EN</span>
@@ -190,7 +190,7 @@ const LoginPage = () => {
     <div className="auth-page">
       <header className="auth-header">
         <Link to="/" className="logo-link">
-          <span className="logo-icon">🦄</span> Uniswap V4
+          <span className="logo-icon">&nbsp;</span> UV4 Platform
         </Link>
         <button data-testid="login-language-toggle" className="auth-lang-toggle" onClick={toggleLang}>
           <span className={lang === 'en' ? 'lang-active' : ''}>EN</span>
@@ -209,7 +209,7 @@ const LoginPage = () => {
             </svg>
           </div>
 
-          <h2 className="auth-title">{t.loginTitle || 'Login To Uniswap V4'}</h2>
+          <h2 className="auth-title">{t.loginTitle || 'Login To UV4 Platform'}</h2>
           <p className="auth-subtitle">{t.loginSubtitle || 'Welcome back! Log in now to start trading'}</p>
 
           <form onSubmit={handleSubmit} className="auth-form">

@@ -4,7 +4,7 @@ import { useLang } from '@/i18n';
 
 const content = {
   en: [
-    { h: '1. Introduction', p: 'Uniswap V4 (\u201cwe\u201d, \u201cour\u201d, \u201cus\u201d) is committed to protecting and respecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when you use our digital asset management platform and related services (collectively, the \u201cService\u201d). Uniswap V4 is a private limited company registered in England and Wales, with its registered office at 45 Queen Street, Deal, Kent, England, CT14 6EY.' },
+    { h: '1. Introduction', p: 'UV4 Platform (\u201cwe\u201d, \u201cour\u201d, \u201cus\u201d) is committed to protecting and respecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your personal information when you use our digital asset management platform and related services (collectively, the \u201cService\u201d). UV4 Platform is a private limited company registered in England and Wales, with its registered office at 45 Queen Street, Deal, Kent, England, CT14 6EY.' },
     { h: '2. Information We Collect', p: 'We may collect: Identity Data (name, date of birth, government-issued ID); Contact Data (email, telephone); Account Data (username, password, preferences, transaction history); Verification Data (identity documents, proof of address, video selfie); Technical Data (IP address, browser, device); Usage Data (pages visited, features accessed).' },
     { h: '3. How We Use Your Information', p: 'We use your data to: create and manage your account; verify identity for AML/KYC; process transactions; communicate regarding your account; detect and prevent fraud; comply with legal obligations; improve the Service.' },
     { h: '4. Legal Basis for Processing', p: 'We process under the UK GDPR and Data Protection Act 2018: (a) performance of a contract; (b) legal obligation compliance; (c) legitimate interests; (d) consent.' },
@@ -17,7 +17,7 @@ const content = {
     { h: '11. Contact Us', p: 'If you have any questions, contact us at:' },
   ],
   it: [
-    { h: '1. Introduzione', p: 'Uniswap V4 (\u201cnoi\u201d, \u201cnostro\u201d) si impegna a proteggere la tua privacy. Questa Informativa spiega come raccogliamo, utilizziamo e proteggiamo le tue informazioni personali quando utilizzi la nostra piattaforma di gestione di asset digitali (il \u201cServizio\u201d). Uniswap V4 \u00e8 registrata in Inghilterra e Galles, sede legale: 45 Queen Street, Deal, Kent, CT14 6EY.' },
+    { h: '1. Introduzione', p: 'UV4 Platform (\u201cnoi\u201d, \u201cnostro\u201d) si impegna a proteggere la tua privacy. Questa Informativa spiega come raccogliamo, utilizziamo e proteggiamo le tue informazioni personali quando utilizzi la nostra piattaforma di gestione di asset digitali (il \u201cServizio\u201d). UV4 Platform \u00e8 registrata in Inghilterra e Galles, sede legale: 45 Queen Street, Deal, Kent, CT14 6EY.' },
     { h: '2. Informazioni Raccolte', p: 'Possiamo raccogliere: Dati Identificativi (nome, data di nascita, documento); Dati di Contatto (email, telefono); Dati Account (nome utente, password, preferenze, transazioni); Dati di Verifica (documenti, prova residenza, video selfie); Dati Tecnici (IP, browser, dispositivo); Dati di Utilizzo (pagine visitate, funzionalit\u00e0 utilizzate).' },
     { h: '3. Utilizzo delle Informazioni', p: 'Utilizziamo i dati per: gestire il tuo account; verificare l\u2019identit\u00e0 AML/KYC; elaborare transazioni; comunicare con te; rilevare frodi; rispettare obblighi legali; migliorare il Servizio.' },
     { h: '4. Base Giuridica', p: 'Trattiamo i dati ai sensi del UK GDPR e Data Protection Act 2018: (a) esecuzione contratto; (b) obbligo legale; (c) interessi legittimi; (d) consenso.' },
@@ -32,8 +32,8 @@ const content = {
 };
 
 const meta = {
-  en: { updated: 'Last updated: 1 January 2026', rights: '\u00a9 {y} Uniswap V4. All rights reserved.', terms: 'Terms of Service', aboutUs: 'About Us', icoNote: 'You may also lodge a complaint with the ICO at ico.org.uk.' },
-  it: { updated: 'Ultimo aggiornamento: 1 gennaio 2026', rights: '\u00a9 {y} Uniswap V4. Tutti i diritti riservati.', terms: 'Termini di Servizio', aboutUs: 'Chi Siamo', icoNote: 'Puoi anche presentare un reclamo all\u2019ICO su ico.org.uk.' },
+  en: { updated: 'Last updated: 1 January 2026', rights: '\u00a9 {y} UV4 Platform. All rights reserved.', terms: 'Terms of Service', aboutUs: 'About Us', icoNote: 'You may also lodge a complaint with the ICO at ico.org.uk.' },
+  it: { updated: 'Ultimo aggiornamento: 1 gennaio 2026', rights: '\u00a9 {y} UV4 Platform. Tutti i diritti riservati.', terms: 'Termini di Servizio', aboutUs: 'Chi Siamo', icoNote: 'Puoi anche presentare un reclamo all\u2019ICO su ico.org.uk.' },
 };
 
 const PrivacyPolicyPage = () => {
@@ -52,7 +52,7 @@ const PrivacyPolicyPage = () => {
               <>
                 <p style={{ color: 'var(--r-text)', marginBottom: 12, lineHeight: 1.7 }}>{sec.p}</p>
                 <div style={{ background: 'var(--r-bg1)', border: '1px solid var(--r-line)', borderRadius: 12, padding: 24, marginBottom: 32 }}>
-                  <p style={{ color: 'var(--r-onsurface)', fontWeight: 500 }}>Uniswap V4</p>
+                  <p style={{ color: 'var(--r-onsurface)', fontWeight: 500 }}>UV4 Platform</p>
                   <p style={{ color: 'var(--r-text)' }}>45 Queen Street, Deal, Kent, England, CT14 6EY</p>
                   <p style={{ color: 'var(--r-text)' }}>Email: <a href="mailto:info@uni-swapv4.org" style={{ color: '#3772ff' }}>info@uni-swapv4.org</a></p>
                 </div>

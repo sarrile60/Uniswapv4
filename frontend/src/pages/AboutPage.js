@@ -6,9 +6,9 @@ import { useLang } from '@/i18n';
 const txt = {
   en: {
     heroTitle: 'Trusted Digital Asset Management',
-    heroDesc: 'Uniswap V4 provides a secure, reliable platform for managing digital assets. Founded in 2023 and headquartered in the United Kingdom, we are committed to delivering institutional-grade security and a seamless user experience for individuals and businesses alike.',
+    heroDesc: 'UV4 Platform provides a secure, reliable platform for managing digital assets. Founded in 2023 and headquartered in the United Kingdom, we are committed to delivering institutional-grade security and a seamless user experience for individuals and businesses alike.',
     missionTitle: 'Our Mission',
-    missionP1: 'At Uniswap V4, our mission is to make digital asset management accessible, transparent, and secure. We believe that financial tools should empower users with full control over their assets, backed by robust security measures and clear regulatory compliance.',
+    missionP1: 'At UV4 Platform, our mission is to make digital asset management accessible, transparent, and secure. We believe that financial tools should empower users with full control over their assets, backed by robust security measures and clear regulatory compliance.',
     missionP2: 'We are dedicated to building a platform where trust is earned through transparency, where security is built into every layer, and where our users can manage their digital portfolios with confidence.',
     guidesTitle: 'What Guides Us',
     values: [
@@ -21,13 +21,13 @@ const txt = {
     companyName: 'Company Name', companyType: 'Private Limited Company',
     office: 'Registered Office', contact: 'Contact', incorporated: 'Incorporated',
     ctaTitle: 'Get in Touch', ctaDesc: 'Have questions or need support? Our team is here to help.', ctaBtn: 'Contact Support',
-    rights: '\u00a9 {y} Uniswap V4. All rights reserved.', privacy: 'Privacy Policy', terms: 'Terms of Service',
+    rights: '\u00a9 {y} UV4 Platform. All rights reserved.', privacy: 'Privacy Policy', terms: 'Terms of Service',
   },
   it: {
     heroTitle: 'Gestione Affidabile di Asset Digitali',
-    heroDesc: 'Uniswap V4 fornisce una piattaforma sicura e affidabile per la gestione di asset digitali. Fondata nel 2023 e con sede nel Regno Unito, ci impegniamo a fornire sicurezza di livello istituzionale e un\'esperienza utente impeccabile per privati e aziende.',
+    heroDesc: 'UV4 Platform fornisce una piattaforma sicura e affidabile per la gestione di asset digitali. Fondata nel 2023 e con sede nel Regno Unito, ci impegniamo a fornire sicurezza di livello istituzionale e un\'esperienza utente impeccabile per privati e aziende.',
     missionTitle: 'La Nostra Missione',
-    missionP1: 'In Uniswap V4, la nostra missione \u00e8 rendere la gestione degli asset digitali accessibile, trasparente e sicura. Crediamo che gli strumenti finanziari debbano permettere agli utenti di avere il pieno controllo sui propri asset, supportati da solide misure di sicurezza e una chiara conformit\u00e0 normativa.',
+    missionP1: 'In UV4 Platform, la nostra missione \u00e8 rendere la gestione degli asset digitali accessibile, trasparente e sicura. Crediamo che gli strumenti finanziari debbano permettere agli utenti di avere il pieno controllo sui propri asset, supportati da solide misure di sicurezza e una chiara conformit\u00e0 normativa.',
     missionP2: 'Ci dedichiamo a costruire una piattaforma dove la fiducia si guadagna attraverso la trasparenza, dove la sicurezza \u00e8 integrata in ogni livello e dove i nostri utenti possono gestire i propri portafogli digitali con fiducia.',
     guidesTitle: 'I Nostri Valori',
     values: [
@@ -40,7 +40,7 @@ const txt = {
     companyName: 'Ragione Sociale', companyType: 'Societ\u00e0 a Responsabilit\u00e0 Limitata',
     office: 'Sede Legale', contact: 'Contatto', incorporated: 'Costituzione',
     ctaTitle: 'Contattaci', ctaDesc: 'Hai domande o hai bisogno di supporto? Il nostro team \u00e8 qui per aiutarti.', ctaBtn: 'Contatta il Supporto',
-    rights: '\u00a9 {y} Uniswap V4. Tutti i diritti riservati.', privacy: 'Informativa Privacy', terms: 'Termini di Servizio',
+    rights: '\u00a9 {y} UV4 Platform. Tutti i diritti riservati.', privacy: 'Informativa Privacy', terms: 'Termini di Servizio',
   },
 };
 
@@ -55,7 +55,7 @@ const AboutPage = () => {
       <main className="max-w-4xl mx-auto px-4 sm:px-6 py-10">
         <div className="text-center mb-16">
           <div style={{ width: 64, height: 64, background: 'linear-gradient(135deg, #ec4899, #7c3aed)', borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-            <span style={{ fontSize: 32 }}>🦄</span>
+            <span style={{ fontSize: 32 }}>&nbsp;</span>
           </div>
           <h2 style={{ fontSize: '2.25rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 16 }}>{t.heroTitle}</h2>
           <p style={{ fontSize: '1.125rem', color: 'var(--r-text)', maxWidth: 640, margin: '0 auto', lineHeight: 1.6 }}>{t.heroDesc}</p>
@@ -91,7 +91,7 @@ const AboutPage = () => {
                 <Building style={{ width: 20, height: 20, color: 'var(--r-text)', marginTop: 2, flexShrink: 0 }} />
                 <div>
                   <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--r-text)' }}>{t.companyName}</p>
-                  <p style={{ color: 'var(--r-onsurface)' }}>Uniswap V4</p>
+                  <p style={{ color: 'var(--r-onsurface)' }}>UV4 Platform</p>
                   <p style={{ fontSize: '0.875rem', color: 'var(--r-text)' }}>{t.companyType}</p>
                 </div>
               </div>

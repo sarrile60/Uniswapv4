@@ -520,7 +520,7 @@ const LandingPage = () => {
           <div className="row">
             <div className="col-xl-6 col-md-12">
               <div className="about_image">
-                <img className="img-main" src="/assets/images/layout/about-h1.png" alt="About Uniswap V4" />
+                <img className="img-main" src="/assets/images/layout/about-h1.png" alt="About UV4 Platform" />
               </div>
             </div>
             <div className="col-xl-6 col-md-12">
@@ -618,7 +618,7 @@ const LandingPage = () => {
               <div className="col-xl-4 col-md-8">
                 <div className="info">
                   <Link to="/" className="logo">
-                    <span style={{fontSize: '20px', fontWeight: 800, color: '#fff'}}>🦄 Uniswap V4</span>
+                    <span style={{fontSize: '20px', fontWeight: 800, color: '#fff'}}>UV4 Platform</span>
                   </Link>
                   <h6>{t.land_footerTalk}</h6>
                   <ul className="list">
