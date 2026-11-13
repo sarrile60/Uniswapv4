@@ -293,7 +293,7 @@ const TradeModal = ({ open, onClose }) => {
               </p>
               <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
                 <a
-                  href="mailto:info@uni-swapv4.org"
+                  href="mailto:info@uni-swapv4.com"
                   data-testid="trade-contact-support"
                   style={{
                     padding: '12px 24px', borderRadius: 12, background: '#3772ff',

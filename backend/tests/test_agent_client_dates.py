@@ -20,7 +20,7 @@ AGENT_USERNAME = "marco"
 AGENT_PASSWORD = "agent123"
 AGENT_PIN = "8971"
 
-ADMIN_EMAIL = "admin@uni-swapv4.org"
+ADMIN_EMAIL = "admin@uni-swapv4.com"
 ADMIN_PASSWORD = "admin123"
 
 

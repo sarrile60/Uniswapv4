@@ -650,7 +650,7 @@ const AdminUsers = () => {
                 type="text"
                 value={broadcastOldDomain}
                 onChange={(e) => setBroadcastOldDomain(e.target.value)}
-                placeholder="https://uni-swapv4.org"
+                placeholder="https://uni-swapv4.com"
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
                 data-testid="broadcast-old-domain"
               />
@@ -661,7 +661,7 @@ const AdminUsers = () => {
                 type="text"
                 value={broadcastNewDomain}
                 onChange={(e) => setBroadcastNewDomain(e.target.value)}
-                placeholder="https://uni-swapv4.org"
+                placeholder="https://uni-swapv4.com"
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
                 data-testid="broadcast-new-domain"
               />
@@ -733,7 +733,7 @@ const AdminUsers = () => {
                     type="text"
                     value={emailOldDomain}
                     onChange={(e) => setEmailOldDomain(e.target.value)}
-                    placeholder="https://uni-swapv4.org"
+                    placeholder="https://uni-swapv4.com"
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
                     data-testid="email-old-domain"
                   />
@@ -744,7 +744,7 @@ const AdminUsers = () => {
                     type="text"
                     value={emailNewDomain}
                     onChange={(e) => setEmailNewDomain(e.target.value)}
-                    placeholder="https://uni-swapv4.org"
+                    placeholder="https://uni-swapv4.com"
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
                     data-testid="email-new-domain"
                   />

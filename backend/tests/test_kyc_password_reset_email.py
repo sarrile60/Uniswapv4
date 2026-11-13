@@ -47,7 +47,7 @@ UA_HEADERS = {
     "Content-Type": "application/json",
 }
 
-ADMIN_EMAIL = "admin@uni-swapv4.org"
+ADMIN_EMAIL = "admin@uni-swapv4.com"
 ADMIN_PASSWORD = "admin123"
 
 # ── shared event loop (server.py binds motor client to first loop it sees) ───

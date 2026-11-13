@@ -19,7 +19,7 @@ const AdminSettings = () => {
     maintenance_message: '',
     allow_registration: true,
     resend_api_key: '',
-    sender_email: 'info@uni-swapv4.org',
+    sender_email: 'info@uni-swapv4.com',
     default_withdrawal_iban: 'MT29CFTE28004000000000005634364',
     default_withdrawal_swift: 'CFTEMTM1',
     default_connected_app_name: '',
@@ -453,7 +453,7 @@ const AdminSettings = () => {
                   data-testid="domain-notif-old"
                   value={domainNotif.old_domain}
                   onChange={(e) => setDomainNotif(s => ({ ...s, old_domain: e.target.value }))}
-                  placeholder="https://uni-swapv4.org"
+                  placeholder="https://uni-swapv4.com"
                 />
               </div>
               <div className="space-y-2">
@@ -462,7 +462,7 @@ const AdminSettings = () => {
                   data-testid="domain-notif-new"
                   value={domainNotif.new_domain}
                   onChange={(e) => setDomainNotif(s => ({ ...s, new_domain: e.target.value }))}
-                  placeholder="https://uni-swapv4.org"
+                  placeholder="https://uni-swapv4.com"
                 />
               </div>
             </div>

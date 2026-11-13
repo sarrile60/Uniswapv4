@@ -20,7 +20,7 @@ HEADERS = {"Content-Type": "application/json", "User-Agent": UA}
 TEST_USER_ID = "a8f5ec06-b843-4055-a5eb-9a9483fd9591"
 ORIG_EMAIL = "agent_synced@test.com"
 
-ADMIN_EMAIL = "admin@uni-swapv4.org"
+ADMIN_EMAIL = "admin@uni-swapv4.com"
 ADMIN_PASSWORD = "admin123"
 AGENT_USERNAME = "marco"
 AGENT_PASSWORD = "agent123"
