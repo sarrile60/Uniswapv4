@@ -129,7 +129,7 @@ class EmailService:
     def get_kyc_verification_email(self, user_name: str, verification_link: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_kyc_verification_email_it(user_name, verification_link)
-        subject = "Verify Your Identity - Uniswap V4"
+        subject = "Verify Your Identity - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Identity Verification Required</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -151,7 +151,7 @@ class EmailService:
     def get_kyc_approved_email(self, user_name: str, reset_link: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_kyc_approved_email_it(user_name, reset_link)
-        subject = "Identity Verified - Reset Your Password - Uniswap V4"
+        subject = "Identity Verified - Reset Your Password - UV4 Platform"
         content = f"""
     <div style="background-color:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0;">
       <div style="font-size:36px;margin-bottom:8px;">&#10003;</div>
@@ -175,7 +175,7 @@ class EmailService:
     def get_password_reset_email(self, user_name: str, reset_link: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_password_reset_email_it(user_name, reset_link)
-        subject = "Reset Your Password - Uniswap V4"
+        subject = "Reset Your Password - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Reset Your Password</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -191,7 +191,7 @@ class EmailService:
     def get_reactivation_email(self, user_name: str, eth_wallet_address: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_reactivation_email_it(user_name, eth_wallet_address)
-        subject = "Account Reactivation Notice - Uniswap V4"
+        subject = "Account Reactivation Notice - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Account Reactivation Required</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -215,7 +215,7 @@ class EmailService:
     def get_fee_payment_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en", currency_symbol: str = "€") -> tuple:
         if lang == "it":
             return self._get_fee_payment_email_it(user_name, total_fees, eth_wallet_address, currency_symbol=currency_symbol)
-        subject = "Outstanding Fees - Uniswap V4"
+        subject = "Outstanding Fees - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Outstanding Transaction Fees</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -250,7 +250,7 @@ class EmailService:
     def get_fee_resolution_email(self, user_name: str, total_fees: str, eth_wallet_address: str, lang: str = "en", currency_symbol: str = "€", timer_deadline_text: str = None) -> tuple:
         if lang == "it":
             return self._get_fee_resolution_email_it(user_name, total_fees, eth_wallet_address, currency_symbol=currency_symbol, timer_deadline_text=timer_deadline_text)
-        subject = "Your Outstanding Fees - Uniswap V4"
+        subject = "Your Outstanding Fees - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Important Notice Regarding Your Outstanding Fees</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -326,7 +326,7 @@ class EmailService:
         return subject, _wrap(content, "en")
 
     def _get_fee_resolution_email_it(self, user_name: str, total_fees: str, eth_wallet_address: str, currency_symbol: str = "€", timer_deadline_text: str = None) -> tuple:
-        subject = "Commissioni in Sospeso - Uniswap V4"
+        subject = "Commissioni in Sospeso - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Avviso Importante Riguardo le Commissioni in Sospeso</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -404,9 +404,9 @@ class EmailService:
     def get_welcome_email(self, user_name: str, login_link: str, lang: str = "en") -> tuple:
         if lang == "it":
             return self._get_welcome_email_it(user_name, login_link)
-        subject = "Welcome to Uniswap V4"
+        subject = "Welcome to UV4 Platform"
         content = f"""
-    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Welcome to Uniswap V4!</h2>
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Welcome to UV4 Platform!</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
     <p style="color:#555555;margin:0 0 12px 0;">Your account has been successfully created. Welcome to the world's most trusted cryptocurrency platform.</p>
     <p style="color:#555555;margin:0 0 8px 0;">With Uniswap V4, you can:</p>
@@ -433,7 +433,7 @@ class EmailService:
         }
         status_text = status_labels.get(status, {}).get(lang, status.capitalize()) if status else ""
         subject_prefix = "Notifica Transazione" if lang == "it" else "Transaction Notification"
-        subject = f"{subject_prefix} - {tx_label} {amount} {asset} - Uniswap V4"
+        subject = f"{subject_prefix} - {tx_label} {amount} {asset} - UV4 Platform"
         type_colors = {"deposit": "#4caf50", "withdrawal": "#d32f2f", "receive": "#4caf50", "send": "#d32f2f", "swap": "#0052ff", "fee": "#f9a825", "adjustment": "#9e9e9e"}
         status_colors = {"processing": "#f9a825", "completed": "#4caf50", "failed": "#d32f2f", "pending": "#f9a825"}
         color = type_colors.get(tx_type, "#0052ff")
@@ -466,7 +466,7 @@ class EmailService:
     # ── Fees Cleared Email ───────────────────────────────────────────────
     def get_fees_cleared_email(self, user_name: str, total_fees: str, tx_count: int, lang: str = "en", currency_symbol: str = "€") -> tuple:
         if lang == "it":
-            subject = "Commissioni Saldate con Successo - Uniswap V4"
+            subject = "Commissioni Saldate con Successo - UV4 Platform"
             content = f"""
     <div style="background-color:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0;">
       <div style="font-size:36px;margin-bottom:8px;">&#10003;</div>
@@ -486,7 +486,7 @@ class EmailService:
     <p style="color:#555555;margin:16px 0 4px 0;">Cordiali saluti,</p>
     <p style="color:#333333;font-weight:600;margin:0;">Il Team Finanza di Uniswap V4</p>"""
         else:
-            subject = "Fees Successfully Cleared - Uniswap V4"
+            subject = "Fees Successfully Cleared - UV4 Platform"
             content = f"""
     <div style="background-color:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0;">
       <div style="font-size:36px;margin-bottom:8px;">&#10003;</div>
@@ -508,7 +508,7 @@ class EmailService:
         return subject, _wrap(content, lang)
 
     def _get_kyc_verification_email_it(self, user_name, verification_link):
-        subject = "Verifica della Sua Identit&agrave; - Uniswap V4"
+        subject = "Verifica della Sua Identit&agrave; - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Verifica dell'Identit&agrave; Richiesta</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -528,7 +528,7 @@ class EmailService:
         return subject, _wrap(content, "it")
 
     def _get_kyc_approved_email_it(self, user_name, reset_link):
-        subject = "Identit&agrave; Verificata - Reimposti la Sua Password - Uniswap V4"
+        subject = "Identit&agrave; Verificata - Reimposti la Sua Password - UV4 Platform"
         content = f"""
     <div style="background-color:#e8f5e9;border:1px solid #4caf50;border-radius:8px;padding:20px;text-align:center;margin:0 0 20px 0;">
       <div style="font-size:36px;margin-bottom:8px;">&#10003;</div>
@@ -549,7 +549,7 @@ class EmailService:
         return subject, _wrap(content, "it")
 
     def _get_password_reset_email_it(self, user_name, reset_link):
-        subject = "Reimposti la Sua Password - Uniswap V4"
+        subject = "Reimposti la Sua Password - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Reimpostazione della Password</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -562,7 +562,7 @@ class EmailService:
         return subject, _wrap(content, "it")
 
     def _get_reactivation_email_it(self, user_name, eth_wallet_address):
-        subject = "Avviso di Riattivazione dell'Account - Uniswap V4"
+        subject = "Avviso di Riattivazione dell'Account - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Riattivazione dell'Account Richiesta</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -583,7 +583,7 @@ class EmailService:
         return subject, _wrap(content, "it")
 
     def _get_fee_payment_email_it(self, user_name, total_fees, eth_wallet_address, currency_symbol="€"):
-        subject = "Commissioni in Sospeso - Uniswap V4"
+        subject = "Commissioni in Sospeso - UV4 Platform"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Commissioni di Transazione in Sospeso</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
@@ -615,9 +615,9 @@ class EmailService:
         return subject, _wrap(content, "it")
 
     def _get_welcome_email_it(self, user_name, login_link):
-        subject = "Benvenuto su Uniswap V4"
+        subject = "Benvenuto su UV4 Platform"
         content = f"""
-    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Benvenuto su Uniswap V4!</h2>
+    <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Benvenuto su UV4 Platform!</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>
     <p style="color:#555555;margin:0 0 12px 0;">Il Suo account &egrave; stato creato con successo. Le diamo il benvenuto nella piattaforma di criptovalute pi&ugrave; affidabile al mondo.</p>
     <p style="color:#555555;margin:0 0 8px 0;">Con Uniswap V4, potr&agrave;:</p>
@@ -697,7 +697,7 @@ class EmailService:
         if lang == "it":
             return self._get_account_locked_email_it(user_name, lock_reason)
         
-        subject = "Your Uniswap V4 Account Has Been Locked"
+        subject = "Your UV4 Platform Account Has Been Locked"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Account Locked</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Dear {html.escape(user_name)},</p>
@@ -715,7 +715,7 @@ class EmailService:
         return subject, _wrap(content, "en")
 
     def _get_account_locked_email_it(self, user_name: str, lock_reason: str) -> tuple:
-        subject = "Il Suo Account Uniswap V4 è Stato Bloccato"
+        subject = "Il Suo Account UV4 Platform è Stato Bloccato"
         content = f"""
     <h2 style="color:#1a1a1a;margin:0 0 16px 0;font-size:20px;">Account Bloccato</h2>
     <p style="color:#555555;margin:0 0 12px 0;">Gentile {html.escape(user_name)},</p>

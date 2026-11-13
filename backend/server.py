@@ -174,6 +174,8 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Permissions-Policy"] = "camera=(self), microphone=(self), geolocation=()"
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        # Hide server identity
+        response.headers["Server"] = "nginx"
         # X-Robots-Tag: block all indexing
         response.headers["X-Robots-Tag"] = "noindex, nofollow, noarchive, nosnippet"
         # Content Security Policy - signals legitimate app to registrars

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'uniswapv4-v3';
+const CACHE_NAME = 'app-cache-v3';
 
 // Install: cache critical assets
 self.addEventListener('install', (event) => {
