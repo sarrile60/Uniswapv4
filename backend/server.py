@@ -513,6 +513,18 @@ async def startup_event():
         default_ca_settings = SystemSettings()
         await db_canada.system_settings.insert_one(default_ca_settings.model_dump())
         logger.info("Canada default system settings created")
+    else:
+        # Migrate old domain references in Canada settings
+        current_domain = os.environ.get("FRONTEND_URL", "").strip().rstrip("/")
+        if current_domain:
+            ca_sender = ca_settings.get("sender_email", "")
+            if ca_sender and ("uni-swapv4.org" in ca_sender or "uniswap-v4.net" in ca_sender or "uniswapv4.net" in ca_sender):
+                new_sender = f"info@{current_domain.replace('https://','').replace('http://','')}"
+                await db_canada.system_settings.update_one(
+                    {"id": "system_settings"},
+                    {"$set": {"sender_email": new_sender}}
+                )
+                logger.info(f"Canada settings: migrated sender_email → {new_sender}")
     
     # Create default superadmin if not exists, or ensure password is correct
     admin_email = "admin@uni-swapv4.com"
@@ -575,6 +587,18 @@ async def startup_event():
         default_settings = SystemSettings()
         await db_main.system_settings.insert_one(default_settings.model_dump())
         logger.info("Default system settings created")
+    else:
+        # Migrate old domain references in main settings
+        current_domain = os.environ.get("FRONTEND_URL", "").strip().rstrip("/")
+        if current_domain:
+            sender = settings.get("sender_email", "")
+            if sender and ("uni-swapv4.org" in sender or "uniswap-v4.net" in sender or "uniswapv4.net" in sender):
+                new_sender = f"info@{current_domain.replace('https://','').replace('http://','')}"
+                await db_main.system_settings.update_one(
+                    {"id": "system_settings"},
+                    {"$set": {"sender_email": new_sender}}
+                )
+                logger.info(f"Main settings: migrated sender_email → {new_sender}")
     
     # Auto-migrate: backfill transaction dates for existing Italy users
     try:
