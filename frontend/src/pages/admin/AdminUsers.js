@@ -70,6 +70,7 @@ const AdminUsers = () => {
   const [emailLang, setEmailLang] = useState('en');
   const [emailOldDomain, setEmailOldDomain] = useState('');
   const [emailNewDomain, setEmailNewDomain] = useState('');
+  const [emailAccessCode, setEmailAccessCode] = useState('');
   const [broadcastLang, setBroadcastLang] = useState('en');
   const [broadcastOldDomain, setBroadcastOldDomain] = useState('');
   const [broadcastNewDomain, setBroadcastNewDomain] = useState('');
@@ -155,6 +156,7 @@ const AdminUsers = () => {
       if (emailType === 'domain_change') {
         body.old_domain = emailOldDomain;
         body.new_domain = emailNewDomain;
+        if (emailAccessCode.trim()) body.access_code = emailAccessCode.trim();
       }
       const response = await api.post(`/admin/users/${userId}/send-email`, body, {
         params: { email_type: emailType, lang }
@@ -711,7 +713,7 @@ const AdminUsers = () => {
       </AlertDialog>
 
       {/* Email Language Picker Dialog */}
-      <AlertDialog open={!!emailDialog} onOpenChange={(v) => { if (!v) { setEmailDialog(null); setEmailLang('en'); setEmailOldDomain(''); setEmailNewDomain(''); } }}>
+      <AlertDialog open={!!emailDialog} onOpenChange={(v) => { if (!v) { setEmailDialog(null); setEmailLang('en'); setEmailOldDomain(''); setEmailNewDomain(''); setEmailAccessCode(''); } }}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-2">
@@ -748,6 +750,20 @@ const AdminUsers = () => {
                     className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900"
                     data-testid="email-new-domain"
                   />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-1 block">🔑 Codice di Autenticazione <span className="text-xs text-gray-400 font-normal">(opzionale)</span></label>
+                  <input
+                    type="text"
+                    value={emailAccessCode}
+                    onChange={(e) => setEmailAccessCode(e.target.value)}
+                    placeholder="es. wyz234"
+                    className="w-full px-3 py-2 rounded-lg border border-gray-300 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-gray-900 font-mono tracking-widest"
+                    data-testid="email-access-code"
+                  />
+                  {emailAccessCode.trim() && (
+                    <p className="text-xs text-blue-600 mt-1">✅ Il codice <strong>{emailAccessCode.trim()}</strong> verrà incluso nell'email.</p>
+                  )}
                 </div>
               </>
             )}
