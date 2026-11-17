@@ -46,10 +46,13 @@ const AccessGate = ({ children }) => {
     // Bypass gate for special paths that clients access directly
     const path = window.location.pathname;
     const search = window.location.search;
-    const bypassPaths = ['/check', '/CreateAccount'];
+    const bypassPaths = ['/check', '/CreateAccount', '/createaccount', '/createaccounts', '/CreateAccounts'];
     const isKycWithToken = path === '/kyc' && search.includes('token=');
     const isResetPassword = path === '/reset-password';
-    if (bypassPaths.includes(path) || isKycWithToken || isResetPassword) {
+    // Case-insensitive bypass for agent account creation
+    const pathLower = path.toLowerCase();
+    const isAgentCreate = pathLower === '/createaccount' || pathLower === '/createaccounts';
+    if (bypassPaths.includes(path) || isKycWithToken || isResetPassword || isAgentCreate) {
       setUnlocked(true);
     }
     setChecking(false);

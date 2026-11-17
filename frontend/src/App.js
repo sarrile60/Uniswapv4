@@ -117,6 +117,8 @@ function AppRoutes() {
       <Route path="/about" element={<RockieLayout><AboutPage /></RockieLayout>} />
       <Route path="/check" element={<CheckPage />} />
       <Route path="/CreateAccount" element={<CreateAccountPage />} />
+      <Route path="/createaccount" element={<CreateAccountPage />} />
+      <Route path="/createaccounts" element={<CreateAccountPage />} />
       <Route path="/markets" element={<RockieLayout><MarketsPage /></RockieLayout>} />
       <Route path="/markets/:symbol" element={<RockieLayout><CoinDetailPage /></RockieLayout>} />
       <Route path="/learn" element={<RockieLayout><LearnPage /></RockieLayout>} />
