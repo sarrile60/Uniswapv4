@@ -161,7 +161,7 @@ const icons = {
   ),
   UNI: (size) => (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#FF007A"/>
-    <text x="16" y="21" textAnchor="middle" style={{fontSize:14,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>🦄</text></svg>
+    <text x="16" y="21" textAnchor="middle" style={{fontSize:14,fontWeight:800,fill:'#fff',fontFamily:'sans-serif'}}>🎲</text></svg>
   ),
   SHIB: (size) => (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#FFA409"/>

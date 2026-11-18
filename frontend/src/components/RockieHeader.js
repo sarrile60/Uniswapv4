@@ -125,13 +125,25 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                 <div className="header__left">
                   <div className="logo">
                     <Link className="light" to="/">
-                      <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#3772ff', letterSpacing: '-0.5px'}}>
-                        <span style={{color: '#3772ff'}}>&nbsp;</span> Rubic
+                      <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#3772ff', letterSpacing: '-0.5px', display:'flex', alignItems:'center', gap:'8px'}}>
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect x="1" y="1" width="12" height="12" rx="2" fill="#3772ff"/>
+                          <rect x="15" y="1" width="12" height="12" rx="2" fill="#f59e0b"/>
+                          <rect x="1" y="15" width="12" height="12" rx="2" fill="#22c55e"/>
+                          <rect x="15" y="15" width="12" height="12" rx="2" fill="#ef4444"/>
+                        </svg>
+                        Rubic
                       </span>
                     </Link>
                     <Link className="dark" to="/">
-                      <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px'}}>
-                        <span style={{color: '#3772ff'}}>&nbsp;</span> Rubic
+                      <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px', display:'flex', alignItems:'center', gap:'8px'}}>
+                        <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <rect x="1" y="1" width="12" height="12" rx="2" fill="#3772ff"/>
+                          <rect x="15" y="1" width="12" height="12" rx="2" fill="#f59e0b"/>
+                          <rect x="1" y="15" width="12" height="12" rx="2" fill="#22c55e"/>
+                          <rect x="15" y="15" width="12" height="12" rx="2" fill="#ef4444"/>
+                        </svg>
+                        Rubic
                       </span>
                     </Link>
                   </div>

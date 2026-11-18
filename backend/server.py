@@ -1,5 +1,5 @@
 """
-Uniswap V4 Wallet Platform - Main Server
+Rubic Platform - Main Server
 FastAPI backend with MongoDB
 """
 

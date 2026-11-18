@@ -149,8 +149,13 @@ const AdminLayout = () => {
           {/* Logo */}
           <div className="flex items-center justify-between p-4 border-b border-gray-800">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-lg">🦄</span>
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center overflow-hidden">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="1" y="1" width="12" height="12" rx="2" fill="#3772ff"/>
+                  <rect x="15" y="1" width="12" height="12" rx="2" fill="#f59e0b"/>
+                  <rect x="1" y="15" width="12" height="12" rx="2" fill="#22c55e"/>
+                  <rect x="15" y="15" width="12" height="12" rx="2" fill="#ef4444"/>
+                </svg>
               </div>
               <span className="text-white font-bold">Admin Panel</span>
             </div>

@@ -1,5 +1,5 @@
 """
-Database Models for Uniswap V4 Wallet Platform
+Database Models for Rubic Platform
 All models use MongoDB with motor async driver
 """
 
