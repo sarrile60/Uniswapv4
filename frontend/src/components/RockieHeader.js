@@ -126,12 +126,12 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                   <div className="logo">
                     <Link className="light" to="/">
                       <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#3772ff', letterSpacing: '-0.5px'}}>
-                        <span style={{color: '#3772ff'}}>&nbsp;</span> UV4 Platform
+                        <span style={{color: '#3772ff'}}>&nbsp;</span> Rubic
                       </span>
                     </Link>
                     <Link className="dark" to="/">
                       <span className="logo-text" style={{fontSize: '24px', fontWeight: 800, color: '#fff', letterSpacing: '-0.5px'}}>
-                        <span style={{color: '#3772ff'}}>&nbsp;</span> UV4 Platform
+                        <span style={{color: '#3772ff'}}>&nbsp;</span> Rubic
                       </span>
                     </Link>
                   </div>
@@ -183,7 +183,7 @@ const RockieHeader = ({ isLoggedIn = false, user = null, onLogout, darkMode = tr
                             <li className="menu-item"><Link to="/about">{t.nav_about}</Link></li>
                             <li className="menu-item"><Link to="/earn">{lang === 'it' ? 'Guadagna' : 'Earn'}</Link></li>
                             <li className="menu-item"><Link to="/learn">{lang === 'it' ? 'Impara' : 'Learn'}</Link></li>
-                            <li className="menu-item"><a href="mailto:info@u-swapv4.com">{t.nav_contact}</a></li>
+                            <li className="menu-item"><a href="mailto:info@rubic.cc">{t.nav_contact}</a></li>
                             <li className="menu-item"><Link to="/terms">{t.nav_faq}</Link></li>
                           </ul>
                         </li>

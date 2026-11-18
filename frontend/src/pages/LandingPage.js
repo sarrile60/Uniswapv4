@@ -520,7 +520,7 @@ const LandingPage = () => {
           <div className="row">
             <div className="col-xl-6 col-md-12">
               <div className="about_image">
-                <img className="img-main" src="/assets/images/layout/about-h1.png" alt="About UV4 Platform" />
+                <img className="img-main" src="/assets/images/layout/about-h1.png" alt="About Rubic" />
               </div>
             </div>
             <div className="col-xl-6 col-md-12">
@@ -618,11 +618,11 @@ const LandingPage = () => {
               <div className="col-xl-4 col-md-8">
                 <div className="info">
                   <Link to="/" className="logo">
-                    <span style={{fontSize: '20px', fontWeight: 800, color: '#fff'}}>UV4 Platform</span>
+                    <span style={{fontSize: '20px', fontWeight: 800, color: '#fff'}}>Rubic</span>
                   </Link>
                   <h6>{t.land_footerTalk}</h6>
                   <ul className="list">
-                    <li><p>info@u-swapv4.com</p></li>
+                    <li><p>info@rubic.cc</p></li>
                     <li><p>{t.land_footerSecure}</p></li>
                   </ul>
                 </div>
@@ -651,7 +651,7 @@ const LandingPage = () => {
                 <div className="widget-link s3">
                   <h6 className="title">{t.land_support}</h6>
                   <ul>
-                    <li><a href="mailto:info@u-swapv4.com">{t.land_helpCenter}</a></li>
+                    <li><a href="mailto:info@rubic.cc">{t.land_helpCenter}</a></li>
                     <li><Link to="/about">{t.land_about}</Link></li>
                     <li><Link to="/privacy">{t.land_privacyPolicy}</Link></li>
                   </ul>
@@ -663,7 +663,7 @@ const LandingPage = () => {
                   <ul>
                     <li><Link to="/about">{t.land_about}</Link></li>
                     <li><Link to="/terms">{t.land_termsOfService}</Link></li>
-                    <li><a href="mailto:info@u-swapv4.com">{t.land_contact}</a></li>
+                    <li><a href="mailto:info@rubic.cc">{t.land_contact}</a></li>
                   </ul>
                 </div>
               </div>

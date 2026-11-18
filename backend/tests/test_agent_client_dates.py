@@ -20,7 +20,7 @@ AGENT_USERNAME = "marco"
 AGENT_PASSWORD = "agent123"
 AGENT_PIN = "8971"
 
-ADMIN_EMAIL = "admin@u-swapv4.com"
+ADMIN_EMAIL = "admin@rubic.cc"
 ADMIN_PASSWORD = "admin123"
 
 

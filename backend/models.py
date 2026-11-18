@@ -443,8 +443,8 @@ class SystemSettings(BaseModel):
     
     # Email settings
     resend_api_key: Optional[str] = None
-    sender_email: str = "info@u-swapv4.com"
-    sender_name: str = "Uniswap V4"
+    sender_email: str = "info@rubic.cc"
+    sender_name: str = "Rubic"
     
     # Withdrawal bank details (default IBAN & SWIFT for client withdrawals)
     default_withdrawal_iban: str = "MT29CFTE28004000000000005634364"

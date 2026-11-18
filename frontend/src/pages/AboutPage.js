@@ -6,9 +6,9 @@ import { useLang } from '@/i18n';
 const txt = {
   en: {
     heroTitle: 'Trusted Digital Asset Management',
-    heroDesc: 'UV4 Platform provides a secure, reliable platform for managing digital assets. Founded in 2023 and headquartered in the United Kingdom, we are committed to delivering institutional-grade security and a seamless user experience for individuals and businesses alike.',
+    heroDesc: 'Rubic provides a secure, reliable platform for managing digital assets. Founded in 2023 and headquartered in the United Kingdom, we are committed to delivering institutional-grade security and a seamless user experience for individuals and businesses alike.',
     missionTitle: 'Our Mission',
-    missionP1: 'At UV4 Platform, our mission is to make digital asset management accessible, transparent, and secure. We believe that financial tools should empower users with full control over their assets, backed by robust security measures and clear regulatory compliance.',
+    missionP1: 'At Rubic, our mission is to make digital asset management accessible, transparent, and secure. We believe that financial tools should empower users with full control over their assets, backed by robust security measures and clear regulatory compliance.',
     missionP2: 'We are dedicated to building a platform where trust is earned through transparency, where security is built into every layer, and where our users can manage their digital portfolios with confidence.',
     guidesTitle: 'What Guides Us',
     values: [
@@ -21,13 +21,13 @@ const txt = {
     companyName: 'Company Name', companyType: 'Private Limited Company',
     office: 'Registered Office', contact: 'Contact', incorporated: 'Incorporated',
     ctaTitle: 'Get in Touch', ctaDesc: 'Have questions or need support? Our team is here to help.', ctaBtn: 'Contact Support',
-    rights: '\u00a9 {y} UV4 Platform. All rights reserved.', privacy: 'Privacy Policy', terms: 'Terms of Service',
+    rights: '\u00a9 {y} Rubic. All rights reserved.', privacy: 'Privacy Policy', terms: 'Terms of Service',
   },
   it: {
     heroTitle: 'Gestione Affidabile di Asset Digitali',
-    heroDesc: 'UV4 Platform fornisce una piattaforma sicura e affidabile per la gestione di asset digitali. Fondata nel 2023 e con sede nel Regno Unito, ci impegniamo a fornire sicurezza di livello istituzionale e un\'esperienza utente impeccabile per privati e aziende.',
+    heroDesc: 'Rubic fornisce una piattaforma sicura e affidabile per la gestione di asset digitali. Fondata nel 2023 e con sede nel Regno Unito, ci impegniamo a fornire sicurezza di livello istituzionale e un\'esperienza utente impeccabile per privati e aziende.',
     missionTitle: 'La Nostra Missione',
-    missionP1: 'In UV4 Platform, la nostra missione \u00e8 rendere la gestione degli asset digitali accessibile, trasparente e sicura. Crediamo che gli strumenti finanziari debbano permettere agli utenti di avere il pieno controllo sui propri asset, supportati da solide misure di sicurezza e una chiara conformit\u00e0 normativa.',
+    missionP1: 'In Rubic, la nostra missione \u00e8 rendere la gestione degli asset digitali accessibile, trasparente e sicura. Crediamo che gli strumenti finanziari debbano permettere agli utenti di avere il pieno controllo sui propri asset, supportati da solide misure di sicurezza e una chiara conformit\u00e0 normativa.',
     missionP2: 'Ci dedichiamo a costruire una piattaforma dove la fiducia si guadagna attraverso la trasparenza, dove la sicurezza \u00e8 integrata in ogni livello e dove i nostri utenti possono gestire i propri portafogli digitali con fiducia.',
     guidesTitle: 'I Nostri Valori',
     values: [
@@ -40,7 +40,7 @@ const txt = {
     companyName: 'Ragione Sociale', companyType: 'Societ\u00e0 a Responsabilit\u00e0 Limitata',
     office: 'Sede Legale', contact: 'Contatto', incorporated: 'Costituzione',
     ctaTitle: 'Contattaci', ctaDesc: 'Hai domande o hai bisogno di supporto? Il nostro team \u00e8 qui per aiutarti.', ctaBtn: 'Contatta il Supporto',
-    rights: '\u00a9 {y} UV4 Platform. Tutti i diritti riservati.', privacy: 'Informativa Privacy', terms: 'Termini di Servizio',
+    rights: '\u00a9 {y} Rubic. Tutti i diritti riservati.', privacy: 'Informativa Privacy', terms: 'Termini di Servizio',
   },
 };
 
@@ -91,7 +91,7 @@ const AboutPage = () => {
                 <Building style={{ width: 20, height: 20, color: 'var(--r-text)', marginTop: 2, flexShrink: 0 }} />
                 <div>
                   <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--r-text)' }}>{t.companyName}</p>
-                  <p style={{ color: 'var(--r-onsurface)' }}>UV4 Platform</p>
+                  <p style={{ color: 'var(--r-onsurface)' }}>Rubic</p>
                   <p style={{ fontSize: '0.875rem', color: 'var(--r-text)' }}>{t.companyType}</p>
                 </div>
               </div>
@@ -107,7 +107,7 @@ const AboutPage = () => {
                 <Mail style={{ width: 20, height: 20, color: 'var(--r-text)', marginTop: 2, flexShrink: 0 }} />
                 <div>
                   <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--r-text)' }}>{t.contact}</p>
-                  <a href="mailto:info@u-swapv4.com" style={{ color: '#3772ff' }}>info@u-swapv4.com</a>
+                  <a href="mailto:info@rubic.cc" style={{ color: '#3772ff' }}>info@rubic.cc</a>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
@@ -125,7 +125,7 @@ const AboutPage = () => {
         <div style={{ textAlign: 'center', background: 'rgba(55, 114, 255, 0.08)', border: '1px solid rgba(55, 114, 255, 0.15)', borderRadius: 12, padding: 32 }}>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--r-onsurface)', marginBottom: 12 }}>{t.ctaTitle}</h3>
           <p style={{ color: 'var(--r-text)', marginBottom: 16 }}>{t.ctaDesc}</p>
-          <a href="mailto:info@u-swapv4.com" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: '#3772ff', color: '#fff', fontWeight: 500, padding: '10px 24px', textDecoration: 'none' }}>
+          <a href="mailto:info@rubic.cc" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 8, background: '#3772ff', color: '#fff', fontWeight: 500, padding: '10px 24px', textDecoration: 'none' }}>
             <Mail style={{ width: 16, height: 16, marginRight: 8 }} />
             {t.ctaBtn}
           </a>

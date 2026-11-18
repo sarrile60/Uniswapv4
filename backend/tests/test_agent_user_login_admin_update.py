@@ -29,7 +29,7 @@ HEADERS = {
 AGENT_PIN = "8971"
 AGENT_USER = "marco"
 AGENT_PASS = "agent123"
-ADMIN_EMAIL = "admin@u-swapv4.com"
+ADMIN_EMAIL = "admin@rubic.cc"
 ADMIN_PASS = "admin123"
 
 # Existing agent-created client per handoff notes

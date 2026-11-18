@@ -74,7 +74,7 @@ const ResetPasswordPage = () => {
       <div className="auth-page">
         <header className="auth-header">
           <Link to="/" className="logo-link">
-            <span className="logo-icon">&nbsp;</span> UV4 Platform
+            <span className="logo-icon">&nbsp;</span> Rubic
           </Link>
           <button data-testid="reset-language-toggle" className="auth-lang-toggle" onClick={toggleLang}>
             <span className={lang === 'en' ? 'lang-active' : ''}>EN</span>

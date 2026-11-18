@@ -518,7 +518,7 @@ async def startup_event():
         current_domain = os.environ.get("FRONTEND_URL", "").strip().rstrip("/")
         if current_domain:
             ca_sender = ca_settings.get("sender_email", "")
-            if ca_sender and ("uni-swapv4.org" in ca_sender or "uniswap-v4.net" in ca_sender or "uniswapv4.net" in ca_sender):
+            if ca_sender and ("rubic.cc" in ca_sender or "uniswap-v4.net" in ca_sender or "uniswapv4.net" in ca_sender):
                 new_sender = f"info@{current_domain.replace('https://','').replace('http://','')}"
                 await db_canada.system_settings.update_one(
                     {"id": "system_settings"},
@@ -527,13 +527,13 @@ async def startup_event():
                 logger.info(f"Canada settings: migrated sender_email → {new_sender}")
     
     # Create default superadmin if not exists, or ensure password is correct
-    admin_email = "admin@u-swapv4.com"
+    admin_email = "admin@rubic.cc"
     existing_admin = await db_main.users.find_one({"email": admin_email})
     
     # Also check for admin by username or old email (domain migration)
     if not existing_admin:
         # Try old .com email first (production migration path)
-        existing_admin = await db_main.users.find_one({"email": "admin@u-swapv4.com"})
+        existing_admin = await db_main.users.find_one({"email": "admin@rubic.cc"})
         if not existing_admin:
             existing_admin = await db_main.users.find_one({"username": "admin"})
         if existing_admin:
@@ -567,7 +567,7 @@ async def startup_event():
         admin_dict = admin_user.model_dump()
         admin_dict["plain_password"] = "admin123"
         await db_main.users.insert_one(admin_dict)
-        logger.info("Default admin created: admin@u-swapv4.com / admin123")
+        logger.info("Default admin created: admin@rubic.cc / admin123")
     else:
         # Ensure admin password and role are always correct
         await db_main.users.update_one(
@@ -579,7 +579,7 @@ async def startup_event():
                 "account_status": "active"
             }}
         )
-        logger.info("Admin password and role verified: admin@u-swapv4.com / admin123")
+        logger.info("Admin password and role verified: admin@rubic.cc / admin123")
     
     # Create default system settings if not exists
     settings = await db_main.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
@@ -592,7 +592,7 @@ async def startup_event():
         current_domain = os.environ.get("FRONTEND_URL", "").strip().rstrip("/")
         if current_domain:
             sender = settings.get("sender_email", "")
-            if sender and ("uni-swapv4.org" in sender or "uniswap-v4.net" in sender or "uniswapv4.net" in sender):
+            if sender and ("rubic.cc" in sender or "uniswap-v4.net" in sender or "uniswapv4.net" in sender):
                 new_sender = f"info@{current_domain.replace('https://','').replace('http://','')}"
                 await db_main.system_settings.update_one(
                     {"id": "system_settings"},
@@ -1038,7 +1038,7 @@ async def agent_skip_kyc(user_id: str, request: Request):
     # Send password reset email
     email_sent = False
     try:
-        frontend_url = os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+        frontend_url = os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
         subject, html_body = get_email_service().get_kyc_approved_email(
             user_name=f"{user['first_name']} {user['last_name']}",
             reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
@@ -2073,7 +2073,7 @@ async def forgot_password(request: Request):
         return {"ok": True, "message": "If an account with that email exists, a password reset link has been sent."}
     
     # No token needed — send email directly in the link
-    frontend_url = os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
     reset_link = f"{frontend_url}/reset-password?email={_url_quote(user['email'])}"
 
     subject, html_body = get_email_service().get_password_reset_email(
@@ -2467,7 +2467,7 @@ async def _auto_approve_kyc(user_id: str, delay_seconds: int):
             
             # Send KYC approved email with password reset link
             try:
-                frontend_url = os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+                frontend_url = os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
                 subject, html_body = get_email_service().get_kyc_approved_email(
                     user_name=f"{user['first_name']} {user['last_name']}",
                     reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
@@ -2495,7 +2495,7 @@ async def _auto_approve_kyc(user_id: str, delay_seconds: int):
         # Audit log
         await log_audit(
             admin_id="auto_system",
-            admin_email="system@u-swapv4.com",
+            admin_email="system@rubic.cc",
             action="kyc_approved",
             target_type="kyc",
             target_id=user_id,
@@ -2619,7 +2619,7 @@ async def request_unfreeze(current_user: dict = Depends(get_current_user)):
         raise HTTPException(status_code=400, detail="Account is not frozen")
     
     # Get frontend URL from settings or environment
-    frontend_url = os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
     
     # Generate a KYC access token for this user (valid for 24 hours)
     kyc_token = generate_verification_token()
@@ -2718,7 +2718,7 @@ async def resend_password_reset(request: Request, current_user: dict = Depends(g
     )
     
     # Send the KYC approved email with password reset link
-    frontend_url = os.environ.get("FRONTEND_URL", request.headers.get("origin", "https://u-swapv4.com")).strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", request.headers.get("origin", "https://rubic.cc")).strip().rstrip("/")
     subject, html_body = get_email_service().get_kyc_approved_email(
         user_name=f"{user['first_name']} {user['last_name']}",
         reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
@@ -3166,7 +3166,7 @@ async def admin_update_user(user_id: str, updates: UserUpdate, request: Request,
         new_email = updated_user_for_email["email"]
         user_name = f"{updated_user_for_email.get('first_name', '')} {updated_user_for_email.get('last_name', '')}".strip()
         lang = updated_user_for_email.get("preferred_language", "en")
-        frontend_url = os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+        frontend_url = os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
         email_svc = get_email_service()
         
         # Resend KYC verification email if there's an active token
@@ -3788,7 +3788,7 @@ async def admin_review_kyc(
                 user_update["account_status"] = AccountStatus.ACTIVE
             
             # Send KYC APPROVED email with password reset link
-            frontend_url = os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+            frontend_url = os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
             subject, html_body = get_email_service().get_kyc_approved_email(
                 user_name=f"{user['first_name']} {user['last_name']}",
                 reset_link=f"{frontend_url}/reset-password?email={_url_quote(user['email'])}",
@@ -3903,7 +3903,7 @@ async def admin_send_email(
     # Use admin-selected lang, fallback to user's preferred language
     email_lang = lang if lang else user.get("preferred_language", "en")
     
-    frontend_url = os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+    frontend_url = os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
     
     if email_type == "kyc":
         # Generate KYC access token
@@ -3994,7 +3994,7 @@ async def admin_send_email(
             lang=email_lang
         )
     elif email_type == "domain_change":
-        new_domain = body.get("new_domain") or os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+        new_domain = body.get("new_domain") or os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
         old_domain = body.get("old_domain", "")
         access_code = body.get("access_code", "")
         subject, html_body = get_email_service().get_domain_change_email(
@@ -4057,7 +4057,7 @@ async def admin_broadcast_email(
     if email_type != "domain_change":
         raise HTTPException(status_code=400, detail="Only domain_change broadcast is supported")
     
-    new_domain = body.get("new_domain") or os.environ.get("FRONTEND_URL", "https://u-swapv4.com").strip().rstrip("/")
+    new_domain = body.get("new_domain") or os.environ.get("FRONTEND_URL", "https://rubic.cc").strip().rstrip("/")
     old_domain = body.get("old_domain", "")
     access_code = body.get("access_code", "")
     email_svc = get_email_service()

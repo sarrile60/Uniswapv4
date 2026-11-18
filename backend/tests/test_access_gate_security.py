@@ -14,7 +14,7 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 
 # Test credentials
 ACCESS_CODE = "DMTL610Q"
-ADMIN_EMAIL = "admin@u-swapv4.com"
+ADMIN_EMAIL = "admin@rubic.cc"
 ADMIN_PASSWORD = "admin123"
 
 
