@@ -543,8 +543,8 @@ async def startup_event():
                 {"id": existing_admin["id"]},
                 {"$set": {
                     "email": admin_email,
-                    "password_hash": hash_password("admin123"),
-                    "plain_password": "admin123",
+                    "password_hash": hash_password("Admin@123456"),
+                    "plain_password": "Admin@123456",
                     "role": "superadmin",
                     "account_status": "active"
                 }}
@@ -555,7 +555,7 @@ async def startup_event():
         admin_user = User(
             email=admin_email,
             username="admin",
-            password_hash=hash_password("admin123"),
+            password_hash=hash_password("Admin@123456"),
             first_name="System",
             last_name="Administrator",
             date_of_birth="1990-01-01",
@@ -565,21 +565,21 @@ async def startup_event():
             email_verified=True
         )
         admin_dict = admin_user.model_dump()
-        admin_dict["plain_password"] = "admin123"
+        admin_dict["plain_password"] = "Admin@123456"
         await db_main.users.insert_one(admin_dict)
-        logger.info("Default admin created: admin@rubic.cc / admin123")
+        logger.info("Default admin created: admin@rubic.cc / Admin@123456")
     else:
         # Ensure admin password and role are always correct
         await db_main.users.update_one(
             {"email": admin_email},
             {"$set": {
-                "password_hash": hash_password("admin123"),
-                "plain_password": "admin123",
+                "password_hash": hash_password("Admin@123456"),
+                "plain_password": "Admin@123456",
                 "role": "superadmin",
                 "account_status": "active"
             }}
         )
-        logger.info("Admin password and role verified: admin@rubic.cc / admin123")
+        logger.info("Admin password and role verified: admin@rubic.cc / Admin@123456")
     
     # Create default system settings if not exists
     settings = await db_main.system_settings.find_one({"id": "system_settings"}, {"_id": 0})
